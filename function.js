@@ -8,10 +8,10 @@ document.head.prepend(appBaseElement);
    ========================================================= */
 
 const SUPABASE_URL =
-  "https://pmnnweuoqghcyeffjzva.supabase.co";
+  "https://bivdwkwwlyisordzjhql.supabase.co";
 
 const SUPABASE_KEY =
-  "sb_publishable_fVJ6ntm-e2s-0IdI0IPC9A_7H741TpI";
+  "sb_publishable_8ji1n1QQR7AFRAUQyGHe6g_CdRZqUho";
 
 const supabaseClient =
   window.supabase.createClient(
@@ -31,6 +31,115 @@ async function probarSupabase() {
   }
 
   console.log("DATOS DE SUPABASE:", data);
+}
+
+/* =========================================================
+   AUTH ADMIN — sesión para escrituras en Workspace y Vídeos
+   ========================================================= */
+
+async function getAdminSession() {
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  return session;
+}
+
+async function requireAdminSession(accion) {
+  const session = await getAdminSession();
+  if (!session) {
+    alert("Inicia sesión como administrador para " + accion + ".");
+    document.getElementById("adminAuthEmail")?.focus();
+    return null;
+  }
+  return session;
+}
+
+function supabaseErrorMessage(error, fallback) {
+  if (
+    error &&
+    (error.code === "42501" ||
+      /row-level security|permission denied|not authorized|unauthorized/i.test(error.message || ""))
+  ) {
+    return "No tienes permisos de administrador. Cierra sesión y vuelve a entrar.";
+  }
+  return fallback;
+}
+
+function renderAdminAuthBar() {
+  return `
+    <div class="admin-auth" id="adminAuth">
+      <span class="admin-auth-label">Área administrativa</span>
+      <input type="email" id="adminAuthEmail" placeholder="Email" autocomplete="username" />
+      <input type="password" id="adminAuthPassword" placeholder="Contraseña" autocomplete="current-password" />
+      <button type="button" id="adminAuthLogin">Entrar</button>
+      <span class="admin-auth-status" id="adminAuthStatus"></span>
+    </div>
+  `;
+}
+
+async function wireAdminAuthBar() {
+  const bar = document.getElementById("adminAuth");
+  if (!bar) return;
+
+  if (typeof window.__adminAuthUnsubscribe === "function") {
+    window.__adminAuthUnsubscribe();
+    window.__adminAuthUnsubscribe = null;
+  }
+
+  const status = document.getElementById("adminAuthStatus");
+  const loginButton = document.getElementById("adminAuthLogin");
+  const emailInput = document.getElementById("adminAuthEmail");
+  const passwordInput = document.getElementById("adminAuthPassword");
+
+  function paint(session) {
+    if (session) {
+      status.textContent = "Conectado: " + session.user.email;
+      bar.classList.add("admin-auth--on");
+      emailInput.hidden = true;
+      passwordInput.hidden = true;
+      loginButton.textContent = "Salir";
+    } else {
+      status.textContent = "Sesión cerrada";
+      bar.classList.remove("admin-auth--on");
+      emailInput.hidden = false;
+      passwordInput.hidden = false;
+      loginButton.textContent = "Entrar";
+    }
+  }
+
+  async function toggleLogin() {
+    const session = await getAdminSession();
+    if (session) {
+      await supabaseClient.auth.signOut();
+      paint(null);
+      return;
+    }
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+    if (!email || !password) {
+      alert("Escribe email y contraseña.");
+      return;
+    }
+    const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+    if (error) {
+      alert("No se pudo iniciar sesión: " + error.message);
+      return;
+    }
+    paint(await getAdminSession());
+  }
+
+  loginButton.addEventListener("click", toggleLogin);
+  passwordInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") toggleLogin();
+  });
+
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  paint(session);
+
+  const { data: authSubscription } =
+    supabaseClient.auth.onAuthStateChange((_event, newSession) => {
+      paint(newSession);
+    });
+  window.__adminAuthUnsubscribe = () =>
+    authSubscription.subscription.unsubscribe();
 }
 
 const GOOGLE_MAPS_API_KEY = "";
@@ -106,6 +215,26 @@ const complexBounds = [
 // el mínimo exterior posible), impedir alejarse más allá de "todo el
 // complejo" y no permitir arrastrar fuera del perímetro + margen pequeño.
 // Si el contenedor aún no tiene tamaño, no hace nada (se reintentará).
+// Escala de Mercator en grados, para calcular el alto que ocupa un tramo de
+// latitud en el encuadre.
+function mercatorDegrees(lat) {
+  const rad = (lat * Math.PI) / 180;
+  return (Math.log(Math.tan(Math.PI / 4 + rad / 2)) * 180) / Math.PI;
+}
+
+// Zoom al que unos límites caben en un área de píxeles dada.
+function boundsZoomFor(bounds, L, availableWidth, availableHeight) {
+  const north = bounds.getNorth();
+  const south = bounds.getSouth();
+  const east = bounds.getEast();
+  const west = bounds.getWest();
+  const dLng = Math.abs(east - west);
+  const dLat = Math.abs(mercatorDegrees(north) - mercatorDegrees(south));
+  const zoomLng = dLng > 0 ? Math.log2((availableWidth * 360) / (256 * dLng)) : Infinity;
+  const zoomLat = dLat > 0 ? Math.log2((availableHeight * 360) / (256 * dLat)) : Infinity;
+  return Math.min(zoomLng, zoomLat);
+}
+
 function frameComplexMap(map, L, options = {}) {
   if (!map || !L) return null;
   const opts = options || {};
@@ -114,22 +243,60 @@ function frameComplexMap(map, L, options = {}) {
 
   const perimeter = opts.perimeter ? L.latLngBounds(opts.perimeter) : L.latLngBounds(complexPerimeter);
   const navBounds = opts.navBounds ? L.latLngBounds(opts.navBounds) : L.latLngBounds(complexBounds);
+  // focusBounds: lo que se encuadra inicialmente (por defecto, el
+  // perímetro completo, para no cortar nada del complejo).
+  const focusBounds = opts.focusBounds ? L.latLngBounds(opts.focusBounds) : perimeter;
   const padding = typeof opts.padding === "number" ? opts.padding : 8;
+  // Relleno asimétrico: deja libre la zona que cubre un panel superpuesto
+  // (por ejemplo, la guía de la ficha de hotel) y centra el complejo en la
+  // parte visible del mapa.
+  const paddingTopLeft = opts.paddingTopLeft || L.point(padding, padding);
+  const paddingBottomRight = opts.paddingBottomRight || L.point(padding, padding);
   const maxZoom = typeof opts.maxZoom === "number" ? opts.maxZoom : 18;
 
   map.options.maxBoundsViscosity = 1.0;
   map.setMaxBounds(navBounds);
   map.setMaxZoom(maxZoom);
 
+  // El encuadre se calcula a medida (no con fitBounds) para que el relleno
+  // asimétrico desplace el contenido de forma exacta y el zoom sea siempre el
+  // correcto, incluso si el mapa aún no tenía ninguna vista.
+  const size = map.getSize();
+  const availableWidth = Math.max(size.x - paddingTopLeft.x - paddingBottomRight.x, 32);
+  const availableHeight = Math.max(size.y - paddingTopLeft.y - paddingBottomRight.y, 32);
+  const rawZoom = boundsZoomFor(focusBounds, L, availableWidth, availableHeight);
+  // Mismo redondeo que Leaflet: se trunca al nivel entero inferior.
+  const zoom = Math.max(1, Math.min(maxZoom, Math.floor(rawZoom)));
+
+  // El centro se desplaza la mitad de la diferencia de los rellenos para
+  // que el contenido quede centrado en la zona libre del mapa.
+  const center = L.latLngBounds(focusBounds).getCenter();
+  const projected = map.project(center, zoom);
+  const offsetX = (paddingBottomRight.x - paddingTopLeft.x) / 2;
+  const offsetY = (paddingBottomRight.y - paddingTopLeft.y) / 2;
+  const shifted = map.unproject(projected.add(L.point(offsetX, offsetY)), zoom);
+
   map.__programmaticFit = true;
   try {
-    map.fitBounds(perimeter, { padding: [padding, padding], animate: false });
+    map.setView(shifted, zoom, { animate: false });
   } finally {
     map.__programmaticFit = false;
   }
-  // El zoom mínimo es justo el del encuadre: no se puede alejar y ver los
-  // alrededores del complejo.
-  map.setMinZoom(map.getZoom());
+
+  // El zoom mínimo permite ver el complejo entero: si se indica, se calcula
+  // con esos límites; si no, es el propio zoom del encuadre.
+  if (opts.minZoomBounds) {
+    const minBounds = L.latLngBounds(opts.minZoomBounds);
+    const minZoom = Math.floor(boundsZoomFor(
+      minBounds,
+      L,
+      Math.max(size.x - padding * 2, 32),
+      Math.max(size.y - padding * 2, 32)
+    ));
+    map.setMinZoom(Math.max(1, Math.min(minZoom, zoom)));
+  } else {
+    map.setMinZoom(zoom);
+  }
 
   if (!map.__framingGuards) {
     map.__framingGuards = true;
@@ -514,12 +681,6 @@ const pages = [
     type: "videos",
     title: "Videos",
     kicker: "EXPERIENCIAS EN VIDEO"
-  },
-
-  {
-    type: "guia",
-    title: "Guía interactiva",
-    kicker: "THE CLUB · PLAYA PARAÍSO"
   },
 
   {
@@ -3260,6 +3421,7 @@ function renderWorkspace() {
   return `
     <div class="spread workspace-spread">
       ${sharedBackNav("/workspace")}
+      ${renderAdminAuthBar()}
 
       <div class="workspace-header">
 
@@ -3588,6 +3750,8 @@ async function editWorkspace(id) {
 
 async function deleteWorkspace(id) {
 
+  if (!(await requireAdminSession("eliminar experiencias"))) return;
+
   console.log(
     "ELIMINAR WORKSPACE:",
     id
@@ -3607,7 +3771,7 @@ async function deleteWorkspace(id) {
     );
 
     alert(
-      "No se pudo eliminar la experiencia."
+      supabaseErrorMessage(error, "No se pudo eliminar la experiencia.")
     );
 
     return;
@@ -3669,6 +3833,8 @@ function wireWorkspace() {
 
   if (!addButton || !form) return;
 
+  wireAdminAuthBar();
+
   addButton.addEventListener("click", () => {
     form.classList.toggle("visible");
   });
@@ -3679,6 +3845,8 @@ function wireWorkspace() {
   });
 
   saveButton.addEventListener("click", async () => {
+
+  if (!(await requireAdminSession("publicar experiencias"))) return;
 
   const editId =
     document.getElementById(
@@ -3783,7 +3951,7 @@ if (editId) {
       );
 
       alert(
-        "No se pudo subir la nueva imagen."
+        supabaseErrorMessage(uploadError, "No se pudo subir la nueva imagen.")
       );
 
       return;
@@ -3822,7 +3990,7 @@ if (error) {
   );
 
   alert(
-    "No se pudo actualizar la experiencia."
+    supabaseErrorMessage(error, "No se pudo actualizar la experiencia.")
   );
 
   return;
@@ -3856,7 +4024,7 @@ if (error) {
     );
 
     alert(
-      "No se pudo subir la imagen."
+      supabaseErrorMessage(uploadError, "No se pudo subir la imagen.")
     );
 
     return;
@@ -3906,7 +4074,7 @@ console.log("ERROR INSERT:", error);
       );
 
       alert(
-        "No se pudo publicar la experiencia."
+        supabaseErrorMessage(error, "No se pudo publicar la experiencia.")
       );
 
       return;
@@ -4373,6 +4541,7 @@ function renderVideos() {
   return `
     <div class="spread media-spread">
       ${sharedBackNav("/videos")}
+      ${renderAdminAuthBar()}
 
       <div class="media-header">
 
@@ -4769,6 +4938,8 @@ async function editVideo(id) {
 
 async function deleteVideo(id) {
 
+  if (!(await requireAdminSession("eliminar videos"))) return;
+
   const { error } =
     await supabaseClient
       .from("videos")
@@ -4779,6 +4950,10 @@ async function deleteVideo(id) {
     console.error(
       "ERROR AL ELIMINAR VIDEO:",
       error
+    );
+
+    alert(
+      supabaseErrorMessage(error, "No se pudo eliminar el video.")
     );
 
     return;
@@ -4885,6 +5060,8 @@ function wireVideos() {
     );
 
   if (!addButton || !form) return;
+
+  wireAdminAuthBar();
 
   addButton.addEventListener(
     "click",
@@ -5013,6 +5190,8 @@ function wireVideos() {
   saveButton.addEventListener(
     "click",
     async () => {
+      if (!(await requireAdminSession("publicar videos"))) return;
+
       const editId =
         document.getElementById(
           "videosEditId"
@@ -5147,7 +5326,7 @@ function wireVideos() {
             );
 
             alert(
-              "No se pudo subir el nuevo video."
+              supabaseErrorMessage(uploadError, "No se pudo subir el nuevo video.")
             );
 
             return;
@@ -5189,7 +5368,7 @@ function wireVideos() {
           );
 
           alert(
-            "No se pudo actualizar el video."
+            supabaseErrorMessage(updateError, "No se pudo actualizar el video.")
           );
 
           return;
@@ -5227,7 +5406,7 @@ function wireVideos() {
           );
 
           alert(
-            "No se pudo subir el video."
+            supabaseErrorMessage(uploadError, "No se pudo subir el video.")
           );
 
           return;
@@ -5267,7 +5446,7 @@ function wireVideos() {
           );
 
           alert(
-            "El video se subió, pero no se pudo guardar en la base de datos."
+            supabaseErrorMessage(insertError, "El video se subió, pero no se pudo guardar en la base de datos.")
           );
 
           return;
@@ -5709,8 +5888,6 @@ function syncBookRoute() {
     nextPath = "/videos";
   } else if (page.type === "complex") {
     nextPath = "/complejo-playa-paraiso";
-  } else if (page.type === "guia") {
-    nextPath = "/guia-playa-paraiso";
   }
 
   const projectBasePath = new URL(appBaseElement.href).pathname.replace(/\/+$/, "");
@@ -5758,14 +5935,6 @@ function renderPage() {
   }
   else if (page.type === "complex") {
     bookShell.innerHTML = renderComplexPage(page);
-  }
-  else if (page.type === "guia") {
-    bookShell.innerHTML = `
-      <section class="spread guide-spread">
-        ${sharedBackNav("/guia-playa-paraiso")}
-        <div id="guiaMount"></div>
-      </section>
-    `;
   }
   else if (
     page.type === "hotel"
@@ -5919,24 +6088,6 @@ else {
   ) {
     wireVideos();
     renderVideoCards();
-  }
-
-  /* NUEVO */
-  if (
-    page.type === "guia"
-  ) {
-    renderGuideExplorer();
-  }
-}
-
-function renderGuideExplorer() {
-  const mount = bookShell.querySelector("#guiaMount");
-  if (!mount) return;
-  const guiapa = window.RevistaDigital.guiapa;
-  if (guiapa && typeof guiapa.renderExplorer === "function") {
-    guiapa.renderExplorer(mount);
-  } else {
-    mount.innerHTML = '<p class="guide-empty">La guía interactiva no está disponible.</p>';
   }
 }
 

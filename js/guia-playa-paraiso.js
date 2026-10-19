@@ -263,8 +263,66 @@
     }
   })();
 
+  // --- Datos operativos: horarios, cartas, tratamientos y paquetes -------
+  // Se leen del módulo de datos del complejo (js/datos-complejo.js). Cada POI
+  // recibe sus horarios según el tipo de servicio y su carta o lista de
+  // tratamientos, listos para mostrarse en la ficha.
+  (function applyOperationalData() {
+    var datos = window.RevistaDigital.datosComplejo || {};
+    var horarios = datos.HORARIOS || {};
+    var servicios = datos.SERVICIOS || {};
+    var catalogo = {};
+    var key;
+
+    for (key in (datos.RESTAURANTES || {})) catalogo[key] = datos.RESTAURANTES[key];
+    for (key in (datos.BARES || {})) catalogo[key] = datos.BARES[key];
+    for (key in (datos.SERVICIOS || {})) catalogo[key] = datos.SERVICIOS[key];
+
+    function formato(horario) {
+      if (!horario) return "";
+      var partes = [];
+      if (horario.breakfast) partes.push("Desayuno " + horario.breakfast);
+      if (horario.lunch) partes.push("Comida " + horario.lunch);
+      if (horario.dinner) partes.push("Cena " + horario.dinner);
+      if (horario.late) partes.push("Bar " + horario.late);
+      if (horario.hours) partes.push(horario.hours);
+      return partes.join(" · ");
+    }
+
+    for (var i = 0; i < POIS.length; i += 1) {
+      var poi = POIS[i];
+      var entry = catalogo[poi.id];
+      if (!entry) {
+        // Spa y golf genéricos del complejo.
+        if (poi.category === "spa") entry = servicios.spa;
+        else if (poi.category === "golf") entry = servicios.golf;
+        else if (poi.category === "piscina") entry = servicios.piscina;
+      }
+      if (!entry) continue;
+
+      var tipo = entry.tipo;
+      var horario = tipo ? horarios[tipo] : null;
+      if (horario) {
+        poi.hours = formato(horario);
+        if (horario.breakfast) poi.breakfast = horario.breakfast;
+        if (horario.lunch) poi.lunch = horario.lunch;
+        if (horario.dinner) poi.dinner = horario.dinner;
+        if (horario.late) poi.late = horario.late;
+        if (horario.hours) poi.hours = horario.hours;
+      }
+      // Servicios con horario propio (spa, golf, piscinas): se respeta el
+      // que viene en el catálogo de datos.
+      if (!poi.hours && entry.hours) poi.hours = entry.hours;
+      if (entry.cuisine) poi.cuisine = entry.cuisine;
+      if (entry.carta) poi.menu = entry.carta;
+      if (entry.treatments) poi.treatments = entry.treatments;
+      if (entry.packages) poi.packages = entry.packages;
+    }
+  })();
+
   window.RevistaDigital.guiapa.POIS = POIS;
   window.RevistaDigital.guiapa.CATEGORIES = CATEGORIES;
+  window.RevistaDigital.guiapa.ACTIVIDADES = (window.RevistaDigital.datosComplejo || {}).ACTIVIDADES || [];
 })();
 
 // Minimal helpers for portal integration
@@ -428,6 +486,85 @@
     return null;
   }
 
+  // --- Zona visible del mapa cuando hay un panel superpuesto --------------
+  // La guía se dibuja encima del mapa del complejo. Para que un lugar
+  // seleccionado no quede escondido bajo el panel, se calcula la diferencia
+  // entre el centro del mapa y el centro de la parte libre.
+  function visibleOffset(map) {
+    var panel = document.querySelector("[data-guide-overlay]");
+    if (!panel || !map || typeof map.getContainer !== "function") return null;
+    if (panel.getAttribute("data-guide-collapsed") === "1") return null;
+    var mapRect = map.getContainer().getBoundingClientRect();
+    var panelRect = panel.getBoundingClientRect();
+    if (!mapRect.width || !mapRect.height || !panelRect.width) return null;
+    // El panel solo desplaza la vista si se solapa con el mapa.
+    var overlaps = panelRect.left < mapRect.right - 4 && panelRect.right > mapRect.left + 4 &&
+      panelRect.top < mapRect.bottom - 4 && panelRect.bottom > mapRect.top + 4;
+    if (!overlaps) return null;
+    var free = {
+      left: mapRect.left,
+      right: mapRect.right,
+      top: mapRect.top,
+      bottom: mapRect.bottom
+    };
+    // Margen de 30 px: el panel se apoya con 14 px de separación.
+    var margin = 30;
+    var coversLeft = panelRect.left - mapRect.left < margin;
+    var coversRight = mapRect.right - panelRect.right < margin;
+    var coversTop = panelRect.top - mapRect.top < margin;
+    var coversBottom = mapRect.bottom - panelRect.bottom < margin;
+    if (coversLeft && coversRight) {
+      // Hoja superior o inferior a todo el ancho.
+      if (coversBottom) free.bottom = Math.min(free.bottom, panelRect.top);
+      else if (coversTop) free.top = Math.max(free.top, panelRect.bottom);
+    } else if (coversTop && coversBottom) {
+      // Panel lateral a todo el alto.
+      if (coversLeft) free.left = Math.max(free.left, panelRect.right);
+      else if (coversRight) free.right = Math.min(free.right, panelRect.left);
+    } else {
+      if (coversLeft) free.left = Math.max(free.left, panelRect.right);
+      else if (coversRight) free.right = Math.min(free.right, panelRect.left);
+      if (coversTop) free.top = Math.max(free.top, panelRect.bottom);
+      else if (coversBottom) free.bottom = Math.min(free.bottom, panelRect.top);
+    }
+    var dx = (free.left + free.right) / 2 - (mapRect.left + mapRect.right) / 2;
+    var dy = (free.top + free.bottom) / 2 - (mapRect.top + mapRect.bottom) / 2;
+    if (!dx && !dy) return null;
+    return { x: dx, y: dy };
+  }
+
+  // Centra una coordenada en la parte visible del mapa (fuera del panel).
+  function focusOn(map, latlng, zoom) {
+    if (!map || typeof map.setView !== "function") return;
+    var offset = visibleOffset(map);
+    if (!offset || !window.L) {
+      map.setView(latlng, zoom, { animate: false });
+      return;
+    }
+    try {
+      var projected = map.project(window.L.latLng(latlng), zoom);
+      var shifted = map.unproject(projected.subtract(window.L.point(offset.x, offset.y)), zoom);
+      map.setView(shifted, zoom, { animate: false });
+    } catch (e) {
+      map.setView(latlng, zoom, { animate: false });
+    }
+  }
+
+  // Si el mapa queda fuera de la pantalla (móvil), se trae a la vista.
+  function revealMap(map) {
+    if (!map || typeof map.getContainer !== "function") return;
+    var rect = map.getContainer().getBoundingClientRect();
+    var visible = rect.bottom > 90 && rect.top < window.innerHeight - 20;
+    if (visible) return;
+    try {
+      map.getContainer().scrollIntoView({ behavior: "smooth", block: "center" });
+    } catch (e) { /* ignore */ }
+  }
+
+  gp.visibleOffset = visibleOffset;
+  gp.focusOn = focusOn;
+  gp.revealMap = revealMap;
+
   function includedPois() {
     return (gp.POIS || []).filter(function (p) { return p && p.external !== true; });
   }
@@ -458,7 +595,7 @@
     });
   }
 
-  var state = { mount: null, filter: "all", query: "", selectedId: null };
+  var state = { mount: null, filter: "all", query: "", selectedId: null, legendMount: null };
 
   function categoryChips() {
     var chips = ['<button type="button" class="guide-chip is-active" data-guide-filter="all" aria-pressed="true">Todos <span>' + includedPois().length + "</span></button>"];
@@ -476,11 +613,9 @@
   }
 
   function renderLegend() {
-    if (!state.mount) return;
-    var legend = state.mount.querySelector("#guideLegend");
+    var legend = state.legendMount || (state.mount && state.mount.querySelector("#guideLegend"));
     if (legend) legend.innerHTML = legendMarkup();
   }
-
   function renderList() {
     if (!state.mount) return;
     var list = state.mount.querySelector("#guideList");
@@ -555,8 +690,9 @@
       // encuadrar toda la ruta; el usuario puede alejar con los controles.
       map.stop();
       var focusZoom = Math.max(map.getZoom() || 16, 16);
-      map.setView([poi.lat, poi.lng], focusZoom, { animate: false });
+      focusOn(map, [poi.lat, poi.lng], focusZoom);
       gp._userFocusedMap = map;
+      revealMap(map);
     } catch (e) { /* ignore */ }
   }
 
@@ -661,6 +797,21 @@
     var isArea = poi.kind === "area";
     if (isArea) source = "Plano oficial (área)";
     var actions;
+    // Botones de reserva: disponibles en toda ficha de restaurante, spa o
+    // golf, estén o no verificados todavía. Quedan colocados y listos para
+    // conectarse cuando se disponga del contacto.
+    var bookingActions = (function(){
+      var cat = poi.category;
+      if (cat === "restaurante" || cat === "spa" || cat === "golf") {
+        var label = cat === "restaurante" ? "Reservar" : (cat === "spa" ? "Reservar cita" : "Reservar tee time");
+        var html = '<button type="button" class="guide-book" data-id="' + escapeHtml(poi.id) + '" data-cat="' + cat + '">' + label + "</button>";
+        if (cat === "golf") {
+          html += '<button type="button" class="guide-cart" data-id="' + escapeHtml(poi.id) + '">Solicitar carrito</button>';
+        }
+        return html;
+      }
+      return "";
+    })();
     if (isArea) {
       actions = '<p class="guide-detail-desc">Se representa como <strong>área/etiqueta</strong> en el mapa: no es una instalación con ruta.</p>' +
         '<div class="guide-detail-actions"><button type="button" class="guide-focus" data-id="' + escapeHtml(poi.id) + '">Ver en el mapa</button></div>';
@@ -668,9 +819,59 @@
       actions = '<div class="guide-detail-actions">' +
         '<button type="button" class="guide-focus" data-id="' + escapeHtml(poi.id) + '">Ver en el mapa</button>' +
         '<button type="button" class="guide-route" data-id="' + escapeHtml(poi.id) + '">Cómo llegar</button>' +
+        bookingActions +
         "</div>";
     } else {
-      actions = '<p class="guide-pending-note">Ubicación pendiente de verificación: no se muestra en el mapa ni ofrece ruta.</p>';
+      actions = '<p class="guide-pending-note">Ubicación pendiente de verificación: no se muestra en el mapa ni ofrece ruta.</p>' +
+        (bookingActions ? '<div class="guide-detail-actions">' + bookingActions + "</div>" : "");
+    }
+    var extraInfo = "";
+    // Desglose de horarios por servicio (desayuno / comida / cena / bar).
+    var scheduleRows = "";
+    if (poi.breakfast) scheduleRows += '<p class="guide-detail-row"><strong>Desayuno</strong> ' + escapeHtml(poi.breakfast) + "</p>";
+    if (poi.lunch) scheduleRows += '<p class="guide-detail-row"><strong>Comida</strong> ' + escapeHtml(poi.lunch) + "</p>";
+    if (poi.dinner) scheduleRows += '<p class="guide-detail-row"><strong>Cena</strong> ' + escapeHtml(poi.dinner) + "</p>";
+    if (poi.late) scheduleRows += '<p class="guide-detail-row"><strong>Bar</strong> ' + escapeHtml(poi.late) + "</p>";
+
+    if (poi.category === "restaurante") {
+      var hours = poi.hours || "Consultar horario en recepción";
+      var cuisine = poi.cuisine || "Cocina internacional";
+      extraInfo = '<div class="guide-extra-info">' +
+        '<p class="guide-detail-row"><strong>Horario</strong> ' + escapeHtml(hours) + "</p>" +
+        scheduleRows +
+        '<p class="guide-detail-row"><strong>Cocina</strong> ' + escapeHtml(cuisine) + "</p>" +
+        (poi.menu ? '<p class="guide-detail-row"><strong>Menú</strong> ' + escapeHtml(poi.menu) + "</p>" : "") +
+        "</div>";
+    } else if (poi.category === "spa") {
+      var spaHours = poi.hours || "09:00 - 19:00";
+      var treatments = poi.treatments || "Masajes, tratamientos faciales, envolturas corporales";
+      extraInfo = '<div class="guide-extra-info">' +
+        '<p class="guide-detail-row"><strong>Horario</strong> ' + escapeHtml(spaHours) + "</p>" +
+        '<p class="guide-detail-row"><strong>Tratamientos</strong> ' + escapeHtml(treatments) + "</p>" +
+        (poi.packages ? '<p class="guide-detail-row"><strong>Paquetes</strong> ' + escapeHtml(poi.packages) + "</p>" : "") +
+        "</div>";
+    } else if (poi.category === "golf") {
+      var golfHours = poi.hours || "07:00 - 18:00";
+      var golfPackages = poi.packages || "Green fee, alquiler de equipo, clases";
+      extraInfo = '<div class="guide-extra-info">' +
+        '<p class="guide-detail-row"><strong>Horario</strong> ' + escapeHtml(golfHours) + "</p>" +
+        '<p class="guide-detail-row"><strong>Tee times</strong> Disponibles desde las 07:00</p>' +
+        '<p class="guide-detail-row"><strong>Paquetes</strong> ' + escapeHtml(golfPackages) + "</p>" +
+        "</div>";
+    } else if (poi.category === "bar") {
+      extraInfo = '<div class="guide-extra-info">' +
+        '<p class="guide-detail-row"><strong>Horario</strong> ' + escapeHtml(poi.hours || "11:00 - 01:00") + "</p>" +
+        scheduleRows +
+        (poi.cuisine ? '<p class="guide-detail-row"><strong>Concepto</strong> ' + escapeHtml(poi.cuisine) + "</p>" : "") +
+        (poi.menu ? '<p class="guide-detail-row"><strong>Carta</strong> ' + escapeHtml(poi.menu) + "</p>" : "") +
+        "</div>";
+    } else if (poi.hours || poi.menu || poi.packages) {
+      extraInfo = '<div class="guide-extra-info">' +
+        (poi.hours ? '<p class="guide-detail-row"><strong>Horario</strong> ' + escapeHtml(poi.hours) + "</p>" : "") +
+        (poi.cuisine ? '<p class="guide-detail-row"><strong>Concepto</strong> ' + escapeHtml(poi.cuisine) + "</p>" : "") +
+        (poi.menu ? '<p class="guide-detail-row"><strong>Carta</strong> ' + escapeHtml(poi.menu) + "</p>" : "") +
+        (poi.packages ? '<p class="guide-detail-row"><strong>Paquetes</strong> ' + escapeHtml(poi.packages) + "</p>" : "") +
+        "</div>";
     }
     detail.innerHTML = '<span class="guide-dot guide-dot--lg" style="background:' + categoryColor(poi.category) + '"></span>' +
       '<h3 class="guide-detail-title">' + escapeHtml(poi.name) + "</h3>" +
@@ -679,9 +880,61 @@
       zone +
       '<p class="guide-detail-row"><strong>Fuente</strong> ' + escapeHtml(source) + "</p>" +
       '<p class="guide-detail-row"><strong>Estado</strong> ' + (isArea ? "Área geográfica" : (verified ? "Verificado" : "Pendiente de verificación")) + "</p>" +
+      extraInfo +
       actions +
-      '<div class="guide-route-box" id="guideRouteBox" role="status" aria-live="polite"></div>';
+      '<div class="guide-route-box" id="guideRouteBox" role="status" aria-live="polite"></div>' +
+      '<div class="guide-book-box" id="guideBookBox"></div>';
     renderRouteStatus();
+  }
+
+  // Pantallas de reserva y de solicitud de carrito. Quedan preparadas para
+  // conectarse al sistema de reservas; por ahora capturan la solicitud y
+  // avisan que se confirmará en recepción.
+  function renderBookingPanel(poi, kind) {
+    var box = state.mount && state.mount.querySelector("#guideBookBox");
+    if (!box || !poi) return;
+    var isCart = kind === "cart";
+    var title = isCart
+      ? "Solicitud de carrito de golf"
+      : (poi.category === "restaurante" ? "Reservar mesa" : (poi.category === "spa" ? "Reservar cita" : "Reservar tee time"));
+    var fields = isCart
+      ? '<label class="guide-book-field"><span>Lugar de recogida</span>' +
+        '<select name="lugar" id="guideCartPlace">' +
+          '<option value="lobby">Lobby del hotel</option>' +
+          '<option value="punto">Punto de encuentro del complejo</option>' +
+          '<option value="otro">Otro punto (indicar en notas)</option>' +
+        "</select></label>"
+      : '<label class="guide-book-field"><span>Fecha</span><input type="date" name="fecha" id="guideBookDate" required /></label>' +
+        '<label class="guide-book-field"><span>Hora</span><input type="time" name="hora" id="guideBookTime" required /></label>' +
+        '<label class="guide-book-field"><span>Personas</span><input type="number" name="personas" id="guideBookGuests" min="1" max="20" value="2" required /></label>';
+    box.innerHTML = '<form class="guide-book-form" id="guideBookForm">' +
+      '<h4 class="guide-book-title">' + escapeHtml(title) + "</h4>" +
+      '<p class="guide-book-place">' + escapeHtml(poi.name) + "</p>" +
+      fields +
+      '<label class="guide-book-field"><span>Nombre</span><input type="text" name="nombre" id="guideBookName" required /></label>' +
+      '<label class="guide-book-field"><span>Habitación</span><input type="text" name="habitacion" id="guideBookRoom" placeholder="Ej. 1204" /></label>' +
+      '<label class="guide-book-field"><span>Notas</span><textarea name="notas" id="guideBookNotes" rows="2"></textarea></label>' +
+      '<div class="guide-book-actions">' +
+        '<button type="submit" class="guide-book-submit">Enviar solicitud</button>' +
+        '<button type="button" class="guide-book-cancel" data-guide-book-cancel="1">Cancelar</button>' +
+      "</div>" +
+      '<p class="guide-book-note">Tu solicitud se registra en el sistema. La confirmación se realiza en recepción del hotel.</p>' +
+    "</form>";
+    var form = box.querySelector("#guideBookForm");
+    if (form) {
+      form.addEventListener("submit", function (event) {
+        event.preventDefault();
+        box.innerHTML = '<div class="guide-book-done">' +
+          '<h4 class="guide-book-title">Solicitud enviada</h4>' +
+          '<p>Registramos tu ' + escapeHtml(title.toLowerCase()) + " para " + escapeHtml(poi.name) + ".</p>" +
+          '<p>Recepción del hotel te confirmará la hora y el punto de encuentro.</p>' +
+        "</div>";
+      });
+    }
+    var cancel = box.querySelector("[data-guide-book-cancel]");
+    if (cancel) {
+      cancel.addEventListener("click", function () { box.innerHTML = ""; });
+    }
   }
 
   function selectPoi(id) {
@@ -708,29 +961,92 @@
     var marker = markerFor(poi);
     try {
       map.stop();
-      map.setView(target, targetZoom, { animate: false });
+      focusOn(map, target, targetZoom);
       gp._userFocusedMap = map;
       if (marker && typeof marker.openPopup === "function") marker.openPopup();
+      revealMap(map);
     } catch (e) { /* ignore map errors */ }
   }
 
-  gp.renderExplorer = function (mount) {
+  // --- Actividades del día -------------------------------------------------
+  // Se renderizan desde los datos del complejo. Cada actividad es
+  // funcional: al tocarla se selecciona el lugar en el mapa y se abre su
+  // ficha con horarios y reservas.
+  function renderActivities() {
+    var list = state.mount && state.mount.querySelector("#guideActivitiesList");
+    if (!list) return;
+    var actividades = gp.ACTIVIDADES || [];
+    if (!actividades.length) {
+      list.innerHTML = '<li class="guide-activity-empty">No hay actividades programadas para hoy.</li>';
+      return;
+    }
+    list.innerHTML = actividades.map(function (item, index) {
+      var poi = item.poiId ? findPoi(item.poiId) : null;
+      var can = poi && canMap(poi);
+      return '<li class="guide-activity-item' + (can ? " is-linked" : "") + '"' +
+        (can ? ' data-activity-id="' + escapeHtml(item.poiId) + '" tabindex="0" role="button"' : "") + ">" +
+        '<span class="guide-activity-time">' + escapeHtml(item.hora) + "</span>" +
+        '<span class="guide-activity-name">' + escapeHtml(item.nombre) + "</span>" +
+        '<span class="guide-activity-location">' + escapeHtml(item.lugar || "") + "</span>" +
+        "</li>";
+    }).join("");
+  }
+
+  function activateActivity(poiId) {
+    if (!poiId) return;
+    var poi = findPoi(poiId);
+    if (!poi) return;
+    selectPoi(poiId);
+    var box = state.mount && state.mount.querySelector("#guideActivities");
+    if (box && typeof box.scrollIntoView === "function") {
+      try { box.scrollIntoView({ behavior: "smooth", block: "nearest" }); } catch (e) { /* ignore */ }
+    }
+  }
+
+  // --- Límites de los lugares del complejo --------------------------------
+  // Recuadro que abarca los lugares verificados con coordenadas. Sirve para
+  // encuadrar el mapa sobre lo que realmente se puede visitar.
+  gp.getFocusBounds = function () {
+    var south = Infinity, west = Infinity, north = -Infinity, east = -Infinity;
+    (gp.POIS || []).forEach(function (poi) {
+      if (!poi || poi.lat == null || poi.lng == null) return;
+      if (poi.verified !== true) return;
+      south = Math.min(south, poi.lat);
+      north = Math.max(north, poi.lat);
+      west = Math.min(west, poi.lng);
+      east = Math.max(east, poi.lng);
+    });
+    if (!isFinite(south)) return null;
+    return [[south, west], [north, east]];
+  };
+
+  gp.renderExplorer = function (mount, options) {
     if (!mount) return null;
+    var opts = options || {};
     state.mount = mount;
     state.filter = "all";
     state.query = "";
     state.selectedId = null;
-    mount.innerHTML = '<div class="guide-explorer">' +
-      '<div class="guide-explorer-head">' +
-        '<div class="guide-explorer-title">' +
-          '<p class="portal-kicker">GUÍA INTERACTIVA · THE CLUB</p>' +
-          "<h2>Explora los lugares del complejo</h2>" +
-          "<p>Busca por nombre o filtra por categoría. Selecciona un lugar verificado para verlo en el mapa.</p>" +
-        "</div>" +
-        '<label class="guide-search"><span aria-hidden="true">\uD83D\uDD0D</span>' +
-          '<input id="guideSearchInput" type="search" placeholder="Buscar restaurante, bar, piscina…" aria-label="Buscar lugar por nombre" autocomplete="off" />' +
-        "</label>" +
-      "</div>" +
+    state.legendMount = opts.legendMount || null;
+    // Modo panel: la guía se dibuja sobre el mapa (una sola columna) y la
+    // leyenda se muestra aparte, debajo del mapa.
+    var panelMode = !!opts.panel;
+    var searchField = '<label class="guide-search"><span aria-hidden="true">\uD83D\uDD0D</span>' +
+      '<input id="guideSearchInput" type="search" placeholder="Buscar restaurante, bar, piscina…" aria-label="Buscar lugar por nombre" autocomplete="off" />' +
+      "</label>";
+    var head = panelMode
+      ? ""
+      : '<div class="guide-explorer-head">' +
+          '<div class="guide-explorer-title">' +
+            '<p class="portal-kicker">GUÍA INTERACTIVA · THE CLUB</p>' +
+            "<h2>Explora los lugares del complejo</h2>" +
+            "<p>Busca por nombre o filtra por categoría. Selecciona un lugar verificado para verlo en el mapa.</p>" +
+          "</div>" +
+          searchField +
+        "</div>";
+    mount.innerHTML = '<div class="guide-explorer' + (panelMode ? " guide-explorer--panel" : "") + '">' +
+      head +
+      (panelMode ? searchField : "") +
       '<div class="guide-filters" id="guideFilters" role="group" aria-label="Filtrar por categoría">' + categoryChips() + "</div>" +
       '<div class="guide-layout">' +
         '<div class="guide-panel guide-list-panel">' +
@@ -739,8 +1055,15 @@
         "</div>" +
         '<aside class="guide-panel guide-side">' +
           '<div class="guide-detail" id="guideDetail"></div>' +
-          '<div class="guide-legend" id="guideLegend"></div>' +
+          (panelMode ? "" : '<div class="guide-legend" id="guideLegend"></div>') +
         "</aside>" +
+      "</div>" +
+      '<div class="guide-activities" id="guideActivities">' +
+        '<div class="guide-activities-head">' +
+          "<h3>Actividades del día</h3>" +
+          "<p>Toca una actividad para ver el lugar en el mapa y reservar.</p>" +
+        "</div>" +
+        '<ul class="guide-activities-list" id="guideActivitiesList"></ul>' +
       "</div>" +
     "</div>";
 
@@ -753,6 +1076,11 @@
     }
 
     mount.addEventListener("click", function (event) {
+      var activity = event.target.closest("[data-activity-id]");
+      if (activity) {
+        activateActivity(activity.getAttribute("data-activity-id"));
+        return;
+      }
       var chip = event.target.closest("[data-guide-filter]");
       if (chip) {
         state.filter = chip.getAttribute("data-guide-filter") || "all";
@@ -779,12 +1107,36 @@
         selectPoi(focus.getAttribute("data-id"));
         return;
       }
+      var book = event.target.closest(".guide-book");
+      if (book) {
+        var bookPoi = findPoi(book.getAttribute("data-id"));
+        if (bookPoi) {
+          if (state.selectedId !== bookPoi.id) selectPoi(bookPoi.id);
+          renderBookingPanel(bookPoi, "booking");
+        }
+        return;
+      }
+      var cart = event.target.closest(".guide-cart");
+      if (cart) {
+        var cartPoi = findPoi(cart.getAttribute("data-id"));
+        if (cartPoi) {
+          if (state.selectedId !== cartPoi.id) selectPoi(cartPoi.id);
+          renderBookingPanel(cartPoi, "cart");
+        }
+        return;
+      }
       var item = event.target.closest(".guide-item");
       if (item) selectPoi(item.getAttribute("data-id"));
     });
 
     mount.addEventListener("keydown", function (event) {
       if (event.key !== "Enter" && event.key !== " ") return;
+      var activity = event.target.closest("[data-activity-id]");
+      if (activity) {
+        event.preventDefault();
+        activateActivity(activity.getAttribute("data-activity-id"));
+        return;
+      }
       var item = event.target.closest(".guide-item");
       if (item) {
         event.preventDefault();
@@ -794,6 +1146,7 @@
 
     renderLegend();
     renderList();
+    renderActivities();
     renderDetail(null);
     return { selectPoi: selectPoi, queryPois: queryPois };
   };

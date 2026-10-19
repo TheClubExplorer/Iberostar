@@ -3180,6 +3180,38 @@ body[data-app-mode="hotel"] .hotel-detail-nav { border-color:#d9c9ae; color:#090
 /* Guia interactiva THE CLUB - Ruta/Como llegar */
 .guide-route { padding: 8px 14px; border-radius: 8px; border: 1px solid var(--gold-deep); background: transparent; color: var(--gold-deep); font: 600 13px Arial, sans-serif; cursor: pointer; transition: background .15s ease; }
 .guide-route:hover { background: rgba(199, 169, 94, .14); }
+.guide-book { padding: 8px 14px; border-radius: 8px; border: 1px solid var(--selection); background: var(--selection); color: #fff; font: 600 13px Arial, sans-serif; cursor: pointer; transition: filter .15s ease; }
+.guide-book:hover { filter: brightness(1.1); }
+.guide-cart { padding: 8px 14px; border-radius: 8px; border: 1px solid #2e8b57; background: #2e8b57; color: #fff; font: 600 13px Arial, sans-serif; cursor: pointer; transition: filter .15s ease; }
+.guide-cart:hover { filter: brightness(1.1); }
+.guide-extra-info { margin-top: 12px; padding: 12px; border-radius: 8px; background: var(--sea, #f1ece3); }
+.guide-extra-info .guide-detail-row { margin: 4px 0; font-size: 13px; }
+.guide-book-box { margin-top: 12px; }
+.guide-book-form { display: grid; gap: 10px; padding: 14px; border: 1px solid rgba(47, 168, 152, .35); border-radius: 10px; background: rgba(47, 168, 152, .07); }
+.guide-book-title { margin: 0; font: 600 15px Arial, sans-serif; color: var(--green-deep, #0b3d66); }
+.guide-book-place { margin: 0; font: 12px Arial, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: var(--muted, #8a8377); }
+.guide-book-field { display: grid; gap: 4px; font: 12px Arial, sans-serif; color: var(--muted, #8a8377); }
+.guide-book-field input, .guide-book-field select, .guide-book-field textarea { width: 100%; padding: 8px 10px; border: 1px solid rgba(64, 54, 46, .18); border-radius: 8px; background: #fff; color: var(--ink, #2c2a26); font: 13px Arial, sans-serif; }
+.guide-book-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+.guide-book-submit { padding: 9px 16px; border-radius: 8px; border: 1px solid var(--selection, #2fa898); background: var(--selection, #2fa898); color: #fff; font: 600 13px Arial, sans-serif; cursor: pointer; }
+.guide-book-submit:hover { filter: brightness(1.1); }
+.guide-book-cancel { padding: 9px 16px; border-radius: 8px; border: 1px solid rgba(64, 54, 46, .25); background: transparent; color: var(--ink, #2c2a26); font: 600 13px Arial, sans-serif; cursor: pointer; }
+.guide-book-note { margin: 0; font: 11.5px/1.5 Arial, sans-serif; color: var(--muted, #8a8377); }
+.guide-book-done { padding: 14px; border-radius: 10px; background: rgba(46, 139, 87, .1); }
+.guide-book-done p { margin: 6px 0 0; font: 13px/1.5 Arial, sans-serif; color: var(--ink, #2c2a26); }
+.guide-activities { margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--line, #ded7cb); }
+.guide-activities-head { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: baseline; justify-content: space-between; margin-bottom: 14px; }
+.guide-activities-head h3 { margin: 0; font: 600 14px Arial, sans-serif; letter-spacing: .12em; text-transform: uppercase; color: var(--gold-deep, #a9884f); }
+.guide-activities-head p { margin: 0; font: 12px/1.5 Arial, sans-serif; color: var(--muted, #8a8377); }
+.guide-activities-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px; }
+.guide-activity-item { display: flex; align-items: baseline; gap: 10px; padding: 10px 14px; border-radius: 8px; background: var(--sea, #f1ece3); font: 13px Arial, sans-serif; }
+.guide-activity-item.is-linked { cursor: pointer; transition: background .15s ease, transform .15s ease; }
+.guide-activity-item.is-linked:hover { background: rgba(47, 168, 152, .16); transform: translateX(2px); }
+.guide-activity-item.is-linked:focus-visible { outline: 2px solid var(--selection, #2fa898); outline-offset: 2px; }
+.guide-activity-time { font-weight: 700; color: var(--gold-deep, #a9884f); min-width: 46px; }
+.guide-activity-name { flex: 1; }
+.guide-activity-location { color: var(--muted, #8a8377); font-size: 12px; }
+.guide-activity-empty { padding: 12px 14px; border-radius: 8px; background: var(--sea, #f1ece3); font: 13px Arial, sans-serif; color: var(--muted, #8a8377); }
 .guide-route-box { margin-top: 12px; }
 .guide-route-status { margin: 0 0 10px; padding: 10px 12px; border-radius: 10px; font: 13px/1.5 Arial, sans-serif; }
 .guide-route-status.is-loading { background: rgba(0, 87, 184, .08); color: #01447f; }
@@ -3579,6 +3611,50 @@ body.pano-360-open { overflow: hidden; }
 .hotel-zone-status strong { color:var(--green); }
 @media (max-width:899px){ .hotel-portal-location { grid-template-columns:1fr; } .hotel-zone-strip { grid-template-columns:repeat(3,minmax(0,1fr)); } }
 @media (max-width:599px){ .hotel-zone-strip { grid-template-columns:repeat(2,minmax(0,1fr)); } .hotel-zone img { height:82px; } }
+
+/* =========================================================
+   FICHA DE HOTEL · MAPA DEL COMPLEJO CON GUÍA SUPERPUESTA
+   (Playa Paraíso: mapa a ancho completo + panel de la guía)
+   ========================================================= */
+.hotel-complex-stage { margin-top:22px; scroll-margin-top:92px; }
+.hotel-complex-actions { margin-bottom:12px; }
+.hotel-complex-map-wrap { position:relative; }
+.hotel-portal-map--complex { width:100%; height:clamp(420px,58vh,720px); border:1px solid #d9c9ae; border-radius:16px; overflow:hidden; background:var(--panel); box-shadow:0 18px 42px rgba(64,54,46,.1); }
+.hotel-complex-legend { margin-top:14px; }
+.hotel-complex-legend.guide-legend { border:1px solid #d9c9ae; border-radius:14px; background:var(--panel); box-shadow:none; padding:14px 18px; }
+.hotel-complex-legend .guide-legend-list { grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); }
+.hotel-zone-panel--wide { margin-top:18px; }
+.hotel-zone-panel--wide .hotel-zone-strip { grid-template-columns:repeat(4,minmax(0,1fr)); }
+
+/* Panel de la guía: se superpone al mapa por la izquierda. */
+.hotel-guide-panel { position:absolute; z-index:600; top:14px; bottom:14px; left:14px; width:min(380px,calc(100% - 28px)); display:flex; flex-direction:column; gap:10px; padding:14px; border:1px solid #d9c9ae; border-radius:14px; background:rgba(255,255,255,.94); backdrop-filter:blur(6px); box-shadow:0 18px 44px rgba(64,54,46,.2); transition:transform .22s ease, opacity .22s ease; }
+.hotel-guide-panel-head { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.hotel-guide-panel-head .portal-kicker { margin:0; }
+.hotel-guide-close { padding:6px 12px; border:1px solid #d9c9ae; border-radius:999px; background:transparent; color:var(--green-deep); font:600 11px Arial,sans-serif; letter-spacing:.06em; text-transform:uppercase; cursor:pointer; }
+.hotel-guide-close:hover { background:#090403; color:#fff; }
+.hotel-guide-open { position:absolute; z-index:600; top:14px; left:14px; padding:10px 16px; border:1px solid #d9c9ae; border-radius:999px; background:rgba(255,255,255,.94); color:var(--green-deep); font:600 11px Arial,sans-serif; letter-spacing:.08em; text-transform:uppercase; cursor:pointer; box-shadow:0 10px 26px rgba(64,54,46,.16); }
+.hotel-guide-open:hover { background:#090403; color:#fff; }
+.hotel-complex-map-wrap.is-guide-collapsed .hotel-guide-panel { transform:translateX(calc(-100% - 20px)); opacity:0; pointer-events:none; }
+.hotel-complex-map-wrap.is-guide-collapsed .hotel-guide-open { display:block; }
+.hotel-complex-map-wrap:not(.is-guide-collapsed) .hotel-guide-open { display:none; }
+
+/* El explorador dentro del panel: una sola columna y con scroll propio. */
+.hotel-guide-panel .guide-explorer-mount { flex:1 1 auto; min-height:0; overflow-y:auto; padding-right:4px; }
+.guide-explorer--panel { gap:12px; }
+.guide-explorer--panel .guide-search { width:100%; min-width:0; }
+.guide-explorer--panel .guide-layout { grid-template-columns:minmax(0,1fr); gap:12px; }
+.guide-explorer--panel .guide-list-panel { overflow:visible; }
+.guide-explorer--panel .guide-list { max-height:none; }
+.guide-explorer--panel .guide-side { gap:12px; }
+.guide-explorer--panel .guide-activities { margin-top:16px; padding-top:14px; }
+.guide-explorer--panel .guide-activities-list { grid-template-columns:minmax(0,1fr); }
+
+@media (max-width:1099px){
+  .hotel-portal-map--complex { height:clamp(420px,64vh,700px); }
+  .hotel-guide-panel { top:auto; right:14px; bottom:14px; left:14px; width:auto; max-height:46%; }
+  .hotel-complex-map-wrap.is-guide-collapsed .hotel-guide-panel { transform:translateY(calc(100% + 20px)); }
+  .hotel-guide-open { top:14px; left:14px; }
+}
 
 /* =========================================================
    AVISO DE UBICACIÓN (bienvenida por geolocalización)
@@ -4508,3 +4584,59 @@ body.pano-360-open { overflow: hidden; }
           min-height: 325px;
         }
       }
+
+/* ============================================================
+   Área administrativa — login de administrador
+   ============================================================ */
+.admin-auth {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 4px;
+  padding: 10px 14px;
+  border: 1px solid rgba(21, 56, 82, 0.18);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.75);
+  font-size: 13px;
+}
+
+.admin-auth-label {
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+.admin-auth input {
+  padding: 6px 10px;
+  border: 1px solid rgba(21, 56, 82, 0.25);
+  border-radius: 6px;
+  font: inherit;
+}
+
+.admin-auth button {
+  padding: 6px 14px;
+  border: 0;
+  border-radius: 6px;
+  background: #153852;
+  color: #fff;
+  font: inherit;
+  cursor: pointer;
+}
+
+.admin-auth-status {
+  margin-left: auto;
+  opacity: 0.8;
+}
+
+.admin-auth--on {
+  border-color: rgba(30, 130, 76, 0.45);
+  background: rgba(230, 248, 238, 0.8);
+}
+
+.admin-auth--on .admin-auth-status {
+  color: #1e824c;
+  font-weight: 600;
+}

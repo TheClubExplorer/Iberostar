@@ -5,6 +5,16 @@
   const getDestinationCatalog = () => window.RevistaDigital.hoteles?.getDestinationCatalog?.() || window.RevistaDigital.catalog?.byCountry || {};
   let activeHotelPortalMap = null;
 
+  // Hoteles de Playa Paraíso que muestran el explorador de lugares del
+  // complejo (actividades, reservas, fichas) en su ficha.
+  const PLAYA_PARAISO_GUIDE_HOTELS = new Set([
+    "iberostar-paraiso-del-mar",
+    "iberostar-paraiso-beach",
+    "iberostar-paraiso-maya",
+    "iberostar-paraiso-lindo",
+    "iberostar-paraiso-joia"
+  ]);
+
   function slugify(value = "") {
     return String(value || "")
       .normalize("NFD")
@@ -127,8 +137,7 @@
       "/": "Inicio",
       "/workspace": "Workspace",
       "/360": "360°",
-      "/videos": "Videos",
-      "/guia-playa-paraiso": "Guía interactiva"
+      "/videos": "Videos"
     };
 
     const currentLabel = routeLabels[getAppRoute(pathname)] ||
@@ -249,8 +258,7 @@
         "/360": "Contenido 360°",
         "/videos": "Videos",
         "/workspace": "Workspace",
-        "/mapa-hoteles": "Mapa general de hoteles",
-        "/guia-playa-paraiso": "Guía interactiva"
+        "/mapa-hoteles": "Mapa general de hoteles"
       };
       if (sectionLabels[route]) {
         return {
@@ -373,7 +381,7 @@
       return context;
     }
 
-    if (parts[0] && ["workspace", "360", "videos", "complejo-playa-paraiso", "guia-playa-paraiso"].includes(parts[0])) {
+    if (parts[0] && ["workspace", "360", "videos", "complejo-playa-paraiso"].includes(parts[0])) {
       context.kind = "section";
       context.destination = parts[0];
       return context;
@@ -492,9 +500,6 @@
               ${portalMapActions(complexHotels)}
             </div>
           </section>
-          <section class="portal-section portal-guide-section">
-            <div id="guideExplorer" class="guide-explorer-mount"></div>
-          </section>
           <section class="portal-section">
             <div class="portal-section-heading">
               <div>
@@ -508,10 +513,6 @@
         </main>`;
         const complexMap = view.querySelector("#complexPortalMap");
         if (complexMap) initComplexPortalMap(complexMap, countrySlug, destination);
-        const guideMount = view.querySelector("#guideExplorer");
-        if (guideMount && window.RevistaDigital.guiapa && typeof window.RevistaDigital.guiapa.renderExplorer === "function") {
-          window.RevistaDigital.guiapa.renderExplorer(guideMount);
-        }
         return true;
       }
     }
@@ -581,6 +582,13 @@
       document.body.dataset.returnRoute = `/${country}/${destination.slug}`;
       view.innerHTML = renderHotelPortal({ countrySlug: country, countryData, destination, hotel });
       initHotelPortalMap(view, hotel, destination, countryData);
+      const hotelGuideMount = view.querySelector("#guideExplorer");
+      if (hotelGuideMount && window.RevistaDigital.guiapa && typeof window.RevistaDigital.guiapa.renderExplorer === "function") {
+        window.RevistaDigital.guiapa.renderExplorer(hotelGuideMount, {
+          panel: PLAYA_PARAISO_GUIDE_HOTELS.has(hotel.slug),
+          legendMount: view.querySelector("#hotelGuideLegend")
+        });
+      }
       view.querySelectorAll(".pano-360-ficha").forEach((ficha) => {
         ficha.addEventListener("click", () => {
           if (!window.RevistaDigital.pannellum360?.open) return;
@@ -813,8 +821,11 @@
       : 0;
     const hasDiningSection = (dining.length || restaurantMarkup) && !paraisoRestaurants360;
 
+    // El orden de los enlaces sigue el orden de las secciones en la página.
+    const hasComplexGuide = PLAYA_PARAISO_GUIDE_HOTELS.has(hotel.slug);
     const navItems = [];
-    if (hasCoordinates) navItems.push(["ubicacion", "Ubicación"]);
+    if (hasCoordinates) navItems.push(["ubicacion", hasComplexGuide ? "Mapa del complejo" : "Ubicación"]);
+    if (hasComplexGuide) navItems.push(["guia", "Lugares del complejo"]);
     if (hasDiningSection) navItems.push(["restaurantes", "Restaurantes"]);
     else if (paraisoRestaurants360) navItems.push(["restaurantes-360", "Restaurantes"]);
     if (services.length) navItems.push(["servicios", "Servicios"]);
@@ -877,7 +888,41 @@
               <span>${escapeHtml(zone.label)}</span>
             </button>`).join("");
 
-    const mapMarkup = hasCoordinates ? `
+    const zonePanelMarkup = `
+            <aside class="hotel-zone-panel${hasComplexGuide ? " hotel-zone-panel--wide" : ""}" aria-label="Zonas del hotel">
+              <p class="portal-kicker">EXPLORA EL HOTEL</p>
+              <p class="hotel-zone-hint">Toca una imagen para ver de qué parte del hotel es y trazar cómo llegar.</p>
+              ${zoneButtons ? `<div class="hotel-zone-strip">${zoneButtons}</div>` : ""}
+              <div class="hotel-zone-status" data-zone-status>
+                <span>Estás viendo: <strong data-zone-name>${escapeHtml(zones[0]?.label || "el hotel")}</strong></span>
+                <button type="button" class="portal-map-btn portal-directions" data-directions="${escapeHtml(displayName)}" data-lat="${coordinates[0]}" data-lng="${coordinates[1]}">Cómo llegar</button>
+              </div>
+            </aside>`;
+
+    const mapMarkup = hasCoordinates ? (hasComplexGuide ? `
+        <section class="hotel-portal-section" id="hotel-ubicacion">
+          <div class="hotel-portal-section-head">
+            <p class="portal-kicker">UBICACIÓN</p>
+            <h2>Mapa del complejo</h2>
+            <p>${escapeHtml(fullAddress)}</p>
+          </div>
+          <div class="hotel-complex-stage" id="hotel-guia">
+            <div class="hotel-complex-actions">${portalMapActions([hotel])}</div>
+            <div class="hotel-complex-map-wrap" data-guide-wrap>
+              <div id="hotelPortalMap" class="hotel-portal-map hotel-portal-map--complex" role="application" aria-label="Mapa de ${escapeHtml(displayName)}"></div>
+              <button type="button" class="hotel-guide-open" data-guide-toggle aria-expanded="false" aria-controls="hotelGuidePanel">Lugares del complejo</button>
+              <aside class="hotel-guide-panel" id="hotelGuidePanel" data-guide-overlay aria-label="Lugares del complejo, rutas y reservas">
+                <div class="hotel-guide-panel-head">
+                  <p class="portal-kicker">GUÍA INTERACTIVA · THE CLUB</p>
+                  <button type="button" class="hotel-guide-close" data-guide-toggle aria-expanded="true" aria-controls="hotelGuidePanel">Ocultar</button>
+                </div>
+                <div id="guideExplorer" class="guide-explorer-mount"></div>
+              </aside>
+            </div>
+            <div class="hotel-complex-legend guide-legend" id="hotelGuideLegend"></div>
+          </div>
+          ${zonePanelMarkup}
+        </section>` : `
         <section class="hotel-portal-section" id="hotel-ubicacion">
           <div class="hotel-portal-section-head">
             <p class="portal-kicker">UBICACIÓN</p>
@@ -889,18 +934,9 @@
               ${portalMapActions([hotel])}
               <div id="hotelPortalMap" class="hotel-portal-map" role="application" aria-label="Mapa de ${escapeHtml(displayName)}"></div>
             </div>
-            <aside class="hotel-zone-panel" aria-label="Zonas del hotel">
-              <p class="portal-kicker">EXPLORA EL HOTEL</p>
-              <p class="hotel-zone-hint">Toca una imagen para ver de qué parte del hotel es y trazar cómo llegar.</p>
-              ${zoneButtons ? `<div class="hotel-zone-strip">${zoneButtons}</div>` : ""}
-              <div class="hotel-zone-status" data-zone-status>
-                <span>Estás viendo: <strong data-zone-name>${escapeHtml(zones[0]?.label || "el hotel")}</strong></span>
-                <button type="button" class="portal-map-btn portal-directions" data-directions="${escapeHtml(displayName)}" data-lat="${coordinates[0]}" data-lng="${coordinates[1]}">Cómo llegar</button>
-              </div>
-            </aside>
+            ${zonePanelMarkup}
           </div>
-        </section>` : "";
-
+        </section>`) : "";
     const paraiso360 = (window.RevistaDigital?.pannellum360?.isPlayaParaiso?.(hotel.name))
       ? window.RevistaDigital.pannellum360.renderSection(hotel.name)
       : "";
@@ -916,6 +952,8 @@
         </section>`
       : "";
 
+    const guideMarkup = "";
+
     return `
       <main class="portal-page">
         ${portalNav(getPortalNavModel(hotelRoute))}
@@ -928,6 +966,7 @@
 
         ${aboutMarkup}
         ${mapMarkup}
+        ${guideMarkup}
         ${paraiso360}
         ${diningMarkup}
         ${restaurantCta}
@@ -955,6 +994,51 @@
     setTimeout(invalidate, 0);
   }
 
+  // Zona del mapa que deja libre el panel de la guía. Se usa como relleno
+  // asimétrico al encuadrar, para que el complejo quede a la vista y no
+  // debajo del panel.
+  function guidePanelLayout(L, element) {
+    const panel = document.querySelector("[data-guide-overlay]");
+    const mapRect = element?.getBoundingClientRect?.();
+    if (!panel || !mapRect || !mapRect.width) return null;
+    const panelRect = panel.getBoundingClientRect();
+    const symmetric = {
+      paddingTopLeft: L.point(16, 16),
+      paddingBottomRight: L.point(16, 16)
+    };
+    if (panel.getAttribute("data-guide-collapsed") === "1") return symmetric;
+    const overlaps = panelRect.left < mapRect.right - 4 && panelRect.right > mapRect.left + 4 &&
+      panelRect.top < mapRect.bottom - 4 && panelRect.bottom > mapRect.top + 4;
+    if (!overlaps) return symmetric;
+    const margin = 30;
+    const coversLeft = panelRect.left - mapRect.left < margin;
+    const coversRight = mapRect.right - panelRect.right < margin;
+    const coversBottom = mapRect.bottom - panelRect.bottom < margin;
+    if (coversLeft && coversRight) {
+      // Hoja inferior (móvil): se reserva el alto que ocupa.
+      const height = Math.round(panelRect.height);
+      return {
+        paddingTopLeft: L.point(16, 16),
+        paddingBottomRight: L.point(16, height + 16)
+      };
+    }
+    // Panel lateral (escritorio): se reserva el ancho que ocupa.
+    const width = Math.round(panelRect.width);
+    if (coversLeft) {
+      return {
+        paddingTopLeft: L.point(width + 28, 16),
+        paddingBottomRight: L.point(0, 16)
+      };
+    }
+    if (coversRight) {
+      return {
+        paddingTopLeft: L.point(0, 16),
+        paddingBottomRight: L.point(width + 28, 16)
+      };
+    }
+    return symmetric;
+  }
+
   function initHotelPortalMap(view, hotel, destination, countryData) {
     const element = view?.querySelector("#hotelPortalMap");
     const coordinates = state()?.hotelCoordinates?.[hotel.name];
@@ -977,28 +1061,85 @@
         maxZoom: 19,
         attribution: "© OpenStreetMap contributors"
       }).addTo(map);
+      // El panel de la guía ocupa la izquierda: los controles de zoom se
+      // colocan a la derecha para que sigan siendo accesibles.
+      if (map.zoomControl) {
+        map.zoomControl.remove();
+        L.control.zoom({ position: "topright" }).addTo(map);
+      }
       L.marker(coordinates)
         .addTo(map)
         .bindPopup(`<strong>${escapeHtml(hotel.name)}</strong><br><small>${escapeHtml(destination.name)}, ${escapeHtml(countryData.name)}</small>`)
         .openPopup();
-      // Encuadre y límites de navegación individuales por hotel: buffer
-      // alrededor de sus coordenadas reales (~330 m). Reutiliza la misma
-      // lógica que el mapa general del complejo (setupComplexMapFraming).
+      // Encuadre y límites de navegación: en las fichas de Playa Paraíso con
+      // explorador se muestra el complejo completo (para que el socio pueda
+      // ver y recorrer todos los lugares); en el resto, un buffer alrededor
+      // de las coordenadas reales del hotel (~330 m).
       const hotelInset = 0.003;
       const hotelPerimeter = L.latLngBounds(
         [coordinates[0] - hotelInset, coordinates[1] - hotelInset],
         [coordinates[0] + hotelInset, coordinates[1] + hotelInset]
       );
-      if (window.RevistaDigital && typeof window.RevistaDigital.setupComplexMapFraming === "function") {
-        window.RevistaDigital.setupComplexMapFraming(map, L, { perimeter: hotelPerimeter, navBounds: hotelPerimeter });
-      } else {
-        map.setMinZoom(map.getBoundsZoom(hotelPerimeter));
-        map.setMaxZoom(18);
-        map.fitBounds(hotelPerimeter, { animate: false });
+      const rdState = state();
+      const hasComplexGuide = PLAYA_PARAISO_GUIDE_HOTELS.has(hotel.slug);
+      const complexPerimeter = (rdState && rdState.complexPerimeter) ? L.latLngBounds(rdState.complexPerimeter) : null;
+      const complexBounds = (rdState && rdState.complexBounds) ? L.latLngBounds(rdState.complexBounds) : null;
+      const framingPerimeter = (hasComplexGuide && complexPerimeter) ? complexPerimeter : hotelPerimeter;
+      const framingNav = (hasComplexGuide && complexBounds) ? complexBounds : (hasComplexGuide && complexPerimeter ? complexPerimeter : hotelPerimeter);
+
+      // En las fichas con guía el mapa ocupa todo el ancho de la sección y
+      // se encuadra sobre el núcleo de lugares verificados (restaurantes,
+      // bares, piscinas, hoteles): así el complejo se ve con más detalle y
+      // el zoom numérico sube. El perímetro real sigue siendo el límite de
+      // navegación, de modo que el usuario puede alejarse y ver el resort
+      // entero. Además se deja libre la franja que cubre el panel de la guía.
+      const focusBounds = hasComplexGuide
+        ? (window.RevistaDigital.guiapa?.getFocusBounds?.() || null)
+        : null;
+      const frameOptions = hasComplexGuide ? {
+        perimeter: framingPerimeter,
+        navBounds: framingNav,
+        focusBounds: focusBounds || framingPerimeter,
+        minZoomBounds: framingPerimeter
+      } : { perimeter: framingPerimeter, navBounds: framingNav };
+      const applyFraming = () => {
+        const options = { ...frameOptions };
+        const panel = guidePanelLayout(L, element);
+        if (panel) {
+          options.paddingTopLeft = panel.paddingTopLeft;
+          options.paddingBottomRight = panel.paddingBottomRight;
+        }
+        if (window.RevistaDigital && typeof window.RevistaDigital.setupComplexMapFraming === "function") {
+          window.RevistaDigital.setupComplexMapFraming(map, L, options);
+        } else {
+          map.setMinZoom(map.getBoundsZoom(options.perimeter));
+          map.setMaxZoom(18);
+          map.fitBounds(options.perimeter, { animate: false });
+          trackMapResize(map, element);
+        }
+      };
+      applyFraming();
+      // Al plegar o desplegar el panel, el mapa vuelve a encuadrar el
+      // complejo en el espacio que queda libre.
+      if (hasComplexGuide) {
+        const panel = document.querySelector("[data-guide-overlay]");
+        if (panel) {
+          panel.addEventListener("guide:toggle", () => {
+            window.setTimeout(applyFraming, 220);
+          });
+        }
       }
+
       try {
         if (hotel.complex !== false && window.RevistaDigital.guiapa && typeof window.RevistaDigital.guiapa.addPoiLayer === "function") {
-          window.RevistaDigital.guiapa.addPoiLayer(map, hotel.name);
+          window.RevistaDigital.guiapa.addPoiLayer(map, hasComplexGuide ? null : hotel.name);
+        }
+      } catch (e) {}
+      // El explorador de la ficha usa este mapa para "Ver en el mapa" y las
+      // rutas a pie, así que queda enlazado al módulo de la guía.
+      try {
+        if (window.RevistaDigital.guiapa && typeof window.RevistaDigital.guiapa.bindMap === "function") {
+          window.RevistaDigital.guiapa.bindMap(map);
         }
       } catch (e) {}
     }).catch((error) => console.warn("No se pudo cargar el mapa del hotel.", error));
@@ -1166,6 +1307,36 @@
     if (zone) handleZoneClick(zone);
   });
 
+  // Panel de la guía sobre el mapa: plegar y desplegar.
+  function setGuidePanelOpen(open) {
+    const wrap = document.querySelector("[data-guide-wrap]");
+    const panel = wrap?.querySelector("[data-guide-overlay]");
+    if (!wrap || !panel) return;
+    const collapsed = !open;
+    if (collapsed) {
+      panel.setAttribute("data-guide-collapsed", "1");
+      wrap.classList.add("is-guide-collapsed");
+    } else {
+      panel.removeAttribute("data-guide-collapsed");
+      wrap.classList.remove("is-guide-collapsed");
+    }
+    wrap.querySelectorAll("[data-guide-toggle]").forEach((button) => {
+      button.setAttribute("aria-expanded", collapsed ? "false" : "true");
+    });
+    panel.dispatchEvent(new CustomEvent("guide:toggle", { detail: { collapsed } }));
+  }
+
+  document.addEventListener("click", (event) => {
+    const toggle = event.target.closest("[data-guide-toggle]");
+    if (!toggle) return;
+    const wrap = toggle.closest("[data-guide-wrap]");
+    const panel = wrap?.querySelector("[data-guide-overlay]");
+    if (!wrap || !panel) return;
+    const isCollapsed = panel.getAttribute("data-guide-collapsed") === "1";
+    // Si el panel estaba plegado se despliega y viceversa.
+    setGuidePanelOpen(isCollapsed);
+  });
+
   function scrollToAppHash(behavior) {
     const hash = window.location.hash;
     if (!hash || hash.length < 2) return;
@@ -1210,6 +1381,8 @@
     const url = new URL(window.location.href);
     url.hash = hash;
     window.history.replaceState(window.history.state, "", url.href);
+    // El enlace "Lugares del complejo" abre además el panel de la guía.
+    if (targetId === "hotel-guia") setGuidePanelOpen(true);
     scrollToAppHash();
   });
 
@@ -1244,7 +1417,10 @@
         "/brasil/praia-do-forte/iberostar-waves-bahia": "/brasil/bahia/iberostar-waves-bahia",
         "/brasil/brasil/iberostar-waves-bahia": "/brasil/bahia/iberostar-waves-bahia",
         "/brasil/brasil/iberostar-heritage-grand-amazon": "/brasil/amazon/iberostar-heritage-grand-amazon",
-        "/jamaica/rose-hall/joia-rose-hall-by-iberostar": "/jamaica/rose-hall/joia-rose-hall"
+        "/jamaica/rose-hall/joia-rose-hall-by-iberostar": "/jamaica/rose-hall/joia-rose-hall",
+        // La guía interactiva se integró en las fichas de los hoteles de
+        // Playa Paraíso: la ruta antigua lleva al destino de Riviera Maya.
+        "/guia-playa-paraiso": "/mexico/riviera-maya"
       };
       if (legacyRouteAliases[route]) {
         route = legacyRouteAliases[route];
@@ -1427,8 +1603,7 @@
         "/complejo-playa-paraiso": "complex",
         "/workspace": "workspace",
         "/360": "media360",
-        "/videos": "videos",
-        "/guia-playa-paraiso": "guia"
+        "/videos": "videos"
       };
       const pageType = pageTypeByRoute[route];
 

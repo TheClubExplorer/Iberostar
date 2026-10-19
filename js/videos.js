@@ -210,15 +210,19 @@
 
       card.className = "media-card";
 
+      const posterPlaceholder = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='9'%3E%3Crect width='16' height='9' fill='%23f1ece3'/%3E%3C/svg%3E";
       card.innerHTML = `
         <video
           class="media-card-video"
           controls
+          preload="none"
+          loading="lazy"
+          poster="${posterPlaceholder}"
           data-video-start="${item.start}"
           data-video-end="${item.end}"
         >
           <source
-            src="${url}"
+            data-src="${url}"
             type="${item.mimeType || "video/mp4"}"
           >
         </video>
@@ -264,6 +268,19 @@
       container.appendChild(card);
 
       const video = card.querySelector("video");
+      const source = card.querySelector("source[data-src]");
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting && source) {
+            source.src = source.dataset.src;
+            source.removeAttribute("data-src");
+            video.load();
+            observer.unobserve(card);
+          }
+        });
+      }, { rootMargin: "200px" });
+      observer.observe(card);
 
       video.addEventListener("loadedmetadata", () => {
         video.currentTime = Number(item.start);
