@@ -11,7 +11,7 @@
       countryKey: "mexico",
       destination: "Riviera Maya",
       brand: "Waves",
-      image: "src/ParaisoDelMar 1.png",
+      image: "src/ParaisoDelMar 1.jpg",
       tagline: "Caribe tradicional y exuberante",
       description: "Arquitectura colonial, jardines tropicales y una de las piscinas más espectaculares de Riviera Maya.",
       route: "/mexico/riviera-maya/iberostar-paraiso-del-mar"
@@ -22,7 +22,7 @@
       countryKey: "mexico",
       destination: "Riviera Maya",
       brand: "Selection",
-      image: "src/paraisoMaya 1.png",
+      image: "src/paraisoMaya 1.jpg",
       tagline: "Homenaje a la cultura maya",
       description: "Esculturas monumentales, parque acuático, piscina de olas y gastronomía de autor frente al Caribe.",
       route: "/mexico/riviera-maya/iberostar-paraiso-maya"
@@ -33,7 +33,7 @@
       countryKey: "mexico",
       destination: "Riviera Maya",
       brand: "Selection",
-      image: "src/ParaisoLindo1.png",
+      image: "src/ParaisoLindo1.jpg",
       tagline: "Diversión familiar y río lento",
       description: "Parque acuático, río lento, piscina de olas y spa para unas vacaciones inolvidables en familia.",
       route: "/mexico/riviera-maya/iberostar-paraiso-lindo"

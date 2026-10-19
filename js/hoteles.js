@@ -145,8 +145,8 @@
       ]
     },
     "republica-dominicana": {
-      name: "República Dominicana", image: "src/ParaisoDelMar 1.png", imageHotel: "Iberostar Selection Bávaro Suites", destinations: [
-        { slug: "punta-cana", name: "Punta Cana", description: "Playas amplias y paisajes tropicales.", image: "src/ParaisoDelMar 1.png", imageHotel: "Iberostar Selection Bávaro Suites", detectionArea: { center: [18.5818, -68.4043], radiusMeters: 30000 } }
+      name: "República Dominicana", image: "src/ParaisoDelMar 1.jpg", imageHotel: "Iberostar Selection Bávaro Suites", destinations: [
+        { slug: "punta-cana", name: "Punta Cana", description: "Playas amplias y paisajes tropicales.", image: "src/ParaisoDelMar 1.jpg", imageHotel: "Iberostar Selection Bávaro Suites", detectionArea: { center: [18.5818, -68.4043], radiusMeters: 30000 } }
       ]
     },
     brasil: {

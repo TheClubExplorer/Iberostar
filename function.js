@@ -394,7 +394,7 @@ const pages = [
     name: "Iberostar Paraíso del Mar",
     location:
       "Iberostar Paraíso del Mar, Playa Paraíso, Quintana Roo, México",
-    image: "src/ParaisoDelMar 1.png",
+    image: "src/ParaisoDelMar 1.jpg",
     intro:
       "Iberostar Waves Paraíso del Mar combina la belleza natural de la Riviera Maya, una experiencia Todo Incluido premium, gastronomía internacional, actividades para toda la familia y acceso a una de las playas más atractivas del Caribe mexicano.",
     stats: [
@@ -416,7 +416,7 @@ const pages = [
     name: "Iberostar Paraíso Maya",
     location:
       "Iberostar Selection Paraíso Maya Suites, Carretera Chetumal-Puerto Juárez km 309, Playa Paraíso, Quintana Roo, México",
-    image: "src/paraisoMaya 1.png",
+    image: "src/paraisoMaya 1.jpg",
     intro:
       "Iberostar Selection Paraíso Maya combina la grandeza de la cultura maya con una experiencia todo incluido frente al Caribe. Sus piscinas, parque acuático, río lento, gastronomía internacional y programas familiares convierten al resort en uno de los destinos más completos de Riviera Maya.",
     stats: [
@@ -438,7 +438,7 @@ const pages = [
     name: "Iberostar Paraíso Lindo",
     location:
       "Iberostar Paraíso Lindo, Playa Paraíso, Quintana Roo, México",
-    image: "src/ParaisoLindo1.png",
+    image: "src/ParaisoLindo1.jpg",
     intro:
       "Iberostar Selection Paraíso Lindo combina naturaleza, diversión y descanso en un entorno privilegiado frente al Caribe mexicano. Sus piscinas, parque acuático, río lento y experiencias gastronómicas lo convierten en el lugar ideal para familias y viajeros que buscan disfrutar de la esencia de Riviera Maya con el sello de hospitalidad Iberostar.",
     stats: [
@@ -568,7 +568,7 @@ const hotelCountryMenus = {
             ],
             images: [
               "src/JOIA2.jpg",
-              "src/ParaisoDelMar 1.png",
+              "src/ParaisoDelMar 1.jpg",
               "src/paraisoBeach1.jpg"
             ]
           },
@@ -584,7 +584,7 @@ const hotelCountryMenus = {
             ],
             images: [
               "src/paraisoBeach1.jpg",
-              "src/ParaisoLindo1.png",
+              "src/ParaisoLindo1.jpg",
               "src/JOIA1.jpg"
             ]
           },
@@ -600,7 +600,7 @@ const hotelCountryMenus = {
             ],
             images: [
               "src/JOIA1.jpg",
-              "src/ParaisoDelMar 1.png",
+              "src/ParaisoDelMar 1.jpg",
               "src/paraisoBeach1.jpg"
             ]
           },
@@ -617,7 +617,7 @@ const hotelCountryMenus = {
             images: [
               "src/JOIA2.jpg",
               "src/paraisoBeach1.jpg",
-              "src/ParaisoDelMar 1.png"
+              "src/ParaisoDelMar 1.jpg"
             ]
           }
         }
@@ -642,7 +642,7 @@ const hotelCountryMenus = {
               "Acabados claros"
             ],
             images: [
-              "src/ParaisoDelMar 1.png",
+              "src/ParaisoDelMar 1.jpg",
               "src/paraisoBeach1.jpg",
               "src/JOIA2.jpg"
             ]
@@ -659,7 +659,7 @@ const hotelCountryMenus = {
             ],
             images: [
               "src/paraisoBeach1.jpg",
-              "src/ParaisoLindo1.png",
+              "src/ParaisoLindo1.jpg",
               "src/JOIA31.jpg"
             ]
           },
@@ -675,7 +675,7 @@ const hotelCountryMenus = {
             ],
             images: [
               "src/JOIA31.jpg",
-              "src/ParaisoDelMar 1.png",
+              "src/ParaisoDelMar 1.jpg",
               "src/paraisoBeach1.jpg"
             ]
           },
@@ -692,7 +692,7 @@ const hotelCountryMenus = {
             images: [
               "src/JOIA2.jpg",
               "src/paraisoBeach1.jpg",
-              "src/ParaisoDelMar 1.png"
+              "src/ParaisoDelMar 1.jpg"
             ]
           }
         }
@@ -718,7 +718,7 @@ const hotelCountryMenus = {
             ],
             images: [
               "src/JOIA31.jpg",
-              "src/ParaisoLindo1.png",
+              "src/ParaisoLindo1.jpg",
               "src/JOIA2.jpg"
             ]
           },
@@ -751,7 +751,7 @@ const hotelCountryMenus = {
             images: [
               "src/JOIA1.jpg",
               "src/JOIA31.jpg",
-              "src/ParaisoDelMar 1.png"
+              "src/ParaisoDelMar 1.jpg"
             ]
           },
 
@@ -765,7 +765,7 @@ const hotelCountryMenus = {
               "Experiencias exclusivas"
             ],
             images: [
-              "src/ParaisoDelMar 1.png",
+              "src/ParaisoDelMar 1.jpg",
               "src/JOIA31.jpg",
               "src/paraisoBeach1.jpg"
             ]
@@ -876,7 +876,7 @@ const hotelCountryMenus = {
             ],
             images: [
               "src/paraisoBeach1.jpg",
-              "src/ParaisoLindo1.png",
+              "src/ParaisoLindo1.jpg",
               "src/JOIA2.jpg"
             ]
           },
@@ -893,7 +893,7 @@ const hotelCountryMenus = {
             images: [
               "src/paraisoBeach1.jpg",
               "src/JOIA1.jpg",
-              "src/ParaisoDelMar 1.png"
+              "src/ParaisoDelMar 1.jpg"
             ]
           },
 
@@ -907,7 +907,7 @@ const hotelCountryMenus = {
               "Ambiente tropical"
             ],
             images: [
-              "src/ParaisoLindo1.png",
+              "src/ParaisoLindo1.jpg",
               "src/paraisoBeach1.jpg",
               "src/JOIA2.jpg"
             ]
@@ -925,7 +925,7 @@ const hotelCountryMenus = {
             images: [
               "src/JOIA2.jpg",
               "src/paraisoBeach1.jpg",
-              "src/ParaisoLindo1.png"
+              "src/ParaisoLindo1.jpg"
             ]
           }
         }
@@ -1026,7 +1026,7 @@ const hotelCountryMenus = {
             ],
             images: [
               "src/paraisoBeach1.jpg",
-              "src/ParaisoLindo1.png",
+              "src/ParaisoLindo1.jpg",
               "src/JOIA2.jpg"
             ]
           },
@@ -1043,7 +1043,7 @@ const hotelCountryMenus = {
             images: [
               "src/paraisoBeach1.jpg",
               "src/JOIA1.jpg",
-              "src/ParaisoDelMar 1.png"
+              "src/ParaisoDelMar 1.jpg"
             ]
           },
 
@@ -1057,7 +1057,7 @@ const hotelCountryMenus = {
               "Zona familiar"
             ],
             images: [
-              "src/ParaisoLindo1.png",
+              "src/ParaisoLindo1.jpg",
               "src/paraisoBeach1.jpg",
               "src/JOIA2.jpg"
             ]
@@ -1075,7 +1075,7 @@ const hotelCountryMenus = {
             images: [
               "src/JOIA2.jpg",
               "src/paraisoBeach1.jpg",
-              "src/ParaisoLindo1.png"
+              "src/ParaisoLindo1.jpg"
             ]
           }
         }
@@ -1109,7 +1109,7 @@ const hotelCountryMenus = {
             ],
             images: [
               "src/paraisoBeach1.jpg",
-              "src/ParaisoLindo1.png",
+              "src/ParaisoLindo1.jpg",
               "src/JOIA2.jpg"
             ]
           },
@@ -1126,7 +1126,7 @@ const hotelCountryMenus = {
             images: [
               "src/paraisoBeach1.jpg",
               "src/JOIA1.jpg",
-              "src/ParaisoDelMar 1.png"
+              "src/ParaisoDelMar 1.jpg"
             ]
           },
 
@@ -1140,7 +1140,7 @@ const hotelCountryMenus = {
               "Áreas de sombra"
             ],
             images: [
-              "src/ParaisoLindo1.png",
+              "src/ParaisoLindo1.jpg",
               "src/paraisoBeach1.jpg",
               "src/JOIA2.jpg"
             ]
@@ -1158,7 +1158,7 @@ const hotelCountryMenus = {
             images: [
               "src/JOIA2.jpg",
               "src/paraisoBeach1.jpg",
-              "src/ParaisoLindo1.png"
+              "src/ParaisoLindo1.jpg"
             ]
           }
         }
@@ -1259,7 +1259,7 @@ const hotelCountryMenus = {
             ],
             images: [
               "src/paraisoBeach1.jpg",
-              "src/ParaisoLindo1.png",
+              "src/ParaisoLindo1.jpg",
               "src/JOIA2.jpg"
             ]
           },
@@ -1276,7 +1276,7 @@ const hotelCountryMenus = {
             images: [
               "src/paraisoBeach1.jpg",
               "src/JOIA1.jpg",
-              "src/ParaisoDelMar 1.png"
+              "src/ParaisoDelMar 1.jpg"
             ]
           },
 
@@ -1290,7 +1290,7 @@ const hotelCountryMenus = {
               "Áreas familiares"
             ],
             images: [
-              "src/ParaisoLindo1.png",
+              "src/ParaisoLindo1.jpg",
               "src/paraisoBeach1.jpg",
               "src/JOIA2.jpg"
             ]
@@ -1308,7 +1308,7 @@ const hotelCountryMenus = {
             images: [
               "src/JOIA2.jpg",
               "src/paraisoBeach1.jpg",
-              "src/ParaisoLindo1.png"
+              "src/ParaisoLindo1.jpg"
             ]
           }
         }
@@ -1334,7 +1334,7 @@ const hotelCountryMenus = {
             ],
             images: [
               "src/paraisoBeach1.jpg",
-              "src/ParaisoLindo1.png",
+              "src/ParaisoLindo1.jpg",
               "src/JOIA2.jpg"
             ]
           },
@@ -1351,7 +1351,7 @@ const hotelCountryMenus = {
             images: [
               "src/paraisoBeach1.jpg",
               "src/JOIA1.jpg",
-              "src/ParaisoDelMar 1.png"
+              "src/ParaisoDelMar 1.jpg"
             ]
           },
 
@@ -1365,7 +1365,7 @@ const hotelCountryMenus = {
               "Zona de descanso"
             ],
             images: [
-              "src/ParaisoLindo1.png",
+              "src/ParaisoLindo1.jpg",
               "src/paraisoBeach1.jpg",
               "src/JOIA2.jpg"
             ]
@@ -1383,7 +1383,7 @@ const hotelCountryMenus = {
             images: [
               "src/JOIA2.jpg",
               "src/paraisoBeach1.jpg",
-              "src/ParaisoLindo1.png"
+              "src/ParaisoLindo1.jpg"
             ]
           }
         }
@@ -1418,7 +1418,7 @@ const hotelCountryMenus = {
             images: [
               "src/JOIA1.jpg",
               "src/paraisoBeach1.jpg",
-              "src/ParaisoLindo1.png"
+              "src/ParaisoLindo1.jpg"
             ]
           },
 
@@ -1434,7 +1434,7 @@ const hotelCountryMenus = {
             images: [
               "src/paraisoBeach1.jpg",
               "src/JOIA1.jpg",
-              "src/ParaisoDelMar 1.png"
+              "src/ParaisoDelMar 1.jpg"
             ]
           },
 
@@ -1448,7 +1448,7 @@ const hotelCountryMenus = {
               "Relajación"
             ],
             images: [
-              "src/ParaisoDelMar 1.png",
+              "src/ParaisoDelMar 1.jpg",
               "src/paraisoBeach1.jpg",
               "src/JOIA1.jpg"
             ]
@@ -1492,7 +1492,7 @@ const hotelCountryMenus = {
             ],
             images: [
               "src/JOIA2.jpg",
-              "src/ParaisoDelMar 1.png",
+              "src/ParaisoDelMar 1.jpg",
               "src/JOIA1.jpg"
             ]
           },
@@ -1566,7 +1566,7 @@ const hotelCountryMenus = {
               "Silencio"
             ],
             images: [
-              "src/ParaisoLindo1.png",
+              "src/ParaisoLindo1.jpg",
               "src/JOIA1.jpg",
               "src/JOIA2.jpg"
             ]
@@ -1583,7 +1583,7 @@ const hotelCountryMenus = {
             ],
             images: [
               "src/JOIA2.jpg",
-              "src/ParaisoLindo1.png",
+              "src/ParaisoLindo1.jpg",
               "src/JOIA31.jpg"
             ]
           },
@@ -1599,7 +1599,7 @@ const hotelCountryMenus = {
             ],
             images: [
               "src/JOIA31.jpg",
-              "src/ParaisoLindo1.png",
+              "src/ParaisoLindo1.jpg",
               "src/JOIA1.jpg"
             ]
           },
@@ -1615,7 +1615,7 @@ const hotelCountryMenus = {
             ],
             images: [
               "src/JOIA1.jpg",
-              "src/ParaisoLindo1.png",
+              "src/ParaisoLindo1.jpg",
               "src/JOIA2.jpg"
             ]
           }
@@ -1643,7 +1643,7 @@ const hotelCountryMenus = {
             images: [
               "src/JOIA31.jpg",
               "src/JOIA2.jpg",
-              "src/ParaisoLindo1.png"
+              "src/ParaisoLindo1.jpg"
             ]
           },
 
