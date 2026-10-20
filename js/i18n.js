@@ -5,6 +5,7 @@
     es: {
       siteTitle: "Iberostar | Destinos y hoteles",
       brandDestinations: "Destinos",
+      navDestinos: "Destinos",
       navMexico: "México",
       navJamaica: "Jamaica",
       navDominican: "República Dominicana",
@@ -49,6 +50,7 @@
     en: {
       siteTitle: "Iberostar | Destinations & Hotels",
       brandDestinations: "Destinations",
+      navDestinos: "Destinations",
       navMexico: "Mexico",
       navJamaica: "Jamaica",
       navDominican: "Dominican Republic",

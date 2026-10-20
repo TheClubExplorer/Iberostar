@@ -334,7 +334,11 @@
 
     listEl.innerHTML = results.map((hotel) => `
       <article class="search-item" data-hotel-route="${hotel.route}" data-hotel-name="${hotel.name}">
-        <img class="search-item-img" src="${hotel.image}" alt="${hotel.name}" loading="lazy" decoding="async" />
+        ${RI.img(hotel.image, {
+          cls: "search-item-img",
+          alt: hotel.name,
+          sizes: "90px"
+        })}
         <div class="search-item-info">
           <div class="search-item-tags">
             <span class="search-badge ${getBrandBadgeClass(hotel.brand)}">${hotel.brand}</span>

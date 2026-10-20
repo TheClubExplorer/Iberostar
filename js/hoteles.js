@@ -42,7 +42,10 @@
       <div class="hotel-panel-grid">
         ${media.length ? media.map((image) => `
           <figure class="hotel-panel-item">
-            <img src="${image}" alt="${title} de ${pageName}" loading="lazy" decoding="async" />
+            ${RI.img(image, {
+              alt: `${title} de ${pageName}`,
+              sizes: "(max-width:760px) 46vw, 30vw"
+            })}
           </figure>
         `).join("") : `
           <div class="hotel-panel-empty">

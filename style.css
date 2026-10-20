@@ -2581,11 +2581,16 @@ button {
 .location-status-action { display:inline-block; margin:8px 0 0 8px; padding:8px 12px; border-radius:5px; background:#090403; color:#fff; font:600 12px Arial,sans-serif; text-decoration:none; white-space:nowrap; }
 .location-status-action:hover,.location-status-action:focus-visible { background:#40362e; color:#fff; }
 .site-tools { position:relative; }
-.site-tools summary { list-style:none; }
+.site-tools summary { list-style:none; display:inline-flex; align-items:center; gap:5px; }
 .site-tools summary::-webkit-details-marker { display:none; }
+.site-tools summary:hover .site-tools-caret { color:var(--gold-deep); }
+.site-tools-caret { font-size:9px; line-height:1; opacity:.7; transition:transform .2s ease; }
+.site-tools[open] > summary .site-tools-caret { transform:rotate(180deg); opacity:1; }
 .site-tools-menu { position:absolute; top:calc(100% + 14px); right:0; display:grid; min-width:205px; gap:0; padding:8px; border:1px solid #ead9bf; border-radius:10px; background:white; box-shadow:0 14px 35px #40362e1c; }
 .site-tools-menu a { padding:10px 12px; border-radius:6px; }
 .site-tools-menu a:hover { background:#fbf8f1; }
+.site-nav-destinos .site-tools-menu { left:0; right:auto; }
+.mobile-menu-btn, .mobile-nav-close, .nav-overlay { display:none; }
 html[data-route-startup="true"] .magazine-stage,html[data-route-startup="true"] #pager { display:none !important; }
 .app-view { display:none; width:100%; }
 body[data-app-mode="portal"] { min-height:100vh; align-items:stretch; justify-content:flex-start; background:var(--paper); color:var(--green-deep); }
@@ -2717,7 +2722,34 @@ body[data-app-mode="hotel"] .hotel-detail-nav { border-color:#d9c9ae; color:#090
 .destination-card.hotel { min-height:480px; }
 .destination-grid--hotels { grid-template-columns:repeat(2,minmax(0,1fr)); }
 @media(max-width:850px) { .destination-grid--hotels { grid-template-columns:1fr; } }
-@media(max-width:850px) { .site-header { align-items:flex-start; flex-direction:column; gap:12px; padding:14px 20px; } .site-nav { width:100%; gap:18px; padding-bottom:3px; } .site-nav a,.site-tools summary { white-space:nowrap; } .site-tools { position:static; } .site-tools-menu { left:0; right:auto; } .destination-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media(max-width:850px) { .site-header { padding:14px 20px; } .destination-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+/* Menú móvil: panel lateral derecho (≤850px). El header conserva su altura de
+   una sola línea; la navegación se saca del flujo como panel fixed. */
+@media(max-width:850px) {
+  .mobile-menu-btn { display:inline-flex; align-items:center; justify-content:center; width:44px; height:44px; padding:0; border:1px solid #f0e8d8; border-radius:10px; background:var(--panel); color:var(--green); cursor:pointer; font-size:22px; line-height:1; }
+  .mobile-menu-btn:hover { border-color:#8f7332; color:var(--gold-deep); }
+  .site-nav { position:fixed; top:0; right:0; z-index:1300; display:flex; flex-direction:column; align-items:stretch; width:min(84vw, 340px); max-width:340px; height:100dvh; gap:4px; padding:64px 18px 28px; background:#fffdf9; border-left:1px solid #ead9bf; box-shadow:-18px 0 45px rgba(64,54,46,.16); overflow-y:auto; transform:translateX(100%); transition:transform .28s ease; }
+  .site-nav.is-open { transform:translateX(0); }
+  .mobile-nav-close { display:inline-flex; align-items:center; justify-content:center; position:absolute; top:18px; right:18px; width:40px; height:40px; padding:0; border:1px solid #f0e8d8; border-radius:10px; background:var(--panel); color:var(--green); cursor:pointer; font-size:24px; line-height:1; }
+  .mobile-nav-close:hover { border-color:#8f7332; color:var(--gold-deep); }
+  .site-nav a, .site-tools summary { white-space:nowrap; font-size:13px; }
+  .site-nav > a, .site-nav > .location-button, .site-nav > .search-trigger-btn, .site-nav > .lang-toggle-btn { padding:13px 14px; border:0; border-radius:8px; background:transparent; text-align:left; width:100%; justify-content:flex-start; }
+  .site-nav > a:hover, .site-nav > .location-button:hover, .site-nav > .search-trigger-btn:hover, .site-nav > .lang-toggle-btn:hover { background:#fbf8f1; }
+  .site-nav > a:active, .site-nav > .location-button:active, .site-nav > .search-trigger-btn:active, .site-nav > .lang-toggle-btn:active { background:#f4efe6; }
+  .site-tools { position:static; border-top:1px solid #f0e8d8; }
+  .site-nav-destinos { order:-1; border-top:0; border-bottom:1px solid #f0e8d8; }
+  .site-tools summary { display:flex; align-items:center; justify-content:space-between; width:100%; padding:15px 14px; border-radius:8px; }
+  .site-tools summary:hover { background:#fbf8f1; }
+  .site-tools summary:active { background:#f4efe6; }
+  .site-tools-caret { font-size:11px; }
+  .site-tools[open] > summary { color:var(--gold-deep); background:#fbf8f1; }
+  .site-tools-menu { position:static; top:auto; left:0; right:auto; min-width:0; width:100%; padding:2px 0 10px; border:0; border-radius:0; background:transparent; box-shadow:none; }
+  .site-tools-menu a { padding:12px 14px 12px 28px; border-radius:8px; }
+  .site-tools-menu a:hover { background:#fbf8f1; }
+  .nav-overlay { display:block; position:fixed; inset:0; z-index:1190; background:rgba(9,4,3,.42); opacity:0; transition:opacity .28s ease; }
+  .nav-overlay[hidden] { display:none; }
+  .nav-overlay.is-open { opacity:1; }
+}
 @media(max-width:600px) { .portal-page { padding-top:16px; } .portal-hero,.portal-destination-hero { grid-template-columns:1fr; } .portal-hero > div,.portal-destination-hero > div { padding:28px; } .portal-hero > img,.portal-destination-hero > img { grid-column:1; grid-row:auto; min-height:220px; max-height:260px; } .portal-map-section { grid-template-columns:1fr; padding:18px; } .portal-destination-map { height:300px; } .portal-destination-map.portal-complex-map { height:300px; min-height:300px; } .portal-all-hotels-map { height:52vh; min-height:300px; } .destination-grid { grid-template-columns:1fr; } .destination-card,.destination-card-copy { min-height:300px; } .site-brand img { width:45px; height:34px; } }
 @media(max-width:700px) { .hotel-restaurant-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media(max-width:460px) { .hotel-restaurant-grid { grid-template-columns:1fr; } }
@@ -3213,6 +3245,17 @@ body[data-app-mode="hotel"] .hotel-detail-nav { border-color:#d9c9ae; color:#090
 .guide-activity-location { color: var(--muted, #8a8377); font-size: 12px; }
 .guide-activity-empty { padding: 12px 14px; border-radius: 8px; background: var(--sea, #f1ece3); font: 13px Arial, sans-serif; color: var(--muted, #8a8377); }
 .guide-route-box { margin-top: 12px; }
+/* Estado de ruta y formulario de reserva/carrito: se muestran al principio del
+   detalle y quedan fijos (sticky) arriba del panel al hacer scroll, para que la
+   ruta y sus acciones se vean de inmediato sin bajar. */
+.guide-detail-feedback { position: sticky; top: -6px; z-index: 3; }
+.guide-detail-feedback:empty { display: none; }
+.guide-detail-feedback .guide-route-box { margin-top: 0; }
+.guide-detail-feedback .guide-book-box { margin-top: 10px; }
+.guide-detail-feedback > *:not(:empty) { background: var(--paper-alt); }
+/* En la vista de página completa el header es sticky (76px): el bloque se ancla
+   por debajo para no quedar oculto. */
+.guide-explorer:not(.guide-explorer--panel) .guide-detail-feedback { top: 84px; }
 .guide-route-status { margin: 0 0 10px; padding: 10px 12px; border-radius: 10px; font: 13px/1.5 Arial, sans-serif; }
 .guide-route-status.is-loading { background: rgba(0, 87, 184, .08); color: #01447f; }
 .guide-route-status.is-ready { background: rgba(46, 139, 87, .12); color: #22694a; }
@@ -3643,17 +3686,122 @@ body.pano-360-open { overflow: hidden; }
 .guide-explorer--panel { gap:12px; }
 .guide-explorer--panel .guide-search { width:100%; min-width:0; }
 .guide-explorer--panel .guide-layout { grid-template-columns:minmax(0,1fr); gap:12px; }
+/* En el panel (ficha del hotel) el detalle va ARRIBA de la lista: al tocar un
+   punto, su ficha y el estado de la ruta quedan visibles sin bajar. */
+.guide-explorer--panel .guide-side { order:-1; }
 .guide-explorer--panel .guide-list-panel { overflow:visible; }
 .guide-explorer--panel .guide-list { max-height:none; }
 .guide-explorer--panel .guide-side { gap:12px; }
 .guide-explorer--panel .guide-activities { margin-top:16px; padding-top:14px; }
 .guide-explorer--panel .guide-activities-list { grid-template-columns:minmax(0,1fr); }
 
+/* Contenido interno del panel más compacto y ordenado (panel del hotel), sin
+   reducir el panel en sí. Se mantiene legible. */
+.guide-explorer--panel { gap:10px; }
+.guide-explorer--panel .guide-search { padding:8px 12px; gap:6px; }
+.guide-explorer--panel .guide-search span { font-size:13px; }
+.guide-explorer--panel .guide-search input { font-size:13px; }
+.guide-explorer--panel .guide-filters { gap:6px; }
+.guide-explorer--panel .guide-chip { padding:5px 10px; gap:5px; font-size:11px; }
+.guide-explorer--panel .guide-chip-dot { width:8px; height:8px; }
+.guide-explorer--panel .guide-list { padding:4px; }
+.guide-explorer--panel .guide-list-head { padding:8px 12px; font-size:10px; letter-spacing:.06em; }
+.guide-explorer--panel .guide-item { gap:9px; padding:7px 9px; border-radius:9px; }
+.guide-explorer--panel .guide-item-body { gap:1px; }
+.guide-explorer--panel .guide-item-name { font-size:13px; }
+.guide-explorer--panel .guide-item-meta { font-size:10.5px; }
+.guide-explorer--panel .guide-dot { width:11px; height:11px; }
+.guide-explorer--panel .guide-dot--lg { width:15px; height:15px; }
+/* Detalle compacto y alineado */
+.guide-explorer--panel .guide-detail { padding:12px; border-radius:12px; }
+.guide-explorer--panel .guide-detail-empty { font-size:12.5px; line-height:1.5; }
+.guide-explorer--panel .guide-detail-title { margin:6px 0 2px; font-size:16px; }
+.guide-explorer--panel .guide-detail-cat { margin:0 0 7px; font-size:9.5px; letter-spacing:.08em; }
+.guide-explorer--panel .guide-detail-desc { margin:0 0 8px; font-size:12.5px; line-height:1.5; }
+.guide-explorer--panel .guide-detail-row { margin:2px 0; font-size:11.5px; line-height:1.45; }
+.guide-explorer--panel .guide-detail-actions { gap:7px; margin-top:10px; }
+.guide-explorer--panel .guide-pending-note { font-size:11.5px; line-height:1.5; }
+/* Caja de estado de ruta y reserva compactas */
+.guide-explorer--panel .guide-route-status { font-size:11.5px; line-height:1.5; }
+.guide-explorer--panel .guide-book-title { font-size:14px; }
+.guide-explorer--panel .guide-book-note { font-size:10.5px; }
+/* Actividades del día compactas */
+.guide-explorer--panel .guide-activities-head h3 { font-size:12px; }
+.guide-explorer--panel .guide-activities-head p { font-size:11px; }
+.guide-explorer--panel .guide-activities-list { gap:8px; }
+.guide-explorer--panel .guide-activity-item { padding:8px 10px; }
+/* Botones internos del panel ligeramente más contenidos */
+.guide-explorer--panel .guide-focus,
+.guide-explorer--panel .guide-route,
+.guide-explorer--panel .guide-book,
+.guide-explorer--panel .guide-cart,
+.guide-explorer--panel .guide-book-submit,
+.guide-explorer--panel .guide-book-cancel,
+.guide-explorer--panel .guide-route-cancel { padding:7px 12px; font-size:12px; border-radius:7px; }
+
+/* Menú flotante de acciones (móvil): sale como burbuja pegada encima del
+   marcador del punto tocado, con "Cómo llegar", reserva/carrito y el estado
+   de la ruta, sin desplazarse. La posición (left/top) la calcula el JS. */
+.guide-mobile-actions { display:none; }
+.guide-mobile-actions[hidden] { display:none !important; }
+.guide-mobile-actions-close {
+  flex:0 0 auto; width:30px; height:30px; border:0; border-radius:50%;
+  background:rgba(64,54,46,.1); color:var(--green-deep);
+  font-size:19px; line-height:1; cursor:pointer;
+}
+.guide-mobile-actions-close:hover,
+.guide-mobile-actions-close:focus-visible { background:rgba(64,54,46,.2); }
+.guide-mobile-actions-buttons { display:flex; flex-wrap:wrap; gap:8px; }
+.guide-mobile-actions-buttons > button { flex:1 1 auto; }
+.guide-mobile-actions-note { flex:1 1 100%; margin:0; color:var(--muted); font:12px/1.5 Arial,sans-serif; }
+.guide-mobile-actions .guide-route-box { margin-top:10px; }
+.guide-mobile-actions .guide-route-box:empty { display:none; }
+.guide-mobile-actions .guide-book-box { margin-top:8px; }
+.guide-mobile-actions .guide-book-box:empty { display:none; }
+
+@media (max-width:850px){
+  .hotel-complex-map-wrap .guide-mobile-actions {
+    display:block;
+    position:absolute;
+    left:8px;
+    top:8px;
+    z-index:1100;
+    max-width:calc(100% - 16px);
+    max-height:calc(100% - 24px);
+    overflow-y:auto;
+    padding:12px 14px;
+    border:1px solid #d9c9ae;
+    border-radius:14px;
+    background:rgba(255,255,255,.98);
+    box-shadow:0 18px 44px rgba(64,54,46,.3);
+    animation:guideMobileActionsIn .16s ease;
+  }
+  .hotel-complex-map-wrap .guide-mobile-actions[hidden] { display:none !important; }
+  .guide-mobile-actions-head {
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    margin-bottom:10px;
+  }
+  .guide-mobile-actions-title {
+    color:var(--green); font:500 16px/1.25 Georgia,serif;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .guide-mobile-actions-buttons > button { flex:1 1 46%; min-width:0; }
+}
+@keyframes guideMobileActionsIn {
+  from { opacity:0; transform:translateY(6px); }
+  to { opacity:1; transform:translateY(0); }
+}
+
 @media (max-width:1099px){
   .hotel-portal-map--complex { height:clamp(420px,64vh,700px); }
   .hotel-guide-panel { top:auto; right:14px; bottom:14px; left:14px; width:auto; max-height:46%; }
   .hotel-complex-map-wrap.is-guide-collapsed .hotel-guide-panel { transform:translateY(calc(100% + 20px)); }
   .hotel-guide-open { top:14px; left:14px; }
+}
+
+/* En móvil, panel de la guía más bajo para dejar ver más mapa. */
+@media (max-width:850px){
+  .hotel-guide-panel { max-height:36%; padding:12px; }
 }
 
 /* =========================================================

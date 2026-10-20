@@ -600,7 +600,7 @@
     ".reference-copy > ul",
     ".reference-right > header",
     ".food-panel > *",
-    ".back-quote > *",
+    ".back-quote > *:not(picture):not(.ri-shade)",
     ".back-contact > *:not(.cover-logo)",
     ".workspace-header",
     ".media-header",
@@ -611,12 +611,15 @@
     ".map-route-list button",
     ".portal-hero > div > *",
     ".portal-hero > img",
+    ".portal-hero > picture > img",
     ".portal-destination-hero > div > *",
     ".portal-destination-hero > img",
+    ".portal-destination-hero > picture > img",
     ".portal-nav",
     ".portal-section > *",
     ".portal-section-heading > *",
-    ".destination-card > *",
+    ".destination-card > *:not(picture)",
+    ".destination-card > picture > img",
     ".portal-map-section > div > *",
     ".hotel-portal-hero-content > *"
   ].join(",");
@@ -704,8 +707,14 @@
       var dy = (lastY / window.innerHeight - 0.5) * 2;
 
       if (right) {
-        right.style.backgroundPosition =
-          (50 + dx * 3).toFixed(2) + "% " + (50 + dy * 3).toFixed(2) + "%";
+        var rightBg = right.querySelector(".ri-bg");
+        if (rightBg) {
+          rightBg.style.objectPosition =
+            (50 + dx * 3).toFixed(2) + "% " + (50 + dy * 3).toFixed(2) + "%";
+        } else {
+          right.style.backgroundPosition =
+            (50 + dx * 3).toFixed(2) + "% " + (50 + dy * 3).toFixed(2) + "%";
+        }
       }
       if (left) {
         left.style.transform =

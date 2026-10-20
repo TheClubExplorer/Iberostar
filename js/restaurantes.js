@@ -179,7 +179,10 @@
     const cards = entries.map((entry) => {
       const badge = entry.has360 ? "<b>360°</b>" : "";
       const media = entry.image
-        ? `<span class="pano-360-ficha-media"><img src="${entry.image}" alt="Recorrido 360° de ${escapeHtml(entry.name)} en ${escapeHtml(hotelName)}" loading="lazy" decoding="async" />${badge}</span>`
+        ? `<span class="pano-360-ficha-media">${RI.img(entry.image, {
+            alt: `Recorrido 360° de ${escapeHtml(entry.name)} en ${escapeHtml(hotelName)}`,
+            sizes: "(max-width:700px) 92vw, 46vw"
+          })}${badge}</span>`
         : `<span class="pano-360-ficha-media pano-360-ficha-media-empty" aria-hidden="true">${badge}</span>`;
       const copy = `<span class="pano-360-ficha-copy"><strong>${escapeHtml(entry.name)}</strong><small>${escapeHtml(entry.cuisine)}</small><small class="pano-360-ficha-place">${place}</small></span>`;
       if (entry.has360) {
@@ -246,8 +249,11 @@
 
           <div
             class="restaurant-menu-photo"
-            style="background-image:linear-gradient(180deg,rgba(5,12,17,.08),rgba(5,12,17,.62)),url('${heroImage}')"
-          >
+          >${RI.bg(heroImage, {
+            gradient: "linear-gradient(180deg,rgba(5,12,17,.08),rgba(5,12,17,.62))",
+            sizes: "100vw",
+            priority: true
+          })}
 
             <div>
               <small>
@@ -311,10 +317,11 @@
 
           <header class="restaurant-menu-brand">
 
-            <img
-              src="src/logo png-02.png"
-              alt="Iberostar The Club"
-            />
+            ${RI.img("src/logo png-02.png", {
+              alt: "Iberostar The Club",
+              loading: "eager",
+              sizes: "138px"
+            })}
 
             <button
               class="restaurant-menu-back"

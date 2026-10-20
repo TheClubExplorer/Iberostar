@@ -81,7 +81,11 @@
       const card = document.createElement("article");
       card.className = "media-card";
       card.innerHTML = `
-        <img class="media-card-image" src="${url}" alt="${item.title}" />
+        ${RI.img(url, {
+          cls: "media-card-image",
+          alt: item.title,
+          sizes: "(max-width:620px) 92vw, (max-width:900px) 46vw, 32vw"
+        })}
         <div class="media-card-content">
           <h3>${item.title}</h3>
           <p>${item.hotel}</p>
