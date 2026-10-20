@@ -3212,10 +3212,15 @@ body[data-app-mode="hotel"] .hotel-detail-nav { border-color:#d9c9ae; color:#090
 /* Guia interactiva THE CLUB - Ruta/Como llegar */
 .guide-route { padding: 8px 14px; border-radius: 8px; border: 1px solid var(--gold-deep); background: transparent; color: var(--gold-deep); font: 600 13px Arial, sans-serif; cursor: pointer; transition: background .15s ease; }
 .guide-route:hover { background: rgba(199, 169, 94, .14); }
-.guide-book { padding: 8px 14px; border-radius: 8px; border: 1px solid var(--selection); background: var(--selection); color: #fff; font: 600 13px Arial, sans-serif; cursor: pointer; transition: filter .15s ease; }
-.guide-book:hover { filter: brightness(1.1); }
-.guide-cart { padding: 8px 14px; border-radius: 8px; border: 1px solid #2e8b57; background: #2e8b57; color: #fff; font: 600 13px Arial, sans-serif; cursor: pointer; transition: filter .15s ease; }
-.guide-cart:hover { filter: brightness(1.1); }
+.guide-book { padding: 10px 16px; border-radius: 10px; border: 1px solid var(--selection); background: var(--selection); color: #fff; font: 600 13px Arial, sans-serif; cursor: pointer; transition: filter .15s ease, transform .1s ease; white-space: nowrap; flex: 1 1 auto; min-width: 140px; text-align: center; }
+.guide-book:hover { filter: brightness(1.1); transform: translateY(-1px); }
+.guide-cart { padding: 10px 16px; border-radius: 10px; border: 1px solid #2e8b57; background: #2e8b57; color: #fff; font: 600 13px Arial, sans-serif; cursor: pointer; transition: filter .15s ease, transform .1s ease; white-space: nowrap; flex: 1 1 auto; min-width: 140px; text-align: center; }
+.guide-cart:hover { filter: brightness(1.1); transform: translateY(-1px); }
+
+/* En paneles estrechos (panel de hotel), botones a ancho completo */
+.guide-explorer--panel .guide-detail-actions { flex-direction: column; gap: 8px; }
+.guide-explorer--panel .guide-book,
+.guide-explorer--panel .guide-cart { width: 100%; min-width: 0; flex: none; }
 .guide-extra-info { margin-top: 12px; padding: 12px; border-radius: 8px; background: var(--sea, #f1ece3); }
 .guide-extra-info .guide-detail-row { margin: 4px 0; font-size: 13px; }
 .guide-book-box { margin-top: 12px; }
@@ -3662,7 +3667,11 @@ body.pano-360-open { overflow: hidden; }
 .hotel-complex-stage { margin-top:22px; scroll-margin-top:92px; }
 .hotel-complex-actions { margin-bottom:12px; }
 .hotel-complex-map-wrap { position:relative; }
-.hotel-portal-map--complex { width:100%; height:clamp(420px,58vh,720px); border:1px solid #d9c9ae; border-radius:16px; overflow:hidden; background:var(--panel); box-shadow:0 18px 42px rgba(64,54,46,.1); }
+/* Máscara del complejo: difumina el borde entre el área visible y la que se
+   oculta alrededor del resort. */
+.complex-mask-feather { filter: blur(10px); }
+.complex-mask-feather-soft { filter: blur(22px); }
+.hotel-portal-map--complex { width:100%; height:clamp(560px,72vh,720px); border:1px solid #d9c9ae; border-radius:16px; overflow:hidden; background:var(--panel); box-shadow:0 18px 42px rgba(64,54,46,.1); }
 .hotel-complex-legend { margin-top:14px; }
 .hotel-complex-legend.guide-legend { border:1px solid #d9c9ae; border-radius:14px; background:var(--panel); box-shadow:none; padding:14px 18px; }
 .hotel-complex-legend .guide-legend-list { grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); }
@@ -3793,8 +3802,9 @@ body.pano-360-open { overflow: hidden; }
 }
 
 @media (max-width:1099px){
-  .hotel-portal-map--complex { height:clamp(420px,64vh,700px); }
-  .hotel-guide-panel { top:auto; right:14px; bottom:14px; left:14px; width:auto; max-height:46%; }
+  .hotel-complex-map-wrap { max-width:none; }
+  .hotel-portal-map--complex { height:clamp(520px,76vh,780px); }
+  .hotel-guide-panel { top:auto; right:14px; bottom:14px; left:14px; width:auto; max-height:42%; }
   .hotel-complex-map-wrap.is-guide-collapsed .hotel-guide-panel { transform:translateY(calc(100% + 20px)); }
   .hotel-guide-open { top:14px; left:14px; }
 }
