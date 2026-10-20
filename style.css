@@ -3221,6 +3221,39 @@ body[data-app-mode="hotel"] .hotel-detail-nav { border-color:#d9c9ae; color:#090
 .guide-explorer--panel .guide-detail-actions { flex-direction: column; gap: 8px; }
 .guide-explorer--panel .guide-book,
 .guide-explorer--panel .guide-cart { width: 100%; min-width: 0; flex: none; }
+
+/* Golf booking button (tee time) - color dorado/ámbar distinto */
+.guide-book[data-cat="golf"] {
+  border-color: #c9a84c;
+  background: linear-gradient(135deg, #d4b85c 0%, #c4a044 100%);
+  color: #1a1508;
+  font-weight: 700;
+  text-shadow: 0 1px 1px rgba(255,255,255,.3);
+}
+.guide-book[data-cat="golf"]:hover {
+  background: linear-gradient(135deg, #e0c46c 0%, #d0ac50 100%);
+  filter: none;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(196, 160, 68, .4);
+}
+.guide-book[data-cat="golf"]:focus-visible {
+  outline: 2px solid #c9a84c;
+  outline-offset: 2px;
+}
+
+/* Golf cart button también en tono dorado */
+.guide-cart[data-cat="golf"] {
+  border-color: #b8963e;
+  background: linear-gradient(135deg, #c9a84c 0%, #b8963e 100%);
+  color: #1a1508;
+  font-weight: 700;
+}
+.guide-cart[data-cat="golf"]:hover {
+  background: linear-gradient(135deg, #d4b85c 0%, #c4a044 100%);
+  filter: none;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(184, 150, 62, .4);
+}
 .guide-extra-info { margin-top: 12px; padding: 12px; border-radius: 8px; background: var(--sea, #f1ece3); }
 .guide-extra-info .guide-detail-row { margin: 4px 0; font-size: 13px; }
 .guide-book-box { margin-top: 12px; }
