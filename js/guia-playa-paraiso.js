@@ -242,7 +242,8 @@
     ["diving-center", 20.7588638, -86.9575332, "Dressel Divers"],
     ["latelier", 20.7551676, -86.9609817, "L'Atelier"],
     ["star-rock-cafe", 20.7618856, -86.9627721, "Star Rock Café"],
-    ["bar-el-puente", 20.7586198, -86.9590972, "Bar El Puente"]
+    ["bar-el-puente", 20.7586198, -86.9590972, "Bar El Puente"],
+    ["theclub", 20.7598333, -86.9652778, "THE CLUB"]
   ];
   OSM_COORDS.forEach(function (row) {
     for (var i = 0; i < POIS.length; i += 1) {
@@ -413,6 +414,100 @@
   // Mapa (instancia Leaflet) en el que el usuario centró un destino a mano.
   // La detección automática de ubicación no reencuadra ese mapa.
   gp._userFocusedMap = gp._userFocusedMap || null;
+
+  // Contorno real del complejo Iberostar Playa Paraíso (polígono de la vía
+  // OpenStreetMap way/138147423 «Iberostar Playa Paraiso Resort», consultada
+  // vía API de OSM). Se usa para la máscara: deja visible solo el complejo y
+  // oculta todo lo de alrededor.
+  gp.COMPLEX_RING = [
+    [20.7588947, -86.9573717],
+    [20.7578714, -86.9577242],
+    [20.7571566, -86.9581953],
+    [20.7565668, -86.9584419],
+    [20.7559920, -86.9586080],
+    [20.7531065, -86.9598838],
+    [20.7536903, -86.9625296],
+    [20.7546786, -86.9619698],
+    [20.7552285, -86.9627738],
+    [20.7572551, -86.9657832],
+    [20.7581078, -86.9669205],
+    [20.7600693, -86.9697573],
+    [20.7648525, -86.9660585],
+    [20.7615495, -86.9612170],
+    [20.7601367, -86.9591462],
+    [20.7600436, -86.9590196],
+    [20.7588947, -86.9573717]
+  ];
+
+  // Dibuja una máscara opaca sobre el mapa: cubre TODO el mundo salvo el
+  // contorno del complejo (agujero), de modo que alrededor "no existe nada".
+  // El borde se difumina con un trazo ancho semitransparente.
+  gp.addComplexMask = function (map, options) {
+    if (!map || !window.L || !gp.COMPLEX_RING || gp.COMPLEX_RING.length < 3) return null;
+    var L = window.L;
+    var opts = options || {};
+    var color = opts.color || "#f5f0e7"; // tono del sitio (--paper)
+    var ring = gp.COMPLEX_RING;
+    // Renderizador SVG explícito: el mapa usa preferCanvas, pero necesitamos
+    // SVG para poder difuminar el borde con CSS (filter: blur).
+    var renderer = (typeof L.svg === "function") ? L.svg({ padding: 0.5 }) : null;
+    // Anillo exterior que rodea el mundo; el contorno del complejo se añade
+    // como agujero (Leaflet dibuja los anillos consecutivos con relleno
+    // alternado tipo even-odd).
+    var world = [
+      [85, -180],
+      [85, 180],
+      [-85, 180],
+      [-85, -180]
+    ];
+    var maskOpts = {
+      stroke: false,
+      fill: true,
+      fillColor: color,
+      fillOpacity: 1,
+      interactive: false,
+      className: "complex-mask-hole"
+    };
+    if (renderer) maskOpts.renderer = renderer;
+    var mask = L.polygon([world, ring], maskOpts).addTo(map);
+    // Borde difuminado: trazo ancho y semitransparente a lo largo del contorno.
+    var featherOpts = {
+      stroke: true,
+      color: color,
+      weight: opts.featherWeight || 26,
+      opacity: 0.55,
+      fill: false,
+      interactive: false,
+      className: "complex-mask-feather"
+    };
+    if (renderer) featherOpts.renderer = renderer;
+    var feather = L.polygon(ring, featherOpts).addTo(map);
+    // Segundo trazo más tenue para suavizar aún más la transición.
+    var featherSoftOpts = {
+      stroke: true,
+      color: color,
+      weight: (opts.featherWeight || 26) * 2.4,
+      opacity: 0.18,
+      fill: false,
+      interactive: false,
+      className: "complex-mask-feather-soft"
+    };
+    if (renderer) featherSoftOpts.renderer = renderer;
+    var featherSoft = L.polygon(ring, featherSoftOpts).addTo(map);
+    gp._complexMask = { mask: mask, feather: feather, featherSoft: featherSoft };
+    return gp._complexMask;
+  };
+
+  gp.removeComplexMask = function () {
+    var g = gp._complexMask;
+    if (!g) return;
+    try {
+      [g.mask, g.feather, g.featherSoft].forEach(function (layer) {
+        if (layer && g.mask && g.mask._map) g.mask._map.removeLayer(layer);
+      });
+    } catch (e) { /* ignore */ }
+    gp._complexMask = null;
+  };
 
   gp.registerMarker = function (id, marker) {
     if (id && marker) gp._markers[id] = marker;
