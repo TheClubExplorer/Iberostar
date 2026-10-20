@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Iberostar | Destinos y hoteles</title>
     <base href="./" />
-    <link rel="icon" type="image/png" href="branding/IB_THE_CLUB_VV_POS_RGB.png" />
+    <link rel="icon" type="image/png" href="branding/favicon-64.png" />
     <script>document.documentElement.dataset.routeStartup = "true";</script>
+    <script src="src/ri-manifest.js"></script>
     <script>
       const routeEntry = new URLSearchParams(window.location.search).get("route-entry");
       if (routeEntry) {
@@ -23,6 +24,7 @@
       }
     </script>
     <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="responsive.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
    <link
@@ -44,29 +46,56 @@
     <div class="intro-overlay" id="introOverlay" aria-hidden="true">
       <div class="intro-backdrop"></div>
       <div class="intro-glow"></div>
-      <img
-        class="intro-logo"
-        id="introLogo"
-        src="src/logo png-02.png"
-        alt="Iberostar"
-      />
+      <picture>
+        <source
+          type="image/webp"
+          srcset="src/logo%20png-02-320.webp 320w, src/logo%20png-02-640.webp 640w, src/logo%20png-02-1280.webp 1280w, src/logo%20png-02.webp 1920w"
+          sizes="(max-width: 700px) 280px, 360px"
+        />
+        <img
+          class="intro-logo"
+          id="introLogo"
+          src="src/logo%20png-02.png"
+          alt="Iberostar"
+          loading="eager"
+          decoding="async"
+        />
+      </picture>
       <canvas class="intro-canvas" id="introCanvas"></canvas>
     </div>
     <header class="site-header" id="siteHeader">
       <a class="site-brand" href="./" data-app-route="/" aria-label="Iberostar, inicio">
-        <img src="branding/IB_THE_CLUB_VV_POS_RGB.png" alt="Iberostar The Club" />
+        <picture>
+          <source
+            type="image/webp"
+            srcset="branding/IB_THE_CLUB_VV_POS_RGB-320.webp 320w, branding/IB_THE_CLUB_VV_POS_RGB-640.webp 640w, branding/IB_THE_CLUB_VV_POS_RGB-1280.webp 1280w, branding/IB_THE_CLUB_VV_POS_RGB.webp 1920w"
+            sizes="(max-width: 600px) 45px, 56px"
+          />
+          <img src="branding/IB_THE_CLUB_VV_POS_RGB.png" alt="Iberostar The Club" loading="eager" decoding="async" />
+        </picture>
         <span>Destinos</span>
       </a>
-      <nav class="site-nav" aria-label="Navegación principal">
-        <a href="./mexico" data-app-route="/mexico" data-i18n="navMexico">México</a>
-        <a href="./jamaica" data-app-route="/jamaica" data-i18n="navJamaica">Jamaica</a>
-        <a href="./republica-dominicana" data-app-route="/republica-dominicana" data-i18n="navDominican">República Dominicana</a>
-        <a href="./brasil" data-app-route="/brasil" data-i18n="navBrazil">Brasil</a>
+      <button type="button" class="mobile-menu-btn" id="mobileMenuButton" aria-label="Abrir menú" aria-expanded="false" aria-controls="siteNav">
+        <span aria-hidden="true">☰</span>
+      </button>
+      <nav class="site-nav" id="siteNav" aria-label="Navegación principal">
+        <button type="button" class="mobile-nav-close" id="mobileNavClose" aria-label="Cerrar menú">
+          <span aria-hidden="true">×</span>
+        </button>
+        <details class="site-tools site-nav-destinos">
+          <summary><span data-i18n="navDestinos">Destinos</span><span class="site-tools-caret" aria-hidden="true">▾</span></summary>
+          <div class="site-tools-menu">
+            <a href="./mexico" data-app-route="/mexico" data-i18n="navMexico">México</a>
+            <a href="./jamaica" data-app-route="/jamaica" data-i18n="navJamaica">Jamaica</a>
+            <a href="./republica-dominicana" data-app-route="/republica-dominicana" data-i18n="navDominican">República Dominicana</a>
+            <a href="./brasil" data-app-route="/brasil" data-i18n="navBrazil">Brasil</a>
+          </div>
+        </details>
         <button type="button" class="location-button" id="requestLocationButton" data-i18n="navLocation">Usar mi ubicación</button>
         <button type="button" class="search-trigger-btn" id="openSearchButton" aria-label="Buscar hoteles" data-i18n="navSearch">🔍 Buscar</button>
         <button type="button" class="lang-toggle-btn" id="langToggleBtn" aria-label="Cambiar idioma">🌐 EN</button>
         <details class="site-tools">
-          <summary data-i18n="navExplore">Explorar</summary>
+          <summary><span data-i18n="navExplore">Explorar</span><span class="site-tools-caret" aria-hidden="true">▾</span></summary>
           <div class="site-tools-menu">
             <a href="./mapa-mundi/index2.html" data-i18n="menuWorldMapD3">Planisferio Interactivo (D3) ↗</a>
             <a href="./workspace" data-app-route="/workspace" data-i18n="menuWorkspace">Workspace</a>
@@ -78,6 +107,7 @@
         </details>
       </nav>
     </header>
+    <div class="nav-overlay" id="navOverlay" hidden></div>
     <div class="app-context-bar" id="appContextBar" hidden aria-live="polite">
       <div class="app-context-bar-inner" id="appContextBarInner"></div>
     </div>
@@ -171,22 +201,23 @@
       })();
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/app.js" defer></script>
-<script src="js/pannellum-360.js" defer></script>
-    <script src="js/routes.js" defer></script>
-    <script src="js/hoteles.js" defer></script>
-    <script src="js/restaurantes.js" defer></script>
-    <script src="js/mapas.js" defer></script>
-    <script src="js/workspace.js" defer></script>
-    <script src="js/media360.js" defer></script>
-    <script src="js/videos.js" defer></script>
-    <script src="js/hotel-gallery-data.js" defer></script>
-    <script src="js/hotel-content-data.js" defer></script>
-    <script src="js/i18n.js" defer></script>
-    <script src="js/search.js" defer></script>
-    <script src="js/datos-complejo.js" defer></script>
-<script src="js/guia-playa-paraiso.js" defer></script>
-    <script src="function.js" defer></script>
-    <script src="js/animations.js" defer></script>
+<script src="js/responsive-images.js?v=2" defer></script>
+<script src="js/app.js?v=2" defer></script>
+<script src="js/pannellum-360.js?v=2" defer></script>
+<script src="js/routes.js?v=2" defer></script>
+<script src="js/hoteles.js?v=2" defer></script>
+<script src="js/restaurantes.js?v=2" defer></script>
+<script src="js/mapas.js?v=2" defer></script>
+<script src="js/workspace.js?v=2" defer></script>
+<script src="js/media360.js?v=2" defer></script>
+<script src="js/videos.js?v=2" defer></script>
+<script src="js/hotel-gallery-data.js?v=2" defer></script>
+<script src="js/hotel-content-data.js?v=2" defer></script>
+<script src="js/i18n.js?v=2" defer></script>
+<script src="js/search.js?v=2" defer></script>
+<script src="js/datos-complejo.js?v=2" defer></script>
+<script src="js/guia-playa-paraiso.js?v=2" defer></script>
+<script src="function.js?v=2" defer></script>
+<script src="js/animations.js?v=2" defer></script>
   </body>
 </html>
