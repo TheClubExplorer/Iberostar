@@ -186,7 +186,15 @@
     {"id":"paraiso-express-stop","name":"Paraíso Express Stop","category":"servicio","description":"Paraíso Express Stop","source":"plano","verified":false},
     {"id":"wedding-chapel","name":"Capilla de bodas","category":"servicio","description":"Wedding chapel","source":"plano","verified":false},
     {"id":"village-villas","name":"Village / Villas","category":"servicio","description":"Village / Villas","source":"plano","verified":false},
-    {"id":"star-friends-desk","name":"Star Friends Desk","category":"kids","description":"Star Friends Desk","source":"plano","verified":false});
+    {"id":"star-friends-desk","name":"Star Friends Desk","category":"kids","description":"Star Friends Desk","source":"plano","verified":false},
+    // --- Nuevos POIs del plano oficial no existentes en catálogo previo ---
+    {"id":"beach-bar","name":"Beach Bar / Bar de playa","category":"bar","description":"Bar de playa genérico","source":"plano","verified":false},
+    {"id":"bar-el-puente","name":"Bar El Puente","category":"bar","description":"Bar El Puente (distinto a heladería)","source":"plano","verified":false},
+    {"id":"buffet-la-marina","name":"Buffet La Marina","category":"restaurante","description":"Buffet restaurante La Marina","source":"plano","verified":false},
+    {"id":"buffet-el-tapatio","name":"Buffet El Tapatío","category":"restaurante","description":"Buffet restaurante El Tapatío","source":"plano","verified":false},
+    {"id":"surprise-gf","name":"Restaurant Surprise (Planta baja)","category":"restaurante","description":"Restaurante Surprise - Ground Floor","source":"plano","verified":false},
+    {"id":"surprise-2f","name":"Restaurant Surprise (2do nivel)","category":"restaurante","description":"Restaurante Surprise - 2nd Level","source":"plano","verified":false},
+    {"id":"shushi","name":"Restaurant Shushi","category":"restaurante","description":"Restaurante Shushi (japonés)","source":"plano","verified":false});
 
   // Coordenadas confirmadas con OpenStreetMap. Cada fila es
   // [id, lat, lng, nombre del elemento OSM]. Solo se incluyen elementos que
@@ -231,7 +239,10 @@
     ["starmarket", 20.7574499, -86.9613521, "Star Market"],
     ["games-room", 20.759771, -86.9662607, "Video Games Room"],
     ["golf-club-house", 20.7586073, -86.9658668, "Golf Clubhouse"],
-    ["diving-center", 20.7588638, -86.9575332, "Dressel Divers"]
+    ["diving-center", 20.7588638, -86.9575332, "Dressel Divers"],
+    ["latelier", 20.7551676, -86.9609817, "L'Atelier"],
+    ["star-rock-cafe", 20.7618856, -86.9627721, "Star Rock Café"],
+    ["bar-el-puente", 20.7586198, -86.9590972, "Bar El Puente"]
   ];
   OSM_COORDS.forEach(function (row) {
     for (var i = 0; i < POIS.length; i += 1) {
@@ -553,6 +564,9 @@
   // Si el mapa queda fuera de la pantalla (móvil), se trae a la vista.
   function revealMap(map) {
     if (!map || typeof map.getContainer !== "function") return;
+    // En móvil no desplazamos la página: el mapa ya está a la vista y moverla
+    // hace que el panel de la guía "salte".
+    if (isMobileGuide()) return;
     var rect = map.getContainer().getBoundingClientRect();
     var visible = rect.bottom > 90 && rect.top < window.innerHeight - 20;
     if (visible) return;
@@ -699,25 +713,39 @@
   function renderRouteStatus() {
     if (!state.mount) return;
     var box = state.mount.querySelector("#guideRouteBox");
-    if (!box) return;
-    var route = gp._route;
-    if (!route || route.status === "idle") {
-      box.innerHTML = "";
-      return;
+    if (box) {
+      var route = gp._route;
+      if (!route || route.status === "idle") {
+        box.innerHTML = "";
+      } else {
+        var name = escapeHtml(route.targetName || "el destino");
+        var html = "";
+        if (route.status === "locating") {
+          html = '<p class="guide-route-status is-loading">' + escapeHtml(route.info || "Obteniendo tu ubicación…") + "</p>";
+        } else if (route.status === "calculating") {
+          html = '<p class="guide-route-status is-loading">Calculando ruta a ' + name + "…</p>";
+        } else if (route.status === "ready") {
+          html = '<p class="guide-route-status is-ready">Ruta ' + escapeHtml(route.info || "") + " hasta " + name + ".</p>";
+        } else {
+          html = '<p class="guide-route-status is-error">' + escapeHtml(route.info || "No se pudo calcular la ruta.") + "</p>";
+        }
+        html += '<button type="button" class="guide-route-cancel">Cancelar ruta</button>';
+        box.innerHTML = html;
+        revealFeedback(box);
+      }
     }
-    var name = escapeHtml(route.targetName || "el destino");
-    var html = "";
-    if (route.status === "locating") {
-      html = '<p class="guide-route-status is-loading">' + escapeHtml(route.info || "Obteniendo tu ubicación…") + "</p>";
-    } else if (route.status === "calculating") {
-      html = '<p class="guide-route-status is-loading">Calculando ruta a ' + name + "…</p>";
-    } else if (route.status === "ready") {
-      html = '<p class="guide-route-status is-ready">Ruta ' + escapeHtml(route.info || "") + " hasta " + name + ".</p>";
-    } else {
-      html = '<p class="guide-route-status is-error">' + escapeHtml(route.info || "No se pudo calcular la ruta.") + "</p>";
-    }
-    html += '<button type="button" class="guide-route-cancel">Cancelar ruta</button>';
-    box.innerHTML = html;
+    renderMobileRouteStatus();
+  }
+
+  // Lleva el bloque de ruta/reserva a la vista (queda sticky arriba del panel).
+  // En móvil el estado de ruta vive en el menú flotante, así que no desplazamos.
+  function revealFeedback(node) {
+    if (!node || isMobileGuide()) return;
+    var target = node.closest ? node.closest(".guide-detail-feedback") : null;
+    target = target || node;
+    try {
+      target.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    } catch (e) { /* ignore */ }
   }
 
   function setRouteStatus(status, id, name, info) {
@@ -781,12 +809,124 @@
   gp.routeToPoi = routeToPoi;
   gp.cancelRoute = function () { cancelRoute(false); };
 
+  // Menú flotante de acciones para móvil: sale sobre el mapa al tocar un punto
+  // y ofrece "Cómo llegar", reserva/carrito y "Ver en el mapa" sin tener que
+  // desplazarse hasta la ficha. El estado de la ruta (distancia y tiempo, como
+  // en un navegador) se muestra aquí mismo.
+  function renderMobileActions(poi) {
+    if (!state.mount) return;
+    state.mobilePoi = poi || null;
+    var panel = mobileActionsRoot("#guideMobileActions");
+    if (!panel) return;
+    var titleEl = mobileActionsRoot("#guideMobileActionsTitle");
+    var body = mobileActionsRoot("#guideMobileActionsBody");
+    if (!body) return;
+    if (!poi) {
+      panel.hidden = true;
+      body.innerHTML = "";
+      if (titleEl) titleEl.textContent = "";
+      return;
+    }
+    var verified = poi.verified === true;
+    var isArea = poi.kind === "area";
+    var cat = poi.category;
+    var btns = "";
+    if (isArea) {
+      btns += '<button type="button" class="guide-focus" data-id="' + escapeHtml(poi.id) + '">Ver en el mapa</button>';
+    } else if (verified) {
+      btns += '<button type="button" class="guide-route" data-id="' + escapeHtml(poi.id) + '">Cómo llegar</button>';
+      btns += '<button type="button" class="guide-focus" data-id="' + escapeHtml(poi.id) + '">Ver en el mapa</button>';
+      if (cat === "restaurante" || cat === "spa" || cat === "golf") {
+        var label = cat === "restaurante" ? "Reservar" : (cat === "spa" ? "Reservar cita" : "Reservar tee time");
+        btns += '<button type="button" class="guide-book" data-id="' + escapeHtml(poi.id) + '" data-cat="' + cat + '">' + label + "</button>";
+        if (cat === "golf") {
+          btns += '<button type="button" class="guide-cart" data-id="' + escapeHtml(poi.id) + '">Solicitar carrito</button>';
+        }
+      }
+    } else {
+      btns += '<span class="guide-mobile-actions-note">Ubicación pendiente de verificación: sin ruta.</span>';
+      if (cat === "restaurante" || cat === "spa" || cat === "golf") {
+        var l2 = cat === "restaurante" ? "Reservar" : (cat === "spa" ? "Reservar cita" : "Reservar tee time");
+        btns += '<button type="button" class="guide-book" data-id="' + escapeHtml(poi.id) + '" data-cat="' + cat + '">' + l2 + "</button>";
+        if (cat === "golf") {
+          btns += '<button type="button" class="guide-cart" data-id="' + escapeHtml(poi.id) + '">Solicitar carrito</button>';
+        }
+      }
+    }
+    if (titleEl) titleEl.textContent = poi.name || "";
+    body.innerHTML = '<div class="guide-mobile-actions-buttons">' + btns + "</div>" +
+      '<div class="guide-route-box" id="guideMobileRouteBox" role="status" aria-live="polite"></div>' +
+      '<div class="guide-book-box" id="guideMobileBookBox"></div>';
+    panel.hidden = false;
+    positionMobileActions(poi);
+    renderMobileRouteStatus();
+  }
+
+  // Coloca el menú flotante pegado justo ENCIMA del panel de la guía (el que
+  // está abajo), con el mismo ancho, para no tapar el mapa ni el marcador.
+  function positionMobileActions(poi) {
+    var panel = mobileActionsRoot("#guideMobileActions");
+    if (!panel || panel.hidden) return;
+    var wrap = panel.offsetParent;
+    if (!wrap) return;
+    var guidePanel = wrap.querySelector(".hotel-guide-panel") ||
+      document.querySelector(".hotel-guide-panel");
+    if (!guidePanel) return;
+    var wrapRect = wrap.getBoundingClientRect();
+    var gpRect = guidePanel.getBoundingClientRect();
+    var margin = 8; // separación entre el menú y el panel
+    // Mismo ancho y misma alineación horizontal que el panel de la guía.
+    var left = (gpRect.left - wrapRect.left);
+    var width = gpRect.width;
+    // Anclado justo ENCIMA del borde superior del panel (por su borde inferior),
+    // así al crecer se extiende hacia arriba y nunca lo tapa ni se sale: el
+    // overflow interno hace scroll si hace falta.
+    var bottom = (wrapRect.bottom - gpRect.top) + margin;
+    var maxH = (gpRect.top - wrapRect.top) - margin - 6;
+    panel.style.left = Math.round(left) + "px";
+    panel.style.width = Math.round(width) + "px";
+    panel.style.maxWidth = "calc(100% - 16px)";
+    panel.style.top = "auto";
+    panel.style.bottom = Math.round(bottom) + "px";
+    panel.style.maxHeight = Math.max(120, Math.round(maxH)) + "px";
+    panel.style.right = "auto";
+    panel.classList.remove("is-below");
+    panel.style.setProperty("--gma-arrow-x", "-9999px");
+  }
+
+  function renderMobileRouteStatus() {
+    var box = mobileActionsRoot("#guideMobileRouteBox");
+    if (!box) return;
+    var route = gp._route;
+    if (!route || route.status === "idle") {
+      box.innerHTML = "";
+      if (isMobileGuide()) positionMobileActions(state.mobilePoi);
+      return;
+    }
+    var name = escapeHtml(route.targetName || "el destino");
+    var html = "";
+    if (route.status === "locating") {
+      html = '<p class="guide-route-status is-loading">' + escapeHtml(route.info || "Obteniendo tu ubicación…") + "</p>";
+    } else if (route.status === "calculating") {
+      html = '<p class="guide-route-status is-loading">Calculando ruta a ' + name + "…</p>";
+    } else if (route.status === "ready") {
+      html = '<p class="guide-route-status is-ready">Ruta ' + escapeHtml(route.info || "") + " hasta " + name + ".</p>";
+    } else {
+      html = '<p class="guide-route-status is-error">' + escapeHtml(route.info || "No se pudo calcular la ruta.") + "</p>";
+    }
+    html += '<button type="button" class="guide-route-cancel">Cancelar ruta</button>';
+    box.innerHTML = html;
+    // El estado de ruta cambia la altura del menú: lo recolocamos sobre el panel.
+    if (isMobileGuide()) positionMobileActions(state.mobilePoi);
+  }
+
   function renderDetail(poi) {
     if (!state.mount) return;
     var detail = state.mount.querySelector("#guideDetail");
     if (!detail) return;
     if (!poi) {
       detail.innerHTML = '<p class="guide-detail-empty">Selecciona un lugar de la lista para ver su información.</p>';
+      renderMobileActions(null);
       return;
     }
     var verified = poi.verified === true;
@@ -873,7 +1013,12 @@
         (poi.packages ? '<p class="guide-detail-row"><strong>Paquetes</strong> ' + escapeHtml(poi.packages) + "</p>" : "") +
         "</div>";
     }
-    detail.innerHTML = '<span class="guide-dot guide-dot--lg" style="background:' + categoryColor(poi.category) + '"></span>' +
+    detail.innerHTML =
+      '<div class="guide-detail-feedback">' +
+        '<div class="guide-route-box" id="guideRouteBox" role="status" aria-live="polite"></div>' +
+        '<div class="guide-book-box" id="guideBookBox"></div>' +
+      '</div>' +
+      '<span class="guide-dot guide-dot--lg" style="background:' + categoryColor(poi.category) + '"></span>' +
       '<h3 class="guide-detail-title">' + escapeHtml(poi.name) + "</h3>" +
       '<p class="guide-detail-cat">' + escapeHtml(categoryLabel(poi.category)) + "</p>" +
       (poi.description ? '<p class="guide-detail-desc">' + escapeHtml(poi.description) + "</p>" : "") +
@@ -881,17 +1026,46 @@
       '<p class="guide-detail-row"><strong>Fuente</strong> ' + escapeHtml(source) + "</p>" +
       '<p class="guide-detail-row"><strong>Estado</strong> ' + (isArea ? "Área geográfica" : (verified ? "Verificado" : "Pendiente de verificación")) + "</p>" +
       extraInfo +
-      actions +
-      '<div class="guide-route-box" id="guideRouteBox" role="status" aria-live="polite"></div>' +
-      '<div class="guide-book-box" id="guideBookBox"></div>';
+      actions;
     renderRouteStatus();
+    renderMobileActions(poi);
+    // En escritorio, llevamos la ficha a la vista (queda arriba de la lista).
+    // En móvil no hace falta desplazarse: las acciones salen en el menú flotante.
+    if (!isMobileGuide()) revealDetail(detail);
+  }
+
+  // ¿Estamos en el ancho donde la guía usa el panel estrecho con menú flotante?
+  function isMobileGuide() {
+    try {
+      return window.matchMedia("(max-width: 850px)").matches;
+    } catch (e) {
+      return window.innerWidth <= 850;
+    }
+  }
+
+  // El menú flotante se reubica fuera del mount (sobre el mapa), así que hay
+  // que buscarlo en el propio mount o, si no está, en el documento.
+  function mobileActionsRoot(selector) {
+    if (state.mount) {
+      var el = state.mount.querySelector(selector);
+      if (el) return el;
+    }
+    return document.querySelector(selector);
+  }
+
+  function revealDetail(detail) {
+    if (!detail) return;
+    try {
+      detail.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    } catch (e) { /* ignore */ }
   }
 
   // Pantallas de reserva y de solicitud de carrito. Quedan preparadas para
   // conectarse al sistema de reservas; por ahora capturan la solicitud y
   // avisan que se confirmará en recepción.
   function renderBookingPanel(poi, kind) {
-    var box = state.mount && state.mount.querySelector("#guideBookBox");
+    // En móvil el formulario vive en el menú flotante; en escritorio, en la ficha.
+    var box = isMobileGuide() ? mobileActionsRoot("#guideMobileBookBox") : (state.mount && state.mount.querySelector("#guideBookBox"));
     if (!box || !poi) return;
     var isCart = kind === "cart";
     var title = isCart
@@ -935,11 +1109,15 @@
     if (cancel) {
       cancel.addEventListener("click", function () { box.innerHTML = ""; });
     }
+    revealFeedback(box);
+    // El formulario cambia la altura del menú: lo recolocamos sobre el panel.
+    if (isMobileGuide()) positionMobileActions(state.mobilePoi);
   }
 
-  function selectPoi(id) {
+  function selectPoi(id, opts) {
     var poi = findPoi(id);
     if (!poi) return;
+    opts = opts || {};
     state.selectedId = id;
     renderList();
     renderDetail(poi);
@@ -964,7 +1142,9 @@
       focusOn(map, target, targetZoom);
       gp._userFocusedMap = map;
       if (marker && typeof marker.openPopup === "function") marker.openPopup();
-      revealMap(map);
+      // No desplazar la página si ya estamos viendo el mapa (p. ej. al usar el
+      // menú flotante móvil); solo se trae a la vista cuando está fuera.
+      if (!opts.noScroll) revealMap(map);
     } catch (e) { /* ignore map errors */ }
   }
 
@@ -1047,6 +1227,13 @@
     mount.innerHTML = '<div class="guide-explorer' + (panelMode ? " guide-explorer--panel" : "") + '">' +
       head +
       (panelMode ? searchField : "") +
+      (panelMode ? '<div class="guide-mobile-actions" id="guideMobileActions" hidden role="region" aria-label="Acciones del lugar seleccionado">' +
+          '<div class="guide-mobile-actions-head">' +
+            '<span class="guide-mobile-actions-title" id="guideMobileActionsTitle"></span>' +
+            '<button type="button" class="guide-mobile-actions-close" id="guideMobileActionsClose" aria-label="Cerrar acciones">×</button>' +
+          '</div>' +
+          '<div class="guide-mobile-actions-body" id="guideMobileActionsBody"></div>' +
+        '</div>' : "") +
       '<div class="guide-filters" id="guideFilters" role="group" aria-label="Filtrar por categoría">' + categoryChips() + "</div>" +
       '<div class="guide-layout">' +
         '<div class="guide-panel guide-list-panel">' +
@@ -1075,7 +1262,29 @@
       });
     }
 
+    // En modo panel, subimos el menú flotante al contenedor del mapa para que
+    // se ancle a la parte superior del mapa (no al panel inferior).
+    var mobileActions = mount.querySelector("#guideMobileActions");
+    if (mobileActions) {
+      var mapWrap = mount.closest(".hotel-complex-map-wrap") || mount.parentNode;
+      if (mapWrap) mapWrap.appendChild(mobileActions);
+    }
+
     mount.addEventListener("click", function (event) {
+      handleGuideClick(event, mount);
+    });
+    // El menú flotante móvil se reubica fuera del mount para anclarse al mapa;
+    // necesita su propio listener delegado.
+    if (mobileActions) mobileActions.addEventListener("click", function (event) {
+      handleGuideClick(event, mount);
+    });
+
+    function handleGuideClick(event, mount) {
+      if (event.target.closest("#guideMobileActionsClose")) {
+        var mpanel = mobileActionsRoot("#guideMobileActions");
+        if (mpanel) mpanel.hidden = true;
+        return;
+      }
       var activity = event.target.closest("[data-activity-id]");
       if (activity) {
         activateActivity(activity.getAttribute("data-activity-id"));
@@ -1104,7 +1313,8 @@
       }
       var focus = event.target.closest(".guide-focus");
       if (focus) {
-        selectPoi(focus.getAttribute("data-id"));
+        // En móvil ya se ve el mapa: no desplazamos la página al centrar el punto.
+        selectPoi(focus.getAttribute("data-id"), { noScroll: isMobileGuide() });
         return;
       }
       var book = event.target.closest(".guide-book");
@@ -1127,7 +1337,7 @@
       }
       var item = event.target.closest(".guide-item");
       if (item) selectPoi(item.getAttribute("data-id"));
-    });
+    }
 
     mount.addEventListener("keydown", function (event) {
       if (event.key !== "Enter" && event.key !== " ") return;

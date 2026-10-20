@@ -360,21 +360,13 @@
             state().currentPosition.longitude
           ]);
         } else if (state().activeMap && window.L) {
-          state().userMarker = window.L.circleMarker(
-            [
-              state().currentPosition.latitude,
-              state().currentPosition.longitude
-            ],
-            {
-              radius: 9,
-              color: "#fff",
-              weight: 3,
-              fillColor: "#28b7a0",
-              fillOpacity: 1
-            }
-          )
-            .addTo(state().activeMap)
-            .bindTooltip("Tu ubicación actual");
+          const size = 28;
+          const personSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="' + size + '" height="' + size + '"><circle cx="12" cy="8" r="4" fill="#d4af37"/><path d="M12 14c-4.41 0-8 2.59-8 6h16c0-3.41-3.59-6-8-6z" fill="#d4af37"/></svg>';
+          const pulseSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" width="72" height="72"><circle cx="36" cy="36" r="18" fill="none" stroke="#d4af37" stroke-width="2" opacity="0.6"><animate attributeName="r" from="18" to="32" dur="1.5s" repeatCount="indefinite"/><animate attributeName="opacity" from="0.6" to="0" dur="1.5s" repeatCount="indefinite"/></circle></svg>';
+          const html = '<div class="user-marker-wrap" style="display:flex;flex-direction:column;align-items:center;transform:translate(-50%,-50%);"><div class="user-marker-pulse" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:72px;height:72px;pointer-events:none;">' + pulseSvg + '</div><div class="user-marker-icon" style="z-index:1;">' + personSvg + '</div></div>';
+          state().userMarker = L.marker([state().currentPosition.latitude, state().currentPosition.longitude], {
+            icon: L.divIcon({ className: "user-marker-div", html: html, iconSize: [size, size], iconAnchor: [size/2, size/2] })
+          }).addTo(state().activeMap).bindTooltip("Tu ubicación actual");
         }
 
         if (typeof window.updateGeneralUserMarker === "function") {
@@ -875,21 +867,7 @@
         .openPopup();
 
       if (state().currentPosition) {
-        state().userMarker = L.circleMarker(
-          [
-            state().currentPosition.latitude,
-            state().currentPosition.longitude
-          ],
-          {
-            radius: 9,
-            color: "#fff",
-            weight: 3,
-            fillColor: "#28b7a0",
-            fillOpacity: 1
-          }
-        )
-          .addTo(state().activeMap)
-          .bindTooltip("Tu ubicación actual");
+        addCurrentUserMarker(state().activeMap, L);
       }
 
       state().activeMap.on("zoomend moveend", () => {
@@ -906,12 +884,12 @@
   function addCurrentUserMarker(map, L) {
     const position = state().currentPosition;
     if (!position) return;
-    state().userMarker = L.circleMarker([position.latitude, position.longitude], {
-      radius: 9,
-      color: "#fff",
-      weight: 3,
-      fillColor: "#28b7a0",
-      fillOpacity: 1
+    const size = 28;
+    const personSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="' + size + '" height="' + size + '"><circle cx="12" cy="8" r="4" fill="#d4af37"/><path d="M12 14c-4.41 0-8 2.59-8 6h16c0-3.41-3.59-6-8-6z" fill="#d4af37"/></svg>';
+    const pulseSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" width="72" height="72"><circle cx="36" cy="36" r="18" fill="none" stroke="#d4af37" stroke-width="2" opacity="0.6"><animate attributeName="r" from="18" to="32" dur="1.5s" repeatCount="indefinite"/><animate attributeName="opacity" from="0.6" to="0" dur="1.5s" repeatCount="indefinite"/></circle></svg>';
+    const html = '<div class="user-marker-wrap" style="display:flex;flex-direction:column;align-items:center;transform:translate(-50%,-50%);"><div class="user-marker-pulse" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:72px;height:72px;pointer-events:none;">' + pulseSvg + '</div><div class="user-marker-icon" style="z-index:1;">' + personSvg + '</div></div>';
+    state().userMarker = L.marker([position.latitude, position.longitude], {
+      icon: L.divIcon({ className: "user-marker-div", html: html, iconSize: [size, size], iconAnchor: [size/2, size/2] })
     }).addTo(map).bindTooltip("Tu ubicación actual");
   }
 

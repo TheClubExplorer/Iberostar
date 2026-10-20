@@ -2267,12 +2267,10 @@ function renderHotelSectionPanel(
               .map(
                 (image) => `
                   <figure class="hotel-panel-item">
-                    <img
-                      src="${image}"
-                      alt="${title} de ${pageName}"
-                      loading="lazy"
-                      decoding="async"
-                    />
+                    ${RI.img(image, {
+                      alt: `${title} de ${pageName}`,
+                      sizes: "(max-width:760px) 46vw, 30vw"
+                    })}
                   </figure>
                 `
               )
@@ -2626,21 +2624,13 @@ function requestCurrentLocation(options = {}) {
           ]);
         }
       } else if (activeMap && window.L) {
-        userMarker = L.circleMarker(
-          [
-            currentPosition.latitude,
-            currentPosition.longitude
-          ],
-          {
-            radius: 9,
-            color: "#fff",
-            weight: 3,
-            fillColor: "#28b7a0",
-            fillOpacity: 1
-          }
-        )
-          .addTo(activeMap)
-          .bindTooltip("Tu ubicación actual");
+        const size = 28;
+        const personSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="' + size + '" height="' + size + '"><circle cx="12" cy="8" r="4" fill="#d4af37"/><path d="M12 14c-4.41 0-8 2.59-8 6h16c0-3.41-3.59-6-8-6z" fill="#d4af37"/></svg>';
+        const pulseSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" width="72" height="72"><circle cx="36" cy="36" r="18" fill="none" stroke="#d4af37" stroke-width="2" opacity="0.6"><animate attributeName="r" from="18" to="32" dur="1.5s" repeatCount="indefinite"/><animate attributeName="opacity" from="0.6" to="0" dur="1.5s" repeatCount="indefinite"/></circle></svg>';
+        const html = '<div class="user-marker-wrap" style="display:flex;flex-direction:column;align-items:center;transform:translate(-50%,-50%);"><div class="user-marker-pulse" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:72px;height:72px;pointer-events:none;">' + pulseSvg + '</div><div class="user-marker-icon" style="z-index:1;">' + personSvg + '</div></div>';
+        userMarker = L.marker([currentPosition.latitude, currentPosition.longitude], {
+          icon: L.divIcon({ className: "user-marker-div", html: html, iconSize: [size, size], iconAnchor: [size/2, size/2] })
+        }).addTo(activeMap).bindTooltip("Tu ubicación actual");
       }
 
       focusActiveMapOnLocation(wantsWelcome);
@@ -3084,8 +3074,12 @@ function renderHotel(page) {
           class="hotel-carousel-slide ${
             index === 0 ? "active" : ""
           }"
-          style="background-image:linear-gradient(180deg,rgba(5,12,17,.12),rgba(5,12,17,.5)),url('${image}')"
-        ></div>
+        >${RI.bg(image, {
+          gradient:
+            "linear-gradient(180deg,rgba(5,12,17,.12),rgba(5,12,17,.5))",
+          sizes: "100vw",
+          priority: index === 0
+        })}</div>
       `
       )
       .join("");
@@ -3258,9 +3252,11 @@ function renderRestaurantMenu(pageIndex) {
 
         <div
           class="restaurant-menu-photo"
-          style="background-image:linear-gradient(180deg,rgba(5,12,17,.08),rgba(5,12,17,.62)),url('${heroImage}')"
-        >
-
+        >${RI.bg(heroImage, {
+          gradient: "linear-gradient(180deg,rgba(5,12,17,.08),rgba(5,12,17,.62))",
+          sizes: "100vw",
+          priority: true
+        })}
           <div>
             <small>
               EXPERIENCIAS CULINARIAS
@@ -3323,10 +3319,11 @@ function renderRestaurantMenu(pageIndex) {
 
         <header class="restaurant-menu-brand">
 
-          <img
-            src="src/logo png-02.png"
-            alt="Iberostar The Club"
-          />
+          ${RI.img("src/logo png-02.png", {
+            alt: "Iberostar The Club",
+            loading: "eager",
+            sizes: "138px"
+          })}
 
           <button
             class="restaurant-menu-back"
@@ -3591,13 +3588,11 @@ async function renderWorkspaceCards() {
 
             ${
               item.image
-                ? `
-                  <img
-                    class="workspace-card-image"
-                    src="${item.image}"
-                    alt="${item.title}"
-                  />
-                `
+                ? RI.img(item.image, {
+                    cls: "workspace-card-image",
+                    alt: item.title,
+                    sizes: "(max-width:620px) 92vw, (max-width:900px) 46vw, 32vw"
+                  })
                 : `
                   <div class="workspace-card-image"></div>
                 `
@@ -4260,11 +4255,11 @@ async function render360Cards() {
       "media-card";
 
     card.innerHTML = `
-      <img
-        class="media-card-image"
-        src="${url}"
-        alt="${item.title}"
-      />
+      ${RI.img(url, {
+        cls: "media-card-image",
+        alt: item.title,
+        sizes: "(max-width:620px) 92vw, (max-width:900px) 46vw, 32vw"
+      })}
 
       <div class="media-card-content">
 
@@ -5482,7 +5477,10 @@ function renderCountryMenu(page) {
         tabindex="0"
         aria-label="Abrir ficha de ${hotel.name}"
       >
-        <img src="${hotel.image}" alt="${hotel.name}" loading="lazy" decoding="async" />
+        ${RI.img(hotel.image, {
+          alt: hotel.name,
+          sizes: "(max-width:700px) 92vw, (max-width:1100px) 46vw, 23vw"
+        })}
         <span class="country-card-label">${country.name}</span>
         <strong>${hotel.name}</strong>
         <em>${hotel.tagline}</em>
@@ -5578,7 +5576,10 @@ function renderComplexPage(page) {
           <p>${page.intro}</p>
         </div>
         <figure class="complex-hero">
-          <img src="${coverImage}" alt="Vista del complejo Iberostar Playa Paraíso" loading="lazy" decoding="async" />
+          ${RI.img(coverImage, {
+            alt: "Vista del complejo Iberostar Playa Paraíso",
+            sizes: "(max-width:620px) 92vw, 34vw"
+          })}
           <figcaption>Playa Paraíso · Riviera Maya</figcaption>
         </figure>
       </header>
@@ -5591,7 +5592,10 @@ function renderComplexPage(page) {
       <div class="complex-hotel-grid">
         ${hotels.map((entry) => `
           <button class="complex-hotel-card" type="button" data-complex-hotel-index="${entry.pageIndex}">
-            <img src="${entry.hotel.image}" alt="${entry.displayName}" loading="lazy" decoding="async" />
+            ${RI.img(entry.hotel.image, {
+              alt: entry.displayName,
+              sizes: "(max-width:620px) 92vw, (max-width:850px) 46vw, 32vw"
+            })}
             <span class="complex-hotel-copy">
               <strong>${entry.displayName}</strong>
               <small>${entry.description}</small>
@@ -5818,7 +5822,11 @@ function renderHotelDetail() {
 
       <section class="hotel-hero">
         <div class="hotel-hero-image-wrap">
-          <img src="${heroImage}" alt="${displayName}" class="hotel-hero-image" loading="lazy" decoding="async" />
+          ${RI.img(heroImage, {
+            alt: displayName,
+            cls: "hotel-hero-image",
+            sizes: "(max-width:860px) 100vw, 55vw"
+          })}
         </div>
 
         <div class="hotel-hero-info">
@@ -5951,11 +5959,12 @@ function renderPage() {
 
         <section class="cover-left">
 
-          <img
-            class="cover-logo"
-            src="src/logo png-02.png"
-            alt="Logo"
-          />
+          ${RI.img("src/logo png-02.png", {
+            cls: "cover-logo",
+            alt: "Logo",
+            loading: "eager",
+            sizes: "(max-width:700px) 180px, 230px"
+          })}
 
           <h1>
             <span>Playa</span>
@@ -5975,8 +5984,12 @@ function renderPage() {
 
         <section
           class="cover-right"
-          style="background-image:linear-gradient(180deg,rgba(255,255,255,.04) 42%,rgba(59,44,31,.35)),url('${page.image}')"
-        >
+        >${RI.bg(page.image, {
+          gradient:
+            "linear-gradient(180deg,rgba(255,255,255,.04) 42%,rgba(59,44,31,.35))",
+          sizes: "100vw",
+          priority: true
+        })}
           <div>
 
             <small>
@@ -6034,14 +6047,21 @@ else {
   bookShell.innerHTML = `
     <div class="spread back-spread">
 
-      <section class="back-quote" style="background-image:linear-gradient(rgba(4,24,39,.62),rgba(4,24,39,.62)),url('${page.image}')">
-        <span>${page.kicker}</span>
+      <section class="back-quote">${RI.bg(page.image, {
+        gradient: "linear-gradient(rgba(4,24,39,.62),rgba(4,24,39,.62))",
+        sizes: "(max-width:700px) 100vw, 50vw"
+      })}<span>${page.kicker}</span>
         <h1>“${page.quote}”</h1>
         <span>KM. 309 · PLAYA DEL CARMEN, Q.ROO MÉXICO</span>
       </section>
 
       <section class="back-contact">
-        <img class="cover-logo" src="src/logo png-02.png" alt="Logo">
+        ${RI.img("src/logo png-02.png", {
+          cls: "cover-logo",
+          alt: "Logo",
+          loading: "eager",
+          sizes: "(max-width:700px) 135px, 230px"
+        })}
         <h1>PLAYA PARAISO</h1>
         <small>IBEROSTAR</small>
 
@@ -6720,7 +6740,7 @@ function initializeHotelMap() {
           }
         );
 
-      streetLayer.addTo(
+streetLayer.addTo(
         activeMap
       );
 
@@ -6734,25 +6754,13 @@ function initializeHotelMap() {
         .openPopup();
 
       if (currentPosition) {
-        userMarker =
-          L.circleMarker(
-            [
-              currentPosition.latitude,
-              currentPosition.longitude
-            ],
-            {
-              radius: 9,
-              color: "#fff",
-              weight: 3,
-              fillColor:
-                "#28b7a0",
-              fillOpacity: 1
-            }
-          )
-            .addTo(activeMap)
-            .bindTooltip(
-              "Tu ubicación actual"
-          );
+        const size = 28;
+        const personSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="' + size + '" height="' + size + '"><circle cx="12" cy="8" r="4" fill="#d4af37"/><path d="M12 14c-4.41 0-8 2.59-8 6h16c0-3.41-3.59-6-8-6z" fill="#d4af37"/></svg>';
+        const pulseSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" width="72" height="72"><circle cx="36" cy="36" r="18" fill="none" stroke="#d4af37" stroke-width="2" opacity="0.6"><animate attributeName="r" from="18" to="32" dur="1.5s" repeatCount="indefinite"/><animate attributeName="opacity" from="0.6" to="0" dur="1.5s" repeatCount="indefinite"/></circle></svg>';
+        const html = '<div class="user-marker-wrap" style="display:flex;flex-direction:column;align-items:center;transform:translate(-50%,-50%);"><div class="user-marker-pulse" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:72px;height:72px;pointer-events:none;">' + pulseSvg + '</div><div class="user-marker-icon" style="z-index:1;">' + personSvg + '</div></div>';
+        userMarker = L.marker([currentPosition.latitude, currentPosition.longitude], {
+          icon: L.divIcon({ className: "user-marker-div", html: html, iconSize: [size, size], iconAnchor: [size/2, size/2] })
+        }).addTo(activeMap).bindTooltip("Tu ubicación actual");
       }
 
       focusActiveMapOnLocation();
@@ -6943,9 +6951,60 @@ if (initialLocationStatus) initialLocationStatus.textContent = "Usa “Usar mi u
 document.getElementById("requestLocationButton")?.addEventListener("click", requestCurrentLocation);
 document.addEventListener("click", (event) => {
   const link = event.target.closest(".site-tools-menu a");
-  if (!link) return;
-  const tools = link.closest(".site-tools");
-  if (tools) tools.removeAttribute("open");
+  const insideTools = event.target.closest(".site-tools");
+  document.querySelectorAll(".site-tools[open]").forEach((tools) => {
+    if (link) {
+      const openedBy = link.closest(".site-tools");
+      if (openedBy === tools || !openedBy) tools.removeAttribute("open");
+      return;
+    }
+    if (!insideTools || insideTools !== tools) tools.removeAttribute("open");
+  });
+  // Al elegir cualquier opción del panel móvil, se cierra.
+  if (event.target.closest("#siteNav a, #siteNav button")) {
+    closeMobileNav();
+  }
+});
+// Panel de navegación móvil (lateral derecho).
+const mobileMenuButton = document.getElementById("mobileMenuButton");
+const mobileNavClose = document.getElementById("mobileNavClose");
+const siteNav = document.getElementById("siteNav");
+const navOverlay = document.getElementById("navOverlay");
+const mobileNavMedia = window.matchMedia("(max-width: 850px)");
+
+function openMobileNav() {
+  if (!siteNav) return;
+  siteNav.classList.add("is-open");
+  if (navOverlay) {
+    navOverlay.hidden = false;
+    requestAnimationFrame(() => navOverlay.classList.add("is-open"));
+  }
+  mobileMenuButton?.setAttribute("aria-expanded", "true");
+  document.body.style.overflow = "hidden";
+}
+
+function closeMobileNav() {
+  if (!siteNav || !siteNav.classList.contains("is-open")) return;
+  siteNav.classList.remove("is-open");
+  if (navOverlay) {
+    navOverlay.classList.remove("is-open");
+    window.setTimeout(() => { navOverlay.hidden = true; }, 280);
+  }
+  mobileMenuButton?.setAttribute("aria-expanded", "false");
+  document.body.style.overflow = "";
+}
+
+mobileMenuButton?.addEventListener("click", () => {
+  if (siteNav?.classList.contains("is-open")) closeMobileNav();
+  else openMobileNav();
+});
+mobileNavClose?.addEventListener("click", closeMobileNav);
+navOverlay?.addEventListener("click", closeMobileNav);
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") closeMobileNav();
+});
+mobileNavMedia?.addEventListener("change", (event) => {
+  if (!event.matches) closeMobileNav();
 });
 window.setTimeout(autoDetectLocation, 700);
 // Vigilancia de contexto cercano: alimenta el aviso "📊 Parece que estás cerca

@@ -401,7 +401,7 @@
 
   function renderCards(records, getPath, type) {
     return records.map((item) => `<a class="destination-card ${type}" href="${escapeHtml(href(getPath(item)))}" data-app-route="${escapeHtml(getPath(item))}">
-      <img src="${escapeHtml(item.image || "src/JOIA2.jpg")}" alt="" loading="lazy"><span class="destination-card-copy"><small>${type === "hotel" ? "HOTEL" : "DESTINO"}</small><strong>${escapeHtml(item.name)}</strong><span>${escapeHtml(item.description || item.tagline || "Descubre el hotel y sus experiencias.")}</span><b>Explorar →</b></span></a>`).join("");
+      ${RI.img(item.image || "src/JOIA2.jpg", { alt: "", sizes: "(max-width:600px) 92vw, (max-width:850px) 46vw, 40vw" })}<span class="destination-card-copy"><small>${type === "hotel" ? "HOTEL" : "DESTINO"}</small><strong>${escapeHtml(item.name)}</strong><span>${escapeHtml(item.description || item.tagline || "Descubre el hotel y sus experiencias.")}</span><b>Explorar →</b></span></a>`).join("");
   }
   function findHotelPortalRoute(hotelName) {
     const targetSlug = slugify(hotelName);
@@ -482,7 +482,11 @@
         view.innerHTML = `<main class="portal-page">
           ${portalNav(getPortalNavModel(route))}
           <section class="portal-destination-hero portal-complex-hero">
-            <img src="${escapeHtml(destination.image || "src/paraiso-del-mar/banner/ParaisoDelMar.jpg")}" alt="">
+            ${RI.img(destination.image || "src/paraiso-del-mar/banner/ParaisoDelMar.jpg", {
+              alt: "",
+              priority: true,
+              sizes: "(max-width:600px) 100vw, 45vw"
+            })}
             <div>
               <p class="portal-kicker">${escapeHtml(complexPage.kicker || `EL COMPLEJO · ${destination.name.toUpperCase()}`)}</p>
               <h1>${escapeHtml(complexPage.title || destination.name)}</h1>
@@ -549,7 +553,11 @@
           countryMapMarkup = `<section class="portal-map-section"><div><p class="portal-kicker">UBICACIÓN</p><h2>Mapa de ${escapeHtml(countryData.name)}</h2><p>Explora los hoteles disponibles en los destinos de ${escapeHtml(countryData.name)}.</p></div><div class="portal-map-frame"><div class="portal-destination-map" id="countryMap" role="application" aria-label="Mapa de hoteles en ${escapeHtml(countryData.name)}"></div>${portalMapActions(countryHotels)}</div></section>`;
         }
       }
-      view.innerHTML = `<main class="portal-page">${!isHome ? portalNav(getPortalNavModel(route)) : ""}<section class="portal-hero"><div><p class="portal-kicker">${breadcrumb}</p><h1>${heading}</h1><p>${intro}</p>${!isHome ? "" : `<a class="portal-hero-link" href="${href("/complejo-playa-paraiso")}" data-app-route="/complejo-playa-paraiso">Conoce Iberostar Playa Paraíso <span>→</span></a>`}</div><img src="${isHome ? "src/paraiso-del-mar/banner/ParaisoDelMar.jpg" : countryData.image}" alt="Paisaje de destino" /></section>${countryMapMarkup}<section class="portal-section"><div class="portal-section-heading"><div><p class="portal-kicker">${isHome ? "NUESTROS PAÍSES" : "DESTINOS"}</p><h2>${isHome ? "Viaja a tu manera" : "Elige dónde hospedarte"}</h2></div>${!isHome ? `<a href="${href("/")}" data-app-route="/">Todos los países</a>` : ""}</div><div class="destination-grid">${cards}</div></section></main>`;
+      view.innerHTML = `<main class="portal-page">${!isHome ? portalNav(getPortalNavModel(route)) : ""}<section class="portal-hero"><div><p class="portal-kicker">${breadcrumb}</p><h1>${heading}</h1><p>${intro}</p>${!isHome ? "" : `<a class="portal-hero-link" href="${href("/complejo-playa-paraiso")}" data-app-route="/complejo-playa-paraiso">Conoce Iberostar Playa Paraíso <span>→</span></a>`}</div>${RI.img(isHome ? "src/paraiso-del-mar/banner/ParaisoDelMar.jpg" : countryData.image, {
+          alt: "Paisaje de destino",
+          priority: true,
+          sizes: "(max-width:600px) 100vw, 45vw"
+        })}</section>${countryMapMarkup}<section class="portal-section"><div class="portal-section-heading"><div><p class="portal-kicker">${isHome ? "NUESTROS PAÍSES" : "DESTINOS"}</p><h2>${isHome ? "Viaja a tu manera" : "Elige dónde hospedarte"}</h2></div>${!isHome ? `<a href="${href("/")}" data-app-route="/">Todos los países</a>` : ""}</div><div class="destination-grid">${cards}</div></section></main>`;
       const countryMap = view.querySelector("#countryMap");
       if (countryMap) {
         window.RevistaDigital.mapas?.initializeAllHotelsMap(countryMap, countryHotels, { countrySlug: country });
@@ -566,7 +574,11 @@
       document.body.dataset.appMode = "portal";
       document.body.dataset.routeManaged = "true";
       const mapDescription = destination.mapNotice || "Selecciona un marcador para abrir la ficha del hotel.";
-      view.innerHTML = `<main class="portal-page">${portalNav(getPortalNavModel(route))}<section class="portal-destination-hero"><img src="${escapeHtml(destination.image)}" alt=""><div><p class="portal-kicker">${escapeHtml(countryData.name).toUpperCase()} · DESTINO</p><h1>${escapeHtml(destination.name)}</h1><p>${escapeHtml(destination.description)}</p>${destination.complex ? `<a class="portal-hero-link" href="${href("/complejo-playa-paraiso")}" data-app-route="/complejo-playa-paraiso">Ver el complejo Playa Paraíso →</a>` : ""}</div></section><section class="portal-section"><div class="portal-section-heading"><div><p class="portal-kicker">ALOJAMIENTOS</p><h2>Hoteles en ${escapeHtml(destination.name)}</h2></div></div><div class="destination-grid destination-grid--hotels">${renderCards(hotels, (hotel) => `/${country}/${destination.slug}/${hotel.slug}`, "hotel")}</div></section></main>`;
+      view.innerHTML = `<main class="portal-page">${portalNav(getPortalNavModel(route))}<section class="portal-destination-hero">${RI.img(destination.image, {
+          alt: "",
+          priority: true,
+          sizes: "(max-width:600px) 100vw, 45vw"
+        })}<div><p class="portal-kicker">${escapeHtml(countryData.name).toUpperCase()} · DESTINO</p><h1>${escapeHtml(destination.name)}</h1><p>${escapeHtml(destination.description)}</p>${destination.complex ? `<a class="portal-hero-link" href="${href("/complejo-playa-paraiso")}" data-app-route="/complejo-playa-paraiso">Ver el complejo Playa Paraíso →</a>` : ""}</div></section><section class="portal-section"><div class="portal-section-heading"><div><p class="portal-kicker">ALOJAMIENTOS</p><h2>Hoteles en ${escapeHtml(destination.name)}</h2></div></div><div class="destination-grid destination-grid--hotels">${renderCards(hotels, (hotel) => `/${country}/${destination.slug}/${hotel.slug}`, "hotel")}</div></section></main>`;
       const mapElement = view.querySelector("#destinationMap");
       if (mapElement) window.RevistaDigital.mapas?.initializeDestinationMap(mapElement, { countrySlug: country, destination });
       return true;
@@ -612,7 +624,7 @@
       ? `<div class="restaurant-chip-row">${chips}${extra}</div>`
       : `<span class="restaurant-count-note">Galería gastronómica</span>`;
     return `<a class="destination-card restaurant-hotel-card" href="${href(hotel.route)}" data-app-route="${hotel.route}">
-      <img src="${escapeHtml(hotel.image)}" alt="" loading="lazy" decoding="async">
+      ${RI.img(hotel.image, { alt: "", sizes: "(max-width:600px) 92vw, (max-width:850px) 46vw, 40vw" })}
       <span class="destination-card-copy">
         <small>${escapeHtml(hotel.destinationName).toUpperCase()}</small>
         <strong>${escapeHtml(hotel.name)}</strong>
@@ -649,7 +661,7 @@
         const hotelWord = country.hotels.length === 1 ? "hotel" : "hoteles";
         const restaurantWord = country.restaurantCount === 1 ? "restaurante" : "restaurantes";
         return `<a class="destination-card restaurant-country-card" href="${href(`/restaurantes/${country.slug}`)}" data-app-route="/restaurantes/${country.slug}">
-        <img src="${escapeHtml(country.image)}" alt="" loading="lazy" decoding="async">
+        ${RI.img(country.image, { alt: "", sizes: "(max-width:600px) 92vw, (max-width:850px) 46vw, 40vw" })}
         <span class="destination-card-copy"><small>RESTAURANTES</small><strong>${escapeHtml(country.name)}</strong><span>${country.hotels.length} ${hotelWord} · ${country.restaurantCount} ${restaurantWord}</span><b>Ver carta →</b></span>
       </a>`;
       }).join("");
@@ -657,7 +669,11 @@
         ${portalNav(getPortalNavModel(route))}
         <section class="portal-hero">
           <div><p class="portal-kicker">RESTAURANTES</p><h1>Sabores de nuestros destinos</h1><p>Elige un país para descubrir la carta de restaurantes de cada hotel.</p></div>
-          <img src="src/paraiso-del-mar/banner/ParaisoDelMar.jpg" alt="">
+          ${RI.img("src/paraiso-del-mar/banner/ParaisoDelMar.jpg", {
+            alt: "",
+            priority: true,
+            sizes: "(max-width:600px) 100vw, 45vw"
+          })}
         </section>
         <section class="portal-section">
           <div class="portal-section-heading"><div><p class="portal-kicker">NUESTROS PAÍSES</p><h2>Cartas por país</h2></div></div>
@@ -693,7 +709,11 @@
       view.innerHTML = `<main class="portal-page">
         ${portalNav(getPortalNavModel(route))}
         <section class="portal-destination-hero">
-          <img src="${escapeHtml(country.image)}" alt="">
+          ${RI.img(country.image, {
+            alt: "",
+            priority: true,
+            sizes: "(max-width:600px) 100vw, 45vw"
+          })}
           <div><p class="portal-kicker">GASTRONOMÍA · ${escapeHtml(country.name).toUpperCase()}</p><h1>Restaurantes en ${escapeHtml(country.name)}</h1><p>${country.hotels.length} ${hotelWord} y ${country.restaurantCount} ${restaurantWord}. Elige un hotel para ver su carta.</p></div>
         </section>
         <section class="portal-section">
@@ -742,7 +762,11 @@
     return `<main class="portal-page">
       ${portalNav(getPortalNavModel(`/restaurantes/${hotel.slug}`))}
       <section class="portal-destination-hero">
-        <img src="${escapeHtml(heroImage)}" alt="">
+        ${RI.img(heroImage, {
+          alt: "",
+          priority: true,
+          sizes: "(max-width:600px) 100vw, 45vw"
+        })}
         <div><p class="portal-kicker">${escapeHtml(country.name).toUpperCase()} · ${escapeHtml(hotel.destinationName).toUpperCase()}</p><h1>${escapeHtml(hotel.name)}</h1><p>${count} ${countWord} para descubrir durante tu estancia.</p><a class="portal-hero-link" href="${href(hotel.hotelRoute)}" data-app-route="${hotel.hotelRoute}">Ver la ficha del hotel →</a></div>
       </section>
       <section class="portal-section">
@@ -770,7 +794,10 @@
     });
   }
   function hotelImageCard(alt, src) {
-    return `<figure class="hotel-portal-card"><img src="${escapeHtml(src)}" alt="${alt}" loading="lazy" decoding="async" /></figure>`;
+    return `<figure class="hotel-portal-card">${RI.img(src, {
+      alt: alt,
+      sizes: "(max-width:640px) 92vw, (max-width:1050px) 46vw, 32vw"
+    })}</figure>`;
   }
   function renderHotelPortal(context) {
     const { countrySlug, countryData, destination, hotel } = context;
@@ -832,7 +859,12 @@
 
     const heroMarkup = `
         <section class="hotel-portal-hero">
-          <img class="hotel-portal-hero-bg" src="${escapeHtml(heroImage)}" alt="${escapeHtml(displayName)}" fetchpriority="high" />
+          ${RI.img(heroImage, {
+            cls: "hotel-portal-hero-bg",
+            alt: displayName,
+            priority: true,
+            sizes: "100vw"
+          })}
           <div class="hotel-portal-hero-scrim"></div>
           <div class="hotel-portal-hero-content">
             <p class="portal-kicker">${escapeHtml(countryData.name).toUpperCase()} · ${escapeHtml(destination.name).toUpperCase()}</p>
@@ -884,7 +916,10 @@
       .filter((zone) => Array.isArray(zone.images) && zone.images.length)
       .map((zone) => ({ label: zone.label, image: zone.images[0] }));
     const zoneButtons = zones.map((zone, index) => `<button type="button" class="hotel-zone${index === 0 ? " is-active" : ""}" data-zone="${escapeHtml(zone.label)}" data-hotel="${escapeHtml(displayName)}" data-lat="${hasCoordinates ? coordinates[0] : ""}" data-lng="${hasCoordinates ? coordinates[1] : ""}">
-              <img src="${escapeHtml(zone.image)}" alt="${escapeHtml(zone.label)}" loading="lazy" decoding="async" />
+              ${RI.img(zone.image, {
+                alt: zone.label,
+                sizes: "(max-width:599px) 45vw, (max-width:899px) 30vw, 22vw"
+              })}
               <span>${escapeHtml(zone.label)}</span>
             </button>`).join("");
 
@@ -1197,9 +1232,13 @@
       }
       const position = state()?.currentPosition;
       if (position) {
-        L.circleMarker([position.latitude, position.longitude], {
-          radius: 7, color: "#fff", weight: 2, fillColor: "#0057b8", fillOpacity: 1
-        }).addTo(map).bindPopup("Tu ubicación");
+        const size = 28;
+        const personSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="' + size + '" height="' + size + '"><circle cx="12" cy="8" r="4" fill="#d4af37"/><path d="M12 14c-4.41 0-8 2.59-8 6h16c0-3.41-3.59-6-8-6z" fill="#d4af37"/></svg>';
+        const pulseSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" width="72" height="72"><circle cx="36" cy="36" r="18" fill="none" stroke="#d4af37" stroke-width="2" opacity="0.6"><animate attributeName="r" from="18" to="32" dur="1.5s" repeatCount="indefinite"/><animate attributeName="opacity" from="0.6" to="0" dur="1.5s" repeatCount="indefinite"/></circle></svg>';
+        const html = '<div class="user-marker-wrap" style="display:flex;flex-direction:column;align-items:center;transform:translate(-50%,-50%);"><div class="user-marker-pulse" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:72px;height:72px;pointer-events:none;">' + pulseSvg + '</div><div class="user-marker-icon" style="z-index:1;">' + personSvg + '</div></div>';
+        L.marker([position.latitude, position.longitude], {
+          icon: L.divIcon({ className: "user-marker-div", html: html, iconSize: [size, size], iconAnchor: [size/2, size/2] })
+        }).addTo(map).bindTooltip("Tu ubicación actual");
       }
       try {
         if (window.RevistaDigital.guiapa && typeof window.RevistaDigital.guiapa.bindMap === "function") {
