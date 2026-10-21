@@ -23,7 +23,7 @@
         window.history.replaceState(null, "", targetUrl.href);
       }
     </script>
-    <link rel="stylesheet" href="style.css?v=4" />
+    <link rel="stylesheet" href="style.css?v=10" />
     <link rel="stylesheet" href="responsive.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -108,9 +108,6 @@
       </nav>
     </header>
     <div class="nav-overlay" id="navOverlay" hidden></div>
-    <div class="app-context-bar" id="appContextBar" hidden aria-live="polite">
-      <div class="app-context-bar-inner" id="appContextBarInner"></div>
-    </div>
     <div id="appView" class="app-view" aria-live="polite"></div>
     <main class="magazine-stage">
       <button class="nav-button nav-left" type="button" aria-label="Página anterior" data-i18n-aria="prevPage">‹</button>
@@ -163,61 +160,24 @@
         <div class="search-results-container" id="searchResultsList"></div>
       </div>
     </div>
-    <script>
-      (function () {
-        function updateAppContextBar() {
-          const bar = document.getElementById("appContextBar");
-          const inner = document.getElementById("appContextBarInner");
-          if (!bar || !inner) return;
-
-          const routeState = window.RevistaDigital?.routes?.computeTopNavState?.() || {
-            breadcrumbs: [{ label: "Inicio", route: "/" }],
-            label: "Inicio"
-          };
-
-          const breadcrumbs = routeState.breadcrumbs || [{ label: "Inicio", route: "/" }];
-          if (breadcrumbs.length <= 1) {
-            bar.hidden = true;
-            return;
-          }
-
-          bar.hidden = false;
-          inner.innerHTML = breadcrumbs.map((item, index) => {
-            const isCurrent = index === breadcrumbs.length - 1;
-            const safeLabel = item.label || "Inicio";
-            const content = isCurrent
-              ? `<span class="app-context-current">${safeLabel}</span>`
-              : `<a class="app-context-link" href="${item.route}" data-app-route="${item.route}">${safeLabel}</a>`;
-            return `${content}${index < breadcrumbs.length - 1 ? '<span>›</span>' : ''}`;
-          }).join("");
-        }
-
-        if (!window.__appContextBarBound) {
-          window.updateAppContextBar = updateAppContextBar;
-          document.addEventListener("DOMContentLoaded", updateAppContextBar);
-          window.addEventListener("popstate", updateAppContextBar);
-          window.__appContextBarBound = true;
-        }
-      })();
-    </script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/responsive-images.js?v=2" defer></script>
 <script src="js/app.js?v=2" defer></script>
 <script src="js/pannellum-360.js?v=5" defer></script>
-<script src="js/routes.js?v=5" defer></script>
+<script src="js/routes.js?v=15" defer></script>
 <script src="js/hoteles.js?v=2" defer></script>
 <script src="js/restaurantes.js?v=2" defer></script>
-<script src="js/mapas.js?v=3" defer></script>
+<script src="js/mapas.js?v=15" defer></script>
 <script src="js/workspace.js?v=2" defer></script>
 <script src="js/media360.js?v=2" defer></script>
 <script src="js/videos.js?v=2" defer></script>
 <script src="js/hotel-gallery-data.js?v=2" defer></script>
 <script src="js/hotel-content-data.js?v=2" defer></script>
-<script src="js/i18n.js?v=2" defer></script>
+<script src="js/i18n.js?v=4" defer></script>
 <script src="js/search.js?v=2" defer></script>
 <script src="js/datos-complejo.js?v=2" defer></script>
-<script src="js/guia-playa-paraiso.js?v=4" defer></script>
-<script src="function.js?v=2" defer></script>
+<script src="js/guia-playa-paraiso.js?v=11" defer></script>
+<script src="function.js?v=7" defer></script>
 <script src="js/animations.js?v=2" defer></script>
   </body>
 </html>

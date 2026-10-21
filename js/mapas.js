@@ -3,6 +3,218 @@
   const mapas = window.RevistaDigital.mapas || {};
   const state = () => window.RevistaDigital.state;
 
+  function touchGuardText(key, fallback) {
+    return window.RevistaDigital?.i18n?.t?.(key, fallback) || fallback;
+  }
+
+  // En móvil el mapa empieza bloqueado: un dedo desplaza la página y un toque
+  // activa el mapa. "Bloquear mapa" devuelve el scroll y "Pantalla completa"
+  // abre el mapa a pantalla completa con su propio botón de salida.
+  mapas.attachTouchScrollGuard = function (map, container) {
+    if (!map || !container) return;
+    if (typeof container.__touchScrollGuardCleanup === "function") {
+      try { container.__touchScrollGuardCleanup(); } catch (error) { /* ignore */ }
+    }
+    container.classList.add("has-touch-guard");
+
+    const mobileQuery = window.matchMedia("(max-width: 900px)");
+    const fullscreenShell = container.closest("[data-guide-wrap]") || container;
+    const initialHandlers = {
+      dragging: Boolean(map.dragging?.enabled?.()),
+      touchZoom: Boolean(map.touchZoom?.enabled?.()),
+      scrollWheelZoom: Boolean(map.scrollWheelZoom?.enabled?.())
+    };
+
+    const makeButton = (className, key, fallback) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = className;
+      button.setAttribute("data-i18n", key);
+      button.setAttribute("data-i18n-aria", key);
+      button.setAttribute("aria-label", touchGuardText(key, fallback));
+      button.textContent = touchGuardText(key, fallback);
+      return button;
+    };
+
+    const activate = document.createElement("button");
+    activate.type = "button";
+    activate.className = "map-touch-activate";
+    activate.setAttribute("data-i18n-aria", "mapTouchActivate");
+    activate.setAttribute("aria-label", touchGuardText("mapTouchActivate", "Toca para mover el mapa"));
+    const activateLabel = document.createElement("span");
+    activateLabel.className = "map-touch-activate-pill";
+    activateLabel.setAttribute("data-i18n", "mapTouchActivate");
+    activateLabel.textContent = touchGuardText("mapTouchActivate", "Toca para mover el mapa");
+    activate.appendChild(activateLabel);
+
+    const lock = makeButton("map-touch-lock", "mapTouchLock", "Bloquear mapa");
+    lock.hidden = true;
+    const fullscreen = makeButton("map-touch-fullscreen", "mapFullscreen", "Pantalla completa");
+    fullscreen.hidden = true;
+
+    container.append(activate, lock, fullscreen);
+
+    const stopPropagation = (event) => event.stopPropagation();
+    [activate, lock, fullscreen].forEach((button) => {
+      ["touchstart", "touchmove", "touchend", "touchcancel", "pointerdown", "pointermove", "pointerup", "pointercancel", "click"].forEach((type) => {
+        button.addEventListener(type, stopPropagation, { passive: true });
+      });
+    });
+
+    const setHandler = (handler, enabled) => {
+      if (!handler) return;
+      try {
+        if (enabled && !handler.enabled()) handler.enable();
+        else if (!enabled && handler.enabled()) handler.disable();
+      } catch (error) { /* ignore */ }
+    };
+
+    const placeRotateControl = (isMobile) => {
+      const rotateControl = container.querySelector(".leaflet-control-rotate");
+      if (!rotateControl) return;
+      const targetCorner = container.querySelector(isMobile ? ".leaflet-top.leaflet-right" : ".leaflet-bottom.leaflet-right");
+      if (!targetCorner) return;
+      if (isMobile) {
+        if (rotateControl.parentElement !== targetCorner) targetCorner.appendChild(rotateControl);
+        return;
+      }
+      const attribution = targetCorner.querySelector(".leaflet-control-attribution");
+      if (rotateControl.parentElement !== targetCorner || rotateControl.nextSibling !== attribution) {
+        targetCorner.insertBefore(rotateControl, attribution || null);
+      }
+    };
+
+    let isFullscreen = false;
+    let fullscreenPlaceholder = null;
+    let viewBeforeFullscreen = null;
+    let wasLockedBeforeFullscreen = true;
+
+    const updateFullscreenButton = () => {
+      const key = isFullscreen ? "mapExitFullscreen" : "mapFullscreen";
+      const fallback = isFullscreen ? "Salir del mapa" : "Pantalla completa";
+      fullscreen.setAttribute("data-i18n", key);
+      fullscreen.setAttribute("data-i18n-aria", key);
+      fullscreen.setAttribute("aria-label", touchGuardText(key, fallback));
+      fullscreen.textContent = touchGuardText(key, fallback);
+    };
+
+    const applyMode = (locked) => {
+      const isMobile = mobileQuery.matches;
+      const lockNow = Boolean(locked) && isMobile && !isFullscreen;
+      container.classList.toggle("map-touch-locked", lockNow);
+      activate.hidden = !lockNow;
+      lock.hidden = lockNow || !isMobile || isFullscreen;
+      fullscreen.hidden = !isMobile;
+      const enabled = isMobile ? !lockNow : true;
+      setHandler(map.dragging, enabled ? initialHandlers.dragging : false);
+      setHandler(map.touchZoom, enabled ? initialHandlers.touchZoom : false);
+      setHandler(map.scrollWheelZoom, enabled ? initialHandlers.scrollWheelZoom : false);
+      placeRotateControl(isMobile);
+    };
+
+    const setFullscreen = (next) => {
+      const nextState = Boolean(next) && mobileQuery.matches;
+      if (nextState === isFullscreen) return;
+      isFullscreen = nextState;
+
+      if (isFullscreen) {
+        wasLockedBeforeFullscreen = !activate.hidden;
+        try { viewBeforeFullscreen = { center: map.getCenter(), zoom: map.getZoom() }; } catch (error) { viewBeforeFullscreen = null; }
+        const parent = fullscreenShell.parentNode;
+        if (parent) {
+          fullscreenPlaceholder = document.createComment("map-fullscreen-placeholder");
+          parent.insertBefore(fullscreenPlaceholder, fullscreenShell);
+          document.body.appendChild(fullscreenShell);
+        }
+        document.documentElement.classList.add("map-fullscreen-open");
+        document.body.classList.add("map-fullscreen-open");
+        fullscreenShell.classList.add("map-fullscreen");
+        applyMode(false);
+        if (fullscreenShell !== container && fullscreenShell.classList.contains("is-guide-collapsed")) {
+          const guideOpen = fullscreenShell.querySelector(".hotel-guide-open");
+          if (guideOpen) guideOpen.click();
+        }
+        updateFullscreenButton();
+        document.addEventListener("keydown", onFullscreenKeydown);
+        window.addEventListener("popstate", onFullscreenPopState);
+        setTimeout(() => {
+          try {
+            map.invalidateSize();
+            if (map.options?.maxBounds) map.fitBounds(map.options.maxBounds, { animate: false });
+          } catch (error) { /* ignore */ }
+        }, 60);
+        return;
+      }
+
+      fullscreenShell.classList.remove("map-fullscreen");
+      document.documentElement.classList.remove("map-fullscreen-open");
+      document.body.classList.remove("map-fullscreen-open");
+      document.removeEventListener("keydown", onFullscreenKeydown);
+      window.removeEventListener("popstate", onFullscreenPopState);
+      if (fullscreenPlaceholder && fullscreenPlaceholder.parentNode) {
+        fullscreenPlaceholder.parentNode.insertBefore(fullscreenShell, fullscreenPlaceholder);
+        fullscreenPlaceholder.remove();
+      }
+      fullscreenPlaceholder = null;
+      updateFullscreenButton();
+      applyMode(wasLockedBeforeFullscreen);
+      setTimeout(() => {
+        try {
+          map.invalidateSize();
+          if (viewBeforeFullscreen) map.setView(viewBeforeFullscreen.center, viewBeforeFullscreen.zoom, { animate: false });
+        } catch (error) { /* ignore */ }
+      }, 60);
+      viewBeforeFullscreen = null;
+    };
+
+    function onFullscreenKeydown(event) {
+      if (event.key === "Escape" && isFullscreen) setFullscreen(false);
+    }
+
+    function onFullscreenPopState() {
+      if (isFullscreen) setFullscreen(false);
+    }
+
+    activate.addEventListener("click", () => applyMode(false));
+    lock.addEventListener("click", () => applyMode(true));
+    fullscreen.addEventListener("click", () => setFullscreen(!isFullscreen));
+
+    const onQueryChange = () => {
+      if (!container.isConnected) return;
+      if (isFullscreen && !mobileQuery.matches) setFullscreen(false);
+      applyMode(mobileQuery.matches);
+    };
+    let removeQueryListener = null;
+    if (typeof mobileQuery.addEventListener === "function") {
+      mobileQuery.addEventListener("change", onQueryChange);
+      removeQueryListener = () => mobileQuery.removeEventListener("change", onQueryChange);
+    } else if (typeof mobileQuery.addListener === "function") {
+      mobileQuery.addListener(onQueryChange);
+      removeQueryListener = () => mobileQuery.removeListener(onQueryChange);
+    }
+
+    container.__touchScrollGuardCleanup = () => {
+      if (isFullscreen) setFullscreen(false);
+      if (removeQueryListener) removeQueryListener();
+      setHandler(map.dragging, initialHandlers.dragging);
+      setHandler(map.touchZoom, initialHandlers.touchZoom);
+      setHandler(map.scrollWheelZoom, initialHandlers.scrollWheelZoom);
+      activate.remove();
+      lock.remove();
+      fullscreen.remove();
+      container.classList.remove("has-touch-guard", "map-touch-locked", "map-fullscreen");
+      fullscreenShell.classList.remove("map-fullscreen");
+      container.__touchScrollGuardCleanup = null;
+    };
+
+    if (typeof map.on === "function") {
+      map.on("unload", () => { if (isFullscreen) setFullscreen(false); });
+    }
+
+    applyMode(true);
+    setTimeout(() => placeRotateControl(mobileQuery.matches), 0);
+  };
+
   function distanceBetweenCoordinates(first, second) {
     const radians = (degrees) => (degrees * Math.PI) / 180;
     const latitudeDelta = radians(second.latitude - first.latitude);
@@ -14,6 +226,37 @@
       Math.cos(firstLatitude) * Math.cos(secondLatitude) * Math.sin(longitudeDelta / 2) ** 2
     );
     return 6371000 * 2 * Math.atan2(Math.sqrt(haversine), Math.sqrt(1 - haversine));
+  }
+
+  function pointToSegmentMeters(point, start, end) {
+    const rad = Math.PI / 180;
+    const startLat = start.lat != null ? start.lat : start[0];
+    const startLng = start.lng != null ? start.lng : start[1];
+    const endLat = end.lat != null ? end.lat : end[0];
+    const endLng = end.lng != null ? end.lng : end[1];
+    const cos = Math.cos(((point.lat + startLat + endLat) / 3) * rad);
+    const ax = startLng * cos, ay = startLat;
+    const bx = endLng * cos, by = endLat;
+    const px = point.lng * cos, py = point.lat;
+    const dx = bx - ax, dy = by - ay;
+    const lengthSquared = dx * dx + dy * dy;
+    let t = lengthSquared ? ((px - ax) * dx + (py - ay) * dy) / lengthSquared : 0;
+    t = Math.max(0, Math.min(1, t));
+    const offsetX = (px - (ax + t * dx)) * rad;
+    const offsetY = (py - (ay + t * dy)) * rad;
+    return Math.sqrt(offsetX * offsetX + offsetY * offsetY) * 6371000;
+  }
+
+  function deviationFromLineMeters(line, point) {
+    if (!line || typeof line.getLatLngs !== "function") return 0;
+    const coordinates = line.getLatLngs() || [];
+    if (coordinates.length < 2) return 0;
+    let minimum = Infinity;
+    for (let index = 0; index < coordinates.length - 1; index += 1) {
+      const distance = pointToSegmentMeters(point, coordinates[index], coordinates[index + 1]);
+      if (distance < minimum) minimum = distance;
+    }
+    return minimum;
   }
 
   function formatApproximateDistance(meters) {
@@ -205,8 +448,215 @@
     return context;
   };
 
+  // --- Precisión del marcador en tiempo real ------------------------------
+  // El GPS del navegador entrega lecturas con ruido (saltos de varios metros
+  // incluso estando quieto). Se descartan las lecturas muy imprecisas y se
+  // suaviza el desplazamiento para que el paseo se vea continuo y estable.
+  const MAX_ACCURACY_METERS = 250;
+  const SNAP_DISTANCE_METERS = 20;
+
+  function normalizeAccuracy(value) {
+    const accuracy = Number(value);
+    return Number.isFinite(accuracy) && accuracy > 0 ? accuracy : Infinity;
+  }
+
+  function smoothUserPosition(position) {
+    if (!position) return null;
+
+    const latitude = Number(position.latitude);
+    const longitude = Number(position.longitude);
+    if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return null;
+
+    const accuracy = normalizeAccuracy(position.accuracy);
+    const next = { latitude, longitude, accuracy };
+    const previous = mapas._smoothedPosition;
+
+    if (!previous) {
+      mapas._smoothedPosition = next;
+      return next;
+    }
+
+    // Una lectura mucho peor que la última buena suele venir de una antena de
+    // telefonía/Wi-Fi y haría saltar el marcador: se descarta.
+    if (accuracy > MAX_ACCURACY_METERS && accuracy > previous.accuracy * 2) {
+      return previous;
+    }
+
+    const distance = distanceBetweenCoordinates(previous, next);
+    let weight;
+    if (distance >= SNAP_DISTANCE_METERS) {
+      weight = 1; // desplazamiento real: seguir al usuario sin retardo
+    } else if (distance <= 1) {
+      weight = 0.25; // temblor del GPS estando quieto: apenas mover
+    } else {
+      weight = 0.6;
+    }
+    if (accuracy < previous.accuracy / 2) weight = Math.max(weight, 0.75);
+
+    mapas._smoothedPosition = {
+      latitude: previous.latitude + (latitude - previous.latitude) * weight,
+      longitude: previous.longitude + (longitude - previous.longitude) * weight,
+      accuracy: Math.min(accuracy, previous.accuracy)
+    };
+    return mapas._smoothedPosition;
+  }
+
+  // Animación breve entre lecturas para que el icono se desplace de forma
+  // continua en lugar de saltar de punto en punto.
+  function animateUserMarker(marker, target) {
+    if (!marker || typeof marker.setLatLng !== "function") return;
+
+    const current = typeof marker.getLatLng === "function" ? marker.getLatLng() : null;
+    if (!current) {
+      marker.setLatLng(target);
+      return;
+    }
+
+    const fromLat = current.lat;
+    const fromLng = current.lng;
+    const toLat = target[0];
+    const toLng = target[1];
+
+    // Un salto grande (primera lectura o cambio de mapa) se aplica directo.
+    if (Math.abs(toLat - fromLat) > 0.001 || Math.abs(toLng - fromLng) > 0.001) {
+      marker.setLatLng(target);
+      return;
+    }
+
+    if (marker.__userMoveFrame) cancelAnimationFrame(marker.__userMoveFrame);
+
+    const canAnimate = typeof requestAnimationFrame === "function";
+    if (!canAnimate) {
+      marker.setLatLng(target);
+      return;
+    }
+
+    const duration = 450;
+    const start = typeof performance !== "undefined" ? performance.now() : Date.now();
+    const step = (now) => {
+      const elapsed = now - start;
+      const t = Math.min(1, elapsed / duration);
+      const eased = t * t * (3 - 2 * t);
+      marker.setLatLng([
+        fromLat + (toLat - fromLat) * eased,
+        fromLng + (toLng - fromLng) * eased
+      ]);
+      if (t < 1) {
+        marker.__userMoveFrame = requestAnimationFrame(step);
+      } else {
+        marker.__userMoveFrame = null;
+      }
+    };
+    marker.__userMoveFrame = requestAnimationFrame(step);
+  }
+
+  // Mueve el marcador dorado del usuario a la posición más reciente. Se llama
+  // con cada actualización de watchPosition para que el icono acompañe al
+  // usuario en tiempo real mientras camina (antes solo se colocaba una vez, al
+  // conceder el permiso, y quedaba estático).
+  mapas.syncUserMarkerPosition = function (coords) {
+    const smoothed = smoothUserPosition(coords || state()?.currentPosition);
+    if (!smoothed) return;
+
+    const current = state()?.currentPosition;
+    if (current) {
+      state().currentPosition = {
+        ...current,
+        latitude: smoothed.latitude,
+        longitude: smoothed.longitude,
+        accuracy: smoothed.accuracy
+      };
+    }
+
+    const marker = state()?.userMarker;
+    if (marker) {
+      animateUserMarker(marker, [smoothed.latitude, smoothed.longitude]);
+    }
+
+    if (typeof window.updateGeneralUserMarker === "function") {
+      window.updateGeneralUserMarker();
+    }
+    if (typeof window.updateHotelUserMarker === "function") {
+      window.updateHotelUserMarker();
+    }
+
+    // Avisa a la guía para recalcular la ruta si el usuario se ha desviado.
+    const guide = window.RevistaDigital?.guiapa;
+    if (guide && typeof guide.onUserPositionUpdate === "function") {
+      try {
+        guide.onUserPositionUpdate({
+          latitude: smoothed.latitude,
+          longitude: smoothed.longitude
+        });
+      } catch (error) { /* ignore route recalculation errors */ }
+    }
+
+    // Lo mismo para las rutas marcadas con "Cómo llegar" en los mapas de hotel.
+    mapas.maybeRecalculateDirections({
+      latitude: smoothed.latitude,
+      longitude: smoothed.longitude
+    });
+  };
+
+  // --- Recalculación de "Cómo llegar" (mapas de hotel) --------------------
+  const DIRECTIONS_DEVIATION_METERS = 25;
+  const DIRECTIONS_RECALC_INTERVAL_MS = 8000;
+
+  mapas.maybeRecalculateDirections = function (coords) {
+    const tracking = mapas._directionsRoute;
+    const line = state()?.routeLine;
+    if (!tracking || !coords || !line) return;
+
+    const now = Date.now();
+    if (tracking.recalcAt && now - tracking.recalcAt < DIRECTIONS_RECALC_INTERVAL_MS) return;
+    const deviation = deviationFromLineMeters(line, { lat: coords.latitude, lng: coords.longitude });
+    if (deviation < DIRECTIONS_DEVIATION_METERS) return;
+
+    const engine = mapas;
+    if (typeof engine.computeRoute !== "function") return;
+
+    tracking.recalcAt = now;
+    if (tracking.recalcAbort) {
+      try { tracking.recalcAbort.abort(); } catch (error) { /* ignore */ }
+    }
+    const controller = typeof AbortController === "function" ? new AbortController() : null;
+    tracking.recalcAbort = controller;
+    const token = ++tracking.recalcToken;
+
+    engine.computeRoute({
+      origin: [coords.latitude, coords.longitude],
+      destination: tracking.destination,
+      prefer: tracking.prefer,
+      signal: controller ? controller.signal : undefined
+    }).then((result) => {
+      if (mapas._directionsRoute !== tracking || tracking.recalcToken !== token) return;
+      tracking.recalcAbort = null;
+      const activeLine = state()?.routeLine;
+      if (!activeLine || typeof activeLine.setLatLngs !== "function") return;
+      activeLine.setLatLngs([
+        [coords.latitude, coords.longitude],
+        ...result.coordinates,
+        tracking.destination
+      ]);
+      const status = document.getElementById("locationStatus");
+      if (status) {
+        const distance = result.distance ? `${(result.distance / 1000).toFixed(1)} km` : "";
+        const minutes = result.duration ? Math.round(result.duration / 60) : null;
+        const detail = [distance, minutes != null ? `${minutes} min` : ""].filter(Boolean).join(" · ");
+        status.textContent = `Ruta ${result.profile === "pedestrian" ? "a pie" : "en coche"} marcada dentro del mapa${detail ? ": " + detail : ""}.`;
+      }
+    }).catch((error) => {
+      if (error && error.name === "AbortError") return;
+      if (mapas._directionsRoute !== tracking) return;
+      // Si falla, se conserva la ruta anterior.
+      tracking.recalcAbort = null;
+    });
+  };
+
   mapas.startNearbyContextWatch = function () {
     if (!navigator.geolocation || mapas._nearbyWatchId) return;
+
+    mapas._smoothedPosition = null;
 
     mapas._nearbyWatchId = navigator.geolocation.watchPosition(
       (position) => {
@@ -215,13 +665,20 @@
           longitude: position.coords.longitude
         };
         state().currentPosition = position.coords;
+        mapas.syncUserMarkerPosition(position.coords);
         mapas.renderNearbyContext(coords);
       },
-      () => {},
+      () => {
+        // Si la vigilancia falla (permiso denegado o pérdida de señal) se
+        // libera el id para poder reiniciarla al volver a conceder ubicación.
+        mapas._nearbyWatchId = null;
+      },
       {
         enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 60000
+        timeout: 15000,
+        // Sin caché: al caminar interesa la posición actual, no una de hace
+        // un minuto.
+        maximumAge: 0
       }
     );
   };
@@ -234,11 +691,35 @@
   window.RevistaDigital.location.renderNearbyContext = mapas.renderNearbyContext;
   window.RevistaDigital.location.routeToNearbyContext = mapas.routeToNearbyContext;
   window.RevistaDigital.location.startNearbyContextWatch = mapas.startNearbyContextWatch;
+  window.RevistaDigital.location.startLiveTracking = mapas.startNearbyContextWatch;
+  window.RevistaDigital.location.syncUserMarkerPosition = mapas.syncUserMarkerPosition;
   window.RevistaDigital.location.autoNavigateNearbyContext = false;
+
+  mapas.loadLeafletRotate = function () {
+    if (window.L && typeof window.L.Map.prototype.setBearing === "function") {
+      return Promise.resolve(window.L);
+    }
+
+    if (window.leafletRotatePromise) {
+      return window.leafletRotatePromise;
+    }
+
+    window.leafletRotatePromise = new Promise((resolve) => {
+      const script = document.createElement("script");
+      script.src = "https://unpkg.com/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js";
+      script.onload = () => resolve(window.L);
+      script.onerror = () => resolve(window.L);
+      document.head.appendChild(script);
+    });
+
+    return window.leafletRotatePromise;
+  };
+
+  window.loadLeafletRotate = mapas.loadLeafletRotate;
 
   mapas.loadLeaflet = function () {
     if (window.L) {
-      return Promise.resolve(window.L);
+      return mapas.loadLeafletRotate();
     }
 
     if (window.leafletPromise) {
@@ -256,7 +737,7 @@
       script.onload = () => resolve(window.L);
       script.onerror = reject;
       document.head.appendChild(script);
-    });
+    }).then(() => mapas.loadLeafletRotate());
 
     return window.leafletPromise;
   };
@@ -338,6 +819,11 @@
       (position) => {
         state().currentPosition = position.coords;
 
+        // Arranca el seguimiento continuo y coloca el marcador con la
+        // posición recién obtenida.
+        mapas.startNearbyContextWatch();
+        mapas.syncUserMarkerPosition(position.coords);
+
         const nearby = findNearbyLocation({
           latitude: position.coords.latitude,
           longitude: position.coords.longitude
@@ -363,7 +849,7 @@
           const size = 28;
           const personSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="' + size + '" height="' + size + '"><circle cx="12" cy="8" r="4" fill="#d4af37"/><path d="M12 14c-4.41 0-8 2.59-8 6h16c0-3.41-3.59-6-8-6z" fill="#d4af37"/></svg>';
           const pulseSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" width="72" height="72"><circle cx="36" cy="36" r="18" fill="none" stroke="#d4af37" stroke-width="2" opacity="0.6"><animate attributeName="r" from="18" to="32" dur="1.5s" repeatCount="indefinite"/><animate attributeName="opacity" from="0.6" to="0" dur="1.5s" repeatCount="indefinite"/></circle></svg>';
-          const html = '<div class="user-marker-wrap" style="display:flex;flex-direction:column;align-items:center;transform:translate(-50%,-50%);"><div class="user-marker-pulse" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:72px;height:72px;pointer-events:none;">' + pulseSvg + '</div><div class="user-marker-icon" style="z-index:1;">' + personSvg + '</div></div>';
+          const html = '<div class="user-marker-wrap" style="position:relative;width:' + size + 'px;height:' + size + 'px;display:flex;align-items:center;justify-content:center;"><div class="user-marker-pulse" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:72px;height:72px;pointer-events:none;">' + pulseSvg + '</div><div class="user-marker-icon" style="position:relative;z-index:1;line-height:0;">' + personSvg + '</div></div>';
           state().userMarker = L.marker([state().currentPosition.latitude, state().currentPosition.longitude], {
             icon: L.divIcon({ className: "user-marker-div", html: html, iconSize: [size, size], iconAnchor: [size/2, size/2] })
           }).addTo(state().activeMap).bindTooltip("Tu ubicación actual");
@@ -392,8 +878,8 @@
       },
       {
         enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 60000
+        timeout: 15000,
+        maximumAge: 0
       }
     );
 
@@ -571,6 +1057,7 @@
   mapas.cancelRoute = function () {
     state().routeLine?.remove();
     state().routeLine = null;
+    mapas._directionsRoute = null;
   };
 
   mapas.openDirections = function (destination, coordinatesArg) {
@@ -626,6 +1113,16 @@
             dashArray: "12 8"
           }).addTo(state().activeMap);
 
+          // Seguimiento de esta ruta: permite recalcularla si el usuario se
+          // desvía mientras camina.
+          mapas._directionsRoute = {
+            destination: destinationCoordinates,
+            prefer: isComplex ? "pedestrian" : "driving",
+            recalcAt: 0,
+            recalcToken: 0,
+            recalcAbort: null
+          };
+
           // Centra en el destino con un zoom cercano en lugar de alejar el mapa
           // para encuadrar toda la ruta (el usuario puede alejar si lo desea).
           const focusZoom = Math.max(state().activeMap.getZoom() || 15, 15);
@@ -639,6 +1136,7 @@
         .catch(() => {
           state().routeLine?.remove();
           state().routeLine = null;
+          mapas._directionsRoute = null;
           if (status) status.textContent = "No se encontró una ruta disponible para ese destino.";
         });
 
@@ -773,8 +1271,13 @@
     mapas.loadLeaflet().then((L) => {
       const generalMap = L.map(mapElement, {
         zoomControl: true,
-        attributionControl: true
+        attributionControl: true,
+        rotate: true,
+        bearing: 0,
+        touchRotate: true,
+        rotateControl: { closeOnZeroBearing: false, position: "bottomright" }
       });
+      mapas.attachTouchScrollGuard(generalMap, mapElement);
 
       state().activeMap = generalMap;
 
@@ -847,13 +1350,21 @@
     state().routeLine = null;
 
     mapas.loadLeaflet().then((L) => {
-      const mapOptions = { zoomControl: true, attributionControl: true };
+      const mapOptions = {
+        zoomControl: true,
+        attributionControl: true,
+        rotate: true,
+        bearing: 0,
+        touchRotate: true,
+        rotateControl: { closeOnZeroBearing: false, position: "bottomright" }
+      };
       if (isPlayaParaisoHotel) {
         mapOptions.maxBounds = complexBounds;
         mapOptions.maxBoundsViscosity = 1.0;
       }
       state().activeMap = L.map(mapElement, mapOptions)
         .setView(destinationCoordinates, isPlayaParaisoHotel ? 17 : 15);
+      mapas.attachTouchScrollGuard(state().activeMap, mapElement);
 
       if (isPlayaParaisoHotel) {
         state().activeMap.setMinZoom(state().activeMap.getBoundsZoom(complexBounds));
@@ -892,7 +1403,7 @@
     const size = 28;
     const personSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="' + size + '" height="' + size + '"><circle cx="12" cy="8" r="4" fill="#d4af37"/><path d="M12 14c-4.41 0-8 2.59-8 6h16c0-3.41-3.59-6-8-6z" fill="#d4af37"/></svg>';
     const pulseSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" width="72" height="72"><circle cx="36" cy="36" r="18" fill="none" stroke="#d4af37" stroke-width="2" opacity="0.6"><animate attributeName="r" from="18" to="32" dur="1.5s" repeatCount="indefinite"/><animate attributeName="opacity" from="0.6" to="0" dur="1.5s" repeatCount="indefinite"/></circle></svg>';
-    const html = '<div class="user-marker-wrap" style="display:flex;flex-direction:column;align-items:center;transform:translate(-50%,-50%);"><div class="user-marker-pulse" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:72px;height:72px;pointer-events:none;">' + pulseSvg + '</div><div class="user-marker-icon" style="z-index:1;">' + personSvg + '</div></div>';
+    const html = '<div class="user-marker-wrap" style="position:relative;width:' + size + 'px;height:' + size + 'px;display:flex;align-items:center;justify-content:center;"><div class="user-marker-pulse" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:72px;height:72px;pointer-events:none;">' + pulseSvg + '</div><div class="user-marker-icon" style="position:relative;z-index:1;line-height:0;">' + personSvg + '</div></div>';
     state().userMarker = L.marker([position.latitude, position.longitude], {
       icon: L.divIcon({ className: "user-marker-div", html: html, iconSize: [size, size], iconAnchor: [size/2, size/2] })
     }).addTo(map).bindTooltip("Tu ubicación actual");
@@ -909,7 +1420,15 @@
     const projectBase = new URL(document.querySelector("base")?.href || window.location.href, window.location.href).pathname.replace(/\/+$/, "");
     const points = hotels.map((hotel) => state().hotelCoordinates[hotel.name]);
     mapas.loadLeaflet().then((L) => {
-      const map = L.map(element, { scrollWheelZoom: true, preferCanvas: true });
+      const map = L.map(element, {
+        scrollWheelZoom: true,
+        preferCanvas: true,
+        rotate: true,
+        bearing: 0,
+        touchRotate: true,
+        rotateControl: { closeOnZeroBearing: false, position: "bottomright" }
+      });
+      mapas.attachTouchScrollGuard(map, element);
       state().activeMap = map;
       state().userMarker = null;
       state().routeLine = null;
@@ -972,7 +1491,15 @@
     const countryOverride = COUNTRY_MAP_OVERRIDES[options.countrySlug] || null;
 
     mapas.loadLeaflet().then((L) => {
-      const map = L.map(element, { scrollWheelZoom: true, preferCanvas: true });
+      const map = L.map(element, {
+        scrollWheelZoom: true,
+        preferCanvas: true,
+        rotate: true,
+        bearing: 0,
+        touchRotate: true,
+        rotateControl: { closeOnZeroBearing: false, position: "bottomright" }
+      });
+      mapas.attachTouchScrollGuard(map, element);
       state().activeMap = map;
       state().userMarker = null;
       state().routeLine = null;

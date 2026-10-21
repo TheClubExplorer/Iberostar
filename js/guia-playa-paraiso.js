@@ -8,6 +8,8 @@
   const CATEGORIES = {
     hotel: { icon: "building", color: "#0057b8" },
     club: { icon: "star", color: "#0057b8" },
+    starprestige: { icon: "star", color: "#b8860b" },
+    concierge: { icon: "concierge-bell", color: "#6b7280" },
     restaurante: { icon: "utensils", color: "#d4af37" },
     bar: { icon: "cocktail", color: "#5f9ea0" },
     piscina: { icon: "swimming", color: "#1e90ff" },
@@ -136,7 +138,7 @@
     {"id":"pool-bar-las-olas","name":"Pool Bar Las Olas","category":"bar","description":"Bar de piscina","source":"plano","verified":false},
     {"id":"lobby-bar-kukulkan","name":"Lobby Bar Kukulkán","category":"bar","description":"Lobby bar","source":"plano","verified":false},
     {"id":"music-bar-rhapsody","name":"Music Bar Rhapsody","category":"bar","description":"Music bar","source":"plano","verified":false},
-    {"id":"lobby-bar-el-mirador","name":"Lobby Bar El Mirador","category":"bar","description":"Lobby bar","source":"plano","verified":false},
+    {"id":"lobby-bar-el-mirador","name":"Lobby Bar El Mirador","category":"bar","hotelId":"Iberostar Paraíso JOIA","lat":20.756335,"lng":-86.962712,"description":"Lobby bar","source":"Google Maps","verified":true},
     {"id":"aqua-bar-la-sirenita","name":"Aqua Bar La Sirenita","category":"bar","description":"Aqua bar","source":"plano","verified":false},
     {"id":"health-bar-spa","name":"Health Bar SPA","category":"bar","description":"Health bar","source":"plano","verified":false},
     {"id":"aqua-bar-la-perla","name":"Aqua Bar La Perla","category":"bar","description":"Aqua bar","source":"plano","verified":false},
@@ -166,7 +168,7 @@
     {"id":"diving-center","name":"Centro de buceo","category":"deportes","description":"Diving center","source":"plano","verified":false},
     {"id":"golf-club-house","name":"Golf Club House","category":"golf","description":"Golf club house","source":"plano","verified":false},
     {"id":"teatro-music-hall","name":"Teatro Music Hall","category":"entretenimiento","description":"Teatro","source":"plano","verified":false},
-    {"id":"teatro-coliseo","name":"Teatro Coliseo","category":"entretenimiento","description":"Teatro","source":"plano","verified":false},
+    {"id":"teatro-coliseo","name":"Teatro Coliseo","category":"entretenimiento","hotelId":"Iberostar Paraíso JOIA","lat":20.756739,"lng":-86.962693,"description":"Teatro","source":"Google Maps","verified":true},
     {"id":"games-room","name":"Sala de juegos","category":"entretenimiento","description":"Games room","source":"plano","verified":false},
     {"id":"casino","name":"Casino","category":"entretenimiento","description":"Casino","source":"plano","verified":false},
     {"id":"shopping-mall","name":"Centro comercial","category":"comer","description":"Shopping mall","source":"plano","verified":false},
@@ -178,9 +180,9 @@
     {"id":"medical-center","name":"Centro médico","category":"servicio","description":"Medical center","source":"plano","verified":false},
     {"id":"drugstore","name":"Farmacia","category":"servicio","description":"Drugstore","source":"plano","verified":false},
     {"id":"preview-gallery","name":"Preview Gallery","category":"servicio","description":"Preview Gallery","source":"plano","verified":false},
-    {"id":"head-concierge","name":"Head Concierge","category":"servicio","description":"Head Concierge","source":"plano","verified":false},
-    {"id":"star-prestige-lounge","name":"Star Prestige Lounge","category":"servicio","description":"Star Prestige Lounge","source":"plano","verified":false},
-    {"id":"star-prestige-beach-club","name":"Star Prestige Beach Club","category":"servicio","description":"Star Prestige Beach Club","source":"plano","verified":false},
+    {"id":"head-concierge","name":"Head Concierge","category":"concierge","description":"Head Concierge","source":"plano","verified":false},
+    {"id":"star-prestige-lounge","name":"Star Prestige Lounge","category":"starprestige","description":"Star Prestige Lounge","source":"plano","verified":false},
+    {"id":"star-prestige-beach-club","name":"Star Prestige Beach Club","category":"starprestige","description":"Star Prestige Beach Club","source":"plano","verified":false},
     {"id":"guest-service","name":"Relaciones públicas","category":"servicio","description":"Guest service","source":"plano","verified":false},
     {"id":"courtesy-room","name":"Duchas de cortesía","category":"servicio","description":"Courtesy room","source":"plano","verified":false},
     {"id":"paraiso-express-stop","name":"Paraíso Express Stop","category":"servicio","description":"Paraíso Express Stop","source":"plano","verified":false},
@@ -195,6 +197,23 @@
     {"id":"surprise-gf","name":"Restaurant Surprise (Planta baja)","category":"restaurante","description":"Restaurante Surprise - Ground Floor","source":"plano","verified":false},
     {"id":"surprise-2f","name":"Restaurant Surprise (2do nivel)","category":"restaurante","description":"Restaurante Surprise - 2nd Level","source":"plano","verified":false},
     {"id":"shushi","name":"Restaurant Shushi","category":"restaurante","description":"Restaurante Shushi (japonés)","source":"plano","verified":false});
+
+  // Instalaciones por hotel con coordenadas confirmadas manualmente
+  // (recorrido del complejo + enlaces de Google Maps).
+  POIS.push(
+    {"id":"concierge-lindo","name":"Concierge Paraíso Lindo","category":"concierge","hotelId":"Iberostar Paraíso Lindo","lat":20.759481,"lng":-86.963898,"description":"Concierge del hotel","source":"Google Maps","verified":true},
+    {"id":"star-prestige-maya","name":"Star Prestige Paraíso Maya","category":"starprestige","hotelId":"Iberostar Paraíso Maya","lat":20.757650,"lng":-86.964755,"description":"Star Prestige (ubicación temporal)","source":"Google Maps","verified":true},
+    {"id":"starcafe-maya","name":"Star Café Maya","category":"bar","hotelId":"Iberostar Paraíso Maya","lat":20.7575018,"lng":-86.9645296,"description":"Star Café de Maya / Lindo","source":"Google Maps","verified":true},
+    {"id":"spa-joia","name":"Spa JOIA","category":"spa","hotelId":"Iberostar Paraíso JOIA","lat":20.755878,"lng":-86.961372,"description":"Spa del hotel JOIA","source":"Google Maps","verified":true},
+    {"id":"fit-fun-joia","name":"Fit & Fun JOIA","category":"deportes","hotelId":"Iberostar Paraíso JOIA","lat":20.7560274,"lng":-86.9611985,"description":"Gimnasio Fit & Fun","source":"Google Maps","verified":true},
+    {"id":"concierge-joia","name":"Concierge JOIA","category":"concierge","hotelId":"Iberostar Paraíso JOIA","lat":20.756125,"lng":-86.962989,"description":"Concierge del hotel JOIA","source":"Google Maps","verified":true},
+    {"id":"legado","name":"Legado","category":"restaurante","hotelId":"Iberostar Paraíso JOIA","lat":20.754923,"lng":-86.961316,"description":"Restaurante mexicano","source":"Google Maps","verified":true},
+    {"id":"star-prestige-joia","name":"Star Prestige JOIA","category":"starprestige","hotelId":"Iberostar Paraíso JOIA","lat":20.756156,"lng":-86.962287,"description":"Star Prestige del hotel JOIA","source":"Google Maps","verified":true},
+    {"id":"concierge-grand-paraiso","name":"Concierge Grand Paraíso (Edificio 71)","category":"concierge","hotelId":"Iberostar Paraíso JOIA","lat":20.753724,"lng":-86.960434,"description":"Concierge de Grand Paraíso","source":"Google Maps","verified":true},
+    {"id":"spa-grand-paraiso","name":"Spa Grand Paraíso","category":"spa","hotelId":"Iberostar Paraíso JOIA","lat":20.753233,"lng":-86.960193,"description":"Spa de Grand Paraíso","source":"Google Maps","verified":true},
+    {"id":"star-prestige-grand-paraiso-playa","name":"Star Prestige Grand Paraíso (playa)","category":"starprestige","hotelId":"Iberostar Paraíso JOIA","lat":20.756829,"lng":-86.958688,"description":"Star Prestige en la playa","source":"Google Maps","verified":true},
+    {"id":"fit-fun-grand-paraiso","name":"Fit & Fun Grand Paraíso","category":"deportes","hotelId":"Iberostar Paraíso JOIA","lat":20.757618,"lng":-86.958517,"description":"Gimnasio Fit & Fun de Grand Paraíso","source":"Google Maps","verified":true}
+  );
 
   // Coordenadas confirmadas con OpenStreetMap. Cada fila es
   // [id, lat, lng, nombre del elemento OSM]. Solo se incluyen elementos que
@@ -546,6 +565,8 @@
   var CATEGORY_LABELS = {
     hotel: "Hoteles",
     club: "THE CLUB",
+    starprestige: "Star Prestige",
+    concierge: "Concierge",
     restaurante: "Restaurantes",
     bar: "Bares",
     piscina: "Piscinas",
@@ -767,7 +788,7 @@
     }).join("");
   }
 
-  gp._route = { status: "idle", targetId: null, targetName: null, info: null, line: null, abort: null };
+  gp._route = { status: "idle", targetId: null, targetName: null, info: null, line: null, abort: null, recalcAbort: null, recalcAt: 0, recalcToken: 0 };
 
   function removeRouteLine() {
     if (gp._route.line) {
@@ -786,6 +807,12 @@
       try { gp._route.abort.abort(); } catch (e) { /* ignore */ }
       gp._route.abort = null;
     }
+    if (gp._route.recalcAbort) {
+      try { gp._route.recalcAbort.abort(); } catch (e) { /* ignore */ }
+      gp._route.recalcAbort = null;
+    }
+    gp._route.recalcAt = 0;
+    gp._route.recalcToken += 1;
     removeRouteLine();
     gp._route.status = "idle";
     gp._route.targetId = null;
@@ -804,14 +831,30 @@
     return parts.join(" · ");
   }
 
-  function drawRoute(origin, poi, result) {
+  function drawRoute(origin, poi, result, options) {
     var shared = window.RevistaDigital && window.RevistaDigital.state;
     var map = gp._map || (shared && shared.activeMap);
     if (!map || !window.L) return;
     removeRouteLine();
     var coordinates = [[origin.latitude, origin.longitude]].concat(result.coordinates, [[poi.lat, poi.lng]]);
-    gp._route.line = window.L.polyline(coordinates, { color: "#0057b8", weight: 6, opacity: 0.95 }).addTo(map);
+    var routePane = map.getPane("complexRoutePane") || map.createPane("complexRoutePane");
+    routePane.style.zIndex = "460";
+    routePane.style.pointerEvents = "none";
+    gp._route.line = window.L.polyline(coordinates, {
+      color: "#0057b8",
+      weight: 6,
+      opacity: 0.95,
+      pane: "complexRoutePane"
+    }).addTo(map);
     if (shared) shared.routeLine = gp._route.line;
+    // Si había una ruta de "Cómo llegar" del mapa de hotel, se deja de
+    // rastrear para que no se recalcule por encima de esta.
+    if (window.RevistaDigital && window.RevistaDigital.mapas) {
+      window.RevistaDigital.mapas._directionsRoute = null;
+    }
+    // En una recalculación automática no se mueve la vista para no interrumpir
+    // al usuario que está caminando.
+    if (options && options.keepView) return;
     try {
       // Prioriza el destino con un zoom cercano en lugar de alejar el mapa para
       // encuadrar toda la ruta; el usuario puede alejar con los controles.
@@ -823,7 +866,90 @@
     } catch (e) { /* ignore */ }
   }
 
-  function renderRouteStatus() {
+  // --- Recalculación automática al desviarse ------------------------------
+  // Distancia mínima (metros) entre el usuario y la línea de ruta para
+  // considerar que se ha salido del camino.
+  var ROUTE_DEVIATION_METERS = 25;
+  // Tiempo mínimo entre recalculaciones (ms) para no saturar el servicio.
+  var ROUTE_RECALC_INTERVAL_MS = 8000;
+
+  function segmentDistanceMeters(point, start, end) {
+    var rad = Math.PI / 180;
+    var cos = Math.cos(((point.lat + start.lat + end.lat) / 3) * rad);
+    var ax = start.lng * cos, ay = start.lat;
+    var bx = end.lng * cos, by = end.lat;
+    var px = point.lng * cos, py = point.lat;
+    var dx = bx - ax, dy = by - ay;
+    var lengthSquared = dx * dx + dy * dy;
+    var t = lengthSquared ? ((px - ax) * dx + (py - ay) * dy) / lengthSquared : 0;
+    t = Math.max(0, Math.min(1, t));
+    var offsetX = (px - (ax + t * dx)) * rad;
+    var offsetY = (py - (ay + t * dy)) * rad;
+    return Math.sqrt(offsetX * offsetX + offsetY * offsetY) * 6371000;
+  }
+
+  function deviationFromRouteMeters(point) {
+    var line = gp._route.line;
+    if (!line || typeof line.getLatLngs !== "function") return 0;
+    var coordinates = line.getLatLngs() || [];
+    if (coordinates.length < 2) return 0;
+    var minimum = Infinity;
+    for (var i = 0; i < coordinates.length - 1; i += 1) {
+      var distance = segmentDistanceMeters(point, coordinates[i], coordinates[i + 1]);
+      if (distance < minimum) minimum = distance;
+    }
+    return minimum;
+  }
+
+  function maybeRecalculateRoute(coords) {
+    if (!coords || coords.latitude == null || coords.longitude == null) return;
+    var route = gp._route;
+    if (!route || route.status !== "ready" || !route.targetId) return;
+
+    var now = Date.now();
+    if (route.recalcAt && now - route.recalcAt < ROUTE_RECALC_INTERVAL_MS) return;
+    if (deviationFromRouteMeters({ lat: coords.latitude, lng: coords.longitude }) < ROUTE_DEVIATION_METERS) return;
+
+    var poi = findPoi(route.targetId);
+    if (!poi || !canMap(poi)) return;
+    var engine = window.RevistaDigital && window.RevistaDigital.mapas;
+    if (!engine || typeof engine.computeRoute !== "function") return;
+
+    route.recalcAt = now;
+    if (route.recalcAbort) {
+      try { route.recalcAbort.abort(); } catch (e) { /* ignore */ }
+    }
+    var controller = typeof AbortController === "function" ? new AbortController() : null;
+    route.recalcAbort = controller;
+    var token = ++route.recalcToken;
+    var preferRoute = typeof engine.isComplexDestination === "function" && engine.isComplexDestination([poi.lat, poi.lng])
+      ? "pedestrian"
+      : "driving";
+
+    engine.computeRoute({
+      origin: [coords.latitude, coords.longitude],
+      destination: [poi.lat, poi.lng],
+      prefer: preferRoute,
+      signal: controller ? controller.signal : undefined
+    }).then(function (result) {
+      // Si la ruta se canceló o se pidió otro destino mientras se calculaba,
+      // se descarta el resultado.
+      if (route !== gp._route || route.targetId !== poi.id || route.recalcToken !== token) return;
+      route.recalcAbort = null;
+      drawRoute(coords, poi, result, { keepView: true });
+      route.info = formatRouteInfo(result);
+      renderRouteStatus(true);
+    }).catch(function (error) {
+      if (error && error.name === "AbortError") return;
+      if (route !== gp._route || route.recalcToken !== token) return;
+      // En una recalculación silenciosa se conserva la ruta anterior si falla.
+      route.recalcAbort = null;
+    });
+  }
+
+  gp.onUserPositionUpdate = maybeRecalculateRoute;
+
+  function renderRouteStatus(skipReveal) {
     if (!state.mount) return;
     var box = state.mount.querySelector("#guideRouteBox");
     if (box) {
@@ -847,7 +973,7 @@
         }
         html += '<button type="button" class="guide-route-cancel">Cancelar ruta</button>';
         box.innerHTML = notice + html;
-        revealFeedback(box);
+        if (!skipReveal) revealFeedback(box);
       }
     }
     renderMobileRouteStatus();
@@ -1511,4 +1637,9 @@
   gp.selectPoi = selectPoi;
   gp.queryPois = queryPois;
   gp.canMapPoi = canMap;
+  gp.renderCategoryLegend = function (mount) {
+    if (!mount) return false;
+    mount.innerHTML = legendMarkup();
+    return true;
+  };
 })();

@@ -146,10 +146,6 @@
     document.body.dataset.currentRouteLabel = currentLabel;
     document.body.dataset.currentRoute = getAppRoute(pathname);
 
-    if (typeof window.updateAppContextBar === "function") {
-      window.updateAppContextBar();
-    }
-
     return window.RevistaDigital.appContext;
   }
 
@@ -203,8 +199,8 @@
 
   /* Componente compartido de navegación de las páginas del portal (#appView).
      getPortalNavModel calcula, de forma centralizada y a partir de la ruta, el
-     destino de regreso (explícito, nunca history.back) y el rastro de ubicación.
-     portalNav pinta ese modelo como marcado reutilizable. */
+     destino de regreso (explícito, nunca history.back). portalNav pinta un único
+     botón de regreso; las migas de pan duplicadas se retiraron a propósito. */
   function getPortalNavModel(route = getAppRoute()) {
     const home = { label: "Inicio", route: "/" };
 
@@ -304,23 +300,9 @@
   }
 
   function portalNav(model) {
-    if (!model) return "";
-    const back = model.back;
-    const trail = Array.isArray(model.trail) ? model.trail : [];
-    const backMarkup = back && back.route
-      ? `<a class="portal-nav-back" href="${href(back.route)}" data-app-route="${back.route}"><span class="portal-nav-back-icon" aria-hidden="true">←</span><span class="portal-nav-back-label">${escapeHtml(back.label)}</span></a>`
-      : "";
-    const trailMarkup = trail.length
-      ? `<nav class="portal-nav-trail" aria-label="Ubicación actual">${trail.map((item, index) => {
-          const isCurrent = index === trail.length - 1;
-          if (isCurrent || !item.route) {
-            return `<span class="portal-nav-trail-current" aria-current="page">${escapeHtml(item.label)}</span>`;
-          }
-          return `<a class="portal-nav-trail-link" href="${href(item.route)}" data-app-route="${item.route}">${escapeHtml(item.label)}</a>`;
-        }).join('<span class="portal-nav-trail-sep" aria-hidden="true">›</span>')}</nav>`
-      : "";
-    if (!backMarkup && !trailMarkup) return "";
-    return `<div class="portal-nav">${backMarkup}${trailMarkup}</div>`;
+    const back = model && model.back;
+    if (!back || !back.route) return "";
+    return `<div class="portal-nav"><a class="portal-nav-back" href="${href(back.route)}" data-app-route="${back.route}"><span class="portal-nav-back-icon" aria-hidden="true">←</span><span class="portal-nav-back-label">${escapeHtml(back.label)}</span></a></div>`;
   }
 
   function resolveRouteTarget(pathname = window.location.pathname) {
@@ -501,6 +483,7 @@
             </div>
             <div class="portal-map-frame">
               <div class="portal-destination-map portal-complex-map" id="complexPortalMap" role="application" aria-label="Mapa del complejo ${escapeHtml(destination.name)}"></div>
+              <div class="hotel-complex-legend guide-legend" id="complexPortalLegend"></div>
               ${portalMapActions(complexHotels)}
             </div>
           </section>
@@ -516,6 +499,8 @@
           </section>
         </main>`;
         const complexMap = view.querySelector("#complexPortalMap");
+        const complexLegend = view.querySelector("#complexPortalLegend");
+        window.RevistaDigital.guiapa?.renderCategoryLegend?.(complexLegend);
         if (complexMap) initComplexPortalMap(complexMap, countrySlug, destination);
         return true;
       }
@@ -593,7 +578,7 @@
       document.body.dataset.routeManaged = "true";
       document.body.dataset.returnRoute = `/${country}/${destination.slug}`;
       view.innerHTML = renderHotelPortal({ countrySlug: country, countryData, destination, hotel });
-      initHotelPortalMap(view, hotel, destination, countryData);
+      initHotelPortalMap(view, hotel, destination, countryData, country);
       const hotelGuideMount = view.querySelector("#guideExplorer");
       if (hotelGuideMount && window.RevistaDigital.guiapa && typeof window.RevistaDigital.guiapa.renderExplorer === "function") {
         window.RevistaDigital.guiapa.renderExplorer(hotelGuideMount, {
@@ -852,7 +837,6 @@
     const services = (content?.tabs?.servicios?.keyPoints?.length
       ? content.tabs.servicios.keyPoints
       : (Array.isArray(page?.benefits) ? page.benefits : []));
-    const stats = (page && Array.isArray(page.stats)) ? page.stats : [];
     const restaurantMarkup = "";
     const hasDiningSection = false;
 
@@ -879,17 +863,6 @@
             ${teaser ? `<p class="hotel-portal-hero-desc">${escapeHtml(teaser)}</p>` : ""}
             <a class="hotel-portal-hero-cta" href="${href(hotelRoute)}#hotel-ubicacion">Descubrir el hotel ↓</a>
           </div>
-        </section>`;
-
-    const aboutMarkup = `
-        <section class="hotel-portal-section hotel-portal-about${stats.length ? " hotel-portal-about-split" : ""}" id="hotel-sobre">
-          <div class="hotel-portal-about-copy">
-            <p class="portal-kicker">SOBRE EL HOTEL</p>
-            <h2>${escapeHtml(displayName)}</h2>
-            ${intro ? `<p>${escapeHtml(intro)}</p>` : ""}
-            <p class="hotel-portal-address">${escapeHtml(fullAddress)}</p>
-          </div>
-          ${stats.length ? `<div class="hotel-portal-stats-panel">${stats.map(([value, label]) => `<div class="hotel-portal-stat"><strong>${escapeHtml(value)}</strong><small>${escapeHtml(label)}</small></div>`).join("")}</div>` : ""}
         </section>`;
 
     const servicesMarkup = services.length ? `
@@ -987,14 +960,9 @@
           ${navItems.map(([id, label]) => `<a href="${href(hotelRoute)}#hotel-${id}">${label}</a>`).join("")}
         </nav>
 
-        ${aboutMarkup}
         ${mapMarkup}
         ${guideMarkup}
         ${servicesMarkup}
-
-        <div class="hotel-portal-actions">
-          <a class="hotel-portal-back" href="${href(destinationRoute)}" data-app-route="${destinationRoute}">← Volver a ${escapeHtml(destination.name)}</a>
-        </div>
       </main>
     `;
   }
@@ -1059,7 +1027,7 @@
     return symmetric;
   }
 
-  function initHotelPortalMap(view, hotel, destination, countryData) {
+  function initHotelPortalMap(view, hotel, destination, countryData, countrySlug) {
     const element = view?.querySelector("#hotelPortalMap");
     const coordinates = state()?.hotelCoordinates?.[hotel.name];
     const mapas = window.RevistaDigital.mapas;
@@ -1072,11 +1040,22 @@
 
     const build = typeof mapas.loadMarkerCluster === "function" ? mapas.loadMarkerCluster() : mapas.loadLeaflet();
     build.then((L) => {
-      const map = L.map(element, { scrollWheelZoom: true, preferCanvas: true, zoomAnimation: false });
+      const map = L.map(element, {
+        scrollWheelZoom: true,
+        preferCanvas: true,
+        zoomAnimation: false,
+        rotate: true,
+        bearing: 0,
+        touchRotate: true,
+        rotateControl: { closeOnZeroBearing: false, position: "bottomright" }
+      });
+      if (typeof mapas.attachTouchScrollGuard === "function") mapas.attachTouchScrollGuard(map, element);
       activeHotelPortalMap = map;
       window.RevistaDigital.state.activeMap = map;
       window.RevistaDigital.state.userMarker = null;
       window.RevistaDigital.state.routeLine = null;
+      const rdState = state();
+      const hasComplexGuide = PLAYA_PARAISO_GUIDE_HOTELS.has(hotel.slug);
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 19,
         attribution: "© OpenStreetMap contributors"
@@ -1087,16 +1066,33 @@
         map.zoomControl.remove();
         L.control.zoom({ position: "topright" }).addTo(map);
       }
-      L.marker(coordinates)
-        .addTo(map)
-        .bindPopup(`<strong>${escapeHtml(hotel.name)}</strong><br><small>${escapeHtml(destination.name)}, ${escapeHtml(countryData.name)}</small>`)
-        .openPopup();
+      if (hasComplexGuide) {
+        const complexHotelPoints = portalHotelPoints(
+          (destination.hotels || []).filter((item) => item.complex !== false)
+        );
+        complexHotelPoints.forEach((item) => {
+          const hotelSlug = slugify(item.name);
+          const hotelRoute = `/${countrySlug}/${destination.slug}/${hotelSlug}`;
+          const marker = L.marker(item.coordinates)
+            .addTo(map)
+            .bindPopup(`<strong>${escapeHtml(item.name)}</strong><br><small>${escapeHtml(destination.name)}, ${escapeHtml(countryData.name)}</small><br><a href="${href(hotelRoute)}" data-app-route="${hotelRoute}">Ver ficha →</a>`);
+          if (item.name === hotel.name) marker.openPopup();
+          const guideHotel = window.RevistaDigital.guiapa?.poiForHotel?.(item.name);
+          if (guideHotel) window.RevistaDigital.guiapa.registerMarker(guideHotel.id, marker);
+          window.RevistaDigital.guiapa?.registerMarker?.(item.name, marker);
+        });
+      } else {
+        L.marker(coordinates)
+          .addTo(map)
+          .bindPopup(`<strong>${escapeHtml(hotel.name)}</strong><br><small>${escapeHtml(destination.name)}, ${escapeHtml(countryData.name)}</small>`)
+          .openPopup();
+      }
       const position = state()?.currentPosition;
       if (position && Number.isFinite(position.latitude) && Number.isFinite(position.longitude)) {
         const size = 28;
         const personSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="' + size + '" height="' + size + '"><circle cx="12" cy="8" r="4" fill="#d4af37"/><path d="M12 14c-4.41 0-8 2.59-8 6h16c0-3.41-3.59-6-8-6z" fill="#d4af37"/></svg>';
         const pulseSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" width="72" height="72"><circle cx="36" cy="36" r="18" fill="none" stroke="#d4af37" stroke-width="2" opacity="0.6"><animate attributeName="r" from="18" to="32" dur="1.5s" repeatCount="indefinite"/><animate attributeName="opacity" from="0.6" to="0" dur="1.5s" repeatCount="indefinite"/></circle></svg>';
-        const html = '<div class="user-marker-wrap" style="display:flex;flex-direction:column;align-items:center;transform:translate(-50%,-50%);"><div class="user-marker-pulse" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:72px;height:72px;pointer-events:none;">' + pulseSvg + '</div><div class="user-marker-icon" style="z-index:1;">' + personSvg + '</div></div>';
+        const html = '<div class="user-marker-wrap" style="position:relative;width:' + size + 'px;height:' + size + 'px;display:flex;align-items:center;justify-content:center;"><div class="user-marker-pulse" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:72px;height:72px;pointer-events:none;">' + pulseSvg + '</div><div class="user-marker-icon" style="position:relative;z-index:1;line-height:0;">' + personSvg + '</div></div>';
         state().userMarker = L.marker([position.latitude, position.longitude], {
           icon: L.divIcon({ className: "user-marker-div", html, iconSize: [size, size], iconAnchor: [size / 2, size / 2] })
         }).addTo(map).bindTooltip("Tu ubicación actual");
@@ -1110,8 +1106,6 @@
         [coordinates[0] - hotelInset, coordinates[1] - hotelInset],
         [coordinates[0] + hotelInset, coordinates[1] + hotelInset]
       );
-      const rdState = state();
-      const hasComplexGuide = PLAYA_PARAISO_GUIDE_HOTELS.has(hotel.slug);
       const complexPerimeter = (rdState && rdState.complexPerimeter) ? L.latLngBounds(rdState.complexPerimeter) : null;
       const complexBounds = (rdState && rdState.complexBounds) ? L.latLngBounds(rdState.complexBounds) : null;
       const framingPerimeter = (hasComplexGuide && complexPerimeter) ? complexPerimeter : hotelPerimeter;
@@ -1188,7 +1182,16 @@
 
     const build = typeof mapas.loadMarkerCluster === "function" ? mapas.loadMarkerCluster() : mapas.loadLeaflet();
     build.then((L) => {
-      const map = L.map(element, { scrollWheelZoom: true, preferCanvas: true, zoomAnimation: false });
+      const map = L.map(element, {
+        scrollWheelZoom: true,
+        preferCanvas: true,
+        zoomAnimation: false,
+        rotate: true,
+        bearing: 0,
+        touchRotate: true,
+        rotateControl: { closeOnZeroBearing: false, position: "bottomright" }
+      });
+      if (typeof mapas.attachTouchScrollGuard === "function") mapas.attachTouchScrollGuard(map, element);
       window.RevistaDigital.state.activeMap = map;
       window.RevistaDigital.state.userMarker = null;
       window.RevistaDigital.state.routeLine = null;
@@ -1210,47 +1213,55 @@
         window.RevistaDigital.guiapa?.registerMarker?.(item.name, hotelMarker);
       } catch (e) { /* ignore guide marker registry errors */ }
     });
+    // Renderiza los POIs antes del encuadre para incluirlos en los límites
+    // y evitar que el mapa abra fuera del complejo.
+    const guide = window.RevistaDigital.guiapa;
+    if (guide && typeof guide.addPoiLayer === "function") {
+      try {
+        if (guide._poiLayer && typeof guide._poiLayer.remove === "function") guide._poiLayer.remove();
+        guide.addPoiLayer(map, null, { disableClusteringAtZoom: 17 });
+      } catch (error) {
+        console.warn("No se pudieron mostrar los lugares del complejo.", error);
+      }
+    }
     // Máscara del complejo: oculta todo lo que rodea al resort dejando
     // visible solo el complejo, con borde difuminado (igual que en las fichas).
-    if (window.RevistaDigital.guiapa && typeof window.RevistaDigital.guiapa.addComplexMask === "function") {
-      try { window.RevistaDigital.guiapa.addComplexMask(map); } catch (e) {}
+    if (guide && typeof guide.addComplexMask === "function") {
+      try { guide.addComplexMask(map); } catch (error) {
+        console.warn("No se pudo aplicar la máscara del complejo.", error);
+      }
     }
     // Encuadre y límites de navegación del complejo Playa Paraíso
-    const regionBounds = portalComplexViewBounds(L, hotels, poiLayer);
-      const rdState = window.RevistaDigital && window.RevistaDigital.state;
-      const perimeter = (rdState && rdState.complexPerimeter) ? L.latLngBounds(rdState.complexPerimeter) : regionBounds;
-      const navBounds = (rdState && rdState.complexBounds) ? L.latLngBounds(rdState.complexBounds) : (regionBounds ? regionBounds.pad(0.05) : null);
-      if (perimeter && window.RevistaDigital && typeof window.RevistaDigital.setupComplexMapFraming === "function") {
-        window.RevistaDigital.setupComplexMapFraming(map, L, { perimeter, navBounds });
-      } else if (regionBounds) {
-        map.setMinZoom(map.getBoundsZoom(regionBounds));
-        map.setMaxZoom(18);
-        map.fitBounds(regionBounds, { animate: false });
-      } else {
-        map.setView(hotels[0].coordinates, 13);
-      }
-      const position = state()?.currentPosition;
-      if (position) {
+    const regionBounds = portalComplexViewBounds(L, hotels, guide?._poiLayer);
+    const rdState = window.RevistaDigital && window.RevistaDigital.state;
+    const perimeter = (rdState && rdState.complexPerimeter) ? L.latLngBounds(rdState.complexPerimeter) : regionBounds;
+    const navBounds = (rdState && rdState.complexBounds) ? L.latLngBounds(rdState.complexBounds) : (regionBounds ? regionBounds.pad(0.05) : null);
+    if (perimeter && window.RevistaDigital && typeof window.RevistaDigital.setupComplexMapFraming === "function") {
+      window.RevistaDigital.setupComplexMapFraming(map, L, { perimeter, navBounds });
+    } else if (regionBounds) {
+      map.setMinZoom(map.getBoundsZoom(regionBounds));
+      map.setMaxZoom(18);
+      map.fitBounds(regionBounds, { animate: false });
+    } else {
+      map.setView(hotels[0].coordinates, 13);
+    }
+    const position = state()?.currentPosition;
+    if (position) {
         const size = 28;
         const personSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="' + size + '" height="' + size + '"><circle cx="12" cy="8" r="4" fill="#d4af37"/><path d="M12 14c-4.41 0-8 2.59-8 6h16c0-3.41-3.59-6-8-6z" fill="#d4af37"/></svg>';
         const pulseSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" width="72" height="72"><circle cx="36" cy="36" r="18" fill="none" stroke="#d4af37" stroke-width="2" opacity="0.6"><animate attributeName="r" from="18" to="32" dur="1.5s" repeatCount="indefinite"/><animate attributeName="opacity" from="0.6" to="0" dur="1.5s" repeatCount="indefinite"/></circle></svg>';
-        const html = '<div class="user-marker-wrap" style="display:flex;flex-direction:column;align-items:center;transform:translate(-50%,-50%);"><div class="user-marker-pulse" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:72px;height:72px;pointer-events:none;">' + pulseSvg + '</div><div class="user-marker-icon" style="z-index:1;">' + personSvg + '</div></div>';
+        const html = '<div class="user-marker-wrap" style="position:relative;width:' + size + 'px;height:' + size + 'px;display:flex;align-items:center;justify-content:center;"><div class="user-marker-pulse" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:72px;height:72px;pointer-events:none;">' + pulseSvg + '</div><div class="user-marker-icon" style="position:relative;z-index:1;line-height:0;">' + personSvg + '</div></div>';
         state().userMarker = L.marker([position.latitude, position.longitude], {
           icon: L.divIcon({ className: "user-marker-div", html: html, iconSize: [size, size], iconAnchor: [size/2, size/2] })
         }).addTo(map).bindTooltip("Tu ubicación actual");
-      }
+    }
     try {
       if (window.RevistaDigital.guiapa && typeof window.RevistaDigital.guiapa.bindMap === "function") {
         window.RevistaDigital.guiapa.bindMap(map);
       }
-      // Forzamos repintado de POIs del complejo por si el registro llegó tarde
-      if (window.RevistaDigital.guiapa && typeof window.RevistaDigital.guiapa.addPoiLayer === "function") {
-        if (window.RevistaDigital.guiapa._poiLayer && typeof window.RevistaDigital.guiapa._poiLayer.remove === "function") {
-          try { window.RevistaDigital.guiapa._poiLayer.remove(); } catch (e) {}
-        }
-        window.RevistaDigital.guiapa.addPoiLayer(map, null, { disableClusteringAtZoom: 17 });
-      }
-    } catch (e) {}
+    } catch (error) {
+      console.warn("No se pudo activar la guía del complejo en el mapa.", error);
+    }
     }).catch((error) => console.warn("No se pudo cargar el mapa del complejo.", error));
   }
   function navigate(path) {

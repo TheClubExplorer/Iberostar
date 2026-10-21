@@ -2460,9 +2460,31 @@ function initializeHotelCarousel(root) {
    LEAFLET
    ========================================================= */
 
+function loadLeafletRotate() {
+  if (typeof window.loadLeafletRotate === "function") {
+    return window.loadLeafletRotate();
+  }
+
+  if (window.L && typeof window.L.Map.prototype.setBearing === "function") {
+    return Promise.resolve(window.L);
+  }
+
+  if (!window.leafletRotatePromise) {
+    window.leafletRotatePromise = new Promise((resolve) => {
+      const script = document.createElement("script");
+      script.src = "https://unpkg.com/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js";
+      script.onload = () => resolve(window.L);
+      script.onerror = () => resolve(window.L);
+      document.head.appendChild(script);
+    });
+  }
+
+  return window.leafletRotatePromise;
+}
+
 function loadLeaflet() {
   if (window.L) {
-    return Promise.resolve(window.L);
+    return loadLeafletRotate();
   }
 
   if (leafletPromise) {
@@ -2496,7 +2518,7 @@ function loadLeaflet() {
 
       document.head.appendChild(script);
     }
-  );
+  ).then(() => loadLeafletRotate());
 
   return leafletPromise;
 }
@@ -2635,6 +2657,12 @@ function requestCurrentLocation(options = {}) {
       clearTimeout(locationRequestWatchdog);
       currentPosition = position.coords;
 
+      // Seguimiento continuo: mantiene el marcador dorado sincronizado
+      // mientras el usuario camina siguiendo una ruta.
+      if (typeof window.RevistaDigital.location?.startLiveTracking === "function") {
+        window.RevistaDigital.location.startLiveTracking();
+      }
+
       if (activeMap && userMarker) {
         userMarker.setLatLng([
           currentPosition.latitude,
@@ -2654,7 +2682,7 @@ function requestCurrentLocation(options = {}) {
         const size = 28;
         const personSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="' + size + '" height="' + size + '"><circle cx="12" cy="8" r="4" fill="#d4af37"/><path d="M12 14c-4.41 0-8 2.59-8 6h16c0-3.41-3.59-6-8-6z" fill="#d4af37"/></svg>';
         const pulseSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" width="72" height="72"><circle cx="36" cy="36" r="18" fill="none" stroke="#d4af37" stroke-width="2" opacity="0.6"><animate attributeName="r" from="18" to="32" dur="1.5s" repeatCount="indefinite"/><animate attributeName="opacity" from="0.6" to="0" dur="1.5s" repeatCount="indefinite"/></circle></svg>';
-        const html = '<div class="user-marker-wrap" style="display:flex;flex-direction:column;align-items:center;transform:translate(-50%,-50%);"><div class="user-marker-pulse" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:72px;height:72px;pointer-events:none;">' + pulseSvg + '</div><div class="user-marker-icon" style="z-index:1;">' + personSvg + '</div></div>';
+        const html = '<div class="user-marker-wrap" style="position:relative;width:' + size + 'px;height:' + size + 'px;display:flex;align-items:center;justify-content:center;"><div class="user-marker-pulse" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:72px;height:72px;pointer-events:none;">' + pulseSvg + '</div><div class="user-marker-icon" style="position:relative;z-index:1;line-height:0;">' + personSvg + '</div></div>';
         userMarker = L.marker([currentPosition.latitude, currentPosition.longitude], {
           icon: L.divIcon({ className: "user-marker-div", html: html, iconSize: [size, size], iconAnchor: [size/2, size/2] })
         }).addTo(activeMap).bindTooltip("Tu ubicación actual");
@@ -2678,8 +2706,8 @@ function requestCurrentLocation(options = {}) {
     },
     {
       enableHighAccuracy: true,
-      timeout: 10000,
-      maximumAge: 60000
+      timeout: 15000,
+      maximumAge: 0
     }
   );
 
@@ -6279,12 +6307,17 @@ function initializeGeneralMap() {
           mapElement,
           {
             zoomControl: true,
-            attributionControl: true
+            attributionControl: true,
+            rotate: true,
+            bearing: 0,
+            touchRotate: true,
+            rotateControl: { closeOnZeroBearing: false, position: "bottomright" }
           }
         );
 
       activeMap =
         generalMap;
+      window.RevistaDigital.mapas?.attachTouchScrollGuard?.(generalMap, mapElement);
 
       // Encuadre y límites de navegación comunes del complejo (perímetro
       // real verificado): no se puede alejar ni desplazar fuera del complejo.
@@ -6434,12 +6467,20 @@ function initializeHotelMap() {
         destinationCoordinates[0] <= complexBounds[1][0] &&
         destinationCoordinates[1] >= complexBounds[0][1] &&
         destinationCoordinates[1] <= complexBounds[1][1];
-      const mapOptions = { zoomControl: true, attributionControl: true };
+      const mapOptions = {
+        zoomControl: true,
+        attributionControl: true,
+        rotate: true,
+        bearing: 0,
+        touchRotate: true,
+        rotateControl: { closeOnZeroBearing: false, position: "bottomright" }
+      };
       if (isPlayaParaiso) {
         mapOptions.maxBounds = complexBounds;
         mapOptions.maxBoundsViscosity = 1.0;
       }
       activeMap = L.map(mapElement, mapOptions).setView(destinationCoordinates, isPlayaParaiso ? 17 : 15);
+      window.RevistaDigital.mapas?.attachTouchScrollGuard?.(activeMap, mapElement);
 
       // No dejar alejar el zoom más allá de lo que ocupa el complejo,
       // así nunca se ve lo que hay fuera de Iberostar Playa Paraíso.
@@ -6472,7 +6513,7 @@ streetLayer.addTo(
         const size = 28;
         const personSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="' + size + '" height="' + size + '"><circle cx="12" cy="8" r="4" fill="#d4af37"/><path d="M12 14c-4.41 0-8 2.59-8 6h16c0-3.41-3.59-6-8-6z" fill="#d4af37"/></svg>';
         const pulseSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" width="72" height="72"><circle cx="36" cy="36" r="18" fill="none" stroke="#d4af37" stroke-width="2" opacity="0.6"><animate attributeName="r" from="18" to="32" dur="1.5s" repeatCount="indefinite"/><animate attributeName="opacity" from="0.6" to="0" dur="1.5s" repeatCount="indefinite"/></circle></svg>';
-        const html = '<div class="user-marker-wrap" style="display:flex;flex-direction:column;align-items:center;transform:translate(-50%,-50%);"><div class="user-marker-pulse" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:72px;height:72px;pointer-events:none;">' + pulseSvg + '</div><div class="user-marker-icon" style="z-index:1;">' + personSvg + '</div></div>';
+        const html = '<div class="user-marker-wrap" style="position:relative;width:' + size + 'px;height:' + size + 'px;display:flex;align-items:center;justify-content:center;"><div class="user-marker-pulse" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:72px;height:72px;pointer-events:none;">' + pulseSvg + '</div><div class="user-marker-icon" style="position:relative;z-index:1;line-height:0;">' + personSvg + '</div></div>';
         userMarker = L.marker([currentPosition.latitude, currentPosition.longitude], {
           icon: L.divIcon({ className: "user-marker-div", html: html, iconSize: [size, size], iconAnchor: [size/2, size/2] })
         }).addTo(activeMap).bindTooltip("Tu ubicación actual");
