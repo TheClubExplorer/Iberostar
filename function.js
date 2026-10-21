@@ -42,9 +42,33 @@ async function getAdminSession() {
   return session;
 }
 
+// La barra de área administrativa es una herramienta interna: se oculta al
+// público y solo aparece si ya hay sesión, si se pide el modo editor con
+// ?editor=1 o cuando alguien intenta publicar/eliminar contenido.
+// El router reescribe la URL y borra el query, por eso se captura el flag al
+// cargar el script y no solo en el momento de renderizar.
+const INITIAL_EDITOR_FLAG = /(^|[?&])(editor|admin)(=1)?(&|$)/.test(window.location.search || "") ||
+  /(^|[#&])(editor|admin)(=1)?(&|$)/.test(window.location.hash || "");
+
+function isEditorMode() {
+  if (INITIAL_EDITOR_FLAG) return true;
+  try {
+    const params = new URLSearchParams(window.location.search);
+    return params.has("editor") || params.has("admin");
+  } catch (e) {
+    return false;
+  }
+}
+
+function setAdminAuthVisible(visible) {
+  const bar = document.getElementById("adminAuth");
+  if (bar) bar.hidden = !visible;
+}
+
 async function requireAdminSession(accion) {
   const session = await getAdminSession();
   if (!session) {
+    setAdminAuthVisible(true);
     alert("Inicia sesión como administrador para " + accion + ".");
     document.getElementById("adminAuthEmail")?.focus();
     return null;
@@ -65,7 +89,7 @@ function supabaseErrorMessage(error, fallback) {
 
 function renderAdminAuthBar() {
   return `
-    <div class="admin-auth" id="adminAuth">
+    <div class="admin-auth" id="adminAuth" hidden>
       <span class="admin-auth-label">Área administrativa</span>
       <input type="email" id="adminAuthEmail" placeholder="Email" autocomplete="username" />
       <input type="password" id="adminAuthPassword" placeholder="Contraseña" autocomplete="current-password" />
@@ -88,6 +112,7 @@ async function wireAdminAuthBar() {
   const loginButton = document.getElementById("adminAuthLogin");
   const emailInput = document.getElementById("adminAuthEmail");
   const passwordInput = document.getElementById("adminAuthPassword");
+  const editorMode = isEditorMode();
 
   function paint(session) {
     if (session) {
@@ -96,12 +121,14 @@ async function wireAdminAuthBar() {
       emailInput.hidden = true;
       passwordInput.hidden = true;
       loginButton.textContent = "Salir";
+      setAdminAuthVisible(true);
     } else {
       status.textContent = "Sesión cerrada";
       bar.classList.remove("admin-auth--on");
       emailInput.hidden = false;
       passwordInput.hidden = false;
       loginButton.textContent = "Entrar";
+      setAdminAuthVisible(editorMode);
     }
   }
 

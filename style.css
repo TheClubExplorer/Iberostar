@@ -4997,6 +4997,10 @@ body.pano-360-open { overflow: hidden; }
   font-size: 13px;
 }
 
+.admin-auth[hidden] {
+  display: none;
+}
+
 .admin-auth-label {
   font-weight: 600;
   letter-spacing: 0.06em;
