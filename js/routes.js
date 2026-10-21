@@ -1196,30 +1196,27 @@
         maxZoom: 19,
         attribution: "© OpenStreetMap contributors"
       }).addTo(map);
-      hotels.forEach((item) => {
-        const hotelSlug = slugify(item.name);
-        const route = `/${countrySlug}/${destination.slug}/${hotelSlug}`;
-        const hotelMarker = L.marker(item.coordinates)
-          .addTo(map)
-          .bindPopup(`<strong>${escapeHtml(item.name)}</strong><br><a href="${href(route)}" data-app-route="${route}">Ver ficha →</a>`);
-        try {
-          const guideHotel = window.RevistaDigital.guiapa?.poiForHotel?.(item.name);
-          window.RevistaDigital.guiapa?.registerMarker?.(guideHotel ? guideHotel.id : item.name, hotelMarker);
-        } catch (e) { /* ignore guide marker registry errors */ }
-      });
-      // Encuadre del complejo: hoteles + áreas comunes verificadas (POIs del
-      // complejo). Se calculan a partir de los marcadores reales para que el
-      // mapa abra centrado en el complejo y no en hoteles/POIs vecinos.
-      let poiLayer = null;
+    hotels.forEach((item) => {
+      const hotelSlug = slugify(item.name);
+      const route = `/${countrySlug}/${destination.slug}/${hotelSlug}`;
+      const hotelMarker = L.marker(item.coordinates)
+        .addTo(map)
+        .bindPopup(`<strong>${escapeHtml(item.name)}</strong><br><a href="${href(route)}" data-app-route="${route}">Ver ficha →</a>`);
       try {
-        if (window.RevistaDigital.guiapa && typeof window.RevistaDigital.guiapa.addPoiLayer === "function") {
-          poiLayer = window.RevistaDigital.guiapa.addPoiLayer(map, null, { disableClusteringAtZoom: 17 });
-        }
-      } catch (e) {}
-      // Encuadre y límites de navegación del complejo Playa Paraíso: se usa el
-      // perímetro real verificado (OSM) como fuente única; solo si no está
-      // disponible se recurre a los marcadores + POIs.
-      const regionBounds = portalComplexViewBounds(L, hotels, poiLayer);
+        const guideHotel = window.RevistaDigital.guiapa?.poiForHotel?.(item.name);
+        const hotelId = guideHotel ? guideHotel.id : ("hotel:" + hotelSlug);
+        window.RevistaDigital.guiapa?.registerMarker?.(hotelId, hotelMarker);
+        // Aseguramos que el marcador también quede accesible por nombre/slug
+        window.RevistaDigital.guiapa?.registerMarker?.(item.name, hotelMarker);
+      } catch (e) { /* ignore guide marker registry errors */ }
+    });
+    // Máscara del complejo: oculta todo lo que rodea al resort dejando
+    // visible solo el complejo, con borde difuminado (igual que en las fichas).
+    if (window.RevistaDigital.guiapa && typeof window.RevistaDigital.guiapa.addComplexMask === "function") {
+      try { window.RevistaDigital.guiapa.addComplexMask(map); } catch (e) {}
+    }
+    // Encuadre y límites de navegación del complejo Playa Paraíso
+    const regionBounds = portalComplexViewBounds(L, hotels, poiLayer);
       const rdState = window.RevistaDigital && window.RevistaDigital.state;
       const perimeter = (rdState && rdState.complexPerimeter) ? L.latLngBounds(rdState.complexPerimeter) : regionBounds;
       const navBounds = (rdState && rdState.complexBounds) ? L.latLngBounds(rdState.complexBounds) : (regionBounds ? regionBounds.pad(0.05) : null);
@@ -1238,15 +1235,22 @@
         const personSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="' + size + '" height="' + size + '"><circle cx="12" cy="8" r="4" fill="#d4af37"/><path d="M12 14c-4.41 0-8 2.59-8 6h16c0-3.41-3.59-6-8-6z" fill="#d4af37"/></svg>';
         const pulseSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" width="72" height="72"><circle cx="36" cy="36" r="18" fill="none" stroke="#d4af37" stroke-width="2" opacity="0.6"><animate attributeName="r" from="18" to="32" dur="1.5s" repeatCount="indefinite"/><animate attributeName="opacity" from="0.6" to="0" dur="1.5s" repeatCount="indefinite"/></circle></svg>';
         const html = '<div class="user-marker-wrap" style="display:flex;flex-direction:column;align-items:center;transform:translate(-50%,-50%);"><div class="user-marker-pulse" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:72px;height:72px;pointer-events:none;">' + pulseSvg + '</div><div class="user-marker-icon" style="z-index:1;">' + personSvg + '</div></div>';
-        L.marker([position.latitude, position.longitude], {
+        state().userMarker = L.marker([position.latitude, position.longitude], {
           icon: L.divIcon({ className: "user-marker-div", html: html, iconSize: [size, size], iconAnchor: [size/2, size/2] })
         }).addTo(map).bindTooltip("Tu ubicación actual");
       }
-      try {
-        if (window.RevistaDigital.guiapa && typeof window.RevistaDigital.guiapa.bindMap === "function") {
-          window.RevistaDigital.guiapa.bindMap(map);
+    try {
+      if (window.RevistaDigital.guiapa && typeof window.RevistaDigital.guiapa.bindMap === "function") {
+        window.RevistaDigital.guiapa.bindMap(map);
+      }
+      // Forzamos repintado de POIs del complejo por si el registro llegó tarde
+      if (window.RevistaDigital.guiapa && typeof window.RevistaDigital.guiapa.addPoiLayer === "function") {
+        if (window.RevistaDigital.guiapa._poiLayer && typeof window.RevistaDigital.guiapa._poiLayer.remove === "function") {
+          try { window.RevistaDigital.guiapa._poiLayer.remove(); } catch (e) {}
         }
-      } catch (e) {}
+        window.RevistaDigital.guiapa.addPoiLayer(map, null, { disableClusteringAtZoom: 17 });
+      }
+    } catch (e) {}
     }).catch((error) => console.warn("No se pudo cargar el mapa del complejo.", error));
   }
   function navigate(path) {
