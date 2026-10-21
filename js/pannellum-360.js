@@ -337,10 +337,187 @@
 
   /* ---------- visor ---------- */
 
+  // Normaliza un texto para comparar etiquetas de 360° con nombres de POI.
+  function normalizeText(value) {
+    return String(value == null ? "" : value)
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, " ")
+      .trim();
+  }
+
+  // Busca el id del POI del mapa que corresponde a una zona/etiqueta del 360°.
+  // Devuelve "" si no hay correspondencia (el botón no se muestra en ese caso).
+  function resolvePoiForPano(zoneKey, label) {
+    const gp = window.RevistaDigital && window.RevistaDigital.guiapa;
+    const pois = gp && gp.POIS;
+    if (!Array.isArray(pois) || !pois.length) return "";
+    const target = normalizeText(label);
+    if (!target) return "";
+    const zone = normalizeText(zoneKey);
+    let fallbackId = "";
+    for (const poi of pois) {
+      const name = normalizeText(poi.name);
+      if (!name) continue;
+      if (name === target) {
+        if (!zone || normalizeText(poi.category) === zone || zone === "restaurantes") return poi.id;
+        if (!fallbackId) fallbackId = poi.id;
+      } else if (!fallbackId && name.indexOf(target) >= 0) {
+        fallbackId = poi.id;
+      }
+    }
+    return fallbackId;
+  }
+
+  function findRestaurantPoi(label) {
+    const target = normalizeText(label);
+    const pois = window.RevistaDigital?.guiapa?.POIS || [];
+    const restaurants = pois.filter((poi) => normalizeText(poi.category) === "restaurante");
+    const exact = restaurants.find((poi) => normalizeText(poi.name) === target);
+    if (exact) return exact;
+    return restaurants
+      .filter((poi) => {
+        const name = normalizeText(poi.name);
+        return name && (target.includes(name) || name.includes(target));
+      })
+      .sort((first, second) =>
+        Math.abs(normalizeText(first.name).length - target.length) -
+        Math.abs(normalizeText(second.name).length - target.length)
+      )[0] || null;
+  }
+
+  function getRestaurantDetails(hotelName, label) {
+    const hotelRestaurant = (pannellum360.getRestaurantes?.(hotelName) || [])
+      .find(([name]) => normalizeText(name) === normalizeText(label));
+    const poi = findRestaurantPoi(label);
+    return {
+      name: hotelRestaurant?.[0] || label || "Restaurante",
+      cuisine: poi?.cuisine || hotelRestaurant?.[1] || "",
+      hours: poi?.hours || "",
+      menu: poi?.menu || ""
+    };
+  }
+
+  function openRestaurantMenuOverlay(hotelName, label) {
+    const details = getRestaurantDetails(hotelName, label);
+    const overlay = document.createElement("div");
+    overlay.className = "pano-360-action-overlay pano-360-menu-overlay";
+    overlay.setAttribute("role", "dialog");
+    overlay.setAttribute("aria-modal", "true");
+    overlay.setAttribute("aria-label", `Menú de ${details.name}`);
+    const menuMarkup = details.menu
+      ? `<ul class="pano-360-action-list pano-360-menu-list">${details.menu.split(/\s*[·•]\s*/).filter(Boolean).map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`
+      : '<p class="pano-360-action-note">La carta digital de este restaurante aún no está disponible. Consulta en el hotel.</p>';
+    overlay.innerHTML = `
+      <div class="pano-360-action-panel pano-360-menu-panel">
+        <div class="pano-360-action-header pano-360-menu-header">
+          <strong>${escapeHtml(details.name)}</strong>
+          <button type="button" class="pano-360-action-close" aria-label="Cerrar menú">×</button>
+        </div>
+        <div class="pano-360-action-content pano-360-menu-content">
+          <p class="pano-360-action-kicker">EXPERIENCIA GASTRONÓMICA</p>
+          <h3>${escapeHtml(details.name)}</h3>
+          <p class="pano-360-menu-hotel">${escapeHtml(hotelName)}</p>
+          ${details.cuisine ? `<p class="pano-360-action-copy pano-360-menu-cuisine">${escapeHtml(details.cuisine)}</p>` : ""}
+          ${details.hours ? `<p class="pano-360-menu-hours"><span>Horario de servicio</span><strong>${escapeHtml(details.hours)}</strong></p>` : ""}
+          <div class="pano-360-menu-divider"><span>La carta</span></div>
+          ${menuMarkup}
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    const close = () => { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); };
+    overlay.addEventListener("click", (event) => { if (event.target === overlay) close(); });
+    overlay.querySelector(".pano-360-action-close")?.addEventListener("click", close);
+  }
+
+  function openRestaurantMap(hotelName, label, closePanorama) {
+    const guide = window.RevistaDigital?.guiapa;
+    const routes = window.RevistaDigital?.routes;
+    const hotelRoute = routes?.findHotelPortalRoute?.(hotelName);
+    const restaurantPoi = findRestaurantPoi(label);
+    const hasRestaurantCoordinates = restaurantPoi?.verified === true &&
+      Number.isFinite(restaurantPoi.lat) && Number.isFinite(restaurantPoi.lng);
+    const hotelPoi = guide?.poiForHotel?.(hotelName);
+    const destination = hasRestaurantCoordinates ? restaurantPoi : hotelPoi;
+    const notice = hasRestaurantCoordinates
+      ? ""
+      : `No hay ubicación interior verificada para ${label}; la ruta se traza hasta ${hotelName}.`;
+
+    if (!hotelRoute || typeof routes.navigate !== "function" || !destination ||
+        typeof guide?.queueRouteToPoi !== "function" ||
+        !guide.queueRouteToPoi(destination.id, notice)) {
+      console.warn(`No se pudo preparar el mapa o la ruta para ${label} en ${hotelName}.`);
+      window.alert("No fue posible preparar el mapa y la ruta para este restaurante.");
+      return;
+    }
+
+    closePanorama();
+    routes.navigate(hotelRoute);
+  }
+
+  function openReservationOverlay(hotelName, label) {
+    const overlay = document.createElement("div");
+    overlay.className = "pano-360-action-overlay";
+    overlay.setAttribute("role", "dialog");
+    overlay.setAttribute("aria-modal", "true");
+    overlay.innerHTML = `
+      <div class="pano-360-action-panel pano-360-booking-panel">
+        <div class="pano-360-action-header">
+          <strong>Reservar</strong>
+          <button type="button" class="pano-360-action-close" aria-label="Cerrar reserva">×</button>
+        </div>
+        <div class="pano-360-action-content">
+          <p class="pano-360-action-kicker">RESERVA ${escapeHtml((label || "restaurante").toUpperCase())}</p>
+          <h3>${escapeHtml(label || "Restaurante")}</h3>
+          <form class="pano-360-booking-form">
+            <label><span>Fecha</span><input type="date" name="date" required /></label>
+            <label><span>Hora</span><input type="time" name="time" required /></label>
+            <label><span>Personas</span><input type="number" name="guests" min="1" max="12" value="2" required /></label>
+            <label><span>Nombre</span><input type="text" name="name" placeholder="Tu nombre" required /></label>
+            <label><span>Habitación</span><input type="text" name="room" placeholder="Ej. 1204" /></label>
+            <button type="submit" class="pano-360-booking-submit">Enviar solicitud</button>
+          </form>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    const close = () => { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); };
+    overlay.addEventListener("click", (event) => { if (event.target === overlay) close(); });
+    overlay.querySelector(".pano-360-action-close")?.addEventListener("click", close);
+    const form = overlay.querySelector(".pano-360-booking-form");
+    form?.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const panel = overlay.querySelector(".pano-360-action-content");
+      if (!panel) return;
+      panel.innerHTML = `
+        <p class="pano-360-action-kicker">SOLICITUD ENVIADA</p>
+        <h3>${escapeHtml(label || "Restaurante")}</h3>
+        <p class="pano-360-action-copy">Tu reserva para ${escapeHtml(label || "este restaurante")} ha quedado registrada.</p>
+        <p class="pano-360-action-note">La confirmación se realiza en recepción del hotel.</p>
+      `;
+    });
+  }
+
   pannellum360.open = function (hotelName, zoneKey, label) {
     ensurePannellum().then(() => {
       const view = VIEW[zoneKey] || VIEW.exteriores;
       const url = buildPanorama(hotelName, zoneKey, label, 2048, 1024).toDataURL("image/jpeg", 0.85);
+
+      // Botón "Ver en el mapa": solo aparece si existe una guía del hotel y un
+      // punto del mapa que corresponda a esta zona/etiqueta. Conecta el
+      // recorrido 360° con la guía interactiva sin tocar su lógica.
+      const poiTarget = resolvePoiForPano(zoneKey, label);
+      const isRestaurantView = String(zoneKey || "").toLowerCase() === "restaurantes" || normalizeText(label).includes("restaurante");
+      const mapButton = !isRestaurantView && poiTarget
+        ? '<button type="button" class="pano-360-map" data-poi="' + escapeHtml(poiTarget) + '">Ver en el mapa</button>'
+        : "";
+      const restaurantActions = isRestaurantView ?
+        '<button type="button" class="pano-360-menu">Ver menú</button>' +
+        '<button type="button" class="pano-360-map">Ver en el mapa</button>' +
+        '<button type="button" class="pano-360-book">Reservar</button>' :
+        "";
 
       const modal = document.createElement("div");
       modal.className = "pano-360-modal";
@@ -349,7 +526,9 @@
       modal.innerHTML =
         '<div class="pano-360-bar">' +
           "<strong>" + escapeHtml(label) + " · " + escapeHtml(hotelName) + "</strong>" +
+          '<span class="pano-360-bar-actions">' + mapButton + restaurantActions +
           '<button type="button" class="pano-360-close" aria-label="Cerrar recorrido">×</button>' +
+          "</span>" +
         "</div>" +
         '<div class="pano-360-stage"><div id="pano360Stage"></div></div>';
 
@@ -401,6 +580,37 @@
 
       document.addEventListener("keydown", onKey);
       modal.querySelector(".pano-360-close").addEventListener("click", closeModal);
+      const mapBtn = modal.querySelector(".pano-360-map");
+      if (mapBtn) {
+        mapBtn.addEventListener("click", () => {
+          if (isRestaurantView) {
+            openRestaurantMap(hotelName, label, closeModal);
+            return;
+          }
+          const poiId = mapBtn.getAttribute("data-poi");
+          closeModal();
+          const gp = window.RevistaDigital && window.RevistaDigital.guiapa;
+          if (!poiId || !gp || typeof gp.selectPoi !== "function") return;
+          const guideMount = document.getElementById("guideExplorer") ||
+            document.querySelector("[data-hotel-guide]");
+          if (guideMount && typeof guideMount.scrollIntoView === "function") {
+            try { guideMount.scrollIntoView({ behavior: "smooth", block: "start" }); } catch (e) { /* ignore */ }
+          }
+          gp.selectPoi(poiId);
+        });
+      }
+      const menuBtn = modal.querySelector(".pano-360-menu");
+      if (menuBtn) {
+        menuBtn.addEventListener("click", () => {
+          openRestaurantMenuOverlay(hotelName, label);
+        });
+      }
+      const bookingBtn = modal.querySelector(".pano-360-book");
+      if (bookingBtn) {
+        bookingBtn.addEventListener("click", () => {
+          openReservationOverlay(hotelName, label);
+        });
+      }
       modal.addEventListener("click", (event) => {
         if (event.target === modal) closeModal();
       });
@@ -430,6 +640,99 @@
       image: buildPreview(hotelName, "restaurantes", name),
       has360: true
     }));
+  };
+
+  pannellum360.getZoneMenuOptions = function (hotelName, zoneKey) {
+    const normalized = String(zoneKey || "").toLowerCase();
+    if (normalized === "restaurantes") {
+      const restaurants = pannellum360.getRestaurantes(hotelName);
+      if (restaurants.length) {
+        return restaurants.map(([name, cuisine]) => ({
+          label: name,
+          subtitle: cuisine || "Restaurante",
+          zoneKey: "restaurantes",
+          hotelName
+        }));
+      }
+      return [{ label: "Restaurante principal", subtitle: "Gastronomía del hotel", zoneKey: "restaurantes", hotelName }];
+    }
+    const presets = {
+      piscinas: [
+        { label: "Piscina principal", subtitle: "Área de descanso", zoneKey: "piscinas", hotelName },
+        { label: "Piscina infantil", subtitle: "Zona familiar", zoneKey: "piscinas", hotelName },
+        { label: "Piscina de olas", subtitle: "Ambiente de relajación", zoneKey: "piscinas", hotelName }
+      ],
+      playa: [
+        { label: "Playa principal", subtitle: "Arena y mar", zoneKey: "playa", hotelName },
+        { label: "Hamacas", subtitle: "Zona de descanso", zoneKey: "playa", hotelName },
+        { label: "Vista del mar", subtitle: "Costa del hotel", zoneKey: "playa", hotelName }
+      ],
+      exteriores: [
+        { label: "Exteriores del hotel", subtitle: "Jardines y entorno", zoneKey: "exteriores", hotelName },
+        { label: "Senderos", subtitle: "Zonas verdes", zoneKey: "exteriores", hotelName },
+        { label: "Entrada y lobby", subtitle: "Recepción del resort", zoneKey: "exteriores", hotelName }
+      ]
+    };
+    return presets[normalized] || [{ label: "Vista del hotel", subtitle: "Exploración 360°", zoneKey: normalized || "exteriores", hotelName }];
+  };
+
+  pannellum360.openZoneMenu = function (hotelName, zoneKey, label) {
+    const items = pannellum360.getZoneMenuOptions(hotelName, zoneKey);
+    if (!items.length) return false;
+
+    const existing = document.querySelector(".pano-360-floating-menu");
+    if (existing && existing.parentNode) existing.parentNode.removeChild(existing);
+
+    const overlay = document.createElement("div");
+    overlay.className = "pano-360-floating-menu";
+    overlay.setAttribute("role", "dialog");
+    overlay.setAttribute("aria-modal", "true");
+    overlay.setAttribute("aria-label", `${label || "Exploración 360°"}`);
+    overlay.innerHTML = `
+      <div class="pano-360-floating-panel">
+        <div class="pano-360-floating-header">
+          <strong>${escapeHtml(label || "Exploración 360°")}</strong>
+          <button type="button" class="pano-360-floating-close" aria-label="Cerrar menú">×</button>
+        </div>
+        <div class="pano-360-floating-list">
+          ${items.map((item) => {
+            const preview = buildPreview(item.hotelName || hotelName, item.zoneKey || zoneKey, item.label);
+            return `
+              <button type="button" class="pano-360-floating-option" data-hotel="${escapeHtml(item.hotelName || hotelName)}" data-zone="${escapeHtml(item.zoneKey || zoneKey)}" data-label="${escapeHtml(item.label)}">
+                <span class="pano-360-floating-thumb"><img src="${preview}" alt="${escapeHtml(item.label)}" loading="lazy" decoding="async" /></span>
+                <span class="pano-360-floating-copy"><strong>${escapeHtml(item.label)}</strong><small>${escapeHtml(item.subtitle)}</small></span>
+              </button>
+            `;
+          }).join("")}
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+    document.body.classList.add("pano-360-open");
+
+    const close = () => {
+      if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+      document.body.classList.remove("pano-360-open");
+    };
+
+    overlay.addEventListener("click", (event) => {
+      if (event.target === overlay) close();
+    });
+    overlay.querySelector(".pano-360-floating-close")?.addEventListener("click", close);
+    overlay.querySelectorAll(".pano-360-floating-option").forEach((button) => {
+      button.addEventListener("click", () => {
+        const optionHotel = button.dataset.hotel;
+        const optionZone = button.dataset.zone;
+        const optionLabel = button.dataset.label;
+        close();
+        if (optionHotel && optionZone && optionLabel) {
+          pannellum360.open(optionHotel, optionZone, optionLabel);
+        }
+      });
+    });
+
+    return true;
   };
 
   pannellum360.renderRestaurantCards = function (hotelName) {

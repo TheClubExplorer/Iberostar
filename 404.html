@@ -7,7 +7,10 @@
   <script>
     (function () {
       const isGitHubPages = window.location.hostname.endsWith("github.io");
-      const projectBase = isGitHubPages ? "/Revista-Digital/" : "/";
+      // El sitio vive en un subdirectorio del repositorio; se deduce el primer
+      // segmento de la ruta para no depender del nombre del repositorio.
+      const segments = window.location.pathname.split("/").filter(Boolean);
+      const projectBase = isGitHubPages && segments.length ? `/${segments[0]}/` : "/";
       const projectPrefix = projectBase.replace(/\/$/, "");
       let routePath = window.location.pathname;
 

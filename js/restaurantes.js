@@ -2,12 +2,11 @@
   window.RevistaDigital = window.RevistaDigital || {};
   const restaurantes = window.RevistaDigital.restaurantes || {};
   const state = () => window.RevistaDigital.state;
-  const restaurantMenuOptions = [
-    { name: "Bella Italia", cuisine: "ITALIANA", hours: "18:00" },
-    { name: "La Palapa", cuisine: "MEXICANA COSTERA", hours: "07:00" },
-    { name: "El Gaucho", cuisine: "PARRILLA ARGENTINA", hours: "19:00" },
-    { name: "Snack & Grill", cuisine: "CASUAL INTERNACIONAL", hours: "12:00" }
-  ];
+  // No hay una lista genérica de restaurantes: cada hotel muestra su catálogo
+  // real o un estado honesto de "información en preparación". Antes existía una
+  // lista inventada (Bella Italia, El Gaucho…) que no correspondía a ningún
+  // hotel y se retiró.
+  const restaurantMenuOptions = [];
   const hotelRestaurantCatalog = {
     "Iberostar Selection Playa Mita": [
       ["El Cuate Pancho", "Mexicana"], ["Pacific Express · Bistró", "Francesa"],
@@ -132,13 +131,11 @@
   restaurantes.renderHotelRestaurants = function (hotelName, fallbackName = "") {
     const restaurants = restaurantes.getHotelRestaurants(hotelName, fallbackName);
     if (!restaurants.length) return "";
-    const restaurantPageUrl = restaurantes.getHotelRestaurantPageUrl(hotelName, fallbackName);
 
     return `<section class="hotel-restaurant-list" aria-labelledby="hotelRestaurantHeading">
       <div class="hotel-restaurant-heading"><div><small>GASTRONOMÍA · SELECCIÓN DE RESTAURANTES</small><h2 id="hotelRestaurantHeading">Restaurantes de ${escapeHtml(hotelName)}</h2></div><span>${restaurants.length} opciones</span></div>
       <div class="hotel-restaurant-grid">${restaurants.map(([name, cuisine]) => `<article class="hotel-restaurant-card"><h3>${escapeHtml(name)}</h3><span>${escapeHtml(cuisine)}</span></article>`).join("")}</div>
-      <p>La oferta, los horarios y las reservaciones pueden variar según la estancia. Confírmalos con el hotel.</p>
-      ${restaurantPageUrl ? `<a class="hotel-restaurant-source" href="${escapeHtml(restaurantPageUrl)}" target="_blank" rel="noopener noreferrer">Consultar menús y horarios oficiales <span aria-hidden="true">↗</span></a>` : ""}
+      <p>La oferta, los horarios y las reservaciones pueden variar según la estancia. Podrás reservar aquí mismo.</p>
     </section>`;
   };
 
@@ -222,15 +219,16 @@
       ? catalogRestaurants.map(([name, cuisine]) => ({ name, cuisine }))
       : (paraiso.length
           ? paraiso.map(([name, cuisine]) => ({ name, cuisine }))
-          : restaurantMenuOptions);
+          : []);
 
     const restaurantCount = menuEntries.length
       || hotel.stats.find(([, label]) => String(label).toLowerCase().includes("restaurantes"))?.[0]
-      || restaurantMenuOptions.length;
+      || 0;
 
     const restaurantListingMarkup = hasParaisoCards
       ? pannellum.renderRestaurantCards(hotel.name)
-      : `<div class="restaurant-menu-options">
+      : (menuEntries.length
+          ? `<div class="restaurant-menu-options">
           ${menuEntries.map((restaurant, index) => `
             <article class="restaurant-menu-option">
               <span class="restaurant-menu-number">${String(index + 1).padStart(2, "0")}</span>
@@ -240,7 +238,8 @@
               </div>
               ${restaurant.hours ? `<span class="restaurant-menu-hours">${escapeHtml(restaurant.hours)}</span>` : ""}
             </article>`).join("")}
-        </div>`;
+        </div>`
+          : `<p class="restaurant-menu-empty">La carta y los horarios de este hotel se están cargando en la web. Muy pronto podrás reservar aquí mismo.</p>`);
 
     return `
       <div class="spread restaurant-menu-spread">

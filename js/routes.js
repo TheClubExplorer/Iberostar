@@ -512,7 +512,7 @@
               </div>
               <a href="${href(`/${countrySlug}/${destination.slug}`)}" data-app-route="/${countrySlug}/${destination.slug}">Ver ${escapeHtml(destination.name)}</a>
             </div>
-            <div class="destination-grid">${complexCards}</div>
+            <div class="destination-grid portal-complex-grid">${complexCards}</div>
           </section>
         </main>`;
         const complexMap = view.querySelector("#complexPortalMap");
@@ -784,12 +784,23 @@
   function wirePanoFiches(root) {
     root.querySelectorAll(".pano-360-ficha[data-hotel]").forEach((ficha) => {
       ficha.addEventListener("click", () => {
-        if (!window.RevistaDigital.pannellum360?.open) return;
-        window.RevistaDigital.pannellum360.open(
-          ficha.dataset.hotel,
-          ficha.dataset.zone,
-          ficha.dataset.label
-        );
+        if (!window.RevistaDigital.pannellum360) return;
+        const hotel = ficha.dataset.hotel;
+        const zone = ficha.dataset.zone;
+        const label = ficha.dataset.label;
+        if (!hotel || !zone || !label) return;
+        const pannellum = window.RevistaDigital.pannellum360;
+        const isRestaurantFiche = ficha.classList.contains("pano-360-ficha-restaurante");
+        if (!isRestaurantFiche && typeof pannellum.openZoneMenu === "function") {
+          const options = pannellum.getZoneMenuOptions?.(hotel, zone) || [];
+          if (options.length > 1) {
+            pannellum.openZoneMenu(hotel, zone, label);
+            return;
+          }
+        }
+        if (typeof pannellum.open === "function") {
+          pannellum.open(hotel, zone, label);
+        }
       });
     });
   }
@@ -842,19 +853,14 @@
       ? content.tabs.servicios.keyPoints
       : (Array.isArray(page?.benefits) ? page.benefits : []));
     const stats = (page && Array.isArray(page.stats)) ? page.stats : [];
-    const restaurantMarkup = window.RevistaDigital.restaurantes?.renderHotelRestaurants?.(displayName, page?.name || "") || "";
-    const paraisoRestaurants360 = (window.RevistaDigital?.pannellum360?.isPlayaParaiso?.(hotel.name))
-      ? window.RevistaDigital.pannellum360.getRestaurantes(hotel.name).length
-      : 0;
-    const hasDiningSection = (dining.length || restaurantMarkup) && !paraisoRestaurants360;
+    const restaurantMarkup = "";
+    const hasDiningSection = false;
 
     // El orden de los enlaces sigue el orden de las secciones en la página.
     const hasComplexGuide = PLAYA_PARAISO_GUIDE_HOTELS.has(hotel.slug);
     const navItems = [];
     if (hasCoordinates) navItems.push(["ubicacion", hasComplexGuide ? "Mapa del complejo" : "Ubicación"]);
     if (hasComplexGuide) navItems.push(["guia", "Lugares del complejo"]);
-    if (hasDiningSection) navItems.push(["restaurantes", "Restaurantes"]);
-    else if (paraisoRestaurants360) navItems.push(["restaurantes-360", "Restaurantes"]);
     if (services.length) navItems.push(["servicios", "Servicios"]);
 
     const heroMarkup = `
@@ -885,16 +891,6 @@
           </div>
           ${stats.length ? `<div class="hotel-portal-stats-panel">${stats.map(([value, label]) => `<div class="hotel-portal-stat"><strong>${escapeHtml(value)}</strong><small>${escapeHtml(label)}</small></div>`).join("")}</div>` : ""}
         </section>`;
-
-    const diningMarkup = hasDiningSection ? `
-        <section class="hotel-portal-section" id="hotel-restaurantes">
-          <div class="hotel-portal-section-head">
-            <p class="portal-kicker">GASTRONOMÍA</p>
-            <h2>Restaurantes</h2>
-            <p>Descubre los restaurantes de ${escapeHtml(displayName)}.</p>
-          </div>
-          ${restaurantMarkup}
-        </section>` : "";
 
     const servicesMarkup = services.length ? `
         <section class="hotel-portal-section" id="hotel-servicios">
@@ -933,6 +929,13 @@
                 <button type="button" class="portal-map-btn portal-directions" data-directions="${escapeHtml(displayName)}" data-lat="${coordinates[0]}" data-lng="${coordinates[1]}">Cómo llegar</button>
               </div>
             </aside>`;
+    const restaurantRouteMarkup = `
+            <aside class="hotel-zone-panel hotel-zone-panel--wide hotel-restaurant-route" aria-label="Ruta a restaurantes">
+              <p class="portal-kicker">RESTAURANTES</p>
+              <p class="hotel-zone-hint">Consulta los restaurantes de ${escapeHtml(displayName)} y descubre sus experiencias.</p>
+              <a class="portal-map-btn" href="${href(`/restaurantes/${hotel.slug}`)}" data-app-route="/restaurantes/${escapeHtml(hotel.slug)}">Ver restaurantes</a>
+            </aside>`;
+    const hotelExploreMarkup = hasComplexGuide ? restaurantRouteMarkup : zonePanelMarkup;
 
     const mapMarkup = hasCoordinates ? (hasComplexGuide ? `
         <section class="hotel-portal-section" id="hotel-ubicacion">
@@ -956,7 +959,7 @@
             </div>
             <div class="hotel-complex-legend guide-legend" id="hotelGuideLegend"></div>
           </div>
-          ${zonePanelMarkup}
+          ${hotelExploreMarkup}
         </section>` : `
         <section class="hotel-portal-section" id="hotel-ubicacion">
           <div class="hotel-portal-section-head">
@@ -972,21 +975,6 @@
             ${zonePanelMarkup}
           </div>
         </section>`) : "";
-    const paraiso360 = (window.RevistaDigital?.pannellum360?.isPlayaParaiso?.(hotel.name))
-      ? window.RevistaDigital.pannellum360.renderSection(hotel.name)
-      : "";
-
-    const restaurantCta = window.RevistaDigital.restaurantes?.getRestaurantHotel?.(hotel.slug)
-      ? `<section class="hotel-portal-section hotel-portal-restaurant-cta" id="hotel-cartas">
-          <div class="hotel-portal-section-head">
-            <p class="portal-kicker">GASTRONOMÍA</p>
-            <h2>La carta de restaurantes</h2>
-            <p>Consulta todos los restaurantes de ${escapeHtml(displayName)} en fichas visuales.</p>
-          </div>
-          <a class="portal-hero-link" href="${href(`/restaurantes/${hotel.slug}`)}" data-app-route="/restaurantes/${hotel.slug}">Ver restaurantes de ${escapeHtml(displayName)} →</a>
-        </section>`
-      : "";
-
     const guideMarkup = "";
 
     return `
@@ -1002,9 +990,6 @@
         ${aboutMarkup}
         ${mapMarkup}
         ${guideMarkup}
-        ${paraiso360}
-        ${diningMarkup}
-        ${restaurantCta}
         ${servicesMarkup}
 
         <div class="hotel-portal-actions">
@@ -1106,6 +1091,16 @@
         .addTo(map)
         .bindPopup(`<strong>${escapeHtml(hotel.name)}</strong><br><small>${escapeHtml(destination.name)}, ${escapeHtml(countryData.name)}</small>`)
         .openPopup();
+      const position = state()?.currentPosition;
+      if (position && Number.isFinite(position.latitude) && Number.isFinite(position.longitude)) {
+        const size = 28;
+        const personSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="' + size + '" height="' + size + '"><circle cx="12" cy="8" r="4" fill="#d4af37"/><path d="M12 14c-4.41 0-8 2.59-8 6h16c0-3.41-3.59-6-8-6z" fill="#d4af37"/></svg>';
+        const pulseSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" width="72" height="72"><circle cx="36" cy="36" r="18" fill="none" stroke="#d4af37" stroke-width="2" opacity="0.6"><animate attributeName="r" from="18" to="32" dur="1.5s" repeatCount="indefinite"/><animate attributeName="opacity" from="0.6" to="0" dur="1.5s" repeatCount="indefinite"/></circle></svg>';
+        const html = '<div class="user-marker-wrap" style="display:flex;flex-direction:column;align-items:center;transform:translate(-50%,-50%);"><div class="user-marker-pulse" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:72px;height:72px;pointer-events:none;">' + pulseSvg + '</div><div class="user-marker-icon" style="z-index:1;">' + personSvg + '</div></div>';
+        state().userMarker = L.marker([position.latitude, position.longitude], {
+          icon: L.divIcon({ className: "user-marker-div", html, iconSize: [size, size], iconAnchor: [size / 2, size / 2] })
+        }).addTo(map).bindTooltip("Tu ubicación actual");
+      }
       // Encuadre y límites de navegación: en las fichas de Playa Paraíso con
       // explorador se muestra el complejo completo (para que el socio pueda
       // ver y recorrer todos los lugares); en el resto, un buffer alrededor
@@ -1163,6 +1158,13 @@
             window.setTimeout(applyFraming, 220);
           });
         }
+      }
+
+      // Máscara del complejo: en las fichas de Playa Paraíso ocultamos todo lo
+      // que rodea al resort (Vidanta, calles, etc.) dejando visible solo el
+      // contorno del complejo, con borde difuminado.
+      if (hasComplexGuide && window.RevistaDigital.guiapa && typeof window.RevistaDigital.guiapa.addComplexMask === "function") {
+        try { window.RevistaDigital.guiapa.addComplexMask(map); } catch (e) {}
       }
 
       try {

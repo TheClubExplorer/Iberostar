@@ -377,6 +377,11 @@
           window.updateHotelUserMarker();
         }
 
+        const guide = window.RevistaDigital?.guiapa;
+        if (guide?._route?.status === "locating" && guide._route.targetId) {
+          guide.routeToPoi?.(guide._route.targetId);
+        }
+
         mapas.renderNearbyContext({
           latitude: state().currentPosition.latitude,
           longitude: state().currentPosition.longitude

@@ -514,7 +514,24 @@
   };
 
   gp.bindMap = function (map) {
-    if (map) gp._map = map;
+    if (!map) return;
+    gp._map = map;
+    const pendingRoute = gp._pendingRouteRequest;
+    if (!pendingRoute) return;
+    gp._pendingRouteRequest = null;
+    window.setTimeout(function () {
+      if (gp._map !== map) return;
+      gp._routeNotice = pendingRoute.notice || "";
+      selectPoi(pendingRoute.id);
+      routeToPoi(pendingRoute.id);
+      renderRouteStatus();
+    }, 0);
+  };
+
+  gp.queueRouteToPoi = function (id, notice) {
+    if (!findPoi(id)) return false;
+    gp._pendingRouteRequest = { id: id, notice: notice || "" };
+    return true;
   };
 
   gp.poiForHotel = function (hotelName) {
@@ -774,6 +791,7 @@
     gp._route.targetId = null;
     gp._route.targetName = null;
     gp._route.info = null;
+    if (!silent) gp._routeNotice = "";
     if (!silent) renderRouteStatus();
   }
 
@@ -810,8 +828,11 @@
     var box = state.mount.querySelector("#guideRouteBox");
     if (box) {
       var route = gp._route;
+      var notice = gp._routeNotice
+        ? '<p class="guide-route-status">' + escapeHtml(gp._routeNotice) + "</p>"
+        : "";
       if (!route || route.status === "idle") {
-        box.innerHTML = "";
+        box.innerHTML = notice;
       } else {
         var name = escapeHtml(route.targetName || "el destino");
         var html = "";
@@ -825,7 +846,7 @@
           html = '<p class="guide-route-status is-error">' + escapeHtml(route.info || "No se pudo calcular la ruta.") + "</p>";
         }
         html += '<button type="button" class="guide-route-cancel">Cancelar ruta</button>';
-        box.innerHTML = html;
+        box.innerHTML = notice + html;
         revealFeedback(box);
       }
     }
@@ -993,8 +1014,11 @@
     var box = mobileActionsRoot("#guideMobileRouteBox");
     if (!box) return;
     var route = gp._route;
+    var notice = gp._routeNotice
+      ? '<p class="guide-route-status">' + escapeHtml(gp._routeNotice) + "</p>"
+      : "";
     if (!route || route.status === "idle") {
-      box.innerHTML = "";
+      box.innerHTML = notice;
       if (isMobileGuide()) positionMobileActions(state.mobilePoi);
       return;
     }
@@ -1010,7 +1034,7 @@
       html = '<p class="guide-route-status is-error">' + escapeHtml(route.info || "No se pudo calcular la ruta.") + "</p>";
     }
     html += '<button type="button" class="guide-route-cancel">Cancelar ruta</button>';
-    box.innerHTML = html;
+    box.innerHTML = notice + html;
     // El estado de ruta cambia la altura del menú: lo recolocamos sobre el panel.
     if (isMobileGuide()) positionMobileActions(state.mobilePoi);
   }
@@ -1248,7 +1272,8 @@
   // funcional: al tocarla se selecciona el lugar en el mapa y se abre su
   // ficha con horarios y reservas.
   function renderActivities() {
-    var list = state.mount && state.mount.querySelector("#guideActivitiesList");
+    var list = (state.mount && state.mount.querySelector("#guideActivitiesList")) ||
+      document.getElementById("guideActivitiesList");
     if (!list) return;
     var actividades = gp.ACTIVIDADES || [];
     if (!actividades.length) {
@@ -1272,7 +1297,8 @@
     var poi = findPoi(poiId);
     if (!poi) return;
     selectPoi(poiId);
-    var box = state.mount && state.mount.querySelector("#guideActivities");
+    var box = (state.mount && state.mount.querySelector("#guideActivities")) ||
+      document.getElementById("guideActivities");
     if (box && typeof box.scrollIntoView === "function") {
       try { box.scrollIntoView({ behavior: "smooth", block: "nearest" }); } catch (e) { /* ignore */ }
     }
@@ -1363,6 +1389,32 @@
     if (mobileActions) {
       var mapWrap = mount.closest(".hotel-complex-map-wrap") || mount.parentNode;
       if (mapWrap) mapWrap.appendChild(mobileActions);
+    }
+
+    // En modo panel, las "Actividades del día" se muestran debajo del mapa (no
+    // dentro del cuadro de la guía interactiva). Se mueve el bloque al
+    // contenedor del mapa, después de la leyenda, y se le añade su propio
+    // listener delegado porque sale del listener del mount.
+    var activities = mount.querySelector("#guideActivities");
+    if (panelMode && activities) {
+      var stage = mount.closest(".hotel-complex-stage") || null;
+      if (stage) {
+        var legendEl = stage.querySelector("#hotelGuideLegend");
+        if (legendEl && legendEl.parentNode === stage) {
+          stage.insertBefore(activities, legendEl.nextSibling);
+        } else {
+          stage.appendChild(activities);
+        }
+      } else {
+        var wrapFallback = mount.closest(".hotel-complex-map-wrap");
+        if (wrapFallback && wrapFallback.parentNode) {
+          wrapFallback.parentNode.insertBefore(activities, wrapFallback.nextSibling);
+        }
+      }
+      activities.classList.add("guide-activities--below-map");
+      activities.addEventListener("click", function (event) {
+        handleGuideClick(event, activities);
+      });
     }
 
     mount.addEventListener("click", function (event) {
