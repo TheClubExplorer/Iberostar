@@ -6731,6 +6731,7 @@ const mobileNavMedia = window.matchMedia("(max-width: 850px)");
 function openMobileNav() {
   if (!siteNav) return;
   siteNav.classList.add("is-open");
+  document.body.classList.add("mobile-nav-open");
   if (navOverlay) {
     navOverlay.hidden = false;
     requestAnimationFrame(() => navOverlay.classList.add("is-open"));
@@ -6742,6 +6743,7 @@ function openMobileNav() {
 function closeMobileNav() {
   if (!siteNav || !siteNav.classList.contains("is-open")) return;
   siteNav.classList.remove("is-open");
+  document.body.classList.remove("mobile-nav-open");
   if (navOverlay) {
     navOverlay.classList.remove("is-open");
     window.setTimeout(() => { navOverlay.hidden = true; }, 280);

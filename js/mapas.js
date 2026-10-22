@@ -710,6 +710,89 @@
       script.onload = () => resolve(window.L);
       script.onerror = () => resolve(window.L);
       document.head.appendChild(script);
+    }).then((L) => {
+      // Los paneles marker/shadow/tooltip/popup NO rotan con el mapa
+      // (norotatePane). leaflet-rotate reposiciona marcadores, clusters y
+      // tooltips en cada 'rotate', pero los popups/error sin zoomAnimation
+      // quedaban con las coordenadas SIN rotar que calcula Leaflet (left/bottom
+      // en coords de layer) y se despegaban del marcador al girar la brújula.
+      //
+      // FIX popups sin zoomAnimation: partimos de la posición que Leaflet deja
+      // renderizada (punta del popup en coords de layer = left/2 + W/2,
+      // -bottom - marginBottom) y la llevamos al sistema rotado con la MISMA
+      // conversión del plugin (rotatedPointToMapPanePoint). El desplazamiento
+      // resultante es la diferencia exacta entre ambas posiciones, por lo que:
+      //  - nunca se aplica la rotación dos veces (se recalcula desde cero),
+      //  - el popup cae EXACTAMENTE en el mismo punto que su marcador (misma
+      //    función, mismo latLng).
+      try {
+        const overlayProto = L.DivOverlay.prototype;
+        const basePosition = overlayProto._updatePosition;
+        overlayProto._updatePosition = function () {
+          basePosition.apply(this, arguments);
+          const map = this._map;
+          const container = this._container;
+          if (!map || !map._rotate || this._zoomAnimated || !container || !container.parentNode) return;
+          const left = parseFloat(container.style.left) || 0;
+          const bottom = parseFloat(container.style.bottom) || 0;
+          const width = container.offsetWidth || 0;
+          const marginBottomCss = parseFloat(L.DomUtil.getStyle(container, "marginBottom")) || 0;
+          // punta del popup tal como la coloca Leaflet (coords de layer, sin rotar)
+          const rawTip = L.point(left + width / 2, -bottom - marginBottomCss);
+          // misma conversión que usan los marcadores del plugin
+          const screenTip = map.rotatedPointToMapPanePoint(rawTip);
+          // setPosition mantiene sincronizado _leaflet_pos (lo usa el _adjustPan
+          // del plugin) y sobreescribe el transform completo (idempotente).
+          L.DomUtil.setPosition(container, L.point(screenTip.x - rawTip.x, screenTip.y - rawTip.y));
+        };
+      } catch (error) {
+        console.warn("No se pudo parchar la reposición de popups rotados.", error);
+      }
+
+      // Re-anclado de lo que vive en panes sin rotar. Nota: leaflet-rotate 0.2.8
+      // no dispara 'rotateend', solo 'rotate' en cada setBearing (incluye cada
+      // fotograma del gesto táctil). 
+      //  - En 'rotate': popups y tooltips (el plugin ya refresca marcadores y
+      //    tooltips en el mismo evento; el popup sin zoomAnimation lo cubrimos
+      //    aquí y con el parche de arriba).
+      //  - En 'zoomend': refresh completo de marcadores (divIcons y clusters,
+      //    que heredan de L.Marker), tooltips y popup para dejar cero drift
+      //    tras acercar/alejar.
+      try {
+        L.Map.addInitHook(function () {
+          const map = this;
+          const isOpenOverlay = (overlay) => overlay && overlay._map && overlay._container && overlay._container.parentNode;
+          const reflowOpenTooltips = () => {
+            map.eachLayer((layer) => {
+              const tooltip = layer.getTooltip && layer.getTooltip();
+              if (isOpenOverlay(tooltip) && typeof tooltip.update === "function") tooltip.update();
+            });
+          };
+          const reflowOverlaysAndMarkers = () => {
+            if (!map._rotate) return;
+            map.eachLayer((layer) => {
+              if (layer instanceof L.Marker) {
+                if (typeof layer.update === "function") layer.update();
+                const tooltip = layer.getTooltip && layer.getTooltip();
+                if (isOpenOverlay(tooltip) && typeof tooltip.update === "function") tooltip.update();
+              }
+            });
+            const popup = map._popup;
+            if (isOpenOverlay(popup) && typeof popup.update === "function") popup.update();
+          };
+          const reflowOverlaysOnly = () => {
+            if (!map._rotate) return;
+            reflowOpenTooltips();
+            const popup = map._popup;
+            if (isOpenOverlay(popup) && typeof popup.update === "function") popup.update();
+          };
+          map.on("rotate", reflowOverlaysOnly);
+          map.on("zoomend", reflowOverlaysAndMarkers);
+        });
+      } catch (error) {
+        console.warn("No se pudo registrar el re-anclado al rotar/zoom.", error);
+      }
+      return L;
     });
 
     return window.leafletRotatePromise;
@@ -1030,8 +1113,9 @@
       coordinates[1] >= bounds[0][1] && coordinates[1] <= bounds[1][1];
   };
 
-  // Motor de rutas reutilizable: prioriza peatonal (Valhalla) y usa OSRM en coche
-  // como respaldo. Devuelve geometría, distancia, duración, proveedor y perfil reales.
+  // Motor de rutas reutilizable. En rutas interiores no cambia a coche si falla
+  // el grafo peatonal; fuera del complejo conserva OSRM como respaldo.
+  // Devuelve geometría, distancia, duración, proveedor y perfil reales.
   // Nunca dibuja una línea recta como si fuera un camino.
   mapas.computeRoute = function (options) {
     const opts = options || {};
@@ -1106,26 +1190,39 @@
           ];
 
           state().routeLine?.remove();
-          state().routeLine = window.L.polyline(routeCoordinates, {
+          const routeLineOptions = {
             color: "#d9b978",
             weight: 6,
             opacity: 0.95,
             dashArray: "12 8"
-          }).addTo(state().activeMap);
+          };
+          // SVG explícito: en mapas con preferCanvas el renderer de canvas
+          // glitchea al rotar con leaflet-rotate (mismo fix que la guía).
+          if (typeof window.L.svg === "function") {
+            routeLineOptions.renderer = window.L.svg({ padding: 0.5 });
+          }
+          state().routeLine = window.L.polyline(routeCoordinates, routeLineOptions).addTo(state().activeMap);
 
           // leaflet-rotate desincroniza el renderer al hacer zoom/rotar:
-          // re-proyectamos la ruta al terminar cada gesto.
+          // re-proyectamos la ruta durante cada rotación ('rotate'; el plugin
+          // 0.2.8 no dispara 'rotateend') y en cada zoom. Se encola un redraw
+          // por fotograma para no recalcular el SVG más de una vez por frame.
           if (state()._routeRedrawHandler && state()._routeRedrawMap) {
-            try { state()._routeRedrawMap.off("zoomend rotateend", state()._routeRedrawHandler); } catch (error) { /* noop */ }
+            try { state()._routeRedrawMap.off("rotate zoomend", state()._routeRedrawHandler); } catch (error) { /* noop */ }
           }
           state()._routeRedrawMap = state().activeMap;
           state()._routeRedrawHandler = () => {
-            const line = state().routeLine;
-            if (line && state().activeMap && line._map === state().activeMap) {
-              try { line.redraw(); } catch (error) { /* noop */ }
-            }
+            if (state()._routeRedrawQueued) return;
+            state()._routeRedrawQueued = true;
+            (window.L && window.L.Util ? window.L.Util.requestAnimFrame : window.requestAnimationFrame)(() => {
+              state()._routeRedrawQueued = false;
+              const line = state().routeLine;
+              if (line && state().activeMap && line._map === state().activeMap) {
+                try { line.redraw(); } catch (error) { /* noop */ }
+              }
+            });
           };
-          state().activeMap.on("zoomend rotateend", state()._routeRedrawHandler);
+          state().activeMap.on("rotate zoomend", state()._routeRedrawHandler);
 
           // Seguimiento de esta ruta: permite recalcularla si el usuario se
           // desvía mientras camina.

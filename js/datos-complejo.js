@@ -212,8 +212,8 @@
   // --- Bares ---------------------------------------------------------------
   const BARES = {
     "sports-bar-corner": { tipo: "bar", cocina: "Sports bar", carta: "Antojitos · Hamburguesas · Wings · Cerveza · Snacks" },
-    "heladeria-el-puente": { tipo: "heladeria", cocina: "Heladería", carta: "Helados artesanales · Sundaes · Smoothies · Café" },
-    "heladeria-el-mirador": { tipo: "heladeria", cocina: "Heladería", carta: "Helados artesanales · Sundaes · Smoothies · Café" },
+    // "heladeria-el-puente" consolidado: es el mismo lugar que "bar-el-puente"
+    // "heladeria-el-mirador" consolidado: es el mismo lugar que "lobby-bar-el-mirador" (JOIA)
     "star-rock-cafe": { tipo: "bar_cierre_temprano", cocina: "Café y repostería", carta: "Café de especialidad · Repostería · Bagels · Smoothies" },
     "pool-bar-las-olas": { tipo: "bar", cocina: "Bar de piscina", carta: "Cócteles · Bucket de cerveza · Botellade agua · Snacks" },
     "lobby-bar-kukulkan": { tipo: "bar", cocina: "Lobby bar", carta: "Coctelería de autor · Whisky · Aperitivos" },

@@ -1,9 +1,78 @@
 # AMPLIACIÓN AUDITORÍA COMPLEJO PLAYA PARAÍSO
 Fecha: 2026-10-15
 
-Inventario final: {"Verificado":50,"Pendiente de ubicación":1,"Pendiente de coordenadas":40,"No verificable":9}
+Inventario del corte 2026-10-15 (histórico; no representa el estado actual): {"Verificado":50,"Pendiente de ubicación":1,"Pendiente de coordenadas":40,"No verificable":9}
 
-## POIs pendientes (50)
+## Actualización de implementación (2026-10-22)
+
+Esta ampliación se contrasta con `js/guia-playa-paraiso.js`, que refleja los cambios actuales de la guía. El conteo de inventario anterior corresponde a un corte previo y no debe tomarse como estado actual: `inventory_final.json` y el listado pendiente de abajo contienen estados obsoletos.
+
+### Ubicaciones ya implementadas en la guía
+- **Coco Bar (`cocobar`):** coordenadas actuales `20.756290,-86.959046`, `source:"Google Maps"`, `verified:true`. Esto reemplaza los registros históricos de `inventory_final.json` (`20.7631,-86.9618`) y de la actualización previa de esta auditoría (`20.756434560304122,-86.9589709211595`).
+- **THE CLUB (`theclub`):** la guía asigna `20.7598333,-86.9652778` desde `OSM_COORDS` y lo marca `verified:true`, con feature `THE CLUB`. El registro antiguo sin coordenadas ya no representa la implementación actual.
+- **Restaurantes añadidos/verificados por Google Maps:** Beach Grill (`20.7578219,-86.9582285`), El Fogón Steak House (`20.756879,-86.959677`), El Fogón Italiano (`20.757161,-86.959936`), Coco Buffet (`20.756466,-86.958965`), El Colonial (`20.7609943,-86.963447`) y Trattoria by El Faro (`20.7589509,-86.9583723`). Todos se registran con `verified:true`.
+- **Head Concierge (`head-concierge`):** `20.759753,-86.965457`, `source:"Google Maps"`, `verified:true`.
+- **Star Prestige Beach Club (`star-prestige-beach-club`):** asociado a Iberostar Paraíso JOIA, `20.756829,-86.958688`, `source:"Google Maps"`, `verified:true`.
+- **Fit & Fun Playa Paraíso (`fit-fun-playa-paraiso`):** `20.7603125,-86.9645625`, `source:"Google Maps"`, `verified:true`.
+- **Buffet La Marina (`buffet-la-marina`):** `20.757842,-86.963819`, `source:"Google Maps"`, `verified:true`. Coordenada confirmada por el usuario el 2026-10-22; sustituye la entrada de plano sin coordenadas (`verified:false`) que tenía.
+- **Buffet El Tapatío (`buffet-el-tapatio`):** `20.756848,-86.960399`, `hotelId:"Iberostar Paraíso Maya"`, `source:"Google Maps"`, `verified:true`. Coordenada confirmada por el usuario el 2026-10-22 (hotel: Paraíso Maya); sustituye la entrada de plano sin coordenadas (`verified:false`) que tenía.
+- **Consolidación El Mirador (2026-10-22):** el usuario confirmó que **Heladería El Mirador y Lobby Bar El Mirador son el mismo lugar**. Se mantuvo `lobby-bar-el-mirador` con sus coordenadas (`20.756335,-86.962712`, hotelId JOIA) y nombre; se eliminó el POI `heladeria-el-mirador` de la guía. Referencias huérfanas en `js/datos-complejo.js` (detalles de carta) e `inventory_final.json` quedan sin efecto y se limpiarán al regenerar el catalogo.
+- **Verificaciones bares (2026-10-22):** `lobby-bar-acuario` ("Lobby Bar Acuario") = `20.7595512,-86.963491`, `sports-bar-corner` ("Sports Bar Corner") = `20.7596764,-86.9634133` y `bar-teatro` ("Bar Teatro") = `20.759376,-86.962659`, los tres `source:"Google Maps"`, `verified:true`, confirmados por el usuario y **todos asignados al hotel Iberostar Paraíso Lindo**. También quedó aclarado que **Pool Bar "Las Olas" y Aqua Bar "Las Olas" son lugares distintos** (ambos conservados como POIs separados) y que el buscador anterior azul ("Beach Bar / Bar de playa", genérico sin coordenadas) no tiene doble registro.
+- **Bar Teatro (`bar-teatro`):** `20.759376,-86.962659`, `source:"Google Maps"`, `verified:true`. Coordenada confirmada por el usuario el 2026-10-22; sustituye la entrada de plano sin coordenadas (`verified:false`) que tenía.
+- **Beach Bar (`beach-bar`):** `20.757856,-86.958359`, `source:"Google Maps"`, `verified:true`. Coordenada confirmada por el usuario el 2026-10-22; ya no es el punto genérico de plano sin coordenadas que era.
+- **Consolidación El Puente (2026-10-22):** el usuario confirmó que **Heladería El Puente y Bar El Puente son el mismo lugar**. Se eliminó el POI `heladeria-el-puente` y su detalle de carta; quedó `bar-el-puente` con su coordenada de `OSM_COORDS` (`20.7586198,-86.9590972`) y la descripción ampliada ("incluye la heladería").
+- **Pool Bar Las Olas (`pool-bar-las-olas`):** `20.757897,-86.961767`, `source:"Google Maps"`, `verified:true`. Coordenada confirmada por el usuario el 2026-10-22 (corrección de la primera cifra que envió, `20.757435,-86.961388`); sustituye la entrada de plano sin coordenadas (`verified:false`) que tenía. Conserva su identidad de POI separado respecto a Aqua Bar "Las Olas".
+- **Corrección Bar El Puente / Aqua Bar Las Olas (2026-10-22):** el punto de la playa que el catálogo traía como `bar-el-puente` vía `OSM_COORDS` (`20.7586198,-86.9590972`) **en realidad es el Aqua Bar "Las Olas"**: se reasignó como coords de `aqua-bar-las-olas` (`source:"OpenStreetMap"`, `verified:true`) y su fila de `OSM_COORDS` se eliminó. El Bar El Puente real quedó con `20.757172,-86.960979` (`source:"Google Maps"`, `verified:true`, incluye la heladería consolidada).
+- **Consolidación Kukulkán / Star Café Maya (2026-10-22):** el usuario confirmó que el punto registrado como `starcafe-maya` (`20.7575018,-86.9645296`) en realidad es el **Lobby Bar "Kukulkán"**. Se eliminó `starcafe-maya` y `lobby-bar-kukulkan` quedó con esas coordenadas, `hotelId:"Iberostar Paraíso Maya"`, `source:"Google Maps"`, `verified:true`.
+- **Music Bar Rhapsody (`music-bar-rhapsody`):** `20.756312,-86.962411`, `source:"Google Maps"`, `verified:true`. Coordenada confirmada por el usuario el 2026-10-22; sustituye la entrada de plano sin coordenadas (`verified:false`) que tenía. Hotel pendiente de confirmar (zona JOIA, junto al lobby-bar-el-mirador).
+- **Aqua Bar La Sirenita (`aqua-bar-la-sirenita`):** `20.754775,-86.960108`, `source:"Google Maps"`, `verified:true`. Coordenada confirmada por el usuario el 2026-10-22; sustituye la entrada de plano sin coordenadas (`verified:false`) que tenía. Hotel pendiente de confirmar (zona Grand Paraíso/JOIA).
+- **PENDIENTE — La Cúpula Bar / Star Rock Café (2026-10-22):** el usuario identificó que el punto de `star-rock-cafe` (asignado por `OSM_COORDS` como `20.7618856,-86.9627721`) en realidad es el **"La Cupula Bar"** (`20.7621251,-86.9630263`, place `0x8f4e610050ca7fa5:0x369f138ff1252b80`). **No se aplicó ningún cambio** a petición del usuario; queda registrado para cuando ordene el ajuste.
+- **Cascada y jacuzzi (`waterfall-jacuzzi`):** `20.759539,-86.960991`, `source:"Google Maps"`, `verified:true`. Coordenada confirmada por el usuario el 2026-10-22; sustituye la entrada de plano sin coordenadas (`verified:false`) que tenía.
+- **Piscina tranquila (`quiet-pool`):** `20.759600,-86.960224`, `source:"Google Maps"`, `verified:true`. Coordenada confirmada por el usuario el 2026-10-22; sustituye la entrada de plano sin coordenadas (`verified:false`) que tenía.
+- **Piscina de actividades (`activities-pool`):** `20.759267,-86.959714`, `source:"Google Maps"`, `verified:true`. Coordenada confirmada por el usuario el 2026-10-22; sustituye la entrada de plano sin coordenadas (`verified:false`) que tenía.
+- **Jacuzzi (`jacuzzi`):** `20.757415,-86.960793`, `source:"Google Maps"`, `verified:true`. Coordenada confirmada por el usuario el 2026-10-22; sustituye la entrada de plano sin coordenadas (`verified:false`) que tenía.
+- **Piscina privada (`private-pool`):** `20.756499,-86.960229`, `source:"Google Maps"`, `verified:true`. Coordenada confirmada por el usuario el 2026-10-22; sustituye la entrada de plano sin coordenadas (`verified:false`) que tenía.
+- **Piscina cubierta (`indoor-pool`):** `20.756076,-86.961331`, `source:"Google Maps"`, `verified:true`. Coordenada confirmada por el usuario el 2026-10-22; sustituye la entrada de plano sin coordenadas (`verified:false`) que tenía (zona junto al spa-joia).
+- **Piscina principal (`main-pool`):** `20.754701,-86.960497`, `source:"Google Maps"`, `verified:true`. Coordenada confirmada por el usuario el 2026-10-22; sustituye la entrada de plano sin coordenadas (`verified:false`) que tenía (zona Grand Paraíso).
+- **Teatro Music Hall (`teatro-music-hall`):** `20.7591882,-86.9627312`, `source:"Google Maps"`, `verified:true`. Coordenada de Google Maps ("Theater Paraíso Lindo-Maya", place `0x8f4e61005f5eb77d:0x50665cfa02c20d1`) proporcionada por el usuario el 2026-10-22; sustituye la entrada de plano sin coordenadas (`verified:false`) que tenía.
+- **Teatro Mar-Playa (antes "Casino") (2026-10-22):** el usuario confirmó que el punto que el plano etiquetaba "Casino" es en realidad el **"Teatro Mar-Playa"** (`20.7608353,-86.9625428`, place `0x8f4e6100099b7827:0xd7d0b35592b80108`). Se sustituyó la entrada `casino` por `teatro-mar-playa` (`category:"entretenimiento"`, `source:"Google Maps"`, `verified:true`).
+- **Health Bar SPA (`health-bar-spa`):** `20.756025,-86.961423`, `source:"Google Maps"`, `verified:true`. Coordenada confirmada por el usuario el 2026-10-22; sustituye la entrada de plano sin coordenadas (`verified:false`) que tenía. Hotel pendiente de confirmar (zona coincide con el sector JOIA: spa-joia/fit-fun-joia).
+- **Restaurant La Marina (`la-marina`):** `20.7577902,-86.9640737`, `source:"Google Maps"`, `verified:true`. Ubicación de Google Maps del "Restaurant La Marina" proporcionada por el usuario el 2026-10-22 (place `0x8f4e6134896ed84f:0x19a130465789f386`); sustituye la asignación de `OSM_COORDS` (`20.7578746,-86.9638876`), cuya fila se eliminó al quedar la coordenada propia en el POI.
+
+Estos estados describen lo implementado en el código; las fuentes Google Maps se consignan según el propio registro y no implican una nueva verificación independiente durante esta actualización. El listado histórico de pendientes que sigue abajo queda supersedido. Pendiente: regenerar `inventory_final.json` y el listado/conteo completo desde el catálogo activo para reemplazarlo.
+
+### Recuento del catálogo activo (actualizado 2026-10-22)
+
+Conteo ejecutado sobre el catálogo activo en `js/guia-playa-paraiso.js`, aplicando las asignaciones de `OSM_COORDS` y las áreas: **94 registros con coordenadas verificadas y 20 pendientes de coordenadas**, de **114 registros** en total (incluye los 5 hoteles). No hay registros activos con coordenadas pero sin verificar.
+
+Pendientes de coordenadas:
+
+- Baby Kitchen
+- Palapas de masajes
+- Tenis
+- Campo de tiro
+- Teatro Music Hall
+- Casino
+- Centro comercial
+- Tienda de piscina
+- Sala de juntas
+- Agencias y teléfonos
+- Internet, billar, biblioteca
+- Centro médico
+- Farmacia
+- Preview Gallery
+- Star Prestige Lounge
+- Relaciones públicas
+- Duchas de cortesía
+- Paraíso Express Stop
+- Village / Villas
+- Star Friends Desk
+
+`Mar Caribe` tiene coordenadas y es una etiqueta de área, no un punto de instalación; no se cuenta entre los 20 pendientes. Este recuento refleja los datos implementados en el catálogo, no una validación externa nueva. El inventario histórico y el listado anterior de pendientes siguen obsoletos.
+
+## POIs pendientes del corte anterior (50; lista obsoleta)
+
+El siguiente listado conserva el detalle histórico del corte del 2026-10-15. No usarlo como lista actual: al menos Coco Bar, THE CLUB, Head Concierge y Star Prestige Beach Club ya aparecen implementados como verificados en la guía activa. El inventario completo pendiente está por regenerar.
 
 ### cocobar [Pendiente de ubicación]
 - Cat: bar | Nombre: Coco Bar
