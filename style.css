@@ -2612,11 +2612,11 @@ body[data-app-mode="tool"] .complex-hotel-card { border-color:#d9c9ae; border-ra
 body[data-app-mode="tool"] .complex-hotel-copy > strong { color:#40362e; }
 body[data-app-mode="tool"] .complex-hotel-action { color:#8f7332; }
 body[data-app-mode="tool"] .general-map-spread::after { display:none; }
-body[data-app-mode="tool"] .location-status { display:none; position:fixed; right:14px; bottom:12px; z-index:1100; max-width:min(90vw,420px); margin:0; padding:10px 14px; border:1px solid #d9c9ae; border-radius:9px; background:#fff; color:#8a7c6e; box-shadow:0 5px 18px #40362e17; text-align:left; }
+body[data-app-mode="tool"] .location-status { display:none; position:fixed; right:14px; bottom:12px; z-index:1250; max-width:min(90vw,420px); margin:0; padding:10px 14px; border:1px solid #d9c9ae; border-radius:9px; background:#fff; color:#8a7c6e; box-shadow:0 5px 18px #40362e17; text-align:left; }
 body[data-app-mode="tool"][data-location-requested="true"] .location-status { display:block; }
-body[data-app-mode="portal"] .location-status { display:none; position:fixed; right:14px; bottom:12px; z-index:1100; max-width:min(90vw,420px); margin:0; padding:10px 14px; border:1px solid #d9c9ae; border-radius:9px; background:#fff; color:#8a7c6e; box-shadow:0 5px 18px #40362e17; text-align:left; }
+body[data-app-mode="portal"] .location-status { display:none; position:fixed; right:14px; bottom:12px; z-index:1250; max-width:min(90vw,420px); margin:0; padding:10px 14px; border:1px solid #d9c9ae; border-radius:9px; background:#fff; color:#8a7c6e; box-shadow:0 5px 18px #40362e17; text-align:left; }
 body[data-app-mode="portal"][data-location-requested="true"] .location-status { display:block; }
-body[data-app-mode="hotel"] .location-status { display:none; position:fixed; right:14px; bottom:12px; z-index:1100; max-width:min(90vw,420px); margin:0; padding:10px 14px; border:1px solid #d9c9ae; border-radius:9px; background:#fff; color:#8a7c6e; box-shadow:0 5px 18px #40362e17; text-align:left; }
+body[data-app-mode="hotel"] .location-status { display:none; position:fixed; right:14px; bottom:12px; z-index:1250; max-width:min(90vw,420px); margin:0; padding:10px 14px; border:1px solid #d9c9ae; border-radius:9px; background:#fff; color:#8a7c6e; box-shadow:0 5px 18px #40362e17; text-align:left; }
 body[data-app-mode="hotel"][data-location-requested="true"] .location-status { display:block; }
 body[data-app-mode="portal"] .app-view { display:block; }
 body[data-app-mode="hotel"] .nav-button,body[data-app-mode="hotel"] #pager { display:none !important; }
@@ -3827,6 +3827,11 @@ body.pano-360-open { overflow: hidden; }
    oculta alrededor del resort. */
 .complex-mask-feather { filter: blur(10px); }
 .complex-mask-feather-soft { filter: blur(22px); }
+/* Durante zoom/rotación (modo brújula activa) el blur de los trazos gigantes
+   de la máscara es lo que más laguea en móvil: se apaga mientras se navega y
+   se reactiva al soltar (el JS alterna .map-interacting en el contenedor). */
+.map-interacting .complex-mask-feather { filter: none; opacity: .4; }
+.map-interacting .complex-mask-feather-soft { filter: none; opacity: .15; }
 .hotel-portal-map--complex { width:100%; height:clamp(560px,72vh,720px); border:1px solid #d9c9ae; border-radius:16px; overflow:hidden; background:var(--panel); box-shadow:0 18px 42px rgba(64,54,46,.1); }
 .hotel-complex-legend { margin-top:14px; }
 .hotel-complex-legend.guide-legend { border:1px solid #d9c9ae; border-radius:14px; background:var(--panel); box-shadow:none; padding:14px 18px; }
@@ -3937,7 +3942,7 @@ body.pano-360-open { overflow: hidden; }
     position:absolute;
     left:8px;
     top:8px;
-    z-index:1100;
+    z-index:1250;
     max-width:calc(100% - 16px);
     max-height:calc(100% - 24px);
     overflow-y:auto;
@@ -4062,7 +4067,7 @@ body.pano-360-open { overflow: hidden; }
 /* =========================================================
    AVISO DE UBICACIÓN (bienvenida por geolocalización)
    ========================================================= */
-.location-welcome { position:fixed; left:18px; bottom:18px; z-index:1200; width:min(360px,calc(100vw - 28px)); padding:22px 22px 20px; border:1px solid #d9c9ae; border-radius:16px; background:linear-gradient(180deg,var(--paper-alt),var(--paper)); box-shadow:0 22px 54px rgba(9,4,3,.22); color:var(--green); }
+.location-welcome { position:fixed; left:18px; bottom:18px; z-index:1250; width:min(360px,calc(100vw - 28px)); padding:22px 22px 20px; border:1px solid #d9c9ae; border-radius:16px; background:linear-gradient(180deg,var(--paper-alt),var(--paper)); box-shadow:0 22px 54px rgba(9,4,3,.22); color:var(--green); }
 .location-welcome[hidden] { display:none; }
 .location-welcome-close { position:absolute; top:10px; right:12px; width:30px; height:30px; border:0; border-radius:50%; background:rgba(64,54,46,.08); color:var(--green-deep); font-size:19px; line-height:1; cursor:pointer; }
 .location-welcome-close:hover,.location-welcome-close:focus-visible { background:rgba(64,54,46,.16); }

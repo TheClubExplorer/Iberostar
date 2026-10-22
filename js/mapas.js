@@ -1113,6 +1113,20 @@
             dashArray: "12 8"
           }).addTo(state().activeMap);
 
+          // leaflet-rotate desincroniza el renderer al hacer zoom/rotar:
+          // re-proyectamos la ruta al terminar cada gesto.
+          if (state()._routeRedrawHandler && state()._routeRedrawMap) {
+            try { state()._routeRedrawMap.off("zoomend rotateend", state()._routeRedrawHandler); } catch (error) { /* noop */ }
+          }
+          state()._routeRedrawMap = state().activeMap;
+          state()._routeRedrawHandler = () => {
+            const line = state().routeLine;
+            if (line && state().activeMap && line._map === state().activeMap) {
+              try { line.redraw(); } catch (error) { /* noop */ }
+            }
+          };
+          state().activeMap.on("zoomend rotateend", state()._routeRedrawHandler);
+
           // Seguimiento de esta ruta: permite recalcularla si el usuario se
           // desvía mientras camina.
           mapas._directionsRoute = {

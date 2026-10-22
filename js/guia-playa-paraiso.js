@@ -91,11 +91,8 @@
     {"id":"spa","name":"Spa Sensations","category":"spa","lat":20.76032,"lng":-86.96629,"description":"Spa del complejo","source":"osm","verified":true},
     {"id":"starcamp","name":"Star Camp","category":"kids","lat":20.76071,"lng":-86.96471,"description":"Star Camp","source":"osm","verified":true},
     {"id":"galaxy","name":"Discoteca Galaxy","category":"discoteca","lat":20.75955,"lng":-86.966,"description":"Discoteca del complejo (+18)","source":"osm","verified":true},
-    // Coco Bar: verificado como parte del resort VECINO "Vidanta Riviera Maya"
-    // (su coordenada queda DENTRO del polígono de Vidanta y FUERA del complejo
-    // Iberostar Playa Paraíso). Se conserva el registro pero se excluye del
-    // explorador y del mapa (external: true).
-    {"id":"cocobar","name":"Coco Bar","category":"bar","lat":20.7631,"lng":-86.9618,"description":"Coco Bar","source":"plano","verified":false},
+    // Coco Bar: coordenada verificada manualmente (Google Maps).
+    {"id":"cocobar","name":"Coco Bar","category":"bar","lat":20.756434560304122,"lng":-86.9589709211595,"description":"Coco Bar","source":"Google Maps","verified":true},
     {"id":"starcafe","name":"Star Café","category":"bar","lat":20.7585,"lng":-86.963,"description":"Star Café","source":"osm","verified":true});
   POIS.push({"id":"theclub","name":"THE CLUB","category":"club","description":"Club premium del complejo","source":"plano","verified":false},
     {"id":"playa-mar-caribe","name":"Mar Caribe","category":"playa","description":"Mar Caribe / Caribbean Sea","source":"plano","verified":false});
@@ -514,6 +511,16 @@
     if (renderer) featherSoftOpts.renderer = renderer;
     var featherSoft = L.polygon(ring, featherSoftOpts).addTo(map);
     gp._complexMask = { mask: mask, feather: feather, featherSoft: featherSoft };
+    if (!map._maskInteractionHook) {
+      map._maskInteractionHook = true;
+      var maskContainer = map.getContainer();
+      map.on("zoomstart rotatestart", function () {
+        try { maskContainer.classList.add("map-interacting"); } catch (e) { /* ignore */ }
+      });
+      map.on("zoomend rotateend moveend", function () {
+        try { maskContainer.classList.remove("map-interacting"); } catch (e) { /* ignore */ }
+      });
+    }
     return gp._complexMask;
   };
 
@@ -831,21 +838,46 @@
     return parts.join(" · ");
   }
 
+  function bindRouteRedraw(map) {
+    if (gp._redrawMap === map) return;
+    if (gp._redrawMap && gp._redrawHandler) {
+      try { gp._redrawMap.off("zoomend rotateend", gp._redrawHandler); } catch (e) { /* ignore */ }
+    }
+    gp._redrawHandler = function () {
+      var line = gp._route && gp._route.line;
+      if (line && map.hasLayer(line)) {
+        try { line.redraw(); } catch (e) { /* ignore */ }
+      }
+    };
+    gp._redrawMap = map;
+    map.on("zoomend rotateend", gp._redrawHandler);
+  }
+
   function drawRoute(origin, poi, result, options) {
     var shared = window.RevistaDigital && window.RevistaDigital.state;
     var map = gp._map || (shared && shared.activeMap);
     if (!map || !window.L) return;
     removeRouteLine();
     var coordinates = [[origin.latitude, origin.longitude]].concat(result.coordinates, [[poi.lat, poi.lng]]);
-    var routePane = map.getPane("complexRoutePane") || map.createPane("complexRoutePane");
+    // El pane debe vivir DENTRO de overlayPane (que a su vez está dentro del
+    // rotatePane de leaflet-rotate): si se crea suelto queda en mapPane y no
+    // rota junto con los tiles, desajustando la ruta al girar.
+    var routePane = map.getPane("complexRoutePane") || map.createPane("complexRoutePane", map.getPane("overlayPane"));
     routePane.style.zIndex = "460";
     routePane.style.pointerEvents = "none";
-    gp._route.line = window.L.polyline(coordinates, {
+    // Renderizador SVG explícito: los mapas de la guía usan preferCanvas y el
+    // renderer de canvas es inestable al rotar/hacer zoom con leaflet-rotate.
+    var lineOptions = {
       color: "#0057b8",
       weight: 6,
       opacity: 0.95,
       pane: "complexRoutePane"
-    }).addTo(map);
+    };
+    if (typeof window.L.svg === "function") {
+      lineOptions.renderer = window.L.svg({ pane: "complexRoutePane", padding: 0.5 });
+    }
+    gp._route.line = window.L.polyline(coordinates, lineOptions).addTo(map);
+    bindRouteRedraw(map);
     if (shared) shared.routeLine = gp._route.line;
     // Si había una ruta de "Cómo llegar" del mapa de hotel, se deja de
     // rastrear para que no se recalcule por encima de esta.
