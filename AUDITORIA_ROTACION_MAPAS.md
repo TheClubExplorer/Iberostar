@@ -51,8 +51,8 @@ El parche anterior (`mapas.js`, bloque DivOverlay) usaba `L.DomUtil.getPosition(
 | Ruta "Cómo llegar" (mapas.js) | handler `_routeRedrawHandler` ahora en `rotate`+`zoomend` (rAF encolado) | PASSestructural |
 | Doble compensación de rotación | popups zoomAnimated excluidos del patch; no-anim recalculan el desplazamiento desde la posición CSS de Leaflet en cada llamada (no acumula) | PASSestructural |
 | AutoPan con popup rotado | `setPosition` mantiene `_leaflet_pos` sincronizado para `_adjustPan` del plugin | PASSestructural |
-| Coordenadas de POIs/hoteles | sin cambios (diff solo en `js/mapas.js`, `js/guia-playa-paraiso.js` y cache-bust `?v=17` / `?v=14`) | CONFIRMADO |
+| Coordenadas de POIs/hoteles | la auditoría de rotación no modificó coordenadas; el estado del catálogo se revisa por separado en las auditorías de coordenadas | SIN CAMBIOS EN ESE PARCHE |
 
 ## 7. Estado empírico
 - **Estructura/lógica:** VERIFICADA (análisis de fuente de leaflet-rotate 0.2.8 (DivOverlay/Tooltip/Marker/Map.setBearing), Leaflet 1.9.4 (DivOverlay._updatePosition, Popup._getAnchor, Markercluster 1.5.3 (MarkerCluster herencia y addLayer)).
-- **Validación en dispositivo (PC/celular con brújula real):** PENDIENTE — cerrar con: cargar `index.html` con `mapas.js?v=17` y `guia-playa-paraiso.js?v=14` (Ctrl+F5 / reabrir pestaña en móvil), girar brújula a ±20° y comprobar que (a) cada marcador/POI/cluster queda sobre su punto geográfico, (b) la ventana emergente queda con su punta sobre el marcador tras rotar y tras hacer zoom, (c) los tooltips del mapa general quedan sobre su marcador.
+- **Validación en dispositivo (PC/celular con brújula real):** PENDIENTE — en el `index.html` actual los scripts usan `mapas.js?v=17` y `guia-playa-paraiso.js?v=16`. Girar el mapa a ±20° y comprobar que (a) cada marcador/POI/cluster queda sobre su punto geográfico, (b) la ventana emergente queda con su punta sobre el marcador tras rotar y hacer zoom, y (c) los tooltips del mapa general quedan sobre su marcador.

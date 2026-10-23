@@ -399,7 +399,7 @@
 
   function portalHotelPoints(hotels) {
     return (hotels || [])
-      .map((hotel) => ({ name: hotel.name, coordinates: state()?.hotelCoordinates?.[hotel.name] }))
+      .map((hotel) => ({ name: hotel.name, slug: hotel.slug, coordinates: state()?.hotelCoordinates?.[hotel.name] }))
       .filter((item) => Array.isArray(item.coordinates));
   }
 
@@ -446,9 +446,126 @@
       </div>`;
   }
 
+  function getCartHotels() {
+    const catalog = getDestinationCatalog() || {};
+    const hotels = [];
+    Object.entries(catalog).forEach(([countrySlug, country]) => {
+      (country.destinations || []).forEach((destination) => {
+        (destination.hotels || []).forEach((hotel) => {
+          if (!PLAYA_PARAISO_GUIDE_HOTELS.has(hotel.slug)) return;
+          const coordinates = state()?.hotelCoordinates?.[hotel.name];
+          if (!Array.isArray(coordinates) || coordinates.length !== 2) return;
+          hotels.push({
+            slug: hotel.slug,
+            name: hotel.name,
+            coordinates,
+            countrySlug,
+            destinationSlug: destination.slug
+          });
+        });
+      });
+    });
+    return hotels;
+  }
+
+  function getPreferredCartHotel(hotels) {
+    let slug = "";
+    try { slug = sessionStorage.getItem("clubCartHotel") || ""; } catch (error) { slug = ""; }
+    return hotels.find((hotel) => hotel.slug === slug) || hotels[0];
+  }
+
+  function renderCartPortal(route, view) {
+    const hotels = getCartHotels();
+    if (!hotels.length) return false;
+    const selected = getPreferredCartHotel(hotels);
+    try { sessionStorage.setItem("clubCartHotel", selected.slug); } catch (error) { /* ignore */ }
+    const options = hotels.map((hotel) => `<option value="${escapeHtml(hotel.slug)}"${hotel.slug === selected.slug ? " selected" : ""}>${escapeHtml(hotel.name)}</option>`).join("");
+    document.body.dataset.appMode = "portal";
+    document.body.dataset.routeManaged = "true";
+    view.innerHTML = `<main class="portal-page cart-page">
+      ${portalNav(getPortalNavModel(route))}
+      <section class="portal-destination-hero cart-page-hero">
+        ${RI.img("src/paraiso-del-mar/banner/ParaisoDelMar.jpg", {
+          alt: "",
+          priority: true,
+          sizes: "(max-width:600px) 100vw, 45vw"
+        })}
+        <div>
+          <p class="portal-kicker">MOVILIDAD · THE CLUB</p>
+          <h1>Carrito de golf</h1>
+          <p>Solicita un carrito, sigue cómo llega hasta tu ubicación exacta y te lleva al destino que elijas.</p>
+          <div class="cart-page-location">
+            <span class="cart-location-status" data-cart-location-status>Activa tu ubicación para mostrar exactamente dónde estás.</span>
+            <button type="button" class="cart-locate-btn" data-cart-locate>Usar mi ubicación</button>
+          </div>
+        </div>
+      </section>
+      <section class="hotel-portal-section hotel-cart-section cart-page-section" id="hotel-carrito">
+        <div class="cart-page-toolbar">
+          <label class="cart-page-hotel-field">
+            <span>Hotel del complejo</span>
+            <select data-cart-hotel-select>${options}</select>
+          </label>
+          <p class="cart-page-hotel-note">El carrito sale desde su posición actual, te recoge donde estés y te lleva a tu destino.</p>
+        </div>
+        <div class="hotel-cart-tracker" data-cart-tracker>
+          <div class="hotel-cart-panel">
+            <div class="hotel-cart-status" data-cart-status></div>
+            <form class="hotel-cart-form" data-cart-form>
+              <p class="hotel-cart-form-note">El carrito te recoge en tu ubicación y te lleva al destino que elijas.</p>
+              <div class="hotel-cart-row">
+                <label class="hotel-cart-field"><span>Nombre</span>
+                  <input type="text" name="nombre" autocomplete="name" placeholder="Tu nombre" />
+                </label>
+                <label class="hotel-cart-field"><span>Habitación</span>
+                  <input type="text" name="habitacion" inputmode="numeric" placeholder="Ej. 1204" />
+                </label>
+              </div>
+              <label class="hotel-cart-field"><span>Destino</span>
+                <select name="destino" data-cart-destination></select>
+              </label>
+              <label class="hotel-cart-field"><span>Notas</span>
+                <textarea name="notas" rows="2" placeholder="Personas, equipaje o referencia del punto"></textarea>
+              </label>
+              <button type="submit" class="hotel-cart-submit">Solicitar carrito</button>
+              <p class="hotel-cart-form-note">Servicio simulado: verás cómo el carrito te recoge y te lleva a tu destino.</p>
+            </form>
+            <div class="hotel-cart-nearby" data-cart-nearby></div>
+          </div>
+          <div class="hotel-cart-map-wrap">
+            <div id="cartTrackingMap" class="hotel-cart-map" role="application" aria-label="Mapa de seguimiento del carrito de golf"></div>
+            <div class="hotel-cart-eta" data-cart-eta hidden></div>
+          </div>
+        </div>
+      </section>
+    </main>`;
+
+    const select = view.querySelector("[data-cart-hotel-select]");
+    const cart = window.RevistaDigital.carritoGolf;
+    const initCart = (hotel) => {
+      if (cart && typeof cart.init === "function") {
+        try {
+          cart.init(view, hotel);
+        } catch (error) {
+          console.warn("No se pudo iniciar el seguimiento del carrito de golf.", error);
+        }
+      }
+    };
+    initCart(selected);
+    if (select) {
+      select.addEventListener("change", () => {
+        const hotel = hotels.find((item) => item.slug === select.value) || hotels[0];
+        try { sessionStorage.setItem("clubCartHotel", hotel.slug); } catch (error) { /* ignore */ }
+        initCart(hotel);
+      });
+    }
+    return true;
+  }
+
   function renderPortal(route) {
     const view = document.getElementById("appView");
     if (!view) return false;
+    if (route === "/carrito-golf" && renderCartPortal(route, view)) return true;
     const catalog = getDestinationCatalog();
     if (route === "/complejo-playa-paraiso") {
       const complexEntry = Object.entries(catalog || {})
@@ -1071,7 +1188,7 @@
           (destination.hotels || []).filter((item) => item.complex !== false)
         );
         complexHotelPoints.forEach((item) => {
-          const hotelSlug = slugify(item.name);
+          const hotelSlug = item.slug || slugify(item.name);
           const hotelRoute = `/${countrySlug}/${destination.slug}/${hotelSlug}`;
           const marker = L.marker(item.coordinates)
             .addTo(map)
@@ -1203,7 +1320,7 @@
         attribution: "© OpenStreetMap contributors"
       }).addTo(map);
     hotels.forEach((item) => {
-      const hotelSlug = slugify(item.name);
+      const hotelSlug = item.slug || slugify(item.name);
       const route = `/${countrySlug}/${destination.slug}/${hotelSlug}`;
       const hotelMarker = L.marker(item.coordinates)
         .addTo(map)

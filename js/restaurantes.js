@@ -88,23 +88,7 @@
     "Coral Level at Iberostar Selection Rose Hall Suites": "Iberostar Selection Rose Hall Suites",
     "Praia do Forte · Star Prestige": "Iberostar Selection Praia do Forte"
   };
-  const hotelRestaurantPageUrls = {
-    "Iberostar Selection Playa Mita": "https://www.iberostar.com/en/hotels/riviera-nayarit/iberostar-selection-playa-mita/",
-    "Iberostar Selection Cancún": "https://www.iberostar.com/en/hotels/cancun/iberostar-selection-cancun/",
-    "Iberostar Waves Cozumel": "https://www.iberostar.com/en/hotels/cozumel/iberostar-waves-cozumel/",
-    "Iberostar Waves Quetzal": "https://www.iberostar.com/en/hotels/riviera-maya/iberostar-waves-quetzal/",
-    "Iberostar Waves Tucán": "https://www.iberostar.com/en/hotels/riviera-maya/iberostar-waves-tucan/",
-    "JOIA Rose Hall by Iberostar": "https://www.iberostar.com/en/hotels/montego-bay/joia-rose-hall-by-iberostar/",
-    "Iberostar Selection Rose Hall Suites": "https://www.iberostar.com/en/hotels/montego-bay/iberostar-selection-rose-hall-suites/",
-    "Iberostar Waves Rose Hall Beach": "https://www.iberostar.com/en/hotels/montego-bay/iberostar-waves-rose-hall-beach/",
-    "Iberostar Selection Bávaro Suites": "https://www.iberostar.com/en/hotels/punta-cana/iberostar-selection-bavaro-suites/",
-    "JOIA Bávaro by Iberostar": "https://www.iberostar.com/en/hotels/punta-cana/joia-bavaro-by-iberostar/",
-    "Iberostar Waves Punta Cana": "https://www.iberostar.com/en/hotels/punta-cana/iberostar-waves-punta-cana/",
-    "Iberostar Waves Dominicana": "https://www.iberostar.com/en/hotels/punta-cana/iberostar-waves-dominicana/",
-    "Iberostar Selection Praia do Forte": "https://www.iberostar.com/en/hotels/bahia/iberostar-selection-praia-do-forte/",
-    "Iberostar Waves Bahia": "https://www.iberostar.com/en/hotels/bahia/iberostar-waves-bahia/",
-    "Iberostar Heritage Grand Amazon": "https://www.iberostar.com/en/hotels/manaus/iberostar-grand-amazon/"
-  };
+  const hotelRestaurantPageUrls = {};
 
   function escapeHtml(value = "") {
     return String(value).replace(/[&<>"']/g, (character) => ({
@@ -120,13 +104,7 @@
     return [];
   };
 
-  restaurantes.getHotelRestaurantPageUrl = function (...hotelNames) {
-    for (const hotelName of hotelNames) {
-      const canonicalName = hotelRestaurantAliases[hotelName] || hotelName;
-      if (hotelRestaurantPageUrls[canonicalName]) return hotelRestaurantPageUrls[canonicalName];
-    }
-    return "";
-  };
+  restaurantes.getHotelRestaurantPageUrl = function () { return ""; };
 
   restaurantes.renderHotelRestaurants = function (hotelName, fallbackName = "") {
     const restaurants = restaurantes.getHotelRestaurants(hotelName, fallbackName);

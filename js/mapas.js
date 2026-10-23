@@ -1113,10 +1113,14 @@
       coordinates[1] >= bounds[0][1] && coordinates[1] <= bounds[1][1];
   };
 
-  // Motor de rutas reutilizable. En rutas interiores no cambia a coche si falla
-  // el grafo peatonal; fuera del complejo conserva OSRM como respaldo.
-  // Devuelve geometría, distancia, duración, proveedor y perfil reales.
-  // Nunca dibuja una línea recta como si fuera un camino.
+  mapas.getPreferredRouteProfile = function (origin, destination) {
+    return mapas.isComplexDestination(origin) && mapas.isComplexDestination(destination)
+      ? "pedestrian"
+      : "driving";
+  };
+
+  // Motor de rutas reutilizable. No sustituye una ruta peatonal fallida por una
+  // ruta vehicular: son redes distintas y el trazado podría ser impracticable.
   mapas.computeRoute = function (options) {
     const opts = options || {};
     const origin = opts.origin;
@@ -1132,10 +1136,7 @@
       return mapas.requestDrivingRoute(origin, destination, signal);
     }
 
-    return mapas.requestPedestrianRoute(origin, destination, signal).catch((error) => {
-      if (isAbortError(error)) throw error;
-      return mapas.requestDrivingRoute(origin, destination, signal);
-    });
+    return mapas.requestPedestrianRoute(origin, destination, signal);
   };
 
   mapas.cancelRoute = function () {
@@ -1172,15 +1173,16 @@
         return;
       }
 
-      const isComplex = mapas.isComplexDestination(destinationCoordinates);
+      const originCoordinates = [state().currentPosition.latitude, state().currentPosition.longitude];
+      const prefer = mapas.getPreferredRouteProfile(originCoordinates, destinationCoordinates);
 
-      if (status) status.textContent = isComplex ? "Calculando ruta a pie..." : "Calculando ruta...";
+      if (status) status.textContent = prefer === "pedestrian" ? "Calculando ruta a pie..." : "Calculando ruta...";
 
       mapas
         .computeRoute({
-          origin: [state().currentPosition.latitude, state().currentPosition.longitude],
+          origin: originCoordinates,
           destination: destinationCoordinates,
-          prefer: isComplex ? "pedestrian" : "driving"
+          prefer
         })
         .then((result) => {
           const routeCoordinates = [
@@ -1228,7 +1230,7 @@
           // desvía mientras camina.
           mapas._directionsRoute = {
             destination: destinationCoordinates,
-            prefer: isComplex ? "pedestrian" : "driving",
+            prefer,
             recalcAt: 0,
             recalcToken: 0,
             recalcAbort: null

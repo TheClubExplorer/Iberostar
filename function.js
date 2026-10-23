@@ -4147,123 +4147,22 @@ console.log("ERROR INSERT:", error);
    ========================================================= */
 
 function render360() {
-  const hotels = [
-    "Iberostar Paraíso del Mar",
-    "Iberostar Paraíso Maya",
-    "Iberostar Paraíso Lindo",
-    "Iberostar Paraíso Beach",
-    "Iberostar Paraíso JOIA"
-  ];
-  const zones = [
-    { key: "piscinas", label: "Piscinas" },
-    { key: "exteriores", label: "Exteriores" },
-    { key: "playa", label: "Playa" },
-    { key: "restaurantes", label: "Restaurantes" }
-  ];
-
-  return `
-    <div class="spread media-spread">
-      ${sharedBackNav("/360")}
-
-      <div class="media-header">
-        <div>
-          <small>RECORRIDO VIRTUAL</small>
-          <h1>Exploración 360°</h1>
-        </div>
-      </div>
-
-      <div class="media-content">
-        <div class="media-selector">
-          <label for="media360Filter">Hotel:</label>
-          <select id="media360Filter">
-            <option value="all">Todo el complejo</option>
-            ${hotels.map((hotel) => `<option value="${hotel}">${hotel}</option>`).join("")}
-          </select>
-        </div>
-
-        <div class="media-grid" id="media360Grid"></div>
-      </div>
-    </div>
-  `;
+  if (window.RevistaDigital?.media360?.render) {
+    return window.RevistaDigital.media360.render();
+  }
+  return '<div class="spread media-spread pano-hub-spread"><div class="media-grid" id="media360Grid"></div></div>';
 }
 
 function render360Cards() {
-  const container = document.getElementById("media360Grid");
-  if (!container) return;
-
-  const filter = document.getElementById("media360Filter")?.value || "all";
-  const hotels = filter === "all"
-    ? [
-        "Iberostar Paraíso del Mar",
-        "Iberostar Paraíso Maya",
-        "Iberostar Paraíso Lindo",
-        "Iberostar Paraíso Beach",
-        "Iberostar Paraíso JOIA"
-      ]
-    : [filter];
-  const zones = [
-    { key: "piscinas", label: "Piscinas" },
-    { key: "exteriores", label: "Exteriores" },
-    { key: "playa", label: "Playa" },
-    { key: "restaurantes", label: "Restaurantes" }
-  ];
-
-  const cards = hotels.map((hotel) => {
-    const image = hotel.includes("JOIA") ? "src/JOIA1.jpg" : hotel.includes("Lindo") ? "src/ParaisoLindo1.jpg" : hotel.includes("Maya") ? "src/paraisoMaya 1.jpg" : hotel.includes("Beach") ? "src/paraisoBeach1.jpg" : "src/ParaisoDelMar 1.jpg";
-    const zonesMarkup = zones.map((zone) => `
-      <button type="button" class="media-zone-button" data-360-hotel="${hotel}" data-360-zone="${zone.key}" data-360-label="${zone.label}">
-        ${zone.label}
-      </button>
-    `).join("");
-
-    return `
-      <article class="media-card media-card-gallery">
-        ${RI.img(image, {
-          cls: "media-card-image",
-          alt: `${hotel} · exploración 360°`,
-          sizes: "(max-width:620px) 92vw, (max-width:900px) 46vw, 32vw"
-        })}
-        <div class="media-card-content">
-          <h3>${hotel}</h3>
-          <p>Complejo Playa Paraíso · Riviera Maya</p>
-          <div class="media-zone-list">${zonesMarkup}</div>
-        </div>
-      </article>
-    `;
-  }).join("");
-
-  container.innerHTML = cards || `<div class="media-empty">No hay recorridos 360° para este filtro.</div>`;
-  container.querySelectorAll("[data-360-zone]").forEach((button) => {
-    button.addEventListener("click", () => {
-      const pannellum = window.RevistaDigital?.pannellum360;
-      const hotel = button.dataset["360Hotel"];
-      const zone = button.dataset["360Zone"];
-      const label = button.dataset["360Label"];
-
-      if (!hotel || !zone || !label || !pannellum) return;
-
-      if (typeof pannellum.openZoneMenu === "function") {
-        const options = pannellum.getZoneMenuOptions?.(hotel, zone) || [];
-        if (options.length > 1) {
-          pannellum.openZoneMenu(hotel, zone, label);
-          return;
-        }
-      }
-
-      if (typeof pannellum.open === "function") {
-        pannellum.open(hotel, zone, label);
-        return;
-      }
-
-      alert(`${hotel} · ${label}: la vista 360° está disponible en el recorrido del complejo.`);
-    });
-  });
+  if (window.RevistaDigital?.media360?.renderCards) {
+    return window.RevistaDigital.media360.renderCards();
+  }
 }
 
 function wire360() {
-  const filter = document.getElementById("media360Filter");
-  filter?.addEventListener("change", render360Cards);
-  render360Cards();
+  if (window.RevistaDigital?.media360?.wire) {
+    return window.RevistaDigital.media360.wire();
+  }
 }
 
 function reset360Form() {}

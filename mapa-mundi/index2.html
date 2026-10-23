@@ -25,26 +25,18 @@
   .tot{text-align:right}
   .tot .n{font-family:'Marcellus',serif;font-size:clamp(22px,3.4vw,34px);line-height:1}
   .tot .l{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-top:6px}
-  .legend{display:flex;flex-wrap:wrap;gap:14px 28px;align-items:center;margin:24px 0 22px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;}
+  .legend{display:flex;flex-wrap:wrap;gap:14px 28px;align-items:center;margin:24px 0 6px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;}
   .legend .item{display:flex;gap:9px;align-items:center;white-space:nowrap}
   .dot{width:12px;height:12px;border-radius:50%;flex:0 0 12px}
   .scale{margin-left:auto;color:var(--muted);text-transform:none;letter-spacing:.04em;font-size:12px}
-  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;position:relative}
-  .panel{background:var(--sea);position:relative;overflow:hidden;height:auto;aspect-ratio:var(--ar,1.6)}
-  .panel svg{width:100%;height:auto;display:block}
-  @media (max-width:1099px){
-    .grid{grid-template-columns:repeat(2,1fr);gap:16px}
-    .panel{grid-column:span 2 !important}
-    .panel:nth-child(3), .panel:nth-child(5), .panel:nth-child(6){grid-column:span 1 !important}
-  }
-  @media (max-width:699px){
-    .grid{grid-template-columns:1fr;gap:14px}
-    .panel{grid-column:span 1 !important}
-    .panel .cap b{font-size:15px}
-  }
-  .panel .cap{position:absolute;top:14px;left:16px;z-index:2;pointer-events:none}
-  .panel .cap b{display:block;font-family:'Marcellus',serif;font-size:17px;font-weight:400;letter-spacing:.1em;text-transform:uppercase}
-  .panel .cap span{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+  .globe-wrap{max-width:1020px;margin:0 auto;position:relative}
+  svg#globo{width:100%;height:auto;display:block;cursor:grab;touch-action:none}
+  svg#globo:active{cursor:grabbing}
+  .zoombar{position:absolute;right:max(0px,calc((100% - 1020px)/2 - 4px));bottom:14px;display:flex;flex-direction:column;gap:8px;z-index:5}
+  .zoombar button{width:38px;height:38px;border:1px solid var(--line);background:#fff;color:var(--ink);font-size:18px;line-height:1;
+    cursor:pointer;border-radius:50%;box-shadow:0 4px 14px rgba(60,50,30,.10);transition:color .15s, transform .15s;font-family:inherit}
+  .zoombar button:hover{color:var(--gold);transform:translateY(-1px)}
+  .hint{text-align:center;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:4px}
   svg{display:block}
   .tip{position:fixed;pointer-events:none;opacity:0;transition:opacity .18s ease,transform .22s cubic-bezier(.2,.8,.2,1);
        transform:translateY(8px) scale(.97);background:#fff;border:1px solid var(--line);border-top:3px solid var(--gold);
@@ -72,14 +64,14 @@
     .lists{grid-template-columns:1fr;gap:0}
     .col{padding-top:6px}
     .col + .col{margin-top:20px;border-top:1px solid var(--line);padding-top:20px}
+    .zoombar{right:8px}
   }
   .back{display:inline-flex;align-items:center;gap:6px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;
         color:var(--muted);text-decoration:none;margin-bottom:22px;padding:6px 2px;transition:color .15s}
   .back:hover{color:var(--gold)}
 
   /* ===== Nodos y foco ===== */
-  .node{transition:opacity .28s ease}
-  .panel svg.has-active .node:not(.active){opacity:.26}
+  svg.has-active .node:not(.active){opacity:.26}
   .node.active .node-art{filter:drop-shadow(0 6px 14px rgba(24,42,58,.3))}
 
   /* Pulso alrededor del punto */
@@ -88,7 +80,7 @@
     transform-origin:center;animation:ringOut .95s ease-out both}
   @keyframes ringOut{0%{transform:scale(.55);opacity:.9}100%{transform:scale(2.3);opacity:0}}
 
-  /* Polvo digital en el borde del recuadro, con deriva sutil (no gira) */
+  /* Polvo digital en el borde de la ficha, con deriva sutil (no gira) */
   .particle-layer{position:fixed;inset:0;pointer-events:none;z-index:21;overflow:hidden}
   .particle{position:absolute;border-radius:50%;background:var(--pc,#2fa898);
     opacity:0;transition:opacity .6s ease;
@@ -132,16 +124,23 @@
     <div class="item"><span class="dot" style="background:var(--waves)"></span>Iberostar Waves</div>
     <div class="item"><span class="dot" style="background:var(--selection)"></span>Iberostar Selection</div>
     <div class="item"><span class="dot" style="background:var(--joia)"></span>JOIA · Grand Collection</div>
-    <div class="scale">Tamaño del punto = nº de hoteles en el destino · Cada mapa a su propia escala</div>
+    <div class="scale">Tamaño del punto = nº de hoteles en el destino · Arrastra el globo para girar · Rueda o botones para acercar</div>
   </div>
 
-  <div class="grid" id="grid"></div>
+  <div class="globe-wrap">
+    <svg id="globo" viewBox="0 0 1040 1040" role="img" aria-label="Globo terráqueo con los destinos de Iberostar"></svg>
+    <div class="zoombar">
+      <button type="button" id="zin" aria-label="Acercar">+</button>
+      <button type="button" id="zout" aria-label="Alejar">−</button>
+    </div>
+    <div class="hint">Arrastra para girar el planeta</div>
+  </div>
   <div class="particle-layer" id="particles"></div>
   <div class="tip" id="tip"></div>
 
   <div class="lists" id="lists"></div>
 
-  <footer>78 hoteles · 20 países y regiones · Geometría: Natural Earth (world-atlas 110m)</footer>
+  <footer>78 hoteles · 20 países y regiones · Geometría: Natural Earth (world-atlas 110m) · Globo 3D</footer>
 </div>
 
 <script>
@@ -189,268 +188,355 @@ const DEST = [
 ];
 DEST.forEach(d=>{ d.waves=d.waves||[]; d.selection=d.selection||[]; d.joia=d.joia||[]; d.total=d.waves.length+d.selection.length+d.joia.length; });
 const byName = new Map(DEST.map(d=>[d.n,d]));
+const byCoord = new Map(DEST.map(d=>[d.lon.toFixed(2)+','+d.lat.toFixed(2), d]));
+const DESTINATION_ROUTES = new Map([
+  ['Praia do Forte', '/brasil/praia-do-forte'],
+  ['Amazonas', '/brasil/amazon'],
+  ['Puerto Plata', '/republica-dominicana'],
+  ['Bávaro · Punta Cana', '/republica-dominicana/punta-cana'],
+  ['Bayahíbe', '/republica-dominicana/punta-cana'],
+  ['Rose Hall · Montego Bay', '/jamaica/rose-hall'],
+  ['Cancún', '/mexico/cancun'],
+  ['Cozumel', '/mexico/cozumel'],
+  ['Riviera Maya · Playa Paraíso', '/mexico/riviera-maya'],
+  ['Punta Mita', '/mexico/playa-mita']
+]);
+const COUNTRY_ROUTES = new Map([
+  ['México', '/mexico'],
+  ['Brasil', '/brasil'],
+  ['Jamaica', '/jamaica'],
+  ['Rep. Dominicana', '/republica-dominicana']
+]);
+function destinationRoute(destination){
+  return DESTINATION_ROUTES.get(destination.n) || COUNTRY_ROUTES.get(destination.c) || '';
+}
+function openDestination(destination){
+  const route = destinationRoute(destination);
+  if(!route) return false;
+  window.location.assign(destinationHref(route));
+  return true;
+}
+function destinationHref(route){
+  const appBase = new URL('../', window.location.href);
+  return new URL(route.replace(/^\/+/,''), appBase).href;
+}
 
-const PANELS = [
-  {id:'mundo', title:'Todos los destinos', span:4, w:1488, h:600, pad:96, labels:false, dotScale:.62,
-   names:null},
-  {id:'caribe', title:'Caribe', span:3, w:1109, h:520, pad:78,
-   names:['Miami Beach','Puerto Plata','Bávaro · Punta Cana','Bayahíbe','Rose Hall · Montego Bay','Palm Beach']},
-  {id:'mexico', title:'México', span:1, w:351, h:520, pad:60,
-   names:['Punta Mita','Cancún','Cozumel','Riviera Maya · Playa Paraíso']},
-  {id:'medoc', title:'Mediterráneo occidental', span:2, w:730, h:430, pad:64,
-   names:['Lisboa','Lagos · Algarve','Cádiz','Málaga · Marbella','Ibiza','Mallorca','Agadir','Marrakech','Saïdia','Hammamet','Port El Kantaoui','Monastir · Mahdia','Djerba']},
-  {id:'canarias', title:'Islas Canarias', span:1, w:351, h:430, pad:56,
-   names:['Lanzarote','Fuerteventura','Tenerife']},
-  {id:'egeo', title:'Adriático y Egeo', span:1, w:351, h:430, pad:52, padTop:120,
-   names:['Herceg Novi','Budva','Creta']},
-  {id:'lejano', title:'Brasil y África oriental', span:4, w:1488, h:300, pad:70,
-   names:['Amazonas','Praia do Forte','Zanzíbar']}
-];
-
-const grid = d3.select('#grid');
 const tip = d3.select('#tip');
-const rScale = d3.scaleSqrt().domain([1,16]).range([7,30]);
+const rScale = d3.scaleSqrt().domain([1,16]).range([7,26]);
 const pie = d3.pie().sort(null).value(d=>d);
 
-const panelSel = grid.selectAll('div.panel').data(PANELS).join('div').attr('class','panel')
-  .style('grid-column',d=>`span ${d.span}`).style('--ar',d=>`${d.w} / ${d.h}`);
-PANELS.forEach(p=>{ if(!p.names) p.names = DEST.map(d=>d.n); });
-panelSel.append('div').attr('class','cap').html(d=>{
-  const items = d.names.map(n=>byName.get(n));
-  const tot = d3.sum(items,x=>x.total);
-  return `<b>${d.title}</b><span>${items.length} destinos · ${tot} hoteles</span>`;
+const W = 1040, CX = W/2, CY = W/2;
+const svg = d3.select('#globo');
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// ===== Filtros: ondulación sutil de costas + sombra de esfera =====
+const defs = svg.append('defs');
+const flt = defs.append('filter').attr('id','ripple')
+  .attr('x','-6%').attr('y','-6%').attr('width','112%').attr('height','112%');
+const turb = flt.append('feTurbulence').attr('type','fractalNoise')
+  .attr('baseFrequency','0.009').attr('numOctaves',2).attr('seed',9).attr('result','noise');
+if(!reduced){
+  turb.append('animate').attr('attributeName','baseFrequency')
+    .attr('dur','11s').attr('values','0.009;0.02;0.009').attr('repeatCount','indefinite');
+}
+flt.append('feDisplacementMap').attr('in','SourceGraphic').attr('in2','noise')
+  .attr('scale',12).attr('xChannelSelector','R').attr('yChannelSelector','G');
+flt.append('feDropShadow').attr('dx',0).attr('dy',5).attr('stdDeviation',6).attr('flood-color','rgba(44,42,38,.28)');
+
+// Sombreado suave para dar volumen al planeta
+const grad = defs.append('radialGradient').attr('id','shade')
+  .attr('cx','.36').attr('cy','.32').attr('r','1.05');
+grad.append('stop').attr('offset','0%').attr('stop-color','rgba(255,255,255,.28)');
+grad.append('stop').attr('offset','45%').attr('stop-color','rgba(255,255,255,0)');
+grad.append('stop').attr('offset','100%').attr('stop-color','rgba(44,42,38,.22)');
+
+// ===== Proyección ortográfica (planeta 3D) =====
+const proj = d3.geoOrthographic().translate([CX,CY]).clipAngle(90);
+const baseScale = W*.44;
+proj.scale(baseScale).rotate([-32,-16]);
+const path = d3.geoPath(proj);
+
+const dropShadow = defs.append('filter').attr('id','globeShadow')
+  .attr('x','-30%').attr('y','-30%').attr('width','160%').attr('height','160%');
+dropShadow.append('feDropShadow').attr('dx',0).attr('dy',10).attr('stdDeviation',14)
+  .attr('flood-color','rgba(44,42,38,.22)');
+
+const ocean = svg.append('g').attr('filter','url(#globeShadow)').append('path')
+  .attr('d',path).attr('fill','var(--sea)').attr('stroke','var(--line)').attr('stroke-width',1.2);
+const shade = svg.append('path').attr('d',path).attr('fill','url(#shade)').attr('pointer-events','none');
+const landG = svg.append('path');
+const guides = svg.append('g').attr('pointer-events','none');
+const nodesG = svg.append('g');
+const fx = svg.append('g').attr('class','fx').attr('pointer-events','none');
+const outline = svg.append('path').attr('d',path).attr('fill','none')
+  .attr('stroke','var(--line)').attr('stroke-width',1.2);
+
+// ===== Puntos de destino =====
+const GAP = 8;
+const nodes = nodesG.selectAll('g.node').data(DEST).join('g').attr('class','node')
+  .attr('tabindex',d=>destinationRoute(d)?0:-1)
+  .attr('role',d=>destinationRoute(d)?'link':'img')
+  .attr('aria-label',d=>`Explorar ${d.n}`)
+  .style('cursor',d=>destinationRoute(d)?'pointer':'default');
+nodes.each(function(d,i){
+  const r = rScale(d.total), arc = d3.arc().innerRadius(0).outerRadius(r);
+  const art = d3.select(this).append('g').attr('class','node-art');
+  art.selectAll('path').data(pie(CATS.map(c=>d[c.key].length)).filter(a=>a.value>0)).join('path')
+    .attr('d',arc).attr('fill',a=>CATS[a.index].color).attr('stroke','#fff').attr('stroke-width',1.4);
+  if(d.total>2) art.append('text').text(d.total)
+    .attr('text-anchor','middle').attr('dy','.35em').attr('font-size',Math.max(11,r*.8))
+    .attr('fill','#fff').attr('pointer-events','none');
+  d3.select(this).append('circle').attr('r',r+8).attr('fill','transparent'); // área de hover
+  this.__geo = {r:r};
+  art.attr('transform','scale(0)')
+    .transition().delay(300+i*28).duration(640).ease(d3.easeBackOut.overshoot(1.7)).attr('transform','scale(1)');
+});
+// líneas guía + punto de ubicación real
+const guideData = DEST.map(d=>{
+  const g = guides.append('g').attr('pointer-events','none');
+  const line = g.append('line').attr('stroke','#8a8377').attr('stroke-width',1).attr('stroke-dasharray','2 2').attr('visibility','hidden');
+  const dot = g.append('circle').attr('r',2.6).attr('fill','#6f685c').attr('stroke','#fff').attr('stroke-width',1).attr('visibility','hidden');
+  return {d, line, dot};
 });
 
-d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-110m.json').then(topo=>{
-  const land = topojson.feature(topo, topo.objects.countries);
-  PANELS.forEach(p=>{
-    const items = p.names.map(n=>byName.get(n));
-    const svg = d3.select(`.panel:nth-child(${PANELS.indexOf(p)+1})`).append('svg')
-      .attr('width',p.w).attr('height',p.h).attr('viewBox',[0,0,p.w,p.h]);
-    const proj = d3.geoMercator()
-      .fitExtent([[p.pad,p.padTop||p.pad],[p.w-p.pad,p.h-p.pad]], {type:'MultiPoint', coordinates:items.map(d=>[d.lon,d.lat])});
-    if(items.length===1 || proj.scale()>9000) proj.scale(Math.min(proj.scale(),9000));
-    const path = d3.geoPath(proj);
+// ===== Render: recoloca continentes y burbujas =====
+const sim = DEST.map(d=>({d, x:0, y:0, r:rScale(d.total), vis:false, dx:0, dy:0}));
+const nodeSel = nodes.nodes();
+let activeNode = null, activeRing = null;
 
-    // --- ondulación sutil de las costas (continentes) ---
-    const uid = 'p' + p.id;
-    const defs = svg.append('defs');
-    const flt = defs.append('filter').attr('id','ripple-'+uid)
-      .attr('x','-6%').attr('y','-6%').attr('width','112%').attr('height','112%');
-    const turb = flt.append('feTurbulence').attr('type','fractalNoise')
-      .attr('baseFrequency','0.009').attr('numOctaves',2)
-      .attr('seed', (p.id.length*3+7)%20).attr('result','noise');
-    if(!matchMedia('(prefers-reduced-motion: reduce)').matches){
-      turb.append('animate').attr('attributeName','baseFrequency')
-        .attr('dur','11s').attr('values','0.009;0.02;0.009').attr('repeatCount','indefinite');
+function render(){
+  const rot = proj.rotate();
+  const center = [-rot[0], -rot[1]];
+  ocean.attr('d',path); shade.attr('d',path); outline.attr('d',path);
+  landG.attr('d',path); // relleno establecido al cargar
+  const R = proj.scale();
+
+  const act = sim.map((n,i)=>{
+    const q = proj([n.d.lon, n.d.lat]);
+    n.vis = q && d3.geoDistance([n.d.lon,n.d.lat], center) < Math.PI/2 - .03;
+    n.dx = q[0]; n.dy = q[1];
+    n.x = n.dx; n.y = n.dy; // partir de la posición proyectada real
+    return n;
+  }).filter(n=>n.vis);
+
+  // Separar burbujas que se empalman (relajación ligera cada fotograma)
+  for(let k=0;k<10;k++){
+    for(let i=0;i<act.length;i++){ const a=act[i];
+      for(let j=i+1;j<act.length;j++){ const b=act[j];
+        const dx=b.x-a.x, dy=b.y-a.y, d2=dx*dx+dy*dy, min=a.r+b.r+GAP;
+        if(d2>0.001 && d2<min*min){
+          const dd=Math.sqrt(d2), f=(min-dd)/dd*.5;
+          a.x-=dx*f; a.y-=dy*f; b.x+=dx*f; b.y+=dy*f;
+        } else if(d2<=0.001){ b.x+=min; }
+      }
     }
-    flt.append('feDisplacementMap').attr('in','SourceGraphic').attr('in2','noise')
-      .attr('scale',12).attr('xChannelSelector','R').attr('yChannelSelector','G');
+  }
+  // mantener las burbujas dentro del disco del planeta
+  act.forEach(n=>{
+    const vx=n.x-CX, vy=n.y-CY, dist=Math.hypot(vx,vy), maxD=R-(n.r+6);
+    if(dist>maxD){ n.x=CX+vx/dist*maxD; n.y=CY+vy/dist*maxD; }
+  });
 
-    svg.append('path').datum(land).attr('d',path).attr('fill','var(--land)')
-       .attr('stroke','#f7f3ec').attr('stroke-width',1)
-       .attr('filter','url(#ripple-'+uid+')');
-
-    // Separar burbujas que se empalman: se desplazan lo mínimo y una línea guía marca la ubicación real
-    const ds = p.dotScale||1, GAP = p.dotScale ? 5 : 8;
-    const sim = items.map(d=>{const q=proj([d.lon,d.lat]);return {d, x0:q[0], y0:q[1], x:q[0], y:q[1], r:rScale(d.total)*ds};});
-    const fs = d3.forceSimulation(sim)
-      .force('x', d3.forceX(n=>n.x0).strength(.18))
-      .force('y', d3.forceY(n=>n.y0).strength(.18))
-      .force('c', d3.forceCollide(n=>n.r+GAP).strength(1).iterations(6)).stop();
-    for(let i=0;i<400;i++){
-      fs.tick();
-      sim.forEach(n=>{ n.x=Math.max(n.r+6,Math.min(p.w-n.r-6,n.x)); n.y=Math.max(n.r+6,Math.min(p.h-n.r-6,n.y)); });
-    }
-    const pos = new Map(sim.map(n=>[n.d,n]));
-    const guides = svg.append('g');
-    sim.forEach(n=>{
-      if(Math.hypot(n.x-n.x0,n.y-n.y0) < n.r*.5) return;
-      guides.append('line').attr('x1',n.x0).attr('y1',n.y0).attr('x2',n.x).attr('y2',n.y)
-        .attr('stroke','#8a8377').attr('stroke-width',1).attr('stroke-dasharray','2 2');
-      guides.append('circle').attr('cx',n.x0).attr('cy',n.y0).attr('r',2.6)
-        .attr('fill','#6f685c').attr('stroke','#fff').attr('stroke-width',1);
-    });
-
-    const nodes = svg.append('g').selectAll('g').data(items).join('g')
-      .attr('class','node')
-      .attr('transform',d=>{const q=pos.get(d);return `translate(${q.x},${q.y})`}).style('cursor','pointer');
-
-    nodes.each(function(d,i){
-      const r = rScale(d.total)*(p.dotScale||1), arc = d3.arc().innerRadius(0).outerRadius(r);
-      const art = d3.select(this).append('g').attr('class','node-art').attr('transform','scale(.2)');
-      art.selectAll('path').data(pie(CATS.map(c=>d[c.key].length)).filter(a=>a.value>0)).join('path')
-        .attr('d',arc).attr('fill',a=>CATS[a.index].color).attr('stroke','#fff').attr('stroke-width',1.4);
-      if(d.total>2 && !(p.dotScale)) art.append('text').text(d.total)
-        .attr('text-anchor','middle').attr('dy','.35em').attr('font-size',Math.max(11,r*.8))
-        .attr('font-family','Marcellus, serif').attr('fill','#fff').attr('pointer-events','none');
-      d3.select(this).append('circle').attr('r',r+8).attr('fill','transparent');
-      const q = pos.get(d);
-      this.__geo = {r:r, x:q.x, y:q.y};
-      // entrada escalonada de cada destino
-      art.transition().delay(160 + i*50).duration(640).ease(d3.easeBackOut.overshoot(1.7))
-        .attr('transform','scale(1)');
-    });
-
-    const fx = svg.append('g').attr('class','fx');
-
-    if(p.labels === false) { hookTips(); return; }
-    // labels with greedy collision avoidance
-    const boxes = items.map(d=>{const q=pos.get(d);return {x:q.x,y:q.y,r:q.r+5};});
-    const cap = d3.select(`.panel:nth-child(${PANELS.indexOf(p)+1}) .cap`).node().getBoundingClientRect();
-    const capBox = {x0:0, x1:cap.width+26, y0:0, y1:cap.height+22};
-    const placed = [capBox];
-    const overlaps = (a,b)=>!(a.x1<b.x0||a.x0>b.x1||a.y1<b.y0||a.y0>b.y1);
-    const order = items.map((d,i)=>i).sort((a,b)=>items[b].total-items[a].total);
-    const CAND = [[1,0,'start',.35],[-1,0,'end',.35],[0,-1,'middle',-.6],[0,1,'middle',1.15],
-                  [1,-1,'start',-.3],[1,1,'start',1.1],[-1,-1,'end',-.3],[-1,1,'end',1.1]];
-    order.forEach(i=>{
-      const d = items[i], b = boxes[i];
-      const wtxt = d.n.length*7.1 + 8, htxt = 17;
-      let best=null;
-      for(const ring of [1,2,3.1]) for(const [sx,sy,anchor,dyEm] of CAND){
-        const gapX = sx ? b.r+7+(ring-1)*20 : 0, gapY = sy ? b.r+9+(ring-1)*17 : 0;
-        const cx = b.x + sx*gapX + (anchor==='start'? wtxt/2 : anchor==='end'? -wtxt/2 : 0);
-        const cy = b.y + sy*gapY + dyEm*11;
-        const box = {x0:cx-wtxt/2, x1:cx+wtxt/2, y0:cy-htxt/2, y1:cy+htxt/2};
-        if(box.x0<4||box.x1>p.w-4||box.y0<4||box.y1>p.h-4) continue;
-        if(overlaps(box, capBox)) continue;
-        let hits = placed.filter(o=>overlaps(box,o)).length;
-        hits += boxes.filter((o,j)=>{
-          const dx=Math.max(o.x-o.r-box.x1, box.x0-(o.x+o.r), 0), dy=Math.max(o.y-o.r-box.y1, box.y0-(o.y+o.r),0);
-          return Math.hypot(dx,dy)===0;
-        }).length;
-        if(!best || hits<best.hits){ best={hits, sx, sy, anchor, dyEm, box, ring}; }
-        if(best && !best.hits) break;
-      }
-      if(!best || best.hits) return;
-      placed.push(best.box);
-      const gapX = best.sx ? b.r+7+(best.ring-1)*20 : 0, gapY = best.sy ? b.r+9+(best.ring-1)*17 : 0;
-      if(best.ring>1) svg.append('line')
-        .attr('x1', b.x + best.sx*(b.r+2)).attr('y1', b.y + best.sy*(b.r+2))
-        .attr('x2', b.x + best.sx*(gapX-4)).attr('y2', b.y + best.sy*(gapY-4))
-        .attr('stroke','#a9a293').attr('stroke-width',.9);
-      svg.append('text').text(d.n)
-        .attr('x', b.x + best.sx*gapX).attr('y', b.y + best.sy*gapY)
-        .attr('dy', best.dyEm+'em').attr('text-anchor', best.anchor)
-        .attr('font-family','Jost, sans-serif').attr('font-size',12.5).attr('letter-spacing','.05em')
-        .attr('fill','#413c33').attr('paint-order','stroke').attr('stroke','var(--sea)').attr('stroke-width',4)
-        .attr('pointer-events','none');
-    });
-
-    hookTips();
-    function hookTips(){
-      const particleLayer = document.getElementById('particles');
-      let current = null, frameParticles = [], touchLock = 0;
-      function positionTip(ev){
-        const tw = Math.min(320, innerWidth-32);
-        tip.style('left',Math.max(8,Math.min(ev.clientX+18, innerWidth-tw-8))+'px')
-           .style('top',Math.max(8,Math.min(ev.clientY-30, innerHeight-260))+'px');
-      }
-      function renderTip(d){
-        if(current === d){ tip.classed('show',true); return; }
-        current = d;
-        let delay = 0, html = `<h4 style="animation-delay:0ms">${d.n}</h4>`
-          + `<div class="co" style="animation-delay:40ms">${d.c} · ${d.total} hotel${d.total>1?'es':''}</div>`;
-        CATS.forEach(c=>{ if(d[c.key].length){
-          delay += 50;
-          html += `<div class="grp" style="animation-delay:${delay}ms">${c.label}</div><ul>`;
-          html += d[c.key].map(x=>{ delay += 45;
-            return `<li style="animation-delay:${delay}ms"><i style="background:${c.color}"></i><span>${x}</span></li>`; }).join('');
-          html += `</ul>`;
-        }});
-        const col = (CATS.find(c=>d[c.key].length)||CATS[0]).color;
-        tip.html(html).classed('show',true).style('border-top-color',col);
-      }
-      function setActive(node,d,on){
-        d3.select(node).classed('active',on);
-        svg.classed('has-active',on);
-        d3.select(node).select('.node-art').interrupt()
-          .transition().duration(260).ease(d3.easeCubicOut).attr('transform', on?'scale(1.22)':'scale(1)');
-        if(on){
-          const g0 = node.__geo, col = (CATS.find(c=>d[c.key].length)||CATS[0]).color;
-          if(g0){
-            const ring = fx.append('circle').attr('class','fx-ring')
-              .attr('cx',g0.x).attr('cy',g0.y).attr('r',g0.r).style('color',col);
-            setTimeout(()=>ring.remove(), 1000);
-          }
-        }
-      }
-      function clearParticles(){
-        frameParticles.splice(0).forEach(p=>{ p.classList.add('gone'); setTimeout(()=>p.remove(), 420); });
-      }
-      // punto sobre el perímetro del recuadro (t de 0 a 1)
-      function pointOnRect(t,w,h,pad){
-        const P = 2*(w+h); let d = t*P;
-        if(d < w) return [d, -pad];
-        d -= w; if(d < h) return [w+pad, d];
-        d -= h; if(d < w) return [w-d, h+pad];
-        d -= w; return [-pad, h-d];
-      }
-      // Polvo sobre el borde del recuadro (una sola fila) con deriva sutil
-      function particlesToFrame(colors){
-        const r = tip.node().getBoundingClientRect();
-        const per = 2*(r.width + r.height);
-        const count = Math.max(56, Math.min(220, Math.round(per/6)));
-        const small = innerWidth < 640;
-        for(let i=0;i<count;i++){
-          const pt = pointOnRect((i + 0.5)/count, r.width, r.height, 3);
-          const size = 2.4 + Math.random()*(small ? 2 : 3.2);
-          const p = document.createElement('div');
-          p.className = 'particle';
-          p.style.left = (r.left + pt[0])+'px';
-          p.style.top = (r.top + pt[1])+'px';
-          p.style.width = size.toFixed(1)+'px';
-          p.style.height = size.toFixed(1)+'px';
-          p.style.margin = (-size/2).toFixed(1)+'px 0 0 '+(-size/2).toFixed(1)+'px';
-          p.style.setProperty('--pc', colors[i%colors.length]||'#2fa898');
-          p.style.setProperty('--fx', (Math.random()*10-5).toFixed(1)+'px');
-          p.style.setProperty('--fy', (Math.random()*10-5).toFixed(1)+'px');
-          p.style.setProperty('--fdur', (2.4 + Math.random()*3.4).toFixed(2)+'s');
-          p.style.setProperty('--fdel', (Math.random()*2.5).toFixed(2)+'s');
-          p.style.transitionDelay = (i*4)+'ms';
-          particleLayer.appendChild(p);
-          frameParticles.push(p);
-          requestAnimationFrame(()=>requestAnimationFrame(()=>p.classList.add('settled')));
-        }
-      }
-      function spawnParticles(d){
-        clearParticles();
-        // color según las gráficas, pero todo país incluye siempre los 3 colores
-        let pal = CATS.map(c=>c.color);
-        CATS.forEach(c=>{ for(let k=0;k<d[c.key].length;k++) pal.push(c.color); });
-        particlesToFrame(pal);
-      }
-      nodes.on('mouseenter',function(ev,d){
-        if(Date.now() - touchLock < 900) return;
-        renderTip(d); positionTip(ev); setActive(this,d,true);
-        spawnParticles(d);
-      })
-        .on('mouseleave',function(ev,d){
-          if(Date.now() - touchLock < 900) return;
-          current=null; setActive(this,d,false); tip.classed('show',false); clearParticles();
-        })
-        .on('touchstart',function(ev,d){
-          ev.preventDefault();
-          touchLock = Date.now();
-          const t = ev.touches[0];
-          svg.selectAll('.node').classed('active',false);
-          current=null; renderTip(d); positionTip({clientX:t.clientX, clientY:t.clientY});
-          setActive(this,d,true);
-          spawnParticles(d);
-        });
+  const posMap = new Map(act.map(n=>[n.d.n, n]));
+  sim.forEach((n, idx)=>{
+    const g = nodeSel[idx];
+    if(n.vis){
+      g.setAttribute('transform',`translate(${n.x},${n.y})`);
+      g.style.removeProperty('display');
+    } else {
+      g.style.display='none';
     }
   });
+  guideData.forEach(({d,line,dot})=>{
+    const n = posMap.get(d.n);
+    const disp = n && Math.hypot(n.x-n.dx, n.y-n.dy) > n.r*.5;
+    if(disp){
+      line.attr('x1',n.dx).attr('y1',n.dy).attr('x2',n.x).attr('y2',n.y).attr('visibility','visible');
+      dot.attr('cx',n.dx).attr('cy',n.dy).attr('visibility','visible');
+    } else { line.attr('visibility','hidden'); dot.attr('visibility','hidden'); }
+  });
+  if(activeRing && activeNode){
+    const d = d3.select(activeNode).datum();
+    const n = posMap.get(d.n);
+    if(n) activeRing.attr('cx',n.x).attr('cy',n.y).attr('r',n.r).style('visibility','visible');
+    else activeRing.style('visibility','hidden');
+  }
+}
+
+// ===== Rotación: arrastre + automática =====
+let autoOn = true, resumeTimer = null, baseRot = proj.rotate()[0], t0 = performance.now();
+const AUTO_SPEED = .0035;
+
+const drag = d3.drag()
+  .filter(ev => !ev.target.closest('.node'))
+  .on('start', ()=>{
+    stopAuto(0); svg.style('cursor','grabbing');
+  })
+  .on('drag', ev=>{
+    const k = 96 / proj.scale();
+    const rot = proj.rotate();
+    proj.rotate([rot[0] + ev.dx*k, Math.max(-75, Math.min(75, rot[1] - ev.dy*k))]);
+    render();
+  })
+  .on('end', ()=>{ svg.style('cursor','grab'); baseRot = proj.rotate()[0]; t0 = performance.now(); scheduleResume(600); });
+svg.call(drag);
+
+function stopAuto(delay){
+  autoOn = false; clearTimeout(resumeTimer);
+  if(delay) resumeTimer = setTimeout(()=>{ autoOn = true; baseRot = proj.rotate()[0]; t0 = performance.now(); }, delay);
+}
+function scheduleResume(delay){
+  clearTimeout(resumeTimer);
+  resumeTimer = setTimeout(()=>{ autoOn = true; baseRot = proj.rotate()[0]; t0 = performance.now(); }, delay);
+}
+d3.timer(()=>{
+  if(!autoOn) return;
+  const r = baseRot + (performance.now()-t0)*AUTO_SPEED;
+  proj.rotate([((r%360)+540)%360-180, proj.rotate()[1]]);
+  render();
 });
 
+// gira siempre; solo se pausa mientras el usuario arrastra el globo
+
+// ===== Zoom: rueda + botones =====
+const zoomBehavior = d3.zoom()
+  .scaleExtent([1, 3.4])
+  .filter(ev => ev.type === 'wheel')
+  .on('zoom', ev => { proj.scale(baseScale*ev.transform.k); render(); });
+svg.call(zoomBehavior);
+function zoomTo(k){
+  curK = Math.max(1, Math.min(3.4, k));
+  zoomBehavior.transform(svg, d3.zoomIdentity.scale(curK));
+}
+let curK = 1;
+d3.select('#zin').on('click', ()=> zoomTo(curK*1.25));
+d3.select('#zout').on('click', ()=> zoomTo(curK/1.25));
+
+// ===== Fichas (tooltips), partículas y foco =====
+const particleLayer = document.getElementById('particles');
+let current = null, frameParticles = [], touchLock = 0;
+function positionTip(ev){
+  const tw = Math.min(320, innerWidth-32);
+  tip.style('left',Math.max(8,Math.min(ev.clientX+18, innerWidth-tw-8))+'px')
+     .style('top',Math.max(8,Math.min(ev.clientY-30, innerHeight-260))+'px');
+}
+function renderTip(d){
+  if(current === d){ tip.classed('show',true); return; }
+  current = d;
+  let delay = 0, html = `<h4 style="animation-delay:0ms">${d.n}</h4>`
+    + `<div class="co" style="animation-delay:40ms">${d.c} · ${d.total} hotel${d.total>1?'es':''}</div>`;
+  CATS.forEach(c=>{ if(d[c.key].length){
+    delay += 50;
+    html += `<div class="grp" style="animation-delay:${delay}ms">${c.label}</div><ul>`;
+    html += d[c.key].map(x=>{ delay += 45;
+      return `<li style="animation-delay:${delay}ms"><i style="background:${c.color}"></i><span>${x}</span></li>`; }).join('');
+    html += `</ul>`;
+  }});
+  const col = (CATS.find(c=>d[c.key].length)||CATS[0]).color;
+  tip.html(html).classed('show',true).style('border-top-color',col);
+}
+function setActive(node,d,on){
+  d3.select(node).classed('active',on);
+  svg.classed('has-active',on);
+  d3.select(node).select('.node-art').interrupt()
+    .transition().duration(260).ease(d3.easeCubicOut).attr('transform', on?'scale(1.22)':'scale(1)');
+  if(on){
+    if(activeRing) activeRing.remove();
+    activeRing = fx.append('circle').attr('class','fx-ring')
+      .style('color',(CATS.find(c=>d[c.key].length)||CATS[0]).color);
+    activeNode = node;
+    setTimeout(()=>{ if(activeRing) activeRing.remove(); activeRing=null; }, 1000);
+    render();
+  } else {
+    if(activeRing){ activeRing.remove(); activeRing=null; }
+    if(activeNode === node) activeNode = null;
+  }
+}
+function clearParticles(){
+  frameParticles.splice(0).forEach(p=>{ p.classList.add('gone'); setTimeout(()=>p.remove(), 420); });
+}
+function pointOnRect(t,w,h,pad){
+  const P = 2*(w+h); let d = t*P;
+  if(d < w) return [d, -pad];
+  d -= w; if(d < h) return [w+pad, d];
+  d -= h; if(d < w) return [w-d, h+pad];
+  d -= w; return [-pad, h-d];
+}
+function particlesToFrame(colors){
+  const r = tip.node().getBoundingClientRect();
+  const per = 2*(r.width + r.height);
+  const count = Math.max(56, Math.min(220, Math.round(per/6)));
+  const small = innerWidth < 640;
+  for(let i=0;i<count;i++){
+    const pt = pointOnRect((i + 0.5)/count, r.width, r.height, 3);
+    const size = 2.4 + Math.random()*(small ? 2 : 3.2);
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = (r.left + pt[0])+'px';
+    p.style.top = (r.top + pt[1])+'px';
+    p.style.width = size.toFixed(1)+'px';
+    p.style.height = size.toFixed(1)+'px';
+    p.style.margin = (-size/2).toFixed(1)+'px 0 0 '+(-size/2).toFixed(1)+'px';
+    p.style.setProperty('--pc', colors[i%colors.length]||'#2fa898');
+    p.style.setProperty('--fx', (Math.random()*10-5).toFixed(1)+'px');
+    p.style.setProperty('--fy', (Math.random()*10-5).toFixed(1)+'px');
+    p.style.setProperty('--fdur', (2.4 + Math.random()*3.4).toFixed(2)+'s');
+    p.style.setProperty('--fdel', (Math.random()*2.5).toFixed(2)+'s');
+    p.style.transitionDelay = (i*4)+'ms';
+    particleLayer.appendChild(p);
+    frameParticles.push(p);
+    requestAnimationFrame(()=>requestAnimationFrame(()=>p.classList.add('settled')));
+  }
+}
+function spawnParticles(d){
+  clearParticles();
+  let pal = CATS.map(c=>c.color);
+  CATS.forEach(c=>{ for(let k=0;k<d[c.key].length;k++) pal.push(c.color); });
+  particlesToFrame(pal);
+}
+nodes.on('mouseenter',function(ev,d){
+  if(Date.now() - touchLock < 900) return;
+  renderTip(d); positionTip(ev); setActive(this,d,true);
+  spawnParticles(d);
+})
+  .on('mouseleave',function(ev,d){
+    if(Date.now() - touchLock < 900) return;
+    current=null; setActive(this,d,false); tip.classed('show',false); clearParticles();
+  })
+  .on('click',function(ev,d){
+    if(!destinationRoute(d)) return;
+    ev.preventDefault();
+    ev.stopPropagation();
+    openDestination(d);
+  })
+  .on('keydown',function(ev,d){
+    if((ev.key==='Enter' || ev.key===' ') && destinationRoute(d)){
+      ev.preventDefault();
+      openDestination(d);
+    }
+  })
+  .on('touchstart',function(ev,d){
+    ev.preventDefault();
+    ev.stopPropagation();
+    touchLock = Date.now();
+    if(openDestination(d)) return;
+    svg.selectAll('.node').classed('active',false);
+    current=null; renderTip(d);
+    const t = ev.touches[0];
+    positionTip({clientX:t.clientX, clientY:t.clientY});
+    setActive(this,d,true);
+    spawnParticles(d);
+  });
+
 document.addEventListener('touchstart',function(ev){
-  if(!ev.target.closest('.grid')){
+  if(!ev.target.closest('.globe-wrap')){
     tip.classed('show',false);
-    d3.selectAll('.grid .node').classed('active',false);
-    d3.selectAll('.grid svg').classed('has-active',false);
+    d3.selectAll('#globo .node').classed('active',false);
+    svg.classed('has-active',false);
   }
 }, {passive:true});
 
+// ===== Botón volver =====
 const back = document.getElementById('back');
 if(back){
   back.addEventListener('click',function(ev){
@@ -465,6 +551,7 @@ if(back){
   });
 }
 
+// ===== Listas por región =====
 const byRegion = d3.group(DEST,d=>d.r);
 const lists = d3.select('#lists');
 ['América','África','Europa'].forEach(r=>{
@@ -473,7 +560,9 @@ const lists = d3.select('#lists');
   col.append('h3').text(`${r} · ${d3.sum(items,d=>d.total)} hoteles`);
   items.forEach(d=>{
     const row = col.append('div').attr('class','row');
-    row.append('div').attr('class','nm').text(d.n);
+    const route = destinationRoute(d);
+    if(route) row.append('a').attr('class','nm').attr('href',destinationHref(route)).text(d.n);
+    else row.append('div').attr('class','nm').text(d.n);
     row.append('div').attr('class','cc').text(d.c.replace(' · ','/'));
     const chips = row.append('div').attr('class','chips');
     CATS.forEach(c=>{
@@ -482,7 +571,17 @@ const lists = d3.select('#lists');
     });
   });
 });
-</script>
 
+// ===== Carga del planeta =====
+d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-110m.json').then(topo=>{
+  const land = topojson.feature(topo, topo.objects.countries);
+  landG.datum(land).attr('d',path)
+    .attr('fill','var(--land)')
+    .attr('stroke','#f7f3ec').attr('stroke-width',1)
+    .attr('filter','url(#ripple)');
+  render();
+});
+render();
+</script>
 
 </body></html>

@@ -176,7 +176,6 @@
     {"id":"shop-tienda","name":"Shop / Tienda","category":"comer","lat":20.762215,"lng":-86.963121,"description":"Shop / Tienda","source":"Google Maps","verified":true},
     {"id":"pool-shop","name":"Tienda de piscina","category":"comer","lat":20.758561,"lng":-86.959673,"description":"Pool shop","source":"Google Maps","verified":true},
     {"id":"meeting-room","name":"Sala de juntas","category":"conv","lat":20.760629,"lng":-86.963838,"description":"Sala de juntas","source":"Google Maps","verified":true},
-    {"id":"agencies-phones","name":"Agencias y teléfonos","category":"servicio","description":"Agencies & phones","source":"plano","verified":false},
     {"id":"billiards-library","name":"Internet, billar, biblioteca","category":"servicio","lat":20.760721,"lng":-86.963638,"description":"Billiards, library","source":"Google Maps","verified":true},
     {"id":"medical-center","name":"Centro médico","category":"servicio","lat":20.759144,"lng":-86.964771,"description":"Medical center","source":"Google Maps","verified":true},
     {"id":"drugstore","name":"Farmacia","category":"servicio","lat":20.759826,"lng":-86.965208,"description":"Drugstore","source":"Google Maps","verified":true},
@@ -185,9 +184,7 @@
     {"id":"star-prestige-lounge","name":"Star Prestige Lounge","category":"starprestige","description":"Star Prestige Lounge","source":"plano","verified":false},
     {"id":"star-prestige-beach-club","name":"Star Prestige Beach Club","category":"starprestige","hotelId":"Iberostar Paraíso JOIA","lat":20.756829,"lng":-86.958688,"description":"Star Prestige Beach Club","source":"Google Maps","verified":true},
     {"id":"courtesy-room","name":"Duchas de cortesía","category":"servicio","lat":20.758045,"lng":-86.964554,"description":"Courtesy room","source":"Google Maps","verified":true},
-    {"id":"paraiso-express-stop","name":"Paraíso Express Stop","category":"servicio","description":"Paraíso Express Stop","source":"plano","verified":false},
     {"id":"wedding-chapel","name":"Capilla de bodas","category":"servicio","description":"Wedding chapel","source":"plano","verified":false},
-    {"id":"village-villas","name":"Village / Villas","category":"servicio","description":"Village / Villas","source":"plano","verified":false},
     {"id":"star-friends-desk","name":"Star Friends Desk","category":"kids","lat":20.755117,"lng":-86.961373,"description":"Star Friends Desk","source":"Google Maps","verified":true},
     // --- Nuevos POIs del plano oficial no existentes en catálogo previo ---
     {"id":"beach-bar","name":"Beach Bar / Bar de playa","category":"bar","lat":20.757856,"lng":-86.958359,"description":"Bar de playa","source":"Google Maps","verified":true},
@@ -1051,9 +1048,11 @@
     var controller = typeof AbortController === "function" ? new AbortController() : null;
     route.recalcAbort = controller;
     var token = ++route.recalcToken;
-    var preferRoute = typeof engine.isComplexDestination === "function" && engine.isComplexDestination([poi.lat, poi.lng])
-      ? "pedestrian"
-      : "driving";
+    var preferRoute = typeof engine.getPreferredRouteProfile === "function"
+      ? engine.getPreferredRouteProfile([coords.latitude, coords.longitude], [poi.lat, poi.lng])
+      : (typeof engine.isComplexDestination === "function" && engine.isComplexDestination([poi.lat, poi.lng])
+        ? "pedestrian"
+        : "driving");
 
     engine.computeRoute({
       origin: [coords.latitude, coords.longitude],
@@ -1158,9 +1157,11 @@
     var controller = typeof AbortController === "function" ? new AbortController() : null;
     gp._route.abort = controller;
     setRouteStatus("calculating", id, poi.name, null);
-    var preferRoute = typeof engine.isComplexDestination === "function" && engine.isComplexDestination([poi.lat, poi.lng])
-      ? "pedestrian"
-      : "driving";
+    var preferRoute = typeof engine.getPreferredRouteProfile === "function"
+      ? engine.getPreferredRouteProfile([position.latitude, position.longitude], [poi.lat, poi.lng])
+      : (typeof engine.isComplexDestination === "function" && engine.isComplexDestination([poi.lat, poi.lng])
+        ? "pedestrian"
+        : "driving");
     engine.computeRoute({
       origin: [position.latitude, position.longitude],
       destination: [poi.lat, poi.lng],
@@ -1472,6 +1473,38 @@
     if (form) {
       form.addEventListener("submit", function (event) {
         event.preventDefault();
+        var tracker = window.RevistaDigital && window.RevistaDigital.carritoGolf;
+        if (isCart && tracker && typeof tracker.request === "function") {
+          var destination = null;
+          if (Number.isFinite(Number(poi.lat)) && Number.isFinite(Number(poi.lng))) {
+            destination = { id: poi.id, name: poi.name, lat: Number(poi.lat), lng: Number(poi.lng) };
+          } else if (poi.hotelId && window.RevistaDigital.guiapa?.poiForHotel) {
+            var hotelPoi = window.RevistaDigital.guiapa.poiForHotel(poi.hotelId);
+            if (hotelPoi && Number.isFinite(Number(hotelPoi.lat)) && Number.isFinite(Number(hotelPoi.lng))) {
+              destination = { id: hotelPoi.id, name: hotelPoi.name, lat: Number(hotelPoi.lat), lng: Number(hotelPoi.lng) };
+            }
+          }
+          var request = tracker.request({
+            guest: form.querySelector("#guideBookName")?.value || "",
+            room: form.querySelector("#guideBookRoom")?.value || "",
+            notes: form.querySelector("#guideBookNotes")?.value || "",
+            destination: destination,
+            source: "guide-map"
+          });
+          if (request) {
+            box.innerHTML = '<div class="guide-book-done guide-book-done--cart">' +
+              '<h4 class="guide-book-title">Se solicitó el transporte</h4>' +
+              '<p>Buscando un carrito para recogerte en ' + escapeHtml(request.pickup.label) +
+              ' y llevarte a ' + escapeHtml(request.destination?.name || poi.name) + '.</p>' +
+              '<button type="button" class="guide-cart-track" data-guide-cart-track="1">Ver el transporte →</button>' +
+            '</div>';
+            box.querySelector("[data-guide-cart-track]")?.addEventListener("click", function () {
+              tracker.openPage(document.body.dataset.hotelSlug || "");
+            });
+            revealFeedback(box);
+            return;
+          }
+        }
         box.innerHTML = '<div class="guide-book-done">' +
           '<h4 class="guide-book-title">Solicitud enviada</h4>' +
           '<p>Registramos tu ' + escapeHtml(title.toLowerCase()) + " para " + escapeHtml(poi.name) + ".</p>" +

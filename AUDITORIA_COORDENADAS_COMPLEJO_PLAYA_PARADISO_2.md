@@ -1,9 +1,13 @@
-# AMPLIACIÓN AUDITORÍA COMPLEJO PLAYA PARAÍSO
-Fecha: 2026-10-15
+# HISTORIAL DE ACTUALIZACIONES Y AMPLIACIÓN — COMPLEJO PLAYA PARAÍSO
+Última actualización: 2026-10-23
+Documento maestro de referencia: `AUDITORIA_COORDENADAS_COMPLEJO_PLAYA_PARADISO.md`
 
-Inventario del corte 2026-10-15 (histórico; no representa el estado actual): {"Verificado":50,"Pendiente de ubicación":1,"Pendiente de coordenadas":40,"No verificable":9}
+> **Nota de estado:** `inventory_final.json` se regeneró desde el catálogo activo: 111 registros, 110 marcados como verificados (99.1%) y 1 pendiente de coordenadas (0.9%). `verified` refleja los datos del código, no una nueva validación independiente en terreno.
 
-Actualización 2026-10-23: `billiards-library` (Internet, billar, biblioteca) ya cuenta con coordenadas 20.760721, -86.963638 proporcionadas para el POI y se marcó `verified: true` en el catálogo. El detalle de pendientes de esta ampliación conserva el corte histórico; consultar `AUDITORIA_COORDENADAS_COMPLEJO_PLAYA_PARADISO.md` para el estado vigente. La coordenada no se verificó de forma independiente contra OSM o el plano.
+## Resumen de Consolidación Activa (2026-10-23)
+- **Catálogo activo:** 111 instalaciones.
+- **Marcados verificados con coordenadas:** 110.
+- **Pendientes restantes (1):** `star-prestige-lounge`.
 
 ## Actualización de implementación (2026-10-22)
 
@@ -43,36 +47,19 @@ Esta ampliación se contrasta con `js/guia-playa-paraiso.js`, que refleja los ca
 
 Estos estados describen lo implementado en el código; las fuentes Google Maps se consignan según el propio registro y no implican una nueva verificación independiente durante esta actualización. El listado histórico de pendientes que sigue abajo queda supersedido. Pendiente: regenerar `inventory_final.json` y el listado/conteo completo desde el catálogo activo para reemplazarlo.
 
-### Recuento del catálogo activo (actualizado 2026-10-22)
+### Recuento del catálogo activo (actualizado 2026-10-23)
 
-Conteo ejecutado sobre el catálogo activo en `js/guia-playa-paraiso.js`, aplicando las asignaciones de `OSM_COORDS` y las áreas: **96 registros con coordenadas verificadas y 18 pendientes de coordenadas**, de **114 registros** en total (incluye los 5 hoteles). No hay registros activos con coordenadas pero sin verificar. Este conteo reemplaza el recuento anterior de 94/20: Teatro Music Hall ya tiene coordenadas y la entrada Casino fue sustituida por Teatro Mar-Playa, también con coordenadas.
+Conteo actualizado ejecutando `node scripts/generate_inventory.js` sobre el catálogo activo en `js/guia-playa-paraiso.js` y aplicando las asignaciones de `OSM_COORDS`: **110 registros marcados verificados con coordenadas y 1 pendiente de coordenadas**, de **111 registros** en total (incluye los 5 hoteles). No hay registros activos con coordenadas pero sin verificar. Este resultado reemplaza los recuentos históricos de 96/18 y 111/3.
 
 Pendientes de coordenadas:
 
-- Baby Kitchen
-- Palapas de masajes
-- Tenis
-- Campo de tiro
-- Centro comercial
-- Tienda de piscina
-- Sala de juntas
-- Agencias y teléfonos
-- Internet, billar, biblioteca
-- Centro médico
-- Farmacia
-- Preview Gallery
 - Star Prestige Lounge
-- Relaciones públicas
-- Duchas de cortesía
-- Paraíso Express Stop
-- Village / Villas
-- Star Friends Desk
 
-`Mar Caribe` tiene coordenadas y es una etiqueta de área, no un punto de instalación; no se cuenta entre los 20 pendientes. Este recuento refleja los datos implementados en el catálogo, no una validación externa nueva. El inventario histórico y el listado anterior de pendientes siguen obsoletos.
+`Mar Caribe` tiene coordenadas y es una etiqueta de área, no un punto de instalación. Este recuento refleja los datos implementados en el catálogo, no una validación externa nueva. La lista extensa que sigue corresponde solo al corte histórico de 2026-10-15; la lista actual de pendientes está arriba.
 
 ## POIs pendientes del corte anterior (50; lista obsoleta)
 
-El siguiente listado conserva el detalle histórico del corte del 2026-10-15. No usarlo como lista actual: al menos Coco Bar, THE CLUB, Head Concierge y Star Prestige Beach Club ya aparecen implementados como verificados en la guía activa. El inventario completo pendiente está por regenerar.
+El siguiente listado conserva el detalle histórico del corte del 2026-10-15. No usarlo como lista actual: al menos Coco Bar, THE CLUB, Head Concierge y Star Prestige Beach Club ya aparecen implementados como verificados en la guía activa. El inventario actual se encuentra regenerado en `inventory_final.json`.
 
 ### cocobar [Pendiente de ubicación]
 - Cat: bar | Nombre: Coco Bar
@@ -296,7 +283,7 @@ El siguiente listado conserva el detalle histórico del corte del 2026-10-15. No
 - En plano PDF: Si | Certidumbre: baja
 - Evaluación: Mencionado en el plano oficial (PDF), pero no identificado en el OSM del bbox. Coordenadas no extraíbles del PDF.
 
-### agencies-phones [No verificable]
+### agencies-phones [Retirado del catálogo activo 2026-10-23]
 - Cat: servicio | Nombre: Agencias y telÃ©fonos
 - OSM hits: (ninguno)
 - En plano PDF: No | Certidumbre: ninguna
@@ -357,13 +344,13 @@ El siguiente listado conserva el detalle histórico del corte del 2026-10-15. No
 - En plano PDF: No | Certidumbre: ninguna
 - Evaluación: No identificado en OSM ni en el plano oficial extraído. Fuente de ubicación desconocida.
 
-### paraiso-express-stop [No verificable]
+### paraiso-express-stop [Retirado del catálogo activo 2026-10-23]
 - Cat: servicio | Nombre: ParaÃ­so Express Stop
 - OSM hits: (ninguno)
 - En plano PDF: No | Certidumbre: ninguna
 - Evaluación: No identificado en OSM ni en el plano oficial extraído. Fuente de ubicación desconocida.
 
-### village-villas [Pendiente de coordenadas]
+### village-villas [Retirado del catálogo activo 2026-10-23]
 - Cat: servicio | Nombre: Village / Villas
 - OSM hits: (ninguno)
 - En plano PDF: Si | Certidumbre: baja
