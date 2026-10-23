@@ -1124,7 +1124,10 @@
         perimeter: framingPerimeter,
         navBounds: framingNav,
         focusBounds: focusBounds || framingPerimeter,
-        minZoomBounds: framingPerimeter
+        minZoomBounds: framingPerimeter,
+        // Los tiles OSM llegan nativos hasta 19: se permite un nivel de
+        // zoom más que el límite previo (18) en los complejos con guía.
+        maxZoom: hasComplexGuide ? 19 : 18
       } : { perimeter: framingPerimeter, navBounds: framingNav };
       const applyFraming = () => {
         const options = { ...frameOptions };
@@ -1137,7 +1140,7 @@
           window.RevistaDigital.setupComplexMapFraming(map, L, options);
         } else {
           map.setMinZoom(map.getBoundsZoom(options.perimeter));
-          map.setMaxZoom(18);
+          map.setMaxZoom(hasComplexGuide ? 19 : 18);
           map.fitBounds(options.perimeter, { animate: false });
           trackMapResize(map, element);
         }

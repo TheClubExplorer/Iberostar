@@ -7,9 +7,9 @@
 
   const CATEGORIES = {
     hotel: { icon: "building", color: "#0057b8" },
-    club: { icon: "star", color: "#0057b8" },
-    starprestige: { icon: "star", color: "#b8860b" },
-    concierge: { icon: "concierge-bell", color: "#6b7280" },
+    club: { icon: "star", color: "#b8860b" },
+    starprestige: { icon: "star", color: "#0057b8" },
+    concierge: { icon: "concierge-bell", color: "#0b3d66" },
     restaurante: { icon: "utensils", color: "#d4af37" },
     bar: { icon: "cocktail", color: "#5f9ea0" },
     piscina: { icon: "swimming", color: "#1e90ff" },
@@ -125,7 +125,7 @@
     {"id":"tonis","name":"Toni's","category":"restaurante","description":"Restaurante surf & turf","source":"plano","verified":false},
     {"id":"haiku","name":"Haiku","category":"restaurante","description":"Restaurante japonés","source":"plano","verified":false},
     {"id":"la-brisa","name":"La Brisa","category":"restaurante","description":"Caribbean raw bar & grill","source":"plano","verified":false},
-    {"id":"baby-kitchen","name":"Baby Kitchen","category":"servicio","description":"Cocina para bebés","source":"plano","verified":false});
+    {"id":"baby-kitchen","name":"Baby Kitchen","category":"servicio","lat":20.758029,"lng":-86.963437,"description":"Cocina para bebés","source":"Google Maps","verified":true});
   POIS.push(
     {"id":"sports-bar-corner","name":"Sports Bar Corner","category":"bar","hotelId":"Iberostar Paraíso Lindo","lat":20.7596764,"lng":-86.9634133,"description":"Sports bar","source":"Google Maps","verified":true},
     // "Heladería El Puente" y "Bar El Puente" son el mismo lugar; quedó un único
@@ -160,10 +160,10 @@
     {"id":"indoor-pool","name":"Piscina cubierta","category":"piscina","lat":20.756076,"lng":-86.961331,"description":"Indoor pool","source":"Google Maps","verified":true},
     {"id":"main-pool","name":"Piscina principal","category":"piscina","lat":20.754701,"lng":-86.960497,"description":"Main pool","source":"Google Maps","verified":true},
     {"id":"mini-water-playground","name":"Mini parque acuático","category":"piscina","description":"Mini water playground","source":"plano","verified":false},
-    {"id":"massage-palapa","name":"Palapas de masajes","category":"spa","description":"Massage palapa","source":"plano","verified":false});
+    {"id":"massage-palapa","name":"Palapas de masajes","category":"spa","lat":20.758252,"lng":-86.957775,"description":"Massage palapa","source":"Google Maps","verified":true});
   POIS.push(
-    {"id":"tennis","name":"Tenis","category":"deportes","description":"Tennis","source":"plano","verified":false},
-    {"id":"shooting-area","name":"Campo de tiro","category":"deportes","description":"Shooting area","source":"plano","verified":false},
+    {"id":"tennis","name":"Tenis","category":"deportes","lat":20.760289,"lng":-86.964375,"description":"Tennis","source":"Google Maps","verified":true},
+    {"id":"shooting-area","name":"Campo de tiro","category":"deportes","lat":20.761933,"lng":-86.962473,"description":"Shooting area","source":"Google Maps","verified":true},
     {"id":"diving-center","name":"Centro de buceo","category":"deportes","description":"Diving center","source":"plano","verified":false},
     {"id":"golf-club-house","name":"Golf Club House","category":"golf","description":"Golf club house","source":"plano","verified":false},
     {"id":"teatro-music-hall","name":"Teatro Music Hall","category":"entretenimiento","lat":20.7591882,"lng":-86.9627312,"description":"Teatro","source":"Google Maps","verified":true},
@@ -171,24 +171,24 @@
     {"id":"games-room","name":"Sala de juegos","category":"entretenimiento","description":"Games room","source":"plano","verified":false},
     // El "Casino" del plano es en realidad el "Teatro Mar-Playa" (Google Maps)
     {"id":"teatro-mar-playa","name":"Teatro Mar-Playa","category":"entretenimiento","lat":20.7608353,"lng":-86.9625428,"description":"Teatro","source":"Google Maps","verified":true},
-    {"id":"shopping-mall","name":"Centro comercial","category":"comer","description":"Shopping mall","source":"plano","verified":false},
+    {"id":"shopping-mall","name":"Centro comercial","category":"comer","lat":20.759933,"lng":-86.965830,"description":"Shopping mall","source":"Google Maps","verified":true},
     {"id":"starmarket","name":"Starmarket","category":"comer","description":"Starmarket","source":"plano","verified":false},
-    {"id":"pool-shop","name":"Tienda de piscina","category":"comer","description":"Pool shop","source":"plano","verified":false},
-    {"id":"meeting-room","name":"Sala de juntas","category":"servicio","description":"Meeting room","source":"plano","verified":false},
+    {"id":"shop-tienda","name":"Shop / Tienda","category":"comer","lat":20.762215,"lng":-86.963121,"description":"Shop / Tienda","source":"Google Maps","verified":true},
+    {"id":"pool-shop","name":"Tienda de piscina","category":"comer","lat":20.758561,"lng":-86.959673,"description":"Pool shop","source":"Google Maps","verified":true},
+    {"id":"meeting-room","name":"Sala de juntas","category":"conv","lat":20.760629,"lng":-86.963838,"description":"Sala de juntas","source":"Google Maps","verified":true},
     {"id":"agencies-phones","name":"Agencias y teléfonos","category":"servicio","description":"Agencies & phones","source":"plano","verified":false},
-    {"id":"billiards-library","name":"Internet, billar, biblioteca","category":"servicio","description":"Billiards, library","source":"plano","verified":false},
-    {"id":"medical-center","name":"Centro médico","category":"servicio","description":"Medical center","source":"plano","verified":false},
-    {"id":"drugstore","name":"Farmacia","category":"servicio","description":"Drugstore","source":"plano","verified":false},
-    {"id":"preview-gallery","name":"Preview Gallery","category":"servicio","description":"Preview Gallery","source":"plano","verified":false},
+    {"id":"billiards-library","name":"Internet, billar, biblioteca","category":"servicio","lat":20.760721,"lng":-86.963638,"description":"Billiards, library","source":"Google Maps","verified":true},
+    {"id":"medical-center","name":"Centro médico","category":"servicio","lat":20.759144,"lng":-86.964771,"description":"Medical center","source":"Google Maps","verified":true},
+    {"id":"drugstore","name":"Farmacia","category":"servicio","lat":20.759826,"lng":-86.965208,"description":"Drugstore","source":"Google Maps","verified":true},
+    {"id":"preview-gallery","name":"Preview Gallery","category":"club","lat":20.757715,"lng":-86.964923,"description":"Preview Gallery (The Club)","source":"Google Maps","verified":true},
     {"id":"head-concierge","name":"Head Concierge","category":"concierge","lat":20.759753,"lng":-86.965457,"description":"Head Concierge","source":"Google Maps","verified":true},
     {"id":"star-prestige-lounge","name":"Star Prestige Lounge","category":"starprestige","description":"Star Prestige Lounge","source":"plano","verified":false},
     {"id":"star-prestige-beach-club","name":"Star Prestige Beach Club","category":"starprestige","hotelId":"Iberostar Paraíso JOIA","lat":20.756829,"lng":-86.958688,"description":"Star Prestige Beach Club","source":"Google Maps","verified":true},
-    {"id":"guest-service","name":"Relaciones públicas","category":"servicio","description":"Guest service","source":"plano","verified":false},
-    {"id":"courtesy-room","name":"Duchas de cortesía","category":"servicio","description":"Courtesy room","source":"plano","verified":false},
+    {"id":"courtesy-room","name":"Duchas de cortesía","category":"servicio","lat":20.758045,"lng":-86.964554,"description":"Courtesy room","source":"Google Maps","verified":true},
     {"id":"paraiso-express-stop","name":"Paraíso Express Stop","category":"servicio","description":"Paraíso Express Stop","source":"plano","verified":false},
     {"id":"wedding-chapel","name":"Capilla de bodas","category":"servicio","description":"Wedding chapel","source":"plano","verified":false},
     {"id":"village-villas","name":"Village / Villas","category":"servicio","description":"Village / Villas","source":"plano","verified":false},
-    {"id":"star-friends-desk","name":"Star Friends Desk","category":"kids","description":"Star Friends Desk","source":"plano","verified":false},
+    {"id":"star-friends-desk","name":"Star Friends Desk","category":"kids","lat":20.755117,"lng":-86.961373,"description":"Star Friends Desk","source":"Google Maps","verified":true},
     // --- Nuevos POIs del plano oficial no existentes en catálogo previo ---
     {"id":"beach-bar","name":"Beach Bar / Bar de playa","category":"bar","lat":20.757856,"lng":-86.958359,"description":"Bar de playa","source":"Google Maps","verified":true},
     {"id":"bar-el-puente","name":"Bar El Puente","category":"bar","lat":20.757172,"lng":-86.960979,"description":"Bar El Puente (incluye la heladería)","source":"Google Maps","verified":true},
@@ -363,6 +363,49 @@
     var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="' + color + '" stroke="#fff" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="#fff"/></svg>';
     return (window.L && window.L.divIcon) ? window.L.divIcon({ html: '<div style="background-image:url(data:image/svg+xml;base64,' + btoa(svg) + ');width:' + size + 'px;height:' + size + 'px;background-size:contain;"></div>', className: 'gp-divicon', iconSize: [size, size], iconAnchor: [size/2, size/2], popupAnchor: [0, -size/2] }) : null;
   };
+  // Marcador animado para los POIs de THE CLUB: halo dorado/azul pulsante.
+  gp.createClubDivIcon = function (color) {
+    var size = 30;
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="' + color + '" stroke="#fff" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="#fff"/></svg>';
+    if (!(window.L && window.L.divIcon)) return null;
+    var core = '<div class="gp-club-core" style="background-image:url(data:image/svg+xml;base64,' + btoa(svg) + ');width:' + size + 'px;height:' + size + 'px;background-size:contain;"></div>';
+    return window.L.divIcon({
+      html: '<div class="gp-club-wrap"><span class="gp-club-pulse"></span><span class="gp-club-pulse gp-club-pulse--late"></span>' + core + '</div>',
+      className: 'gp-divicon gp-club-divicon',
+      iconSize: [size, size],
+      iconAnchor: [size/2, size/2],
+      popupAnchor: [0, -size/2]
+    });
+  };
+  // Marcador animado para los POIs de Star Prestige: anillo dorado giratorio
+  // tipo diamante alrededor del marcador.
+  gp.createPrestigeDivIcon = function (color) {
+    var size = 30;
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="' + color + '" stroke="#fff" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="#fff"/></svg>';
+    if (!(window.L && window.L.divIcon)) return null;
+    var core = '<div class="gp-sp-core" style="background-image:url(data:image/svg+xml;base64,' + btoa(svg) + ');width:' + size + 'px;height:' + size + 'px;background-size:contain;"></div>';
+    return window.L.divIcon({
+      html: '<div class="gp-sp-wrap"><span class="gp-sp-ring"></span><span class="gp-sp-ring gp-sp-ring--wide"></span>' + core + '</div>',
+      className: 'gp-divicon gp-sp-divicon',
+      iconSize: [size, size],
+      iconAnchor: [size/2, size/2],
+      popupAnchor: [0, -size/2]
+    });
+  };
+  // Marcador discreto para los POIs de Concierge: halo sutil que respira.
+  gp.createConciergeDivIcon = function (color) {
+    var size = 30;
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="' + color + '" stroke="#fff" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="#fff"/></svg>';
+    if (!(window.L && window.L.divIcon)) return null;
+    var core = '<div class="gp-con-core" style="background-image:url(data:image/svg+xml;base64,' + btoa(svg) + ');width:' + size + 'px;height:' + size + 'px;background-size:contain;"></div>';
+    return window.L.divIcon({
+      html: '<div class="gp-con-wrap">' + core + '</div>',
+      className: 'gp-divicon gp-con-divicon',
+      iconSize: [size, size],
+      iconAnchor: [size/2, size/2],
+      popupAnchor: [0, -size/2]
+    });
+  };
   gp.addPoiLayer = function (map, filterHotelId, options) {
     if (!map || !window.L) return null;
     var L = window.L;
@@ -404,11 +447,40 @@
         return;
       }
       var cat = gp.CATEGORIES[p.category] || gp.CATEGORIES.servicio;
-      var icon = gp.createDivIcon(cat.color);
+      // Animaciones intercambiadas a petición: THE CLUB usa los anillos
+      // diamante giratorios y Star Prestige los halos pulsantes.
+      var icon = p.category === "club"
+        ? gp.createPrestigeDivIcon(cat.color)
+        : p.category === "starprestige"
+          ? gp.createClubDivIcon(cat.color)
+          : p.category === "concierge"
+            ? gp.createConciergeDivIcon(cat.color)
+            : gp.createDivIcon(cat.color);
       var m = window.L.marker([p.lat, p.lng], icon ? { icon: icon } : {});
       var name = p.name || "";
-      var popup = '<strong>' + name + '</strong><br><small>' + (p.description||'') + '</small><br><button type="button" class="gp-dir" data-lat="' + p.lat + '" data-lng="' + p.lng + '" data-name="' + name.replace(/"/g,'&quot;') + '">Cómo llegar</button>';
-      m.bindPopup(popup);
+      var dirButton = '<button type="button" class="gp-dir" data-lat="' + p.lat + '" data-lng="' + p.lng + '" data-name="' + name.replace(/"/g,'&quot;') + '">Cómo llegar</button>';
+      var popup, popupOptions;
+      if (p.category === "club") {
+        popup = '<div class="gp-club-popup">'
+          + '<div class="gp-club-popup-badge"><img class="gp-club-popup-logo" src="branding/IB_THE_CLUB_VV_POS_RGB-320.webp" alt="" /></div>'
+          + '<h3 class="gp-club-popup-name">' + name + '</h3>'
+          + (p.hours ? '<p class="gp-club-popup-hours">' + p.hours + '</p>' : '')
+          + dirButton
+          + '</div>';
+        popupOptions = { className: 'gp-club-pop', minWidth: 190, maxWidth: 230 };
+      } else if (p.category === "starprestige") {
+        popup = '<div class="gp-sp-popup">'
+          + '<div class="gp-sp-popup-badge"><span class="gp-sp-popup-star">✦</span>STAR PRESTIGE</div>'
+          + '<h3 class="gp-sp-popup-name">' + name + '</h3>'
+          + (p.description ? '<p class="gp-sp-popup-desc">' + p.description + '</p>' : '')
+          + (p.hours ? '<p class="gp-sp-popup-hours">' + p.hours + '</p>' : '')
+          + dirButton
+          + '</div>';
+        popupOptions = { className: 'gp-sp-pop', minWidth: 220, maxWidth: 260 };
+      } else {
+        popup = '<strong>' + name + '</strong><br><small>' + (p.description||'') + '</small><br>' + dirButton;
+      }
+      m.bindPopup(popup, popupOptions);
       gp.registerMarker(p.id, m);
       m.addTo(layer);
     });

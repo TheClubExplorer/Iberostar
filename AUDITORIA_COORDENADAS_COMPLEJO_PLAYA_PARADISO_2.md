@@ -3,6 +3,8 @@ Fecha: 2026-10-15
 
 Inventario del corte 2026-10-15 (histórico; no representa el estado actual): {"Verificado":50,"Pendiente de ubicación":1,"Pendiente de coordenadas":40,"No verificable":9}
 
+Actualización 2026-10-23: `billiards-library` (Internet, billar, biblioteca) ya cuenta con coordenadas 20.760721, -86.963638 proporcionadas para el POI y se marcó `verified: true` en el catálogo. El detalle de pendientes de esta ampliación conserva el corte histórico; consultar `AUDITORIA_COORDENADAS_COMPLEJO_PLAYA_PARADISO.md` para el estado vigente. La coordenada no se verificó de forma independiente contra OSM o el plano.
+
 ## Actualización de implementación (2026-10-22)
 
 Esta ampliación se contrasta con `js/guia-playa-paraiso.js`, que refleja los cambios actuales de la guía. El conteo de inventario anterior corresponde a un corte previo y no debe tomarse como estado actual: `inventory_final.json` y el listado pendiente de abajo contienen estados obsoletos.
@@ -43,7 +45,7 @@ Estos estados describen lo implementado en el código; las fuentes Google Maps s
 
 ### Recuento del catálogo activo (actualizado 2026-10-22)
 
-Conteo ejecutado sobre el catálogo activo en `js/guia-playa-paraiso.js`, aplicando las asignaciones de `OSM_COORDS` y las áreas: **94 registros con coordenadas verificadas y 20 pendientes de coordenadas**, de **114 registros** en total (incluye los 5 hoteles). No hay registros activos con coordenadas pero sin verificar.
+Conteo ejecutado sobre el catálogo activo en `js/guia-playa-paraiso.js`, aplicando las asignaciones de `OSM_COORDS` y las áreas: **96 registros con coordenadas verificadas y 18 pendientes de coordenadas**, de **114 registros** en total (incluye los 5 hoteles). No hay registros activos con coordenadas pero sin verificar. Este conteo reemplaza el recuento anterior de 94/20: Teatro Music Hall ya tiene coordenadas y la entrada Casino fue sustituida por Teatro Mar-Playa, también con coordenadas.
 
 Pendientes de coordenadas:
 
@@ -51,8 +53,6 @@ Pendientes de coordenadas:
 - Palapas de masajes
 - Tenis
 - Campo de tiro
-- Teatro Music Hall
-- Casino
 - Centro comercial
 - Tienda de piscina
 - Sala de juntas
@@ -302,11 +302,12 @@ El siguiente listado conserva el detalle histórico del corte del 2026-10-15. No
 - En plano PDF: No | Certidumbre: ninguna
 - Evaluación: No identificado en OSM ni en el plano oficial extraído. Fuente de ubicación desconocida.
 
-### billiards-library [Pendiente de coordenadas]
+### billiards-library [Actualizado 2026-10-23: coordenadas proporcionadas]
 - Cat: servicio | Nombre: Internet, billar, biblioteca
-- OSM hits: (ninguno)
+- Coordenadas: 20.760721, -86.963638 (`verified: true` en el catálogo)
+- OSM hits: (ninguno identificado en la auditoría original)
 - En plano PDF: Si | Certidumbre: baja
-- Evaluación: Mencionado en el plano oficial (PDF), pero no identificado en el OSM del bbox. Coordenadas no extraíbles del PDF.
+- Evaluación: La coordenada fue proporcionada para este POI y añadida al catálogo. No fue verificada de forma independiente en OSM o extraída del plano; el análisis original de fuentes se conserva como histórico.
 
 ### medical-center [No verificable]
 - Cat: servicio | Nombre: Centro mÃ©dico

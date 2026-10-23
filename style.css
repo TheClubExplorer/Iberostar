@@ -3166,6 +3166,100 @@ html.map-fullscreen-open,body.map-fullscreen-open { overflow:hidden !important; 
 .gp-divicon { background: transparent; border: none; }
 .gp-dir { margin-top: 4px; padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(212,175,55,.6); background: linear-gradient(180deg, rgba(250,244,227,1), rgba(241,228,184,1)); color: #1f1f1f; font-weight: 600; cursor: pointer; }
 .gp-dir:hover { filter: brightness(1.05); }
+/* POIs de THE CLUB: halo pulsante dorado/azul en el mapa */
+.gp-club-wrap { position: relative; width: 30px; height: 30px; }
+.gp-club-pulse { position: absolute; inset: -7px; border-radius: 50%; border: 2px solid rgba(212,175,55,.85); opacity: 0; z-index: 0; transform: scale(.6); animation: gpClubPulse 2.4s ease-out infinite; }
+.gp-club-pulse--late { border-color: rgba(212,175,55,.55); animation-delay: 1.2s; }
+.gp-club-core { position: relative; z-index: 1; }
+@keyframes gpClubPulse {
+  0% { transform: scale(.6); opacity: .95; }
+  70% { transform: scale(2); opacity: 0; }
+  100% { transform: scale(2); opacity: 0; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .gp-club-core { animation: gpClubBreath 2.4s ease-in-out infinite; }
+}
+@keyframes gpClubBreath {
+  0%, 100% { filter: drop-shadow(0 0 0 rgba(212,175,55,0)); }
+  50% { filter: drop-shadow(0 0 7px rgba(212,175,55,.95)); }
+}
+/* Popup especial de los POIs de THE CLUB */
+.gp-club-pop .leaflet-popup-content-wrapper {
+  background: linear-gradient(160deg, #0e3a63 0%, #0b2a4a 100%);
+  border: 2px solid rgba(212,175,55,.9);
+  border-radius: 14px;
+  box-shadow: 0 10px 26px rgba(0, 20, 40, .45);
+}
+.gp-club-pop .leaflet-popup-content { margin: 6px 9px; font-family: Arial, sans-serif; }
+.gp-club-pop .leaflet-popup-tip { background: #0b2a4a; border: 2px solid rgba(212,175,55,.9); border-top: 0; }
+.gp-club-popup-badge { display: flex; align-items: center; justify-content: center; margin-bottom: 2px; background: transparent; border: none; box-shadow: none; }
+.gp-club-popup-star { color: #0b3d66; font-size: 12px; line-height: 0; }
+.gp-club-popup-logo { width: 156px; height: 156px; object-fit: contain; display: block; filter: drop-shadow(0 0 14px rgba(255,216,115,.4)); }
+.gp-club-popup-name { margin: 0 0 2px; color: #fdf7e8; font: 600 12px/1.1 Arial, sans-serif; letter-spacing: .06em; text-transform: uppercase; opacity: .95; text-align: center; }
+.gp-club-popup-desc { margin: 2px 0 4px; color: rgba(255,255,255,.78); font: 13px/1.45 Arial, sans-serif; }
+.gp-club-popup-hours { margin: 0 0 4px; color: #ffd873; font: 600 11px/1.2 Arial, sans-serif; }
+.gp-club-popup .gp-dir, .gp-club-pop .gp-dir { width: 100%; padding: 4px 8px; font-size: 12px; border-color: rgba(0,87,184,.55); background: linear-gradient(180deg, #ffd873, #e5b85f); color: #243b53; box-shadow: 0 3px 8px rgba(212,175,55,.4); }
+.gp-club-pop .gp-dir:hover { filter: brightness(1.06); }
+/* Animación de entrada elegante del popup de THE CLUB */
+@media (prefers-reduced-motion: no-preference) {
+  .gp-club-pop .leaflet-popup-content-wrapper { animation: gpClubPopIn .42s cubic-bezier(.22, 1, .36, 1) both; overflow: hidden; position: relative; }
+  .gp-club-pop .leaflet-popup-content-wrapper::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(115deg, transparent 30%, rgba(255,216,115,.38) 46%, rgba(255,255,255,.65) 50%, rgba(255,216,115,.38) 54%, transparent 70%); transform: translateX(-130%); animation: gpClubShine 1.1s ease-out .25s 1 both; }
+  .gp-club-popup-badge { animation: gpClubLogoIn .5s cubic-bezier(.34, 1.4, .64, 1) both; animation-delay: .12s; }
+}
+@keyframes gpClubPopIn {
+  from { opacity: 0; transform: translateY(10px) scale(.94); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes gpClubShine {
+  from { transform: translateX(-130%); }
+  to { transform: translateX(130%); }
+}
+@keyframes gpClubLogoIn {
+  from { opacity: 0; transform: scale(.5); }
+  to { opacity: 1; transform: scale(1); }
+}
+/* POIs de Star Prestige: anillos-diamante dorados giratorios en el mapa */
+.gp-sp-wrap { position: relative; width: 30px; height: 30px; }
+.gp-sp-ring { position: absolute; inset: -6px; border-radius: 7px; border: 1.5px solid rgba(184,134,11,.85); transform: rotate(45deg); z-index: 0; animation: gpSpSpin 7s linear infinite; box-shadow: 0 0 10px rgba(184,134,11,.45); }
+.gp-sp-ring--wide { inset: -11px; border-color: rgba(212,175,55,.45); border-radius: 9px; animation: gpSpSpin 7s linear infinite reverse; }
+.gp-sp-core { position: relative; z-index: 1; }
+@keyframes gpSpSpin {
+  from { transform: rotate(45deg); }
+  to { transform: rotate(405deg); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .gp-sp-core { animation: gpSpGlow 2.8s ease-in-out infinite; }
+}
+@keyframes gpSpGlow {
+  0%, 100% { filter: drop-shadow(0 0 0 rgba(212,175,55,0)); }
+  50% { filter: drop-shadow(0 0 8px rgba(212,175,55,.9)); }
+}
+/* Popup especial de los POIs de Star Prestige (estilo oscuro premium) */
+.gp-sp-pop .leaflet-popup-content-wrapper {
+  background: linear-gradient(160deg, #212a36 0%, #141a22 100%);
+  border: 2px solid rgba(212,175,55,.85);
+  border-radius: 14px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, .45);
+}
+.gp-sp-pop .leaflet-popup-content { margin: 12px 14px; color: #fff; font-family: Arial, sans-serif; }
+.gp-sp-pop .leaflet-popup-tip { background: #141a22; border: 2px solid rgba(212,175,55,.85); border-top: 0; }
+.gp-sp-popup-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 999px; border: 1px solid rgba(212,175,55,.9); background: rgba(212,175,55,.12); color: #f2d383; font: 700 10px Arial, sans-serif; letter-spacing: .2em; }
+.gp-sp-popup-star { color: #f2d383; font-size: 12px; line-height: 0; }
+.gp-sp-popup-name { margin: 9px 0 2px; color: #fff; font: 600 18px/1.2 Georgia, serif; letter-spacing: .01em; }
+.gp-sp-popup-desc { margin: 2px 0 4px; color: rgba(255,255,255,.72); font: 13px/1.45 Arial, sans-serif; }
+.gp-sp-popup-hours { margin: 0 0 8px; color: #f2d383; font: 600 12px/1.4 Arial, sans-serif; }
+.gp-sp-pop .gp-dir { width: 100%; border: 1.5px solid rgba(212,175,55,.9); background: transparent; color: #f2d383; font-weight: 700; transition: background .15s ease, color .15s ease; }
+.gp-sp-pop .gp-dir:hover { background: #e5b85f; color: #141a22; }
+/* POIs de Concierge: pulso de brillo del propio marcador (se atenúa y recupera) */
+.gp-con-wrap { position: relative; width: 30px; height: 30px; }
+.gp-con-core { position: relative; z-index: 1; }
+@media (prefers-reduced-motion: no-preference) {
+  .gp-con-core { animation: gpConPing 4s ease-in-out infinite; }
+}
+@keyframes gpConPing {
+  0%, 100% { filter: brightness(1) saturate(1); }
+  50% { filter: brightness(.55) saturate(.55) drop-shadow(0 0 3px rgba(255,255,255,.65)); }
+}
 
 /* Guia interactiva THE CLUB - Explorador de lugares */
 .guide-explorer { display: flex; flex-direction: column; gap: 18px; }

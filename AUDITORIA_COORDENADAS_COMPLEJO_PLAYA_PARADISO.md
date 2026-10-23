@@ -21,10 +21,14 @@ Auditar de forma sistemática las coordenadas y rutas asociadas al complejo **Ib
 ## 4. Inventario de puntos (estado por punto)
 Catálogo total: **100 POIs** (tras auditoría).
 
+### Actualización de catálogo (2026-10-23)
+- `billiards-library` (Internet, billar, biblioteca) recibió las coordenadas **20.760721, -86.963638** proporcionadas para este POI y quedó marcado con coordenadas y `verified: true` en `js/guia-playa-paraiso.js` e `inventory_final.json`.
+- Estado actualizado del catálogo: **51 Verificados**, **1 Pendiente de ubicación** y **48 Pendientes de coordenadas** (100 POIs). La actualización registra la coordenada proporcionada; no constituye una verificación independiente en OSM o en el plano.
+
 ### Distribución por estado
-- **Verificados (Verificado): 50** — POIs con `verified === true` y coordenadas, presentes en mapa/explorador (incluye área "Mar Caribe" con `kind:"area"`).
+- **Verificados (Verificado): 51** — POIs con `verified === true` y coordenadas, presentes en mapa/explorador (incluye área "Mar Caribe" con `kind:"area"` y la actualización de `billiards-library` del 2026-10-23).
 - **Pendiente de ubicación: 1** — POI con coordenadas pero `verified === false` (`cocobar`, tras corrección).
-- **Pendiente de coordenadas: 49** — POIs con `verified === false` y **sin** coordenadas (`lat/lng` ausentes).
+- **Pendiente de coordenadas: 48** — POIs con `verified === false` y **sin** coordenadas (`lat/lng` ausentes).
 - **Pendiente de ruta / Error confirmado / No verificable:** 0 (ninguno clasificado como tales tras corrección).
 
 ### Detalle por categorías (resumen)
