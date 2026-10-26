@@ -1211,8 +1211,8 @@
       if (cat === "restaurante" || cat === "spa" || cat === "golf") {
         var label = cat === "restaurante" ? "Reservar" : (cat === "spa" ? "Reservar cita" : "Reservar tee time");
         btns += '<button type="button" class="guide-book" data-id="' + escapeHtml(poi.id) + '" data-cat="' + cat + '">' + label + "</button>";
-        if (cat === "golf") {
-          btns += '<button type="button" class="guide-cart" data-id="' + escapeHtml(poi.id) + '">Solicitar carrito</button>';
+        if (cat === "golf" || cat === "restaurante") {
+          btns += '<button type="button" class="guide-cart" data-id="' + escapeHtml(poi.id) + '" data-cat="' + cat + '">Solicitar carrito</button>';
         }
       }
     } else {
@@ -1220,8 +1220,8 @@
       if (cat === "restaurante" || cat === "spa" || cat === "golf") {
         var l2 = cat === "restaurante" ? "Reservar" : (cat === "spa" ? "Reservar cita" : "Reservar tee time");
         btns += '<button type="button" class="guide-book" data-id="' + escapeHtml(poi.id) + '" data-cat="' + cat + '">' + l2 + "</button>";
-        if (cat === "golf") {
-          btns += '<button type="button" class="guide-cart" data-id="' + escapeHtml(poi.id) + '">Solicitar carrito</button>';
+        if (cat === "golf" || cat === "restaurante") {
+          btns += '<button type="button" class="guide-cart" data-id="' + escapeHtml(poi.id) + '" data-cat="' + cat + '">Solicitar carrito</button>';
         }
       }
     }
@@ -1320,8 +1320,8 @@
       if (cat === "restaurante" || cat === "spa" || cat === "golf") {
         var label = cat === "restaurante" ? "Reservar" : (cat === "spa" ? "Reservar cita" : "Reservar tee time");
         var html = '<button type="button" class="guide-book" data-id="' + escapeHtml(poi.id) + '" data-cat="' + cat + '">' + label + "</button>";
-        if (cat === "golf") {
-          html += '<button type="button" class="guide-cart" data-id="' + escapeHtml(poi.id) + '">Solicitar carrito</button>';
+        if (cat === "golf" || cat === "restaurante") {
+          html += '<button type="button" class="guide-cart" data-id="' + escapeHtml(poi.id) + '" data-cat="' + cat + '">Solicitar carrito</button>';
         }
         return html;
       }
@@ -1447,12 +1447,7 @@
       ? "Solicitud de carrito de golf"
       : (poi.category === "restaurante" ? "Reservar mesa" : (poi.category === "spa" ? "Reservar cita" : "Reservar tee time"));
     var fields = isCart
-      ? '<label class="guide-book-field"><span>Lugar de recogida</span>' +
-        '<select name="lugar" id="guideCartPlace">' +
-          '<option value="lobby">Lobby del hotel</option>' +
-          '<option value="punto">Punto de encuentro del complejo</option>' +
-          '<option value="otro">Otro punto (indicar en notas)</option>' +
-        "</select></label>"
+      ? '<p class="guide-book-note">El carrito te recogerá en tu ubicación actual. Activa la ubicación del dispositivo para compartir el punto exacto.</p>'
       : '<label class="guide-book-field"><span>Fecha</span><input type="date" name="fecha" id="guideBookDate" required /></label>' +
         '<label class="guide-book-field"><span>Hora</span><input type="time" name="hora" id="guideBookTime" required /></label>' +
         '<label class="guide-book-field"><span>Personas</span><input type="number" name="personas" id="guideBookGuests" min="1" max="20" value="2" required /></label>';
@@ -1797,6 +1792,13 @@
   };
 
   gp.selectPoi = selectPoi;
+  gp.requestCartForPoi = function (id) {
+    var poi = findPoi(id);
+    if (!poi || (poi.category !== "restaurante" && poi.category !== "golf")) return false;
+    selectPoi(id, { noScroll: isMobileGuide() });
+    renderBookingPanel(poi, "cart");
+    return true;
+  };
   gp.queryPois = queryPois;
   gp.canMapPoi = canMap;
   gp.renderCategoryLegend = function (mount) {

@@ -3337,6 +3337,21 @@ html.map-fullscreen-open,body.map-fullscreen-open { overflow:hidden !important; 
   font-weight: 700;
   text-shadow: 0 1px 1px rgba(255,255,255,.3);
 }
+.guide-book[data-cat="restaurante"] {
+  border-color: #145c4b;
+  background: #145c4b;
+  color: #fff;
+  font-weight: 700;
+}
+.guide-book[data-cat="restaurante"]:hover {
+  background: #0f493b;
+  filter: none;
+  transform: translateY(-1px);
+}
+.guide-book[data-cat="restaurante"]:focus-visible {
+  outline: 2px solid #145c4b;
+  outline-offset: 2px;
+}
 .guide-book[data-cat="golf"]:hover {
   background: linear-gradient(135deg, #e0c46c 0%, #d0ac50 100%);
   filter: none;
