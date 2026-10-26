@@ -344,6 +344,9 @@
   }
 
   function startLocationTracking() {
+    // Las vistas previas de la guía usan el carrito como demostración dentro
+    // de un iframe. No deben iniciar rastreo GPS ni mostrar un permiso.
+    if (document.documentElement.dataset.tourPreview === "true") return;
     if (cg._watchId != null) return;
     if (!navigator.geolocation) {
       cg._locationState = "unavailable";
@@ -513,13 +516,15 @@
       remainingSeconds: null,
       progress: 0
     };
+    request.tourDemo = options.tourDemo === true &&
+      document.documentElement.dataset.tourPreview === "true";
     cg._requests[slug] = request;
     render();
     syncMap();
     cg._timers[slug] = cg._timers[slug] || {};
     cg._timers[slug].accept = window.setTimeout(function () {
       acceptRequest(slug, request.id);
-    }, ACCEPT_MIN_MS + Math.random() * (ACCEPT_MAX_MS - ACCEPT_MIN_MS));
+    }, request.tourDemo ? 350 : ACCEPT_MIN_MS + Math.random() * (ACCEPT_MAX_MS - ACCEPT_MIN_MS));
     return request;
   };
 
@@ -564,7 +569,7 @@
     timers.ride = window.setTimeout(function () {
       timers.ride = null;
       startRide(slug, requestId);
-    }, 1500);
+    }, activeRequest()?.tourDemo ? 350 : 1500);
   }
 
   function startRide(slug, requestId) {
@@ -721,7 +726,9 @@
     request.remainingSeconds = request.etaSeconds;
     request.progress = 0;
     request.startedAt = Date.now();
-    request.durationMs = Math.max(ROUTE_MIN_MS, Math.min(ROUTE_MAX_MS, (request.etaSeconds * 1000) / TIME_SCALE));
+    request.durationMs = request.tourDemo
+      ? (leg === "ride" ? 4400 : 2000)
+      : Math.max(ROUTE_MIN_MS, Math.min(ROUTE_MAX_MS, (request.etaSeconds * 1000) / TIME_SCALE));
     if (contextSlug() === slug) {
       render();
       syncMap();
@@ -988,20 +995,37 @@
     }
     updateMapEta(request);
     var fitKey = (cg._context ? cg._context.slug : "") + ":" + (request ? request.id : "idle") +
-      ":" + (destination ? destination.id : "none") + ":" + (request ? request.routeStatus || "" : "idle");
+      ":" + (destination ? destination.id : "none") + ":" + (request ? request.status || "" : "idle") +
+      ":" + (request ? request.routeStatus || "" : "idle");
     if (cg._fitKey !== fitKey) {
       cg._fitKey = fitKey;
-      var points = getCarts().map(function (cart) { return [cart.lat, cart.lng]; });
-      points.push([pickup.lat, pickup.lng]);
-      if (destination) points.push([destination.lat, destination.lng]);
-      if (request && request.routeCoordinates) {
-        points = points.concat(request.routeCoordinates);
+      var points;
+      if (request && request.tourDemo) {
+        points = request.routeCoordinates ? request.routeCoordinates.slice() : [];
+        var activeTarget = request.status === "riding" && destination
+          ? [destination.lat, destination.lng]
+          : [pickup.lat, pickup.lng];
+        if (assigned) points.push([assigned.lat, assigned.lng]);
+        points.push(activeTarget);
+        if (request.from) points.push(request.from);
+      } else {
+        points = getCarts().map(function (cart) { return [cart.lat, cart.lng]; });
+        points.push([pickup.lat, pickup.lng]);
+        if (destination) points.push([destination.lat, destination.lng]);
+        if (request && request.routeCoordinates) points = points.concat(request.routeCoordinates);
       }
       try {
-        cg._map.fitBounds(cg._L.latLngBounds(points).pad(0.28), { animate: false });
+        cg._map.fitBounds(cg._L.latLngBounds(points).pad(request && request.tourDemo ? 0.2 : 0.28), { animate: false });
       } catch (e) { /* ignore */ }
     }
   }
+
+  cg.refreshMapLayout = function () {
+    if (!cg._map) return;
+    try { cg._map.invalidateSize({ pan: false, animate: false }); } catch (error) { /* ignore */ }
+    cg._fitKey = null;
+    syncMap();
+  };
 
   function updateMapProgress(request) {
     if (!cg._map || !cg._L || !request) return;
@@ -1266,7 +1290,8 @@
       room: room ? room.value : "",
       notes: notes ? notes.value : "",
       destinationId: destination ? destination.value : "",
-      source: "section"
+      source: "section",
+      tourDemo: document.documentElement.dataset.tourPreview === "true"
     });
   }
 

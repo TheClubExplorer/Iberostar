@@ -56,6 +56,10 @@
   function runIntro() {
     var overlay = document.getElementById("introOverlay");
     if (!overlay) return;
+    if (document.documentElement.dataset.tourPreview === "true") {
+      overlay.remove();
+      return;
+    }
 
     var logo = document.getElementById("introLogo");
     var canvas = document.getElementById("introCanvas");
@@ -72,6 +76,9 @@
           overlay.parentNode.removeChild(overlay);
         }
       }, 800);
+      window.setTimeout(function () {
+        window.RevistaDigital?.siteTour?.afterLogo?.();
+      }, 805);
     }
 
     /* Cierre de seguridad: pase lo que pase, la intro no bloquea la revista. */

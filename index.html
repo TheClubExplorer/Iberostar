@@ -9,6 +9,9 @@
     <script>document.documentElement.dataset.routeStartup = "true";</script>
     <script src="src/ri-manifest.js"></script>
     <script>
+      if (new URLSearchParams(window.location.search).get("tour-preview") === "1") {
+        document.documentElement.dataset.tourPreview = "true";
+      }
       const routeEntry = new URLSearchParams(window.location.search).get("route-entry");
       if (routeEntry) {
         const cleanRoute = decodeURIComponent(routeEntry || "/")
@@ -23,7 +26,7 @@
         window.history.replaceState(null, "", targetUrl.href);
       }
     </script>
-    <link rel="stylesheet" href="style.css?v=14" />
+    <link rel="stylesheet" href="style.css?v=37" />
     <link rel="stylesheet" href="responsive.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -104,6 +107,7 @@
             <a href="./360" data-app-route="/360" data-i18n="menu360">Contenido 360°</a>
             <a href="./restaurantes" data-app-route="/restaurantes" data-i18n="menuRestaurants">Restaurantes</a>
             <a href="./mexico/riviera-maya" data-app-route="/mexico/riviera-maya" data-i18n="menuComplex">Iberostar Playa Paraíso</a>
+            <button type="button" class="site-tour-menu-trigger" data-site-tour-open data-i18n="menuSiteTour">Ver guía animada</button>
           </div>
         </details>
       </nav>
@@ -163,9 +167,10 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/responsive-images.js?v=2" defer></script>
-<script src="js/app.js?v=2" defer></script>
+<script src="js/app.js?v=3" defer></script>
 <script src="js/pannellum-360.js?v=5" defer></script>
-<script src="js/routes.js?v=22" defer></script>
+<script src="js/routes.js?v=23" defer></script>
+<script src="js/site-tour.js?v=40" defer></script>
 <script src="js/hoteles.js?v=2" defer></script>
 <script src="js/restaurantes.js?v=2" defer></script>
 <script src="js/mapas.js?v=18" defer></script>
@@ -174,12 +179,12 @@
 <script src="js/videos.js?v=2" defer></script>
 <script src="js/hotel-gallery-data.js?v=2" defer></script>
 <script src="js/hotel-content-data.js?v=2" defer></script>
-<script src="js/i18n.js?v=4" defer></script>
+<script src="js/i18n.js?v=5" defer></script>
 <script src="js/search.js?v=2" defer></script>
 <script src="js/datos-complejo.js?v=2" defer></script>
 <script src="js/guia-playa-paraiso.js?v=21" defer></script>
-<script src="js/carrito-golf.js?v=5" defer></script>
-<script src="function.js?v=7" defer></script>
-<script src="js/animations.js?v=2" defer></script>
+<script src="js/carrito-golf.js?v=12" defer></script>
+<script src="function.js?v=13" defer></script>
+<script src="js/animations.js?v=4" defer></script>
   </body>
 </html>

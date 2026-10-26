@@ -23,6 +23,7 @@
       menuRestaurants: "Restaurantes",
       menuComplex: "Iberostar Playa Paraíso",
       menuGuia: "Guía interactiva",
+      menuSiteTour: "Ver guía animada",
 
       prevPage: "Página anterior",
       nextPage: "Página siguiente",
@@ -72,6 +73,7 @@
       menuRestaurants: "Restaurants",
       menuComplex: "Iberostar Playa Paraíso",
       menuGuia: "Interactive guide",
+      menuSiteTour: "View animated guide",
 
       prevPage: "Previous page",
       nextPage: "Next page",
@@ -175,4 +177,3 @@
     translations
   };
 })();
-

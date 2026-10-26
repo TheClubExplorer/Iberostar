@@ -209,6 +209,13 @@ const hotelCoordinates = {
   "Praia do Forte · Star Prestige": [-12.5462, -37.98689]
 };
 
+// Additional GPS landmark for the Paraíso Maya concierge; the resort marker stays at its existing coordinates.
+const additionalHotelDetectionPoints = {
+  "Iberostar Para\u00edso Maya": [
+    { name: "Concierge Para\u00edso Maya", latitude: 20.757707, longitude: -86.964236 }
+  ]
+};
+
 const hotelDetectionRadii = Object.fromEntries(
   Object.keys(hotelCoordinates).map((hotelName) => [hotelName, locationDetectionRadiusMeters])
 );
@@ -2735,6 +2742,16 @@ function findNearestHotel(coords) {
 
 function ensureLocationWelcomeElement() {
   let element = document.getElementById("locationWelcome");
+  let backdrop = document.getElementById("locationWelcomeBackdrop");
+  if (!backdrop) {
+    backdrop = document.createElement("div");
+    backdrop.id = "locationWelcomeBackdrop";
+    backdrop.className = "location-welcome-backdrop";
+    backdrop.setAttribute("aria-hidden", "true");
+    backdrop.hidden = true;
+    backdrop.addEventListener("click", dismissLocationWelcome);
+    document.body.appendChild(backdrop);
+  }
   if (element) return element;
 
   element = document.createElement("aside");
@@ -2775,8 +2792,12 @@ function showLocationWelcome(coords) {
   if (!region || !country) return;
 
   const element = ensureLocationWelcomeElement();
+  const backdrop = document.getElementById("locationWelcomeBackdrop");
   element.querySelector(".location-welcome-region").textContent = region.name;
   element.querySelector(".location-welcome-country").textContent = country.name;
+  element.querySelector(".location-welcome-kicker").textContent = nearest?.hotel
+    ? "¿ESTÁS CERCA DE…?"
+    : "¿ESTÁS EN…?";
   element.querySelector(".location-welcome-message").textContent =
     `¡Bienvenido! Nos alegra tenerte tan cerca de ${region.name}. Preparamos todo para que tu visita sea mágica.`;
 
@@ -2789,7 +2810,7 @@ function showLocationWelcome(coords) {
     hotelBox.hidden = false;
     element.querySelector(".location-welcome-hotel-name").textContent = nearest.hotel.name;
     element.querySelector(".location-welcome-hotel-distance").textContent =
-      `a unos ${formatApproximateDistance(nearest.distance)} de ti · ${region.name}, ${country.name}`;
+      `${nearby.matchedLocation && nearby.matchedLocation !== nearest.hotel.name ? nearby.matchedLocation + " · " : ""}a unos ${formatApproximateDistance(nearest.distance)} de ti · ${region.name}, ${country.name}`;
 
     hotelLink.hidden = false;
     hotelLink.href = hotelRoute;
@@ -2808,6 +2829,8 @@ function showLocationWelcome(coords) {
     directionsButton.hidden = true;
   }
 
+  backdrop.hidden = false;
+  requestAnimationFrame(() => backdrop.classList.add("is-visible"));
   element.hidden = false;
   element.classList.remove("is-leaving");
   element.classList.remove("is-visible");
@@ -2815,18 +2838,21 @@ function showLocationWelcome(coords) {
   element.classList.add("is-visible");
 
   clearTimeout(element._hideTimer);
-  element._hideTimer = setTimeout(dismissLocationWelcome, 17000);
+  element._hideTimer = setTimeout(dismissLocationWelcome, 45000);
 }
 
 function dismissLocationWelcome() {
   const element = document.getElementById("locationWelcome");
   if (!element || element.hidden) return;
   clearTimeout(element._hideTimer);
+  const backdrop = document.getElementById("locationWelcomeBackdrop");
+  backdrop?.classList.remove("is-visible");
   element.classList.remove("is-visible");
   element.classList.add("is-leaving");
   setTimeout(() => {
     element.hidden = true;
     element.classList.remove("is-leaving");
+    if (backdrop) backdrop.hidden = true;
   }, 340);
 }
 
@@ -2859,6 +2885,7 @@ function startWelcomeDirections(nearest) {
 }
 
 function autoDetectLocation() {
+  if (document.documentElement.dataset.tourPreview === "true") return;
   if (autoLocationAttempted) return;
   autoLocationAttempted = true;
   if (!navigator.geolocation) return;
@@ -2872,6 +2899,12 @@ function autoDetectLocation() {
   } else {
     start();
   }
+}
+
+function startLocationServices() {
+  if (document.documentElement.dataset.tourPreview === "true") return;
+  autoDetectLocation();
+  window.RevistaDigital.location?.startNearbyContextWatch?.();
 }
 
 
@@ -5273,13 +5306,21 @@ function findNearbyLocation(coords) {
       const coordinatesForDestination = [];
       destination.hotels.forEach((hotel) => {
         if (!Number.isFinite(hotel.latitude) || !Number.isFinite(hotel.longitude)) return;
-        const point = { latitude: hotel.latitude, longitude: hotel.longitude };
-        coordinatesForDestination.push(point);
-        const distance = distanceBetweenCoordinates(coords, point);
         const detectionRadius = hotel.detectionRadiusMeters || locationDetectionRadiusMeters;
-        if (distance <= detectionRadius && (!closestHotel || distance < closestHotel.distance)) {
-          closestHotel = { hotel, country, countrySlug, destination, distance };
-        }
+        const hotelNameKey = String(hotel.name || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        const configuredPoints = additionalHotelDetectionPoints[hotel.name] ||
+          (/paraiso maya/i.test(hotelNameKey) ? additionalHotelDetectionPoints["Iberostar Para\u00edso Maya"] : []);
+        const points = [
+          { latitude: hotel.latitude, longitude: hotel.longitude, name: hotel.name },
+          ...configuredPoints
+        ];
+        points.forEach((point) => {
+          coordinatesForDestination.push(point);
+          const distance = distanceBetweenCoordinates(coords, point);
+          if (distance <= detectionRadius && (!closestHotel || distance < closestHotel.distance)) {
+            closestHotel = { hotel, country, countrySlug, destination, distance, matchedLocation: point.name || hotel.name };
+          }
+        });
       });
       const areaCenter = destination.detectionArea?.center;
       if (areaCenter?.length === 2) {
@@ -6663,13 +6704,7 @@ document.addEventListener("keydown", (event) => {
 mobileNavMedia?.addEventListener("change", (event) => {
   if (!event.matches) closeMobileNav();
 });
-window.setTimeout(autoDetectLocation, 700);
-// Vigilancia de contexto cercano: alimenta el aviso "📊 Parece que estás cerca
-// de…". Antes no se iniciaba nunca porque app.js regresaba antes de llamarla
-// cuando las rutas gestionan el arranque.
-if (typeof window.RevistaDigital.location?.startNearbyContextWatch === "function") {
-  window.RevistaDigital.location.startNearbyContextWatch();
-}
+window.RevistaDigital.startLocationServices = startLocationServices;
 if (typeof window.RevistaDigital.routes?.restoreCurrentRoute === "function") {
   if (document.body.dataset.routeManaged !== "true") {
     window.RevistaDigital.routes.restoreCurrentRoute();

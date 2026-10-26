@@ -1439,6 +1439,7 @@
       history.pushState({ appRoute: path, restaurantReturnRoute, cartReturnRoute }, "", target);
     }
     handleRouteChange(path);
+    window.RevistaDigital.siteTour?.onRouteChange?.(getCurrentRoute());
   }
   document.addEventListener("click", (event) => {
     const link = event.target.closest("a[data-app-route]");
@@ -1606,6 +1607,7 @@
     // El enlace "Lugares del complejo" abre además el panel de la guía.
     if (targetId === "hotel-guia") setGuidePanelOpen(true);
     scrollToAppHash();
+    window.RevistaDigital.siteTour?.onRouteChange?.(getCurrentRoute() + "#" + targetId);
   });
 
   function initializeRouteHandler() {
@@ -1615,11 +1617,13 @@
         document.body.dataset.restaurantReturnRoute = event.state.restaurantReturnRoute;
       }
       handleRouteChange(route);
+      window.RevistaDigital.siteTour?.onRouteChange?.(getCurrentRoute());
     });
   }
 
   function restoreCurrentRoute() {
     handleRouteChange();
+    window.RevistaDigital.siteTour?.onRouteChange?.(getCurrentRoute());
   }
 
   function handleRouteChange(route = getCurrentRoute()) {

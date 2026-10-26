@@ -25,7 +25,8 @@
       }
     }
 
-    if (typeof window.RevistaDigital.location?.startNearbyContextWatch === "function") {
+    if (document.documentElement.dataset.tourPreview !== "true" &&
+        typeof window.RevistaDigital.location?.startNearbyContextWatch === "function") {
       try {
         window.RevistaDigital.location.startNearbyContextWatch();
       } catch (error) {
