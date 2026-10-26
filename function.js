@@ -5537,7 +5537,7 @@ function syncBookRoute() {
   } else if (page.type === "videos") {
     nextPath = "/videos";
   } else if (page.type === "complex") {
-    nextPath = "/complejo-playa-paraiso";
+    nextPath = "/mexico/riviera-maya";
   }
 
   const projectBasePath = new URL(appBaseElement.href).pathname.replace(/\/+$/, "");

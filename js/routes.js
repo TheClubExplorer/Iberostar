@@ -213,6 +213,28 @@
       };
     }
 
+    if (route === "/carrito-golf") {
+      const cartReturnRoute = window.history.state?.cartReturnRoute;
+      const returnParts = typeof cartReturnRoute === "string"
+        ? cartReturnRoute.split("/").filter(Boolean)
+        : [];
+      const catalog = getDestinationCatalog() || {};
+      const destination = catalog.mexico?.destinations?.find((item) => item.slug === "riviera-maya");
+      const hotel = returnParts.length === 3 && returnParts[0] === "mexico" && returnParts[1] === "riviera-maya"
+        ? destination?.hotels?.find((item) => item.slug === returnParts[2] && PLAYA_PARAISO_GUIDE_HOTELS.has(item.slug))
+        : null;
+      if (hotel) {
+        return {
+          back: { label: `Volver a ${hotel.name}`, route: `/mexico/riviera-maya/${hotel.slug}` },
+          trail: [{ label: "México", route: "/mexico" }, { label: "Riviera Maya", route: "/mexico/riviera-maya" }, { label: hotel.name }]
+        };
+      }
+      return {
+        back: { label: "Volver a Riviera Maya", route: "/mexico/riviera-maya" },
+        trail: [{ label: "México", route: "/mexico" }, { label: "Riviera Maya" }]
+      };
+    }
+
     const parts = route.split("/").filter(Boolean);
 
     if (parts[0] === "restaurantes") {
@@ -469,6 +491,14 @@
   }
 
   function getPreferredCartHotel(hotels) {
+    const cartReturnRoute = window.history.state?.cartReturnRoute;
+    const returnParts = typeof cartReturnRoute === "string"
+      ? cartReturnRoute.split("/").filter(Boolean)
+      : [];
+    if (returnParts.length === 3 && returnParts[0] === "mexico" && returnParts[1] === "riviera-maya") {
+      const returnHotel = hotels.find((hotel) => hotel.slug === returnParts[2]);
+      if (returnHotel) return returnHotel;
+    }
     let slug = "";
     try { slug = sessionStorage.getItem("clubCartHotel") || ""; } catch (error) { slug = ""; }
     return hotels.find((hotel) => hotel.slug === slug) || hotels[0];
@@ -655,7 +685,7 @@
           countryMapMarkup = `<section class="portal-map-section"><div><p class="portal-kicker">UBICACIÓN</p><h2>Mapa de ${escapeHtml(countryData.name)}</h2><p>Explora los hoteles disponibles en los destinos de ${escapeHtml(countryData.name)}.</p></div><div class="portal-map-frame"><div class="portal-destination-map" id="countryMap" role="application" aria-label="Mapa de hoteles en ${escapeHtml(countryData.name)}"></div>${portalMapActions(countryHotels)}</div></section>`;
         }
       }
-      view.innerHTML = `<main class="portal-page">${!isHome ? portalNav(getPortalNavModel(route)) : ""}<section class="portal-hero"><div><p class="portal-kicker">${breadcrumb}</p><h1>${heading}</h1><p>${intro}</p>${!isHome ? "" : `<a class="portal-hero-link" href="${href("/complejo-playa-paraiso")}" data-app-route="/complejo-playa-paraiso">Conoce Iberostar Playa Paraíso <span>→</span></a>`}</div>${RI.img(isHome ? "src/paraiso-del-mar/banner/ParaisoDelMar.jpg" : countryData.image, {
+      view.innerHTML = `<main class="portal-page">${!isHome ? portalNav(getPortalNavModel(route)) : ""}<section class="portal-hero"><div><p class="portal-kicker">${breadcrumb}</p><h1>${heading}</h1><p>${intro}</p>${!isHome ? "" : `<a class="portal-hero-link" href="${href("/mexico/riviera-maya")}" data-app-route="/mexico/riviera-maya">Conoce Iberostar Playa Paraíso <span>→</span></a>`}</div>${RI.img(isHome ? "src/paraiso-del-mar/banner/ParaisoDelMar.jpg" : countryData.image, {
           alt: "Paisaje de destino",
           priority: true,
           sizes: "(max-width:600px) 100vw, 45vw"
@@ -680,7 +710,7 @@
           alt: "",
           priority: true,
           sizes: "(max-width:600px) 100vw, 45vw"
-        })}<div><p class="portal-kicker">${escapeHtml(countryData.name).toUpperCase()} · DESTINO</p><h1>${escapeHtml(destination.name)}</h1><p>${escapeHtml(destination.description)}</p>${destination.complex ? `<a class="portal-hero-link" href="${href("/complejo-playa-paraiso")}" data-app-route="/complejo-playa-paraiso">Ver el complejo Playa Paraíso →</a>` : ""}</div></section><section class="portal-section"><div class="portal-section-heading"><div><p class="portal-kicker">ALOJAMIENTOS</p><h2>Hoteles en ${escapeHtml(destination.name)}</h2></div></div><div class="destination-grid destination-grid--hotels">${renderCards(hotels, (hotel) => `/${country}/${destination.slug}/${hotel.slug}`, "hotel")}</div></section></main>`;
+        })}<div><p class="portal-kicker">${escapeHtml(countryData.name).toUpperCase()} · DESTINO</p><h1>${escapeHtml(destination.name)}</h1><p>${escapeHtml(destination.description)}</p>${destination.complex ? `<a class="portal-hero-link" href="${href("/mexico/riviera-maya")}" data-app-route="/mexico/riviera-maya">Ver el complejo Playa Paraíso →</a>` : ""}</div></section><section class="portal-section"><div class="portal-section-heading"><div><p class="portal-kicker">ALOJAMIENTOS</p><h2>Hoteles en ${escapeHtml(destination.name)}</h2></div></div><div class="destination-grid destination-grid--hotels">${renderCards(hotels, (hotel) => `/${country}/${destination.slug}/${hotel.slug}`, "hotel")}</div></section></main>`;
       const mapElement = view.querySelector("#destinationMap");
       if (mapElement) window.RevistaDigital.mapas?.initializeDestinationMap(mapElement, { countrySlug: country, destination });
       return true;
@@ -962,6 +992,7 @@
     const navItems = [];
     if (hasCoordinates) navItems.push(["ubicacion", hasComplexGuide ? "Mapa del complejo" : "Ubicación"]);
     if (hasComplexGuide) navItems.push(["guia", "Lugares del complejo"]);
+    if (hasComplexGuide) navItems.push(["transporte", "Transporte"]);
     if (services.length) navItems.push(["servicios", "Servicios"]);
 
     const heroMarkup = `
@@ -1026,6 +1057,17 @@
               <a class="portal-map-btn" href="${href(`/restaurantes/${hotel.slug}`)}" data-app-route="/restaurantes/${escapeHtml(hotel.slug)}">Ver restaurantes</a>
             </aside>`;
     const hotelExploreMarkup = hasComplexGuide ? restaurantRouteMarkup : zonePanelMarkup;
+    const transportMarkup = hasComplexGuide ? `
+        <section class="hotel-portal-section hotel-transport-section" id="hotel-transporte">
+          <div class="hotel-transport-card">
+            <div class="hotel-transport-copy">
+              <p class="portal-kicker">TRANSPORTE</p>
+              <h2>¿Quieres llegar más rápido a tu destino?</h2>
+              <p>¡Solicita el transporte más cercano ahora!</p>
+            </div>
+            <a class="hotel-transport-cta" href="${href("/carrito-golf")}" data-app-route="/carrito-golf">Solicitar transporte</a>
+          </div>
+        </section>` : "";
 
     const mapMarkup = hasCoordinates ? (hasComplexGuide ? `
         <section class="hotel-portal-section" id="hotel-ubicacion">
@@ -1078,6 +1120,7 @@
         </nav>
 
         ${mapMarkup}
+        ${transportMarkup}
         ${guideMarkup}
         ${servicesMarkup}
       </main>
@@ -1391,7 +1434,10 @@
       ? (document.body.dataset.restaurantReturnRoute || getCurrentRoute())
       : null;
     if (restaurantReturnRoute) document.body.dataset.restaurantReturnRoute = restaurantReturnRoute;
-    if (window.location.pathname !== target) history.pushState({ appRoute: path, restaurantReturnRoute }, "", target);
+    if (window.location.pathname !== target) {
+      const cartReturnRoute = path === "/carrito-golf" ? getCurrentRoute() : null;
+      history.pushState({ appRoute: path, restaurantReturnRoute, cartReturnRoute }, "", target);
+    }
     handleRouteChange(path);
   }
   document.addEventListener("click", (event) => {
@@ -1578,14 +1624,6 @@
 
   function handleRouteChange(route = getCurrentRoute()) {
       route = route.startsWith("/") ? route : `/${route}`;
-      if (route === "/") {
-        document.body.dataset.routeManaged = "true";
-        document.body.dataset.appMode = "portal";
-      }
-      window.RevistaDigital.routeContext = getRouteContext(route);
-      window.RevistaDigital.routeTarget = resolveRouteTarget(route);
-      refreshCurrentAppContext(route);
-      if (!route.startsWith("/restaurantes/")) delete document.body.dataset.restaurantReturnRoute;
       const legacyRouteAliases = {
         "/brasil/brasil": "/brasil/praia-do-forte",
         "/brasil/manaus": "/brasil/amazon",
@@ -1594,14 +1632,22 @@
         "/brasil/brasil/iberostar-waves-bahia": "/brasil/bahia/iberostar-waves-bahia",
         "/brasil/brasil/iberostar-heritage-grand-amazon": "/brasil/amazon/iberostar-heritage-grand-amazon",
         "/jamaica/rose-hall/joia-rose-hall-by-iberostar": "/jamaica/rose-hall/joia-rose-hall",
-        // La guía interactiva se integró en las fichas de los hoteles de
-        // Playa Paraíso: la ruta antigua lleva al destino de Riviera Maya.
-        "/guia-playa-paraiso": "/mexico/riviera-maya"
+        "/guia-playa-paraiso": "/mexico/riviera-maya",
+        "/complejo-playa-paraiso": "/mexico/riviera-maya"
       };
       if (legacyRouteAliases[route]) {
-        route = legacyRouteAliases[route];
-        history.replaceState(history.state, "", href(route));
+        const canonicalRoute = legacyRouteAliases[route];
+        history.replaceState(history.state, "", href(canonicalRoute));
+        return handleRouteChange(canonicalRoute);
       }
+      if (route === "/") {
+        document.body.dataset.routeManaged = "true";
+        document.body.dataset.appMode = "portal";
+      }
+      window.RevistaDigital.routeContext = getRouteContext(route);
+      window.RevistaDigital.routeTarget = resolveRouteTarget(route);
+      refreshCurrentAppContext(route);
+      if (!route.startsWith("/restaurantes/")) delete document.body.dataset.restaurantReturnRoute;
       if (renderPortal(route)) {
         state().activeRestaurantMenuIndex = null;
         state().activeHotelDetail = null;

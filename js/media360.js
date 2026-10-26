@@ -103,8 +103,32 @@
 
   function wire360() {
     const filter = document.getElementById("media360Filter");
-    filter?.addEventListener("change", render360Cards);
+    if (filter && filter.dataset.bound !== "true") {
+      filter.dataset.bound = "true";
+      filter.addEventListener("change", render360Cards);
+    }
     render360Cards();
+
+    const currentRoute = window.RevistaDigital.appContext?.route || document.body.dataset.currentRoute;
+    if (currentRoute !== "/360") return;
+    let pendingSelection = null;
+    try {
+      const storedSelection = window.sessionStorage.getItem("club360RestaurantSelection");
+      if (storedSelection) {
+        window.sessionStorage.removeItem("club360RestaurantSelection");
+        pendingSelection = JSON.parse(storedSelection);
+      }
+    } catch (error) {
+      console.warn("No se pudo recuperar el restaurante para la exploración 360°.", error);
+      return;
+    }
+    if (pendingSelection?.hotelName && pendingSelection?.label) {
+      window.RevistaDigital.pannellum360?.open?.(
+        pendingSelection.hotelName,
+        "restaurantes",
+        pendingSelection.label
+      );
+    }
   }
 
   function reset360Form() {}

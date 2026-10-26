@@ -403,6 +403,187 @@
       popupAnchor: [0, -size/2]
     });
   };
+  var POI_GALLERY_HOTELS = [
+    {
+      name: "Iberostar Paraíso del Mar",
+      slug: "iberostar-paraiso-del-mar",
+      folder: "paraiso-del-mar",
+      images: ["PMA_GAST_0015", "PMA_GAST_0024", "PMA_GAST_0060", "PMA_GAST_0065", "PMA_GAST_0072"]
+    },
+    {
+      name: "Iberostar Paraíso Maya",
+      slug: "iberostar-paraiso-maya",
+      folder: "paraiso-maya",
+      images: ["PMY_GAST_0231", "PMY_GAST_0235", "PMY_GAST_0262", "PMY_GAST_0270", "PMY_GAST_0296"]
+    },
+    {
+      name: "Iberostar Paraíso Lindo",
+      slug: "iberostar-paraiso-lindo",
+      folder: "paraiso-lindo",
+      restaurantFolder: "Restaurante",
+      images: ["PLI_GAST_0043", "PLI_GAST_0085", "PLI_GAST_0089", "PLI_GAST_0098", "PLI_GAST_0105"]
+    },
+    {
+      name: "Iberostar Paraíso Beach",
+      slug: "iberostar-paraiso-beach",
+      folder: "paraiso-beach",
+      images: ["PBE_GAST_0048", "PBE_GAST_0049", "PBE_GAST_0053", "PBE_GAST_0059", "PBE_GAST_0061"]
+    },
+    {
+      name: "Iberostar Paraíso JOIA",
+      slug: "iberostar-paraiso-joia",
+      folder: "paraiso-JOIA",
+      images: ["GHP_GAST_0097", "GHP_GAST_0102", "GHP_GAST_0103", "GHP_GAST_0166", "GHP_GAST_0191"]
+    }
+  ];
+  var GOLF_GALLERY_IMAGES = [
+    "src/Golf-Playa-Paraiso/PGC_GOLF_0015.webp",
+    "src/Golf-Playa-Paraiso/PGC_GOLF_0026.webp",
+    "src/Golf-Playa-Paraiso/PGC_GOLF_0032.webp",
+    "src/Golf-Playa-Paraiso/PGC_GOLF_0073.webp"
+  ];
+
+  function popupEscape(value) {
+    return String(value == null ? "" : value).replace(/[&<>"']/g, function (character) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[character];
+    });
+  }
+
+  function poiGalleryHotel(poi) {
+    var direct = POI_GALLERY_HOTELS.find(function (hotel) { return hotel.name === poi.hotelId; });
+    if (direct) return direct;
+    var hotelSlug = document.body && document.body.dataset.hotelSlug;
+    var pageHotel = POI_GALLERY_HOTELS.find(function (hotel) { return hotel.slug === hotelSlug; });
+    if (pageHotel && (!Number.isFinite(poi.lat) || !Number.isFinite(poi.lng))) return pageHotel;
+
+    var hotelCoordinates = window.RevistaDigital.state && window.RevistaDigital.state.hotelCoordinates;
+    if (!Number.isFinite(poi.lat) || !Number.isFinite(poi.lng) || !hotelCoordinates) return pageHotel || null;
+    var closest = null;
+    var closestDistance = Infinity;
+    POI_GALLERY_HOTELS.forEach(function (hotel) {
+      var coordinates = hotelCoordinates[hotel.name];
+      if (!Array.isArray(coordinates)) return;
+      var latitudeDelta = poi.lat - coordinates[0];
+      var longitudeDelta = (poi.lng - coordinates[1]) * Math.cos(poi.lat * Math.PI / 180);
+      var distance = latitudeDelta * latitudeDelta + longitudeDelta * longitudeDelta;
+      if (distance < closestDistance) {
+        closest = hotel;
+        closestDistance = distance;
+      }
+    });
+    return closest || pageHotel || null;
+  }
+
+  function poiPopupMarkup(poi) {
+    var name = popupEscape(poi.name);
+    var description = popupEscape(poi.description || "");
+    var isRestaurant = poi.category === "restaurante";
+    var isGolf = poi.category === "golf";
+    var hotel = isRestaurant ? poiGalleryHotel(poi) : null;
+    var images = isGolf
+      ? GOLF_GALLERY_IMAGES
+      : (isRestaurant
+        ? (hotel?.images || []).map(function (image) {
+            return "src/" + hotel.folder + "/" + (hotel.restaurantFolder || "restaurante") + "/" + image + "-640.webp";
+          })
+        : []);
+    var has360 = isRestaurant && hotel && window.RevistaDigital.pannellum360?.isPlayaParaiso?.(hotel.name);
+    var slides = images.map(function (image, index) {
+      return '<div class="gp-map-carousel-slide' + (index === 0 ? ' is-active' : '') + '" data-map-slide aria-hidden="' + (index === 0 ? 'false' : 'true') + '">' +
+        '<img src="' + popupEscape(image) + '" alt="' + name + ' · imagen ' + (index + 1) + '" loading="' + (index === 0 ? 'eager' : 'lazy') + '" decoding="async" />' +
+        '</div>';
+    });
+    if (has360) {
+      slides.push('<div class="gp-map-carousel-slide gp-map-carousel-360" data-map-slide aria-hidden="true">' +
+        '<strong>¿Quieres ver más de ' + name + '?</strong>' +
+        '<span>Explora este restaurante en 360° en ' + popupEscape(hotel.name) + '.</span>' +
+        '<button type="button" class="gp-map-carousel-360-link" data-poi-360-hotel="' + popupEscape(hotel.name) + '" data-poi-360-label="' + name + '">Ver exploración 360°</button>' +
+        '</div>');
+    }
+    var carousel = images.length
+      ? '<div class="gp-map-carousel" data-map-carousel>' +
+          '<div class="gp-map-carousel-slides">' + slides.join("") + '</div>' +
+          '<div class="gp-map-carousel-controls">' +
+            '<button type="button" data-map-carousel-step="-1" aria-label="Imagen anterior">‹</button>' +
+            '<span data-map-carousel-count>1 / ' + slides.length + '</span>' +
+            '<button type="button" data-map-carousel-step="1" aria-label="Imagen siguiente">›</button>' +
+          '</div>' +
+        '</div>'
+      : "";
+    var cartButton = (isRestaurant || isGolf)
+      ? '<button type="button" class="gp-map-cart guide-cart" data-id="' + popupEscape(poi.id) + '" data-cat="' + popupEscape(poi.category) + '">Solicitar carrito</button>'
+      : "";
+    return '<div class="gp-map-poi-popup"><strong class="gp-map-poi-title">' + name + '</strong>' +
+      (description ? '<small class="gp-map-poi-description">' + description + '</small>' : '') +
+      carousel +
+      '<button type="button" class="gp-dir" data-lat="' + poi.lat + '" data-lng="' + poi.lng + '" data-name="' + name + '">Cómo llegar</button>' +
+      cartButton +
+      '</div>';
+  }
+
+  function initializePoiPopup(popupElement) {
+    if (!popupElement) return;
+    var carousel = popupElement.querySelector("[data-map-carousel]");
+    if (carousel) {
+      var slides = Array.prototype.slice.call(carousel.querySelectorAll("[data-map-slide]"));
+      var count = carousel.querySelector("[data-map-carousel-count]");
+      if (carousel.dataset.initialized !== "true") {
+        carousel.dataset.initialized = "true";
+        carousel.__currentSlide = 0;
+        carousel.__showSlide = function (index) {
+          carousel.__currentSlide = (index + slides.length) % slides.length;
+          slides.forEach(function (slide, slideIndex) {
+            var active = slideIndex === carousel.__currentSlide;
+            slide.classList.toggle("is-active", active);
+            slide.setAttribute("aria-hidden", String(!active));
+          });
+          if (count) count.textContent = (carousel.__currentSlide + 1) + " / " + slides.length;
+        };
+        carousel.querySelectorAll("[data-map-carousel-step]").forEach(function (button) {
+          button.addEventListener("click", function () {
+            carousel.__showSlide(carousel.__currentSlide + Number(button.dataset.mapCarouselStep || 0));
+          });
+        });
+      }
+      var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (!reduceMotion && slides.length > 1 && !carousel.__autoPlay) {
+        carousel.__autoPlay = window.setInterval(function () {
+          carousel.__showSlide(carousel.__currentSlide + 1);
+        }, 3500);
+      }
+      carousel.__showSlide(carousel.__currentSlide);
+    }
+    var cartButton = popupElement.querySelector(".gp-map-cart");
+    if (cartButton && cartButton.dataset.bound !== "true") {
+      cartButton.dataset.bound = "true";
+      cartButton.addEventListener("click", function () {
+        window.RevistaDigital.guiapa?.requestCartForPoi?.(cartButton.dataset.id);
+      });
+    }
+    var panoramaButton = popupElement.querySelector("[data-poi-360-hotel]");
+    if (panoramaButton && panoramaButton.dataset.bound !== "true") {
+      panoramaButton.dataset.bound = "true";
+      panoramaButton.addEventListener("click", function () {
+        try {
+          window.sessionStorage.setItem("club360RestaurantSelection", JSON.stringify({
+            hotelName: panoramaButton.getAttribute("data-poi-360-hotel"),
+            label: panoramaButton.getAttribute("data-poi-360-label")
+          }));
+        } catch (error) {
+          console.warn("No se pudo guardar el restaurante para la exploración 360°.", error);
+          return;
+        }
+        var routes = window.RevistaDigital.routes;
+        if (routes && typeof routes.navigate === "function") {
+          routes.navigate("/360");
+        } else {
+          var baseHref = document.querySelector("base")?.href || window.location.href;
+          window.location.assign(new URL("360", baseHref).href);
+        }
+      });
+    }
+  }
+
   gp.addPoiLayer = function (map, filterHotelId, options) {
     if (!map || !window.L) return null;
     var L = window.L;
@@ -454,30 +635,47 @@
             ? gp.createConciergeDivIcon(cat.color)
             : gp.createDivIcon(cat.color);
       var m = window.L.marker([p.lat, p.lng], icon ? { icon: icon } : {});
-      var name = p.name || "";
-      var dirButton = '<button type="button" class="gp-dir" data-lat="' + p.lat + '" data-lng="' + p.lng + '" data-name="' + name.replace(/"/g,'&quot;') + '">Cómo llegar</button>';
-      var popup, popupOptions;
-      if (p.category === "club") {
-        popup = '<div class="gp-club-popup">'
-          + '<div class="gp-club-popup-badge"><img class="gp-club-popup-logo" src="branding/IB_THE_CLUB_VV_POS_RGB-320.webp" alt="" /></div>'
-          + '<h3 class="gp-club-popup-name">' + name + '</h3>'
-          + (p.hours ? '<p class="gp-club-popup-hours">' + p.hours + '</p>' : '')
-          + dirButton
-          + '</div>';
-        popupOptions = { className: 'gp-club-pop', minWidth: 190, maxWidth: 230 };
-      } else if (p.category === "starprestige") {
-        popup = '<div class="gp-sp-popup">'
-          + '<div class="gp-sp-popup-badge"><span class="gp-sp-popup-star">✦</span>STAR PRESTIGE</div>'
-          + '<h3 class="gp-sp-popup-name">' + name + '</h3>'
-          + (p.description ? '<p class="gp-sp-popup-desc">' + p.description + '</p>' : '')
-          + (p.hours ? '<p class="gp-sp-popup-hours">' + p.hours + '</p>' : '')
-          + dirButton
-          + '</div>';
-        popupOptions = { className: 'gp-sp-pop', minWidth: 220, maxWidth: 260 };
+      var popupOptions;
+      if (p.category === "restaurante" || p.category === "golf") {
+        popupOptions = { className: "gp-map-poi-pop", minWidth: 230, maxWidth: 280 };
+        m.bindPopup(poiPopupMarkup(p), popupOptions);
+        m.on("popupopen", function (event) {
+          initializePoiPopup(event.popup.getElement());
+        });
+        m.on("popupclose", function (event) {
+          var popupElement = event.popup.getElement();
+          var carousel = popupElement && popupElement.querySelector("[data-map-carousel]");
+          if (carousel && carousel.__autoPlay) {
+            window.clearInterval(carousel.__autoPlay);
+            carousel.__autoPlay = null;
+          }
+        });
       } else {
-        popup = '<strong>' + name + '</strong><br><small>' + (p.description||'') + '</small><br>' + dirButton;
+        var name = p.name || "";
+        var dirButton = '<button type="button" class="gp-dir" data-lat="' + p.lat + '" data-lng="' + p.lng + '" data-name="' + name.replace(/"/g,'&quot;') + '">Cómo llegar</button>';
+        var popup;
+        if (p.category === "club") {
+          popup = '<div class="gp-club-popup">'
+            + '<div class="gp-club-popup-badge"><img class="gp-club-popup-logo" src="branding/IB_THE_CLUB_VV_POS_RGB-320.webp" alt="" /></div>'
+            + '<h3 class="gp-club-popup-name">' + name + '</h3>'
+            + (p.hours ? '<p class="gp-club-popup-hours">' + p.hours + '</p>' : '')
+            + dirButton
+            + '</div>';
+          popupOptions = { className: 'gp-club-pop', minWidth: 190, maxWidth: 230 };
+        } else if (p.category === "starprestige") {
+          popup = '<div class="gp-sp-popup">'
+            + '<div class="gp-sp-popup-badge"><span class="gp-sp-popup-star">✦</span>STAR PRESTIGE</div>'
+            + '<h3 class="gp-sp-popup-name">' + name + '</h3>'
+            + (p.description ? '<p class="gp-sp-popup-desc">' + p.description + '</p>' : '')
+            + (p.hours ? '<p class="gp-sp-popup-hours">' + p.hours + '</p>' : '')
+            + dirButton
+            + '</div>';
+          popupOptions = { className: 'gp-sp-pop', minWidth: 220, maxWidth: 260 };
+        } else {
+          popup = '<strong>' + name + '</strong><br><small>' + (p.description||'') + '</small><br>' + dirButton;
+        }
+        m.bindPopup(popup, popupOptions);
       }
-      m.bindPopup(popup, popupOptions);
       gp.registerMarker(p.id, m);
       m.addTo(layer);
     });

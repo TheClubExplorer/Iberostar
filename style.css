@@ -3922,6 +3922,41 @@ body.pano-360-open { overflow: hidden; }
   transform:rotate(45deg);
 }
 .hotel-restaurant-route .portal-map-btn:focus-visible { outline:2px solid var(--green-deep); outline-offset:3px; }
+.hotel-transport-card {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:24px;
+  padding:clamp(22px,4vw,38px);
+  border:1px solid #d9c9ae;
+  border-radius:18px;
+  background:linear-gradient(120deg,#fbf8f1,#f3ead6);
+  box-shadow:0 12px 32px rgba(64,54,46,.08);
+}
+.hotel-transport-copy { max-width:680px; }
+.hotel-transport-copy h2 { margin:6px 0 10px; color:#40362e; font:500 clamp(24px,3vw,36px)/1.2 Georgia,serif; }
+.hotel-transport-copy > p:last-child { margin:0; color:#8a7c6e; font:14px/1.65 Arial,sans-serif; }
+.hotel-transport-cta {
+  display:inline-flex;
+  flex:0 0 auto;
+  align-items:center;
+  justify-content:center;
+  min-height:48px;
+  padding:12px 22px;
+  border:1px solid #8f7332;
+  border-radius:999px;
+  background:linear-gradient(135deg,#d4b85c,#b8963e);
+  color:#1a1508;
+  font:700 11px/1 Arial,sans-serif;
+  letter-spacing:.07em;
+  text-decoration:none;
+  text-transform:uppercase;
+  transition:filter .18s ease,transform .18s ease,box-shadow .18s ease;
+}
+.hotel-transport-cta:hover,
+.hotel-transport-cta:focus-visible { filter:brightness(1.05); transform:translateY(-2px); box-shadow:0 8px 20px rgba(64,54,46,.16); }
+.hotel-transport-cta:focus-visible { outline:2px solid var(--green-deep); outline-offset:3px; }
+@media(max-width:599px) { .hotel-transport-card { align-items:stretch; flex-direction:column; } .hotel-transport-cta { width:100%; } }
 @media (max-width:899px){ .hotel-portal-location { grid-template-columns:1fr; } .hotel-zone-strip { grid-template-columns:repeat(3,minmax(0,1fr)); } }
 @media (max-width:599px){ .hotel-zone-strip { grid-template-columns:repeat(2,minmax(0,1fr)); } .hotel-zone img { height:82px; } }
 
@@ -5623,6 +5658,31 @@ body.mobile-nav-open .location-status { display: none !important; }
   filter: brightness(1.08);
   transform: translateY(-1px);
 }
+
+.gp-map-poi-pop .leaflet-popup-content-wrapper { border-radius: 13px; }
+.gp-map-poi-pop .leaflet-popup-content { width: 238px !important; margin: 10px 12px; }
+.gp-map-poi-popup { display: grid; gap: 7px; font-family: Arial, sans-serif; }
+.gp-map-poi-title { color: #17344e; font-size: 14px; line-height: 1.25; }
+.gp-map-poi-description { color: #6e7780; font-size: 11px; line-height: 1.35; }
+.gp-map-carousel { overflow: hidden; border-radius: 9px; background: #eef0ed; }
+.gp-map-carousel-slides { position: relative; height: 126px; }
+.gp-map-carousel-slide { display: none; position: absolute; inset: 0; }
+.gp-map-carousel-slide.is-active { display: flex; }
+.gp-map-carousel-slide img { width: 100%; height: 100%; object-fit: cover; }
+.gp-map-carousel-controls { display: flex; align-items: center; justify-content: space-between; height: 30px; padding: 0 8px; color: #344a5d; font-size: 11px; }
+.gp-map-carousel-controls button { width: 26px; height: 25px; border: 0; border-radius: 6px; background: #fff; color: #17344e; font-size: 19px; line-height: 1; cursor: pointer; }
+.gp-map-carousel-controls button:hover { background: #f1e4b8; }
+.gp-map-carousel-360 { flex-direction: column; align-items: flex-start; justify-content: center; gap: 6px; padding: 13px; background: linear-gradient(135deg, #edf4f7, #f8f1df); box-sizing: border-box; }
+.gp-map-carousel-360 strong { color: #17344e; font-size: 12px; line-height: 1.3; }
+.gp-map-carousel-360 span { color: #536575; font-size: 10px; line-height: 1.35; }
+.gp-map-carousel-360-link,
+.gp-map-cart { width: 100%; min-height: 31px; padding: 6px 9px; border: 1px solid #2e8b57; border-radius: 7px; background: #2e8b57; color: #fff; font: 700 11px Arial, sans-serif; cursor: pointer; }
+.gp-map-carousel-360-link { width: auto; border-color: #0057b8; background: #0057b8; }
+.gp-map-cart:hover,
+.gp-map-cart:focus-visible,
+.gp-map-carousel-360-link:hover,
+.gp-map-carousel-360-link:focus-visible { filter: brightness(1.08); }
+.gp-map-poi-popup > .gp-dir { width: 100%; margin: 0; font-size: 11px; }
 
 @media (max-width: 850px) {
   .hotel-cart-tracker { grid-template-columns: 1fr; gap: 16px; }
