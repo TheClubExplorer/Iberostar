@@ -806,6 +806,12 @@
   function renderSlide() {
     if (!overlay || !currentSlides.length) return;
     var slide = currentSlides[currentIndex];
+    var pageTranslations = window.RevistaDigital && window.RevistaDigital.pageTranslations;
+    var translate = function (value) {
+      return pageTranslations && typeof pageTranslations.translateText === "function"
+        ? pageTranslations.translateText(value)
+        : value;
+    };
     var scene = overlay.querySelector(".site-tour-scene");
     var content = overlay.querySelector(".site-tour-content");
     var eyebrow = overlay.querySelector(".site-tour-eyebrow");
@@ -821,12 +827,12 @@
     } else {
       scene.outerHTML = sceneMarkup(slide.scene);
     }
-    eyebrow.textContent = slide.eyebrow;
+    eyebrow.textContent = translate(slide.eyebrow);
     content.classList.toggle("is-welcome", slide.treatment === "welcome");
     content.classList.toggle("is-detected-location", slide.treatment === "detected-location");
     if (slide.treatment === "welcome") {
       title.replaceChildren();
-      var welcomeLetters = Array.from(slide.title);
+      var welcomeLetters = Array.from(translate(slide.title));
       welcomeLetters.forEach(function (character, index) {
         if (character === " ") {
           title.appendChild(document.createTextNode(" "));
@@ -840,15 +846,15 @@
         title.appendChild(letter);
       });
     } else {
-      title.textContent = slide.title;
+      title.textContent = translate(slide.title);
     }
-    description.textContent = slide.description;
+    description.textContent = translate(slide.description);
     content.classList.remove("is-entering", "is-leaving");
     void content.offsetWidth;
     content.classList.add("is-entering");
     counter.textContent = currentSlides.length > 1
       ? (currentIndex + 1) + " / " + currentSlides.length
-      : "GUÍA DE ESTA SECCIÓN";
+      : translate("GUÍA DE ESTA SECCIÓN");
     dots.innerHTML = currentSlides.length > 1
       ? currentSlides.map(function (_, index) {
           return '<button type="button" class="site-tour-dot' + (index === currentIndex ? " is-active" : "") +
@@ -859,7 +865,7 @@
 
     if (slide.route) {
       action.hidden = false;
-      action.textContent = slide.action || "Ir a esta sección";
+      action.textContent = translate(slide.action || "Ir a esta sección");
       action.dataset.route = slide.route;
     } else {
       action.hidden = true;
@@ -1035,6 +1041,10 @@
     event.preventDefault();
     tour.open();
     document.querySelector(".site-tools[open]")?.removeAttribute("open");
+  });
+
+  window.addEventListener("languagechange", function () {
+    if (overlay) renderSlide();
   });
 
   var tour = window.RevistaDigital.siteTour || {};

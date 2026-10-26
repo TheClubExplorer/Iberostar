@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
@@ -11,6 +11,8 @@
     <script>
       if (new URLSearchParams(window.location.search).get("tour-preview") === "1") {
         document.documentElement.dataset.tourPreview = "true";
+      } else {
+        document.documentElement.dataset.languageGate = "pending";
       }
       const routeEntry = new URLSearchParams(window.location.search).get("route-entry");
       if (routeEntry) {
@@ -26,7 +28,7 @@
         window.history.replaceState(null, "", targetUrl.href);
       }
     </script>
-    <link rel="stylesheet" href="style.css?v=37" />
+    <link rel="stylesheet" href="style.css?v=38" />
     <link rel="stylesheet" href="responsive.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -46,6 +48,16 @@
   </head>
 
   <body>
+    <div class="language-gate" id="languageGate" role="dialog" aria-modal="true" aria-labelledby="languageGateTitle" aria-describedby="languageGateCountry">
+      <section class="language-gate-card">
+        <p class="language-gate-kicker">THE CLUB EXPLORER</p>
+        <h1 id="languageGateTitle">Elige tu idioma</h1>
+        <p class="language-gate-country" id="languageGateCountry">Sugerencia según el idioma de tu dispositivo</p>
+        <div class="language-gate-options" id="languageGateOptions" role="radiogroup" aria-label="Idioma"></div>
+        <button class="language-gate-continue" id="languageGateContinue" type="button">Continuar</button>
+        <p class="language-gate-note">Después podrás cambiarlo desde el menú.</p>
+      </section>
+    </div>
     <div class="intro-overlay" id="introOverlay" aria-hidden="true">
       <div class="intro-backdrop"></div>
       <div class="intro-glow"></div>
@@ -170,7 +182,7 @@
 <script src="js/app.js?v=3" defer></script>
 <script src="js/pannellum-360.js?v=5" defer></script>
 <script src="js/routes.js?v=23" defer></script>
-<script src="js/site-tour.js?v=40" defer></script>
+<script src="js/site-tour.js?v=42" defer></script>
 <script src="js/hoteles.js?v=2" defer></script>
 <script src="js/restaurantes.js?v=2" defer></script>
 <script src="js/mapas.js?v=18" defer></script>
@@ -179,12 +191,14 @@
 <script src="js/videos.js?v=2" defer></script>
 <script src="js/hotel-gallery-data.js?v=2" defer></script>
 <script src="js/hotel-content-data.js?v=2" defer></script>
-<script src="js/i18n.js?v=5" defer></script>
+<script src="js/i18n.js?v=7" defer></script>
+<script src="js/page-translations.js?v=2" defer></script>
+<script src="js/language-gate.js?v=1" defer></script>
 <script src="js/search.js?v=2" defer></script>
 <script src="js/datos-complejo.js?v=2" defer></script>
 <script src="js/guia-playa-paraiso.js?v=21" defer></script>
 <script src="js/carrito-golf.js?v=12" defer></script>
 <script src="function.js?v=13" defer></script>
-<script src="js/animations.js?v=4" defer></script>
+<script src="js/animations.js?v=5" defer></script>
   </body>
 </html>

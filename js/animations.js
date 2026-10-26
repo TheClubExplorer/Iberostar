@@ -744,7 +744,11 @@
      --------------------------------------------------------- */
 
   function boot() {
-    runIntro();
+    if (document.documentElement.dataset.languageGate === "pending") {
+      window.addEventListener("languagegate:complete", runIntro, { once: true });
+    } else {
+      runIntro();
+    }
     watchShell();
     enableCoverParallax();
   }

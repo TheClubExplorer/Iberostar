@@ -50,7 +50,13 @@
       openD3WorldMap: "Abrir Planisferio Interactivo",
       searchHotelsHeading: "Explorar catálogo de hoteles",
       searchFilterBrand: "Filtrar por marca",
-      searchFilterCountry: "Filtrar por país"
+      searchFilterCountry: "Filtrar por país",
+      menuTransport: "Transporte",
+      searchClose: "Cerrar búsqueda",
+      searchExit: "ESC para salir",
+      hotelIndustry: "Hotelería",
+      previousCountry: "Ver país anterior",
+      nextCountry: "Ver siguiente país"
     },
     en: {
       siteTitle: "Iberostar | Destinations & Hotels",
@@ -100,7 +106,13 @@
       openD3WorldMap: "Open Interactive World Map",
       searchHotelsHeading: "Explore hotel catalog",
       searchFilterBrand: "Filter by brand",
-      searchFilterCountry: "Filter by country"
+      searchFilterCountry: "Filter by country",
+      menuTransport: "Transportation",
+      searchClose: "Close search",
+      searchExit: "Press ESC to exit",
+      hotelIndustry: "Hotels",
+      previousCountry: "Previous country",
+      nextCountry: "Next country"
     }
   };
 

@@ -3459,6 +3459,31 @@ html.map-fullscreen-open,body.map-fullscreen-open { overflow:hidden !important; 
    ========================================================= */
 
 /* ---------- Intro: logo Iberostar ---------- */
+html[data-language-gate="pending"] body { overflow:hidden; }
+html[data-language-gate="pending"] .intro-overlay { visibility:hidden; animation:none; }
+.language-gate { position:fixed; inset:0; z-index:15000; display:none; place-items:center; padding:22px; overflow-y:auto; background:radial-gradient(ellipse at 50% 34%,#243a43 0%,#13232c 52%,#081117 100%); color:#f9f5e9; }
+html[data-language-gate="pending"] .language-gate { display:grid; }
+.language-gate.is-leaving { animation:languageGateOut .3s ease forwards; }
+@keyframes languageGateOut { to { opacity:0; visibility:hidden; } }
+.language-gate-card { width:min(480px,100%); padding:clamp(26px,5vw,42px); border:1px solid rgba(220,194,131,.55); border-radius:22px; background:linear-gradient(155deg,rgba(255,253,246,.98),rgba(244,237,220,.98)); box-shadow:0 28px 90px rgba(0,0,0,.38); color:#263b37; }
+.language-gate-kicker { margin:0 0 12px; color:#9a7a38; font:700 10px/1.4 Arial,sans-serif; letter-spacing:.22em; }
+.language-gate-card h1 { margin:0; color:#243a36; font:500 clamp(30px,6vw,42px)/1.1 Georgia,serif; }
+.language-gate-country { margin:10px 0 22px; color:#756b5e; font:14px/1.5 Arial,sans-serif; }
+.language-gate-options { display:grid; gap:10px; }
+.language-gate-option { display:flex; width:100%; min-height:62px; align-items:center; gap:12px; padding:12px 15px; border:1px solid #d9c9ae; border-radius:13px; background:#fffdf8; color:#263b37; text-align:left; cursor:pointer; transition:border-color .18s ease,background .18s ease,transform .18s ease,box-shadow .18s ease; }
+.language-gate-option:hover { transform:translateY(-1px); border-color:#a98949; }
+.language-gate-option[aria-checked="true"] { border-color:#8f7332; background:#f7f0df; box-shadow:0 0 0 2px rgba(143,115,50,.14); }
+.language-gate-option-mark { display:grid; width:20px; height:20px; flex:0 0 20px; place-items:center; border:1px solid #b8aa95; border-radius:50%; color:transparent; font:700 12px Arial,sans-serif; }
+.language-gate-option[aria-checked="true"] .language-gate-option-mark { border-color:#8f7332; background:#8f7332; color:#fff; }
+.language-gate-option-copy { display:grid; gap:3px; }
+.language-gate-option-copy strong { font:600 15px/1.2 Arial,sans-serif; }
+.language-gate-option-copy small { color:#817669; font:12px/1.3 Arial,sans-serif; }
+.language-gate-continue { width:100%; min-height:48px; margin-top:18px; border:1px solid #8f7332; border-radius:999px; background:#8f7332; color:#fff; font:700 13px Arial,sans-serif; letter-spacing:.04em; cursor:pointer; transition:background .18s ease,transform .18s ease; }
+.language-gate-continue:hover { transform:translateY(-1px); background:#745c2b; }
+.language-gate-note { margin:13px 0 0; color:#887d6d; font:12px/1.45 Arial,sans-serif; text-align:center; }
+.language-gate button:focus-visible { outline:3px solid #c7a95e; outline-offset:3px; }
+@media(max-width:520px) { .language-gate { padding:16px; } .language-gate-card { padding:26px 22px 22px; border-radius:18px; } }
+
 .intro-overlay {
   position: fixed;
   inset: 0;
