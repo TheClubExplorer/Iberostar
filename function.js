@@ -82,7 +82,7 @@ function supabaseErrorMessage(error, fallback) {
     (error.code === "42501" ||
       /row-level security|permission denied|not authorized|unauthorized/i.test(error.message || ""))
   ) {
-    return "No tienes permisos de administrador. Cierra sesión y vuelve a entrar.";
+    return "Inicie sesión con una cuenta de administrador.";
   }
   return fallback;
 }
@@ -142,7 +142,7 @@ async function wireAdminAuthBar() {
     const email = emailInput.value.trim();
     const password = passwordInput.value;
     if (!email || !password) {
-      alert("Escribe email y contraseña.");
+      alert("Escriba su email y contraseña.");
       return;
     }
     const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
@@ -542,14 +542,14 @@ const pages = [
     image: "src/JOIA2.jpg",
     title: "Iberostar Playa Paraíso",
     subtitle: "La guía interactiva del complejo",
-    quote: "Un destino que se queda contigo para siempre"
+    quote: "Un destino que se queda con usted para siempre"
   },
 
   {
     type: "complex",
     title: "Iberostar Playa Paraíso",
     kicker: "EL COMPLEJO · RIVIERA MAYA",
-    intro: "Cinco hoteles, cinco maneras de vivir el Caribe. Elige tu próxima experiencia en Playa Paraíso."
+    intro: "Cinco hoteles, cinco maneras de vivir el Caribe. Elija su próxima experiencia en Playa Paraíso."
   },
 
   {
@@ -700,12 +700,6 @@ const pages = [
   },
 
   {
-    type: "workspace",
-    title: "Workspace",
-    kicker: "EXPERIENCIAS DE LA COMUNIDAD"
-  },
-
-  {
     type: "media360",
     title: "Exploración 360°",
     kicker: "RECORRIDO VIRTUAL"
@@ -721,7 +715,7 @@ const pages = [
     type: "back",
     kicker: "CONTRAPORTADA",
     image: "src/JOIA31.jpg",
-    quote: "Un destino que se queda contigo para siempre",
+    quote: "Un destino que se queda con usted para siempre",
     contact: [
       "+52 984 877 2800",
       "reservas@iberostar.com",
@@ -745,7 +739,7 @@ const hotelCountryMenus = {
     hotels: [
       {
         name: "Iberostar Selection Playa Mita",
-        tagline: "El Pacífico, a tu ritmo",
+        tagline: "El Pacífico, a su ritmo",
         description:
           "Experiencias: surf, vela y rutas junto al mar.",
         image:
@@ -2647,7 +2641,7 @@ function requestCurrentLocation(options = {}) {
 
   if (!navigator.geolocation) {
     status.textContent =
-      "La geolocalización no está disponible en este navegador.";
+      "Active la ubicación desde un navegador compatible.";
     return;
   }
 
@@ -2656,7 +2650,7 @@ function requestCurrentLocation(options = {}) {
   locationRequestWatchdog = setTimeout(() => { locationRequestPending = false; }, 12000);
 
   status.textContent =
-    "Solicitando permiso para detectar tu ubicación...";
+    "Solicitando permiso para detectar su ubicación...";
 
   navigator.geolocation.getCurrentPosition(
     (position) => {
@@ -2692,7 +2686,7 @@ function requestCurrentLocation(options = {}) {
         const html = '<div class="user-marker-wrap" style="position:relative;width:' + size + 'px;height:' + size + 'px;display:flex;align-items:center;justify-content:center;"><div class="user-marker-pulse" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:72px;height:72px;pointer-events:none;">' + pulseSvg + '</div><div class="user-marker-icon" style="position:relative;z-index:1;line-height:0;">' + personSvg + '</div></div>';
         userMarker = L.marker([currentPosition.latitude, currentPosition.longitude], {
           icon: L.divIcon({ className: "user-marker-div", html: html, iconSize: [size, size], iconAnchor: [size/2, size/2] })
-        }).addTo(activeMap).bindTooltip("Tu ubicación actual");
+        }).addTo(activeMap).bindTooltip("Su ubicación actual");
       }
 
       focusActiveMapOnLocation(wantsWelcome);
@@ -2705,11 +2699,11 @@ function requestCurrentLocation(options = {}) {
       locationRequestPending = false;
       clearTimeout(locationRequestWatchdog);
       const messages = {
-        1: 'No diste permiso para acceder a tu ubicacion.',
-        2: 'No se pudo determinar tu ubicacion. Comprueba la senal y vuelve a intentar.',
-        3: 'La solicitud de ubicacion tardo demasiado. Vuelve a intentar.'
+        1: 'Active el permiso de ubicación para compartir su posición.',
+        2: 'Active la ubicación y compruebe la señal para compartir su posición.',
+        3: 'Vuelva a intentar para compartir su ubicación.'
       };
-      status.textContent = messages[error?.code] || 'No se pudo obtener tu ubicacion.';
+      status.textContent = messages[error?.code] || 'Active la ubicación para compartir su posición.';
     },
     {
       enableHighAccuracy: true,
@@ -2763,12 +2757,12 @@ function ensureLocationWelcomeElement() {
   element.innerHTML = `
     <button type="button" class="location-welcome-close" aria-label="Cerrar aviso">&times;</button>
     <span class="location-welcome-pin" aria-hidden="true"></span>
-    <p class="location-welcome-kicker">¿ESTÁS EN…?</p>
+    <p class="location-welcome-kicker">¿ESTÁ USTED EN…?</p>
     <h2 class="location-welcome-region"></h2>
     <p class="location-welcome-country"></p>
     <p class="location-welcome-message"></p>
     <div class="location-welcome-hotel" hidden>
-      <span class="location-welcome-hotel-label">Tu hotel más cercano</span>
+      <span class="location-welcome-hotel-label">Su hotel más cercano</span>
       <strong class="location-welcome-hotel-name"></strong>
       <small class="location-welcome-hotel-distance"></small>
     </div>
@@ -2796,10 +2790,10 @@ function showLocationWelcome(coords) {
   element.querySelector(".location-welcome-region").textContent = region.name;
   element.querySelector(".location-welcome-country").textContent = country.name;
   element.querySelector(".location-welcome-kicker").textContent = nearest?.hotel
-    ? "¿ESTÁS CERCA DE…?"
-    : "¿ESTÁS EN…?";
+    ? "¿ESTÁ USTED CERCA DE…?"
+    : "¿ESTÁ USTED EN…?";
   element.querySelector(".location-welcome-message").textContent =
-    `¡Bienvenido! Nos alegra tenerte tan cerca de ${region.name}. Preparamos todo para que tu visita sea mágica.`;
+    `¡Bienvenido! Nos alegra tenerle tan cerca de ${region.name}. Preparamos todo para que su visita sea mágica.`;
 
   const hotelBox = element.querySelector(".location-welcome-hotel");
   const hotelLink = element.querySelector('[data-role="hotel"]');
@@ -3368,7 +3362,7 @@ function renderRestaurantMenu(pageIndex) {
           </h2>
 
           <p>
-            Una selección para disfrutar durante tu estancia en
+            Una selección para disfrutar durante su estancia en
             ${hotel.name}.
           </p>
 
@@ -3396,7 +3390,7 @@ function renderRestaurantMenu(pageIndex) {
 
           <p class="restaurant-menu-note">
             Los horarios pueden variar según la temporada.
-            Consulta disponibilidad al llegar.
+            Consulte disponibilidad al llegar.
           </p>
 
         </div>
@@ -3572,7 +3566,7 @@ function renderWorkspace() {
 
             <textarea
               id="workspaceText"
-              placeholder="Escribe la experiencia..."
+              placeholder="Escriba la experiencia..."
             ></textarea>
 
           </label>
@@ -4285,7 +4279,7 @@ function renderVideos() {
             class="video-duration-info"
             id="videosDurationInfo"
           >
-            Selecciona un video para establecer el fragmento.
+            Seleccione un video para establecer el fragmento.
           </div>
 
           <div class="video-time-row">
@@ -4670,7 +4664,7 @@ function resetVideoForm() {
   document.getElementById(
     "videosDurationInfo"
   ).textContent =
-    "Selecciona un video para establecer el fragmento.";
+    "Seleccione un video para establecer el fragmento.";
 
   document.getElementById(
     "videosSaveButton"
@@ -4888,7 +4882,7 @@ function wireVideos() {
 
       if (!title) {
         alert(
-          "Escribe un título."
+          "Escriba un título."
         );
 
         return;
@@ -4901,7 +4895,7 @@ function wireVideos() {
         end <= start
       ) {
         alert(
-          "Revisa el inicio y el final del fragmento."
+          "Revise el inicio y el final del fragmento."
         );
 
         return;
@@ -4919,7 +4913,7 @@ function wireVideos() {
 
       if (!editId && !file) {
         alert(
-          "Selecciona un video."
+          "Seleccione un video."
         );
 
         return;
@@ -5260,8 +5254,8 @@ function renderComplexPage(page) {
       </header>
 
       <div class="complex-hotels-heading">
-        <h2>Descubre nuestros hoteles</h2>
-        <span>Selecciona una ficha para explorar</span>
+        <h2>Descubra nuestros hoteles</h2>
+        <span>Seleccione una ficha para explorar</span>
       </div>
 
       <div class="complex-hotel-grid">
@@ -5355,9 +5349,9 @@ function describeNearbyLocation(coords) {
   const nearby = findNearbyLocation(coords);
   if (nearby?.type === "hotel") {
     const distance = formatApproximateDistance(nearby.distance);
-    return `Estás aproximadamente a ${distance} de ${nearby.hotel.name}, en ${nearby.destination.name}, ${nearby.country.name}.`;
+    return `Está aproximadamente a ${distance} de ${nearby.hotel.name}, en ${nearby.destination.name}, ${nearby.country.name}.`;
   }
-  if (nearby?.type === "destination") return `Estás en ${nearby.destination.name}, ${nearby.country.name}.`;
+  if (nearby?.type === "destination") return `Está en ${nearby.destination.name}, ${nearby.country.name}.`;
   return "Ubicación actual disponible para calcular rutas. No se detectó un destino Iberostar cercano.";
 }
 
@@ -5467,7 +5461,7 @@ function renderHotelDetail() {
   const activeTab = activeTabKey === "servicios"
     ? (displayTabs?.servicios || {
         title: "Servicios",
-        description: `Explora las áreas y experiencias disponibles en ${displayName}.`,
+        description: `Explore las áreas y experiencias disponibles en ${displayName}.`,
         keyPoints: hotel.serviceHighlights?.length ? hotel.serviceHighlights : serviceHighlights,
         images: serviceImages
       })
@@ -5529,12 +5523,12 @@ function renderHotelDetail() {
 
       <section class="hotel-detail-section-intro" aria-live="polite">
         <small>${activeTab.title}</small>
-        <p>${activeTab.description || `Explora ${activeTab.title.toLowerCase()} de ${displayName}.`}</p>
+        <p>${activeTab.description || `Explore ${activeTab.title.toLowerCase()} de ${displayName}.`}</p>
       </section>
 
       ${hasHotelCoordinates ? `
         <section class="hotel-detail-map-section">
-          <div class="hotel-detail-map-heading"><small>UBICACIÓN</small><h2>Explora el hotel en el mapa</h2></div>
+          <div class="hotel-detail-map-heading"><small>UBICACIÓN</small><h2>Explore el hotel en el mapa</h2></div>
           ${hotelMap({ name: hotel.name, location: hotel.name })}
         </section>
       ` : ""}
@@ -6456,7 +6450,7 @@ streetLayer.addTo(
         const html = '<div class="user-marker-wrap" style="position:relative;width:' + size + 'px;height:' + size + 'px;display:flex;align-items:center;justify-content:center;"><div class="user-marker-pulse" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:72px;height:72px;pointer-events:none;">' + pulseSvg + '</div><div class="user-marker-icon" style="position:relative;z-index:1;line-height:0;">' + personSvg + '</div></div>';
         userMarker = L.marker([currentPosition.latitude, currentPosition.longitude], {
           icon: L.divIcon({ className: "user-marker-div", html: html, iconSize: [size, size], iconAnchor: [size/2, size/2] })
-        }).addTo(activeMap).bindTooltip("Tu ubicación actual");
+        }).addTo(activeMap).bindTooltip("Su ubicación actual");
       }
 
       focusActiveMapOnLocation();
@@ -6643,7 +6637,7 @@ if (window.RevistaDigital.mapas) {
 }
 
 const initialLocationStatus = document.getElementById("locationStatus");
-if (initialLocationStatus) initialLocationStatus.textContent = "Usa “Usar mi ubicación” para encontrar el hotel cercano o calcular una ruta.";
+if (initialLocationStatus) initialLocationStatus.textContent = "Use “Usar mi ubicación” para encontrar el hotel cercano o calcular una ruta.";
 document.getElementById("requestLocationButton")?.addEventListener("click", requestCurrentLocation);
 document.addEventListener("click", (event) => {
   const link = event.target.closest(".site-tools-menu a");
@@ -6713,3 +6707,6 @@ if (typeof window.RevistaDigital.routes?.restoreCurrentRoute === "function") {
   renderPage();
 }
 delete document.documentElement.dataset.routeStartup;
+if (document.documentElement.dataset.tourPreview !== "true") {
+  window.setTimeout(startLocationServices, 300);
+}

@@ -71,8 +71,6 @@
       }
     } else if (page?.type === "country-menu") {
       nextPath = `/hoteles/${page.country}`;
-    } else if (page?.type === "workspace") {
-      nextPath = "/workspace";
     } else if (page?.type === "media360") {
       nextPath = "/360";
     } else if (page?.type === "videos") {
@@ -385,7 +383,7 @@
       return context;
     }
 
-    if (parts[0] && ["workspace", "360", "videos", "complejo-playa-paraiso"].includes(parts[0])) {
+    if (parts[0] && ["360", "videos", "complejo-playa-paraiso"].includes(parts[0])) {
       context.kind = "section";
       context.destination = parts[0];
       return context;
@@ -405,7 +403,7 @@
 
   function renderCards(records, getPath, type) {
     return records.map((item) => `<a class="destination-card ${type}" href="${escapeHtml(href(getPath(item)))}" data-app-route="${escapeHtml(getPath(item))}">
-      ${RI.img(item.image || "src/JOIA2.jpg", { alt: "", sizes: "(max-width:600px) 92vw, (max-width:850px) 46vw, 40vw" })}<span class="destination-card-copy"><small>${type === "hotel" ? "HOTEL" : "DESTINO"}</small><strong>${escapeHtml(item.name)}</strong><span>${escapeHtml(item.description || item.tagline || "Descubre el hotel y sus experiencias.")}</span><b>Explorar →</b></span></a>`).join("");
+      ${RI.img(item.image || "src/JOIA2.jpg", { alt: "", sizes: "(max-width:600px) 92vw, (max-width:850px) 46vw, 40vw" })}<span class="destination-card-copy"><small>${type === "hotel" ? "HOTEL" : "DESTINO"}</small><strong>${escapeHtml(item.name)}</strong><span>${escapeHtml(item.description || item.tagline || "Descubra el hotel y sus experiencias.")}</span><b>Explorar →</b></span></a>`).join("");
   }
   function findHotelPortalRoute(hotelName) {
     const targetSlug = slugify(hotelName);
@@ -523,9 +521,9 @@
         <div>
           <p class="portal-kicker">MOVILIDAD · THE CLUB</p>
           <h1>Carrito de golf</h1>
-          <p>Solicita un carrito, sigue cómo llega hasta tu ubicación exacta y te lleva al destino que elijas.</p>
+          <p>Solicite un carrito, siga cómo llega hasta su ubicación exacta y le lleva al destino que elija.</p>
           <div class="cart-page-location">
-            <span class="cart-location-status" data-cart-location-status>Activa tu ubicación para mostrar exactamente dónde estás.</span>
+            <span class="cart-location-status" data-cart-location-status>Active su ubicación para mostrar exactamente dónde está.</span>
             <button type="button" class="cart-locate-btn" data-cart-locate>Usar mi ubicación</button>
           </div>
         </div>
@@ -536,16 +534,16 @@
             <span>Hotel del complejo</span>
             <select data-cart-hotel-select>${options}</select>
           </label>
-          <p class="cart-page-hotel-note">El carrito sale desde su posición actual, te recoge donde estés y te lleva a tu destino.</p>
+          <p class="cart-page-hotel-note">El carrito sale desde su posición actual, le recoge donde está y le lleva a su destino.</p>
         </div>
         <div class="hotel-cart-tracker" data-cart-tracker>
           <div class="hotel-cart-panel">
             <div class="hotel-cart-status" data-cart-status></div>
             <form class="hotel-cart-form" data-cart-form>
-              <p class="hotel-cart-form-note">El carrito te recoge en tu ubicación y te lleva al destino que elijas.</p>
+              <p class="hotel-cart-form-note">El carrito le recoge en su ubicación y le lleva al destino que elija.</p>
               <div class="hotel-cart-row">
                 <label class="hotel-cart-field"><span>Nombre</span>
-                  <input type="text" name="nombre" autocomplete="name" placeholder="Tu nombre" />
+                  <input type="text" name="nombre" autocomplete="name" placeholder="Su nombre" />
                 </label>
                 <label class="hotel-cart-field"><span>Habitación</span>
                   <input type="text" name="habitacion" inputmode="numeric" placeholder="Ej. 1204" />
@@ -558,7 +556,7 @@
                 <textarea name="notas" rows="2" placeholder="Personas, equipaje o referencia del punto"></textarea>
               </label>
               <button type="submit" class="hotel-cart-submit">Solicitar carrito</button>
-              <p class="hotel-cart-form-note">Servicio simulado: verás cómo el carrito te recoge y te lleva a tu destino.</p>
+              <p class="hotel-cart-form-note">Servicio simulado: verá cómo el carrito le recoge y le lleva a su destino.</p>
             </form>
             <div class="hotel-cart-nearby" data-cart-nearby></div>
           </div>
@@ -626,7 +624,7 @@
             <div>
               <p class="portal-kicker">UBICACIÓN</p>
               <h2>Mapa del complejo</h2>
-              <p>Los hoteles de ${escapeHtml(destination.name)} en un solo mapa. Usa “Ubicarme” para situarte y “Cómo llegar” para trazar la ruta.</p>
+              <p>Los hoteles de ${escapeHtml(destination.name)} en un solo mapa. Use “Ubicarme” para situarte y “Cómo llegar” para trazar la ruta.</p>
             </div>
             <div class="portal-map-frame">
               <div class="portal-destination-map portal-complex-map" id="complexPortalMap" role="application" aria-label="Mapa del complejo ${escapeHtml(destination.name)}"></div>
@@ -664,14 +662,14 @@
       document.body.dataset.appMode = "portal";
       document.body.dataset.routeManaged = "true";
       const countryCards = Object.entries(catalog).map(([key, item]) => ({ name: item.name, image: item.image, description: `${item.destinations.length} destinos para explorar.`, route: `/${key}` }));
-      let heading = "Encuentra tu próximo destino";
-      let intro = "Explora hoteles y destinos Iberostar. Elige un país para comenzar.";
+      let heading = "Encuentre su próximo destino";
+      let intro = "Explore hoteles y destinos Iberostar. Elija un país para comenzar.";
       let cards = renderCards(countryCards, (item) => item.route, "country");
       let breadcrumb = "IBEROSTAR · DESTINOS";
       let countryMapMarkup = "";
       let countryHotels = [];
       if (!isHome) {
-        heading = countryData.name; intro = `Descubre los destinos de ${countryData.name}.`;
+        heading = countryData.name; intro = `Descubra los destinos de ${countryData.name}.`;
         breadcrumb = `DESTINOS · ${countryData.name.toUpperCase()}`;
         cards = renderCards(countryData.destinations, (item) => `/${country}/${item.slug}`, "destination");
         countryHotels = countryData.destinations.flatMap((destination) => destination.hotels.map((hotel) => ({
@@ -682,14 +680,14 @@
           destinationName: destination.name
         }))).filter((hotel) => Array.isArray(state()?.hotelCoordinates?.[hotel.name]));
         if (countryHotels.length) {
-          countryMapMarkup = `<section class="portal-map-section"><div><p class="portal-kicker">UBICACIÓN</p><h2>Mapa de ${escapeHtml(countryData.name)}</h2><p>Explora los hoteles disponibles en los destinos de ${escapeHtml(countryData.name)}.</p></div><div class="portal-map-frame"><div class="portal-destination-map" id="countryMap" role="application" aria-label="Mapa de hoteles en ${escapeHtml(countryData.name)}"></div>${portalMapActions(countryHotels)}</div></section>`;
+          countryMapMarkup = `<section class="portal-map-section"><div><p class="portal-kicker">UBICACIÓN</p><h2>Mapa de ${escapeHtml(countryData.name)}</h2><p>Explore los hoteles disponibles en los destinos de ${escapeHtml(countryData.name)}.</p></div><div class="portal-map-frame"><div class="portal-destination-map" id="countryMap" role="application" aria-label="Mapa de hoteles en ${escapeHtml(countryData.name)}"></div>${portalMapActions(countryHotels)}</div></section>`;
         }
       }
-      view.innerHTML = `<main class="portal-page">${!isHome ? portalNav(getPortalNavModel(route)) : ""}<section class="portal-hero"><div><p class="portal-kicker">${breadcrumb}</p><h1>${heading}</h1><p>${intro}</p>${!isHome ? "" : `<a class="portal-hero-link" href="${href("/mexico/riviera-maya")}" data-app-route="/mexico/riviera-maya">Conoce Iberostar Playa Paraíso <span>→</span></a>`}</div>${RI.img(isHome ? "src/paraiso-del-mar/banner/ParaisoDelMar.jpg" : countryData.image, {
+      view.innerHTML = `<main class="portal-page">${!isHome ? portalNav(getPortalNavModel(route)) : ""}<section class="portal-hero"><div><p class="portal-kicker">${breadcrumb}</p><h1>${heading}</h1><p>${intro}</p>${!isHome ? "" : `<a class="portal-hero-link" href="${href("/mexico/riviera-maya")}" data-app-route="/mexico/riviera-maya">Conozca Iberostar Playa Paraíso <span>→</span></a>`}</div>${RI.img(isHome ? "src/paraiso-del-mar/banner/ParaisoDelMar.jpg" : countryData.image, {
           alt: "Paisaje de destino",
           priority: true,
           sizes: "(max-width:600px) 100vw, 45vw"
-        })}</section>${countryMapMarkup}<section class="portal-section"><div class="portal-section-heading"><div><p class="portal-kicker">${isHome ? "NUESTROS PAÍSES" : "DESTINOS"}</p><h2>${isHome ? "Viaja a tu manera" : "Elige dónde hospedarte"}</h2></div>${!isHome ? `<a href="${href("/")}" data-app-route="/">Todos los países</a>` : ""}</div><div class="destination-grid">${cards}</div></section></main>`;
+        })}</section>${countryMapMarkup}<section class="portal-section"><div class="portal-section-heading"><div><p class="portal-kicker">${isHome ? "NUESTROS PAÍSES" : "DESTINOS"}</p><h2>${isHome ? "Viaje a su manera" : "Elija dónde hospedarse"}</h2></div>${!isHome ? `<a href="${href("/")}" data-app-route="/">Todos los países</a>` : ""}</div><div class="destination-grid">${cards}</div></section></main>`;
       const countryMap = view.querySelector("#countryMap");
       if (countryMap) {
         window.RevistaDigital.mapas?.initializeAllHotelsMap(countryMap, countryHotels, { countrySlug: country });
@@ -705,7 +703,7 @@
         || Array.isArray(destination.mapCenter);
       document.body.dataset.appMode = "portal";
       document.body.dataset.routeManaged = "true";
-      const mapDescription = destination.mapNotice || "Selecciona un marcador para abrir la ficha del hotel.";
+      const mapDescription = destination.mapNotice || "Seleccione un marcador para abrir la ficha del hotel.";
       view.innerHTML = `<main class="portal-page">${portalNav(getPortalNavModel(route))}<section class="portal-destination-hero">${RI.img(destination.image, {
           alt: "",
           priority: true,
@@ -754,7 +752,7 @@
       ? `<span class="restaurant-chip restaurant-chip-more">+${hotel.restaurants.length - 4}</span>` : "";
     const meta = hotel.restaurants.length
       ? `<div class="restaurant-chip-row">${chips}${extra}</div>`
-      : `<span class="restaurant-count-note">Galería gastronómica</span>`;
+      : `<span class="restaurant-count-note">Sin restaurantes registrados</span>`;
     return `<a class="destination-card restaurant-hotel-card" href="${href(hotel.route)}" data-app-route="${hotel.route}">
       ${RI.img(hotel.image, { alt: "", sizes: "(max-width:600px) 92vw, (max-width:850px) 46vw, 40vw" })}
       <span class="destination-card-copy">
@@ -800,7 +798,7 @@
       view.innerHTML = `<main class="portal-page">
         ${portalNav(getPortalNavModel(route))}
         <section class="portal-hero">
-          <div><p class="portal-kicker">RESTAURANTES</p><h1>Sabores de nuestros destinos</h1><p>Elige un país para descubrir la carta de restaurantes de cada hotel.</p></div>
+          <div><p class="portal-kicker">RESTAURANTES</p><h1>Sabores de nuestros destinos</h1><p>Elija un país para descubrir la carta de restaurantes de cada hotel.</p></div>
           ${RI.img("src/paraiso-del-mar/banner/ParaisoDelMar.jpg", {
             alt: "",
             priority: true,
@@ -846,10 +844,10 @@
             priority: true,
             sizes: "(max-width:600px) 100vw, 45vw"
           })}
-          <div><p class="portal-kicker">GASTRONOMÍA · ${escapeHtml(country.name).toUpperCase()}</p><h1>Restaurantes en ${escapeHtml(country.name)}</h1><p>${country.hotels.length} ${hotelWord} y ${country.restaurantCount} ${restaurantWord}. Elige un hotel para ver su carta.</p></div>
+          <div><p class="portal-kicker">GASTRONOMÍA · ${escapeHtml(country.name).toUpperCase()}</p><h1>Restaurantes en ${escapeHtml(country.name)}</h1><p>${country.hotels.length} ${hotelWord} y ${country.restaurantCount} ${restaurantWord}. Elija un hotel para ver su carta.</p></div>
         </section>
         <section class="portal-section">
-          <div class="portal-section-heading"><div><p class="portal-kicker">HOTELES Y SUS RESTAURANTES</p><h2>Elige un hotel</h2></div></div>
+          <div class="portal-section-heading"><div><p class="portal-kicker">HOTELES Y SUS RESTAURANTES</p><h2>Elija un hotel</h2></div></div>
           <div class="destination-grid">${country.hotels.map(restaurantHotelCardMarkup).join("")}</div>
         </section>
         <section class="portal-section">
@@ -885,11 +883,6 @@
       hotelLabel: hotel.name,
       countryLabel: country.name
     });
-    const gallery = Array.isArray(hotel.photos) && hotel.photos.length
-      ? `<section class="portal-section">
-          <div class="portal-section-heading"><div><p class="portal-kicker">GALERÍA GASTRONÓMICA</p><h2>Ambientes y platos</h2></div></div>
-          <div class="hotel-portal-card-grid hotel-portal-card-grid-3">${hotel.photos.slice(0, 9).map((src) => hotelImageCard("", src)).join("")}</div>
-        </section>` : "";
     const heroImage = hotel.image || "src/paraiso-del-mar/banner/ParaisoDelMar.jpg";
     return `<main class="portal-page">
       ${portalNav(getPortalNavModel(`/restaurantes/${hotel.slug}`))}
@@ -899,13 +892,12 @@
           priority: true,
           sizes: "(max-width:600px) 100vw, 45vw"
         })}
-        <div><p class="portal-kicker">${escapeHtml(country.name).toUpperCase()} · ${escapeHtml(hotel.destinationName).toUpperCase()}</p><h1>${escapeHtml(hotel.name)}</h1><p>${count} ${countWord} para descubrir durante tu estancia.</p><a class="portal-hero-link" href="${href(hotel.hotelRoute)}" data-app-route="${hotel.hotelRoute}">Ver la ficha del hotel →</a></div>
+        <div><p class="portal-kicker">${escapeHtml(country.name).toUpperCase()} · ${escapeHtml(hotel.destinationName).toUpperCase()}</p><h1>${escapeHtml(hotel.name)}</h1><p>${count} ${countWord} para descubrir durante su estancia.</p><a class="portal-hero-link" href="${href(hotel.hotelRoute)}" data-app-route="${hotel.hotelRoute}">Ver la ficha del hotel →</a></div>
       </section>
       <section class="portal-section">
         <div class="portal-section-heading"><div><p class="portal-kicker">LA CARTA</p><h2>Restaurantes de ${escapeHtml(hotel.name)}</h2></div><span class="restaurant-count-note">${count} ${count === 1 ? "opción" : "opciones"}</span></div>
-        ${fiches || `<p class="restaurant-count-note">Este hotel ofrece una experiencia gastronómica que puedes descubrir en su galería.</p>`}
+        ${fiches || `<p class="restaurant-count-note">Sin cartas registradas para este hotel.</p>`}
       </section>
-      ${gallery}
       <section class="portal-section">
         <div class="portal-section-heading"><div><p class="portal-kicker">MÁS CARTAS</p><h2>Más restaurantes de ${escapeHtml(country.name)}</h2></div></div>
         <p class="restaurant-count-note"><a href="${href(breadcrumbCountryRoute)}" data-app-route="${breadcrumbCountryRoute}">Ver todos los restaurantes de ${escapeHtml(country.name)} →</a></p>
@@ -1018,7 +1010,7 @@
           <div class="hotel-portal-section-head">
             <p class="portal-kicker">SERVICIOS</p>
             <h2>Servicios y comodidades</h2>
-            <p>Lo que te espera durante tu estancia.</p>
+            <p>Lo que le espera durante su estancia.</p>
           </div>
           <ul class="hotel-portal-services">${services.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
         </section>` : "";
@@ -1042,18 +1034,18 @@
 
     const zonePanelMarkup = `
             <aside class="hotel-zone-panel${hasComplexGuide ? " hotel-zone-panel--wide" : ""}" aria-label="Zonas del hotel">
-              <p class="portal-kicker">EXPLORA EL HOTEL</p>
-              <p class="hotel-zone-hint">Toca una imagen para ver de qué parte del hotel es y trazar cómo llegar.</p>
+              <p class="portal-kicker">EXPLORE EL HOTEL</p>
+              <p class="hotel-zone-hint">Toque una imagen para ver de qué parte del hotel es y trazar cómo llegar.</p>
               ${zoneButtons ? `<div class="hotel-zone-strip">${zoneButtons}</div>` : ""}
               <div class="hotel-zone-status" data-zone-status>
-                <span>Estás viendo: <strong data-zone-name>${escapeHtml(zones[0]?.label || "el hotel")}</strong></span>
+                <span>Está viendo: <strong data-zone-name>${escapeHtml(zones[0]?.label || "el hotel")}</strong></span>
                 <button type="button" class="portal-map-btn portal-directions" data-directions="${escapeHtml(displayName)}" data-lat="${coordinates[0]}" data-lng="${coordinates[1]}">Cómo llegar</button>
               </div>
             </aside>`;
     const restaurantRouteMarkup = `
             <aside class="hotel-zone-panel hotel-zone-panel--wide hotel-restaurant-route" aria-label="Ruta a restaurantes">
               <p class="portal-kicker">RESTAURANTES</p>
-              <p class="hotel-zone-hint">Consulta los restaurantes de ${escapeHtml(displayName)} y descubre sus experiencias.</p>
+              <p class="hotel-zone-hint">Consulte los restaurantes de ${escapeHtml(displayName)} y descubra sus experiencias.</p>
               <a class="portal-map-btn" href="${href(`/restaurantes/${hotel.slug}`)}" data-app-route="/restaurantes/${escapeHtml(hotel.slug)}">Ver restaurantes</a>
             </aside>`;
     const hotelExploreMarkup = hasComplexGuide ? restaurantRouteMarkup : zonePanelMarkup;
@@ -1062,8 +1054,8 @@
           <div class="hotel-transport-card">
             <div class="hotel-transport-copy">
               <p class="portal-kicker">TRANSPORTE</p>
-              <h2>¿Quieres llegar más rápido a tu destino?</h2>
-              <p>¡Solicita el transporte más cercano ahora!</p>
+              <h2>¿Desea llegar más rápido a su destino?</h2>
+              <p>¡Solicite el transporte más cercano ahora!</p>
             </div>
             <a class="hotel-transport-cta" href="${href("/carrito-golf")}" data-app-route="/carrito-golf">Solicitar transporte</a>
           </div>
@@ -1255,7 +1247,7 @@
         const html = '<div class="user-marker-wrap" style="position:relative;width:' + size + 'px;height:' + size + 'px;display:flex;align-items:center;justify-content:center;"><div class="user-marker-pulse" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:72px;height:72px;pointer-events:none;">' + pulseSvg + '</div><div class="user-marker-icon" style="position:relative;z-index:1;line-height:0;">' + personSvg + '</div></div>';
         state().userMarker = L.marker([position.latitude, position.longitude], {
           icon: L.divIcon({ className: "user-marker-div", html, iconSize: [size, size], iconAnchor: [size / 2, size / 2] })
-        }).addTo(map).bindTooltip("Tu ubicación actual");
+        }).addTo(map).bindTooltip("Su ubicación actual");
       }
       // Encuadre y límites de navegación: en las fichas de Playa Paraíso con
       // explorador se muestra el complejo completo (para que el socio pueda
@@ -1416,7 +1408,7 @@
         const html = '<div class="user-marker-wrap" style="position:relative;width:' + size + 'px;height:' + size + 'px;display:flex;align-items:center;justify-content:center;"><div class="user-marker-pulse" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:72px;height:72px;pointer-events:none;">' + pulseSvg + '</div><div class="user-marker-icon" style="position:relative;z-index:1;line-height:0;">' + personSvg + '</div></div>';
         state().userMarker = L.marker([position.latitude, position.longitude], {
           icon: L.divIcon({ className: "user-marker-div", html: html, iconSize: [size, size], iconAnchor: [size/2, size/2] })
-        }).addTo(map).bindTooltip("Tu ubicación actual");
+        }).addTo(map).bindTooltip("Su ubicación actual");
     }
     try {
       if (window.RevistaDigital.guiapa && typeof window.RevistaDigital.guiapa.bindMap === "function") {
@@ -1827,7 +1819,6 @@
 
       const pageTypeByRoute = {
         "/complejo-playa-paraiso": "complex",
-        "/workspace": "workspace",
         "/360": "media360",
         "/videos": "videos"
       };

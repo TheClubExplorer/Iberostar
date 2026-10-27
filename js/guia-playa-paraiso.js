@@ -108,23 +108,27 @@
     {"id":"burgers","name":"Burgers","category":"restaurante","description":"Hamburguesas","source":"plano","verified":false},
     {"id":"antojitos-tacos","name":"Antojitos / Tacos","category":"restaurante","description":"Antojitos / Tacos","source":"plano","verified":false},
     {"id":"crepes","name":"Crepes & Ice Cream","category":"restaurante","description":"Crepas y helados","source":"plano","verified":false},
-    {"id":"el-museo","name":"El Museo","category":"restaurante","description":"Restaurante gourmet","source":"plano","verified":false},
+    {"id":"el-museo","name":"El Museo","category":"restaurante","description":"Cocina italiana","source":"plano","verified":false},
     {"id":"jambalaya","name":"Jambalaya","category":"restaurante","description":"Restaurante cajún","source":"plano","verified":false},
     {"id":"la-pagoda","name":"La Pagoda","category":"restaurante","description":"Restaurante buffet","source":"plano","verified":false},
     {"id":"el-fogon-steak","name":"El Fogón (Steak House)","category":"restaurante","lat":20.756879,"lng":-86.959677,"description":"Steak house","source":"Google Maps","verified":true},
     {"id":"el-fogon-italiano","name":"El Fogón (Italiano)","category":"restaurante","lat":20.757161,"lng":-86.959936,"description":"Restaurante italiano","source":"Google Maps","verified":true},
-    {"id":"coco-buffet","name":"Coco Buffet","category":"restaurante","lat":20.756466,"lng":-86.958965,"description":"Snack buffet","source":"Google Maps","verified":true},
+    {"id":"coco-buffet","name":"Coco Beach Snack Bar","category":"restaurante","lat":20.756466,"lng":-86.958965,"description":"Snack bar de playa","source":"Google Maps","verified":true},
+    {"id":"under-the-sea","name":"Under the Sea","category":"restaurante","hotelId":"Iberostar Paraíso Maya","description":"Mariscos y pescados","source":"IHG","verified":false},
+    {"id":"lemon-spices","name":"Lemon & Spices","category":"restaurante","hotelId":"Iberostar Paraíso Maya","description":"Cocina griega","source":"IHG","verified":false},
+    {"id":"olivetti","name":"Olivetti","category":"restaurante","hotelId":"Iberostar Paraíso Maya","description":"Cocina italiana","source":"IHG","verified":false},
+    {"id":"ember","name":"Ember Steak House","category":"restaurante","hotelId":"Iberostar Paraíso JOIA","description":"Steak house frente al mar","source":"IHG","verified":false},
     {"id":"el-rancho","name":"El Rancho","category":"restaurante","description":"Steak house","source":"plano","verified":false},
     {"id":"la-geisha","name":"La Geisha","category":"restaurante","description":"Restaurante japonés","source":"plano","verified":false},
-    {"id":"letoile","name":"L'Etoile","category":"restaurante","description":"Restaurante gourmet","source":"plano","verified":false},
-    {"id":"la-marina","name":"La Marina","category":"restaurante","lat":20.7577902,"lng":-86.9640737,"description":"Restaurante mediterráneo / buffet","source":"Google Maps","verified":true},
+    {"id":"letoile","name":"L'Etoile","category":"restaurante","description":"Cocina francesa","source":"plano","verified":false},
+    {"id":"la-marina","name":"La Marina","category":"restaurante","lat":20.7577902,"lng":-86.9640737,"description":"Marisquería","source":"Google Maps","verified":true},
     {"id":"el-tapatio","name":"El Tapatío","category":"restaurante","description":"Restaurante mexicano / buffet","source":"plano","verified":false},
     {"id":"venecia","name":"Venecia","category":"restaurante","description":"Restaurante italiano","source":"plano","verified":false},
     {"id":"bellavista","name":"Bellavista","category":"restaurante","description":"Restaurante buffet","source":"plano","verified":false},
     {"id":"latelier","name":"L'Atelier","category":"restaurante","description":"Restaurante gourmet","source":"plano","verified":false},
-    {"id":"tonis","name":"Toni's","category":"restaurante","description":"Restaurante surf & turf","source":"plano","verified":false},
+
     {"id":"haiku","name":"Haiku","category":"restaurante","description":"Restaurante japonés","source":"plano","verified":false},
-    {"id":"la-brisa","name":"La Brisa","category":"restaurante","description":"Caribbean raw bar & grill","source":"plano","verified":false},
+    {"id":"la-brisa","name":"La Brisa Beach Bar","category":"bar","hotelId":"Iberostar Paraíso JOIA","description":"Bar de playa","source":"IHG","verified":false},
     {"id":"baby-kitchen","name":"Baby Kitchen","category":"servicio","lat":20.758029,"lng":-86.963437,"description":"Cocina para bebés","source":"Google Maps","verified":true});
   POIS.push(
     {"id":"sports-bar-corner","name":"Sports Bar Corner","category":"bar","hotelId":"Iberostar Paraíso Lindo","lat":20.7596764,"lng":-86.9634133,"description":"Sports bar","source":"Google Maps","verified":true},
@@ -328,7 +332,7 @@
       if (!entry) continue;
 
       var tipo = entry.tipo;
-      var horario = tipo ? horarios[tipo] : null;
+      var horario = entry.horario || (tipo ? horarios[tipo] : null);
       if (horario) {
         poi.hours = formato(horario);
         if (horario.breakfast) poi.breakfast = horario.breakfast;
@@ -339,11 +343,13 @@
       }
       // Servicios con horario propio (spa, golf, piscinas): se respeta el
       // que viene en el catálogo de datos.
+      if (entry.horarioTexto) poi.hours = entry.horarioTexto;
       if (!poi.hours && entry.hours) poi.hours = entry.hours;
-      if (entry.cuisine) poi.cuisine = entry.cuisine;
+      if (entry.cocina || entry.cuisine) poi.cuisine = entry.cocina || entry.cuisine;
       if (entry.carta) poi.menu = entry.carta;
       if (entry.treatments) poi.treatments = entry.treatments;
       if (entry.packages) poi.packages = entry.packages;
+      if (entry.teeTimes) poi.teeTimes = entry.teeTimes;
     }
   })();
 
@@ -495,8 +501,8 @@
     });
     if (has360) {
       slides.push('<div class="gp-map-carousel-slide gp-map-carousel-360" data-map-slide aria-hidden="true">' +
-        '<strong>¿Quieres ver más de ' + name + '?</strong>' +
-        '<span>Explora este restaurante en 360° en ' + popupEscape(hotel.name) + '.</span>' +
+        '<strong>¿Desea ver más de ' + name + '?</strong>' +
+        '<span>Explore este restaurante en 360° en ' + popupEscape(hotel.name) + '.</span>' +
         '<button type="button" class="gp-map-carousel-360-link" data-poi-360-hotel="' + popupEscape(hotel.name) + '" data-poi-360-label="' + name + '">Ver exploración 360°</button>' +
         '</div>');
     }
@@ -1062,20 +1068,16 @@
     var pois = queryPois(state);
     if (count) count.textContent = pois.length + " de " + includedPois().length + " lugares";
     if (!pois.length) {
-      list.innerHTML = '<li class="guide-empty">No hay lugares que coincidan con tu búsqueda.</li>';
+      list.innerHTML = '<li class="guide-empty">Ajuste la búsqueda para ver más lugares.</li>';
       return;
     }
     list.innerHTML = pois.map(function (p) {
-      var verified = p.verified === true;
       var active = p.id === state.selectedId ? " is-active" : "";
-      var status = verified
-        ? '<span class="guide-badge guide-badge--ok">Verificado</span>'
-        : '<span class="guide-badge guide-badge--pending">Pendiente</span>';
       var meta = escapeHtml(categoryLabel(p.category)) + (p.hotelId ? " · " + escapeHtml(p.hotelId) : "");
-      return '<li class="guide-item' + (verified ? "" : " is-pending") + active + '" data-id="' + escapeHtml(p.id) + '" tabindex="0" role="button">' +
+      return '<li class="guide-item' + active + '" data-id="' + escapeHtml(p.id) + '" tabindex="0" role="button">' +
         '<span class="guide-dot" style="background:' + categoryColor(p.category) + '"></span>' +
         '<span class="guide-item-body"><span class="guide-item-name">' + escapeHtml(p.name) + '</span><span class="guide-item-meta">' + meta + "</span></span>" +
-        status + "</li>";
+        "</li>";
     }).join("");
   }
 
@@ -1289,13 +1291,13 @@
         var name = escapeHtml(route.targetName || "el destino");
         var html = "";
         if (route.status === "locating") {
-          html = '<p class="guide-route-status is-loading">' + escapeHtml(route.info || "Obteniendo tu ubicación…") + "</p>";
+          html = '<p class="guide-route-status is-loading">' + escapeHtml(route.info || "Obteniendo su ubicación…") + "</p>";
         } else if (route.status === "calculating") {
           html = '<p class="guide-route-status is-loading">Calculando ruta a ' + name + "…</p>";
         } else if (route.status === "ready") {
           html = '<p class="guide-route-status is-ready">Ruta ' + escapeHtml(route.info || "") + " hasta " + name + ".</p>";
         } else {
-          html = '<p class="guide-route-status is-error">' + escapeHtml(route.info || "No se pudo calcular la ruta.") + "</p>";
+          html = '<p class="guide-route-status is-error">' + escapeHtml(route.info || "Intente calcular la ruta de nuevo.") + "</p>";
         }
         html += '<button type="button" class="guide-route-cancel">Cancelar ruta</button>';
         box.innerHTML = notice + html;
@@ -1328,11 +1330,11 @@
     var poi = findPoi(id);
     if (!poi) return;
     if (poi.kind === "area") {
-      setRouteStatus("error", id, poi.name, "Es un área geográfica (mar); no se calcula una ruta.");
+      setRouteStatus("error", id, poi.name, "Seleccione un punto de acceso del complejo para calcular la ruta.");
       return;
     }
     if (!canMap(poi)) {
-      setRouteStatus("error", id, poi.name, "Este lugar aún no tiene coordenadas verificadas.");
+      setRouteStatus("error", id, poi.name, "Estamos actualizando la ubicación de este lugar.");
       return;
     }
     var shared = window.RevistaDigital && window.RevistaDigital.state;
@@ -1341,7 +1343,7 @@
     gp._route.targetId = id;
     gp._route.targetName = poi.name;
     if (!position || position.latitude == null || position.longitude == null) {
-      setRouteStatus("locating", id, poi.name, "Necesitamos tu ubicación para calcular la ruta.");
+      setRouteStatus("locating", id, poi.name, "Necesitamos su ubicación para calcular la ruta.");
       try {
         if (typeof window.requestCurrentLocation === "function") window.requestCurrentLocation();
       } catch (e) { /* ignore */ }
@@ -1349,7 +1351,7 @@
     }
     var engine = window.RevistaDigital && window.RevistaDigital.mapas;
     if (!engine || typeof engine.computeRoute !== "function") {
-      setRouteStatus("error", id, poi.name, "El servicio de rutas no está disponible.");
+      setRouteStatus("error", id, poi.name, "Estamos actualizando el servicio de rutas. Intente de nuevo.");
       return;
     }
     var controller = typeof AbortController === "function" ? new AbortController() : null;
@@ -1372,7 +1374,7 @@
     }).catch(function (error) {
       if (error && error.name === "AbortError") return;
       if (gp._route.targetId !== id) return;
-      setRouteStatus("error", id, poi.name, "No se encontró una ruta disponible para ese destino.");
+      setRouteStatus("error", id, poi.name, "Seleccione otro destino para calcular la ruta.");
     });
   }
 
@@ -1479,13 +1481,13 @@
     var name = escapeHtml(route.targetName || "el destino");
     var html = "";
     if (route.status === "locating") {
-      html = '<p class="guide-route-status is-loading">' + escapeHtml(route.info || "Obteniendo tu ubicación…") + "</p>";
+      html = '<p class="guide-route-status is-loading">' + escapeHtml(route.info || "Obteniendo su ubicación…") + "</p>";
     } else if (route.status === "calculating") {
       html = '<p class="guide-route-status is-loading">Calculando ruta a ' + name + "…</p>";
     } else if (route.status === "ready") {
       html = '<p class="guide-route-status is-ready">Ruta ' + escapeHtml(route.info || "") + " hasta " + name + ".</p>";
     } else {
-      html = '<p class="guide-route-status is-error">' + escapeHtml(route.info || "No se pudo calcular la ruta.") + "</p>";
+      html = '<p class="guide-route-status is-error">' + escapeHtml(route.info || "Intente calcular la ruta de nuevo.") + "</p>";
     }
     html += '<button type="button" class="guide-route-cancel">Cancelar ruta</button>';
     box.innerHTML = notice + html;
@@ -1498,7 +1500,7 @@
     var detail = state.mount.querySelector("#guideDetail");
     if (!detail) return;
     if (!poi) {
-      detail.innerHTML = '<p class="guide-detail-empty">Selecciona un lugar de la lista para ver su información.</p>';
+      detail.innerHTML = '<p class="guide-detail-empty">Seleccione un lugar de la lista para ver su información.</p>';
       renderMobileActions(null);
       return;
     }
@@ -1547,33 +1549,33 @@
     if (poi.late) scheduleRows += '<p class="guide-detail-row"><strong>Bar</strong> ' + escapeHtml(poi.late) + "</p>";
 
     if (poi.category === "restaurante") {
-      var hours = poi.hours || "Consultar horario en recepción";
-      var cuisine = poi.cuisine || "Cocina internacional";
+      var hours = poi.hours || "Consultar horario en la app de Iberostar";
+      var cuisine = poi.cuisine || "Consultar en la app de Iberostar";
       extraInfo = '<div class="guide-extra-info">' +
-        '<p class="guide-detail-row"><strong>Horario</strong> ' + escapeHtml(hours) + "</p>" +
+        (scheduleRows ? "" : '<p class="guide-detail-row"><strong>Horario</strong> ' + escapeHtml(hours) + "</p>") +
         scheduleRows +
         '<p class="guide-detail-row"><strong>Cocina</strong> ' + escapeHtml(cuisine) + "</p>" +
         (poi.menu ? '<p class="guide-detail-row"><strong>Menú</strong> ' + escapeHtml(poi.menu) + "</p>" : "") +
         "</div>";
     } else if (poi.category === "spa") {
-      var spaHours = poi.hours || "09:00 - 19:00";
-      var treatments = poi.treatments || "Masajes, tratamientos faciales, envolturas corporales";
+      var spaHours = poi.hours || "Consultar horario en la app de Iberostar";
+      var treatments = poi.treatments || "Consulte los tratamientos disponibles en la app de Iberostar.";
       extraInfo = '<div class="guide-extra-info">' +
         '<p class="guide-detail-row"><strong>Horario</strong> ' + escapeHtml(spaHours) + "</p>" +
         '<p class="guide-detail-row"><strong>Tratamientos</strong> ' + escapeHtml(treatments) + "</p>" +
         (poi.packages ? '<p class="guide-detail-row"><strong>Paquetes</strong> ' + escapeHtml(poi.packages) + "</p>" : "") +
         "</div>";
     } else if (poi.category === "golf") {
-      var golfHours = poi.hours || "07:00 - 18:00";
-      var golfPackages = poi.packages || "Green fee, alquiler de equipo, clases";
+      var golfHours = poi.hours || "Consultar horario en la app de Iberostar";
+      var golfPackages = poi.packages || "Consulte los paquetes en la app de Iberostar.";
       extraInfo = '<div class="guide-extra-info">' +
         '<p class="guide-detail-row"><strong>Horario</strong> ' + escapeHtml(golfHours) + "</p>" +
-        '<p class="guide-detail-row"><strong>Tee times</strong> Disponibles desde las 07:00</p>' +
+        (poi.teeTimes ? '<p class="guide-detail-row"><strong>Tee times</strong> ' + escapeHtml(poi.teeTimes) + "</p>" : "") +
         '<p class="guide-detail-row"><strong>Paquetes</strong> ' + escapeHtml(golfPackages) + "</p>" +
         "</div>";
     } else if (poi.category === "bar") {
       extraInfo = '<div class="guide-extra-info">' +
-        '<p class="guide-detail-row"><strong>Horario</strong> ' + escapeHtml(poi.hours || "11:00 - 01:00") + "</p>" +
+        (scheduleRows ? "" : '<p class="guide-detail-row"><strong>Horario</strong> ' + escapeHtml(poi.hours || "Consultar horario en la app de Iberostar") + "</p>") +
         scheduleRows +
         (poi.cuisine ? '<p class="guide-detail-row"><strong>Concepto</strong> ' + escapeHtml(poi.cuisine) + "</p>" : "") +
         (poi.menu ? '<p class="guide-detail-row"><strong>Carta</strong> ' + escapeHtml(poi.menu) + "</p>" : "") +
@@ -1596,8 +1598,6 @@
       '<p class="guide-detail-cat">' + escapeHtml(categoryLabel(poi.category)) + "</p>" +
       (poi.description ? '<p class="guide-detail-desc">' + escapeHtml(poi.description) + "</p>" : "") +
       zone +
-      '<p class="guide-detail-row"><strong>Fuente</strong> ' + escapeHtml(source) + "</p>" +
-      '<p class="guide-detail-row"><strong>Estado</strong> ' + (isArea ? "Área geográfica" : (verified ? "Verificado" : "Pendiente de verificación")) + "</p>" +
       extraInfo +
       actions;
     renderRouteStatus();
@@ -1645,7 +1645,7 @@
       ? "Solicitud de carrito de golf"
       : (poi.category === "restaurante" ? "Reservar mesa" : (poi.category === "spa" ? "Reservar cita" : "Reservar tee time"));
     var fields = isCart
-      ? '<p class="guide-book-note">El carrito te recogerá en tu ubicación actual. Activa la ubicación del dispositivo para compartir el punto exacto.</p>'
+      ? '<p class="guide-book-note">El carrito le recogerá en su ubicación actual. Active la ubicación del dispositivo para compartir el punto exacto.</p>'
       : '<label class="guide-book-field"><span>Fecha</span><input type="date" name="fecha" id="guideBookDate" required /></label>' +
         '<label class="guide-book-field"><span>Hora</span><input type="time" name="hora" id="guideBookTime" required /></label>' +
         '<label class="guide-book-field"><span>Personas</span><input type="number" name="personas" id="guideBookGuests" min="1" max="20" value="2" required /></label>';
@@ -1660,7 +1660,7 @@
         '<button type="submit" class="guide-book-submit">Enviar solicitud</button>' +
         '<button type="button" class="guide-book-cancel" data-guide-book-cancel="1">Cancelar</button>' +
       "</div>" +
-      '<p class="guide-book-note">Tu solicitud se registra en el sistema. La confirmación se realiza en recepción del hotel.</p>' +
+          '<p class="guide-book-note">Su solicitud se registra en el sistema. La confirmación se realiza en recepción del hotel.</p>' +
     "</form>";
     var form = box.querySelector("#guideBookForm");
     if (form) {
@@ -1700,8 +1700,8 @@
         }
         box.innerHTML = '<div class="guide-book-done">' +
           '<h4 class="guide-book-title">Solicitud enviada</h4>' +
-          '<p>Registramos tu ' + escapeHtml(title.toLowerCase()) + " para " + escapeHtml(poi.name) + ".</p>" +
-          '<p>Recepción del hotel te confirmará la hora y el punto de encuentro.</p>' +
+          '<p>Registramos su ' + escapeHtml(title.toLowerCase()) + " para " + escapeHtml(poi.name) + ".</p>" +
+          '<p>Recepción del hotel le confirmará la hora y el punto de encuentro.</p>' +
         "</div>";
       });
     }
@@ -1821,8 +1821,8 @@
       : '<div class="guide-explorer-head">' +
           '<div class="guide-explorer-title">' +
             '<p class="portal-kicker">GUÍA INTERACTIVA · THE CLUB</p>' +
-            "<h2>Explora los lugares del complejo</h2>" +
-            "<p>Busca por nombre o filtra por categoría. Selecciona un lugar verificado para verlo en el mapa.</p>" +
+            "<h2>Explore los lugares del complejo</h2>" +
+            "<p>Busque por nombre o filtre por categoría. Seleccione un lugar verificado para verlo en el mapa.</p>" +
           "</div>" +
           searchField +
         "</div>";
@@ -1850,7 +1850,7 @@
       '<div class="guide-activities" id="guideActivities">' +
         '<div class="guide-activities-head">' +
           "<h3>Actividades del día</h3>" +
-          "<p>Toca una actividad para ver el lugar en el mapa y reservar.</p>" +
+          "<p>Toque una actividad para ver el lugar en el mapa y reservar.</p>" +
         "</div>" +
         '<ul class="guide-activities-list" id="guideActivitiesList"></ul>' +
       "</div>" +

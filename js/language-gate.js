@@ -30,11 +30,11 @@
     : (browserLanguage || i18n.getLang() || available[0]);
   var copy = {
     es: {
-      title: "Elige tu idioma",
-      country: "País o región sugerido por tu dispositivo:",
-      unknownCountry: "No disponible",
+      title: "Elija su idioma",
+      country: "País o región sugerido por su dispositivo:",
+      unknownCountry: "Detección automática",
       continue: "Continuar",
-      note: "Después podrás cambiarlo desde el menú."
+      note: "Después podrá cambiarlo desde el menú."
     },
     en: {
       title: "Choose your language",
