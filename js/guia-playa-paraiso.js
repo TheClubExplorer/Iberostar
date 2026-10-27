@@ -86,132 +86,132 @@
     }
   ];
 
-  POIS.push({"id":"golf","name":"Iberostar Playa Paraíso Golf Club","category":"golf","lat":20.75946,"lng":-86.96714,"description":"Campo 18 hoyos","source":"osm","verified":true},
-    {"id":"convention","name":"Centro de Convenciones","category":"conv","lat":20.76143,"lng":-86.96538,"description":"Centro de convenciones del complejo","source":"osm","verified":true},
-    {"id":"spa","name":"Spa Sensations","category":"spa","lat":20.76032,"lng":-86.96629,"description":"Spa del complejo","source":"osm","verified":true},
-    {"id":"starcamp","name":"Star Camp","category":"kids","lat":20.76071,"lng":-86.96471,"description":"Star Camp","source":"osm","verified":true},
-    {"id":"galaxy","name":"Discoteca Galaxy","category":"discoteca","lat":20.75955,"lng":-86.966,"description":"Discoteca del complejo (+18)","source":"osm","verified":true},
+  POIS.push({"id":"golf","name":"Iberostar Playa Paraíso Golf Club","category":"golf","lat":20.75946,"lng":-86.96714,"description":"Campo 18 hoyos"},
+    {"id":"convention","name":"Centro de Convenciones","category":"conv","lat":20.76143,"lng":-86.96538,"description":"Centro de convenciones del complejo"},
+    {"id":"spa","name":"Spa Sensations","category":"spa","lat":20.76032,"lng":-86.96629,"description":"Spa del complejo"},
+    {"id":"starcamp","name":"Star Camp","category":"kids","lat":20.76071,"lng":-86.96471,"description":"Star Camp"},
+    {"id":"galaxy","name":"Discoteca Galaxy","category":"discoteca","lat":20.75955,"lng":-86.966,"description":"Discoteca del complejo (+18)"},
     // Coco Bar: coordenada verificada manualmente (Google Maps).
-    {"id":"cocobar","name":"Coco Bar","category":"bar","lat":20.756290,"lng":-86.959046,"description":"Coco Bar","source":"Google Maps","verified":true},
-    {"id":"starcafe","name":"Star Café","category":"bar","lat":20.7585,"lng":-86.963,"description":"Star Café","source":"osm","verified":true});
-  POIS.push({"id":"theclub","name":"THE CLUB","category":"club","description":"Espacio exclusivo para socios donde usted disfruta de atención personalizada, ambientes cálidos y experiencias preferentes en el corazón del complejo.","hours":"08:00 - 22:00","amenities":"Wi-Fi de alta velocidad, áreas de descanso, terraza, prensa digital, bebidas y snacks","services":"Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas","source":"plano","verified":false},
-    {"id":"playa-mar-caribe","name":"Mar Caribe","category":"playa","description":"Mar Caribe / Caribbean Sea","source":"plano","verified":false});
+    {"id":"cocobar","name":"Coco Bar","category":"bar","lat":20.756290,"lng":-86.959046,"description":"Coco Bar"},
+    {"id":"starcafe","name":"Star Café","category":"bar","lat":20.7585,"lng":-86.963,"description":"Star Café"});
+  POIS.push({"id":"theclub","name":"THE CLUB","category":"club","description":"Espacio exclusivo para socios donde usted disfruta de atención personalizada, ambientes cálidos y experiencias preferentes en el corazón del complejo.","hours":"08:00 - 22:00","amenities":"Wi-Fi de alta velocidad, áreas de descanso, terraza, prensa digital, bebidas y snacks","services":"Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas"},
+    {"id":"playa-mar-caribe","name":"Mar Caribe","category":"playa","description":"Mar Caribe / Caribbean Sea"});
   POIS.push(
-    {"id":"hashiru","name":"Hashiru","category":"restaurante","description":"Restaurante japonés","source":"plano","verified":false},
-    {"id":"la-dorada","name":"La Dorada","category":"restaurante","description":"Restaurante mediterráneo","source":"plano","verified":false},
-    {"id":"rodizio","name":"Rodizio","category":"restaurante","description":"Restaurante de especialidad brasileño","source":"plano","verified":false},
-    {"id":"el-mercado","name":"El Mercado","category":"restaurante","description":"Restaurante buffet","source":"plano","verified":false},
-    {"id":"la-plaza","name":"La Plaza","category":"restaurante","description":"Restaurante buffet","source":"plano","verified":false},
-    {"id":"la-hacienda","name":"La Hacienda","category":"restaurante","description":"Restaurante mexicano","source":"plano","verified":false},
-    {"id":"el-puerto","name":"El Puerto","category":"restaurante","description":"Restaurante de especialidad","source":"plano","verified":false},
-    {"id":"beach-grill","name":"Beach Grill","category":"restaurante","lat":20.7578219,"lng":-86.9582285,"description":"Grill de playa","source":"Google Maps","verified":true},
-    {"id":"burgers","name":"Burgers","category":"restaurante","description":"Hamburguesas","source":"plano","verified":false},
-    {"id":"antojitos-tacos","name":"Antojitos / Tacos","category":"restaurante","description":"Antojitos / Tacos","source":"plano","verified":false},
-    {"id":"crepes","name":"Crepes & Ice Cream","category":"restaurante","description":"Crepas y helados","source":"plano","verified":false},
-    {"id":"el-museo","name":"El Museo","category":"restaurante","description":"Restaurante gourmet","source":"plano","verified":false},
-    {"id":"jambalaya","name":"Jambalaya","category":"restaurante","description":"Restaurante cajún","source":"plano","verified":false},
-    {"id":"la-pagoda","name":"La Pagoda","category":"restaurante","description":"Restaurante buffet","source":"plano","verified":false},
-    {"id":"el-fogon-steak","name":"El Fogón (Steak House)","category":"restaurante","lat":20.756879,"lng":-86.959677,"description":"Steak house","source":"Google Maps","verified":true},
-    {"id":"el-fogon-italiano","name":"El Fogón (Italiano)","category":"restaurante","lat":20.757161,"lng":-86.959936,"description":"Restaurante italiano","source":"Google Maps","verified":true},
-    {"id":"coco-buffet","name":"Coco Beach Snack Bar","category":"restaurante","lat":20.756466,"lng":-86.958965,"description":"Snack bar de playa","source":"Google Maps","verified":true},
-    {"id":"el-rancho","name":"El Rancho","category":"restaurante","description":"Steak house","source":"plano","verified":false},
-    {"id":"la-geisha","name":"La Geisha","category":"restaurante","description":"Restaurante japonés","source":"plano","verified":false},
-    {"id":"letoile","name":"L'Etoile","category":"restaurante","description":"Cocina francesa","source":"plano","verified":false},
-    {"id":"la-marina","name":"La Marina","category":"restaurante","lat":20.7577902,"lng":-86.9640737,"description":"Restaurante mediterráneo","source":"Google Maps","verified":true},
-    {"id":"el-tapatio","name":"El Tapatío","category":"restaurante","description":"Restaurante mexicano / buffet","source":"plano","verified":false},
-    {"id":"venecia","name":"Venecia","category":"restaurante","description":"Restaurante italiano","source":"plano","verified":false},
-    {"id":"bellavista","name":"Bellavista","category":"restaurante","description":"Restaurante buffet","source":"plano","verified":false},
-    {"id":"latelier","name":"L'Atelier","category":"restaurante","description":"Restaurante gourmet","source":"plano","verified":false},
+    {"id":"hashiru","name":"Hashiru","category":"restaurante","description":"Restaurante japonés"},
+    {"id":"la-dorada","name":"La Dorada","category":"restaurante","description":"Restaurante mediterráneo"},
+    {"id":"rodizio","name":"Rodizio","category":"restaurante","description":"Restaurante de especialidad brasileño"},
+    {"id":"el-mercado","name":"El Mercado","category":"restaurante","description":"Restaurante buffet"},
+    {"id":"la-plaza","name":"La Plaza","category":"restaurante","description":"Restaurante buffet"},
+    {"id":"la-hacienda","name":"La Hacienda","category":"restaurante","description":"Restaurante mexicano"},
+    {"id":"el-puerto","name":"El Puerto","category":"restaurante","description":"Restaurante de especialidad"},
+    {"id":"beach-grill","name":"Beach Grill","category":"restaurante","lat":20.7578219,"lng":-86.9582285,"description":"Grill de playa"},
+    {"id":"burgers","name":"Burgers","category":"restaurante","description":"Hamburguesas"},
+    {"id":"antojitos-tacos","name":"Antojitos / Tacos","category":"restaurante","description":"Antojitos / Tacos"},
+    {"id":"crepes","name":"Crepes & Ice Cream","category":"restaurante","description":"Crepas y helados"},
+    {"id":"el-museo","name":"El Museo","category":"restaurante","description":"Restaurante gourmet"},
+    {"id":"jambalaya","name":"Jambalaya","category":"restaurante","description":"Restaurante cajún"},
+    {"id":"la-pagoda","name":"La Pagoda","category":"restaurante","description":"Restaurante buffet"},
+    {"id":"el-fogon-steak","name":"El Fogón (Steak House)","category":"restaurante","lat":20.756879,"lng":-86.959677,"description":"Steak house"},
+    {"id":"el-fogon-italiano","name":"El Fogón (Italiano)","category":"restaurante","lat":20.757161,"lng":-86.959936,"description":"Restaurante italiano"},
+    {"id":"coco-buffet","name":"Coco Beach Snack Bar","category":"restaurante","lat":20.756466,"lng":-86.958965,"description":"Snack bar de playa"},
+    {"id":"el-rancho","name":"El Rancho","category":"restaurante","description":"Steak house"},
+    {"id":"la-geisha","name":"La Geisha","category":"restaurante","description":"Restaurante japonés"},
+    {"id":"letoile","name":"L'Etoile","category":"restaurante","description":"Cocina francesa"},
+    {"id":"la-marina","name":"La Marina","category":"restaurante","lat":20.7577902,"lng":-86.9640737,"description":"Restaurante mediterráneo"},
+    {"id":"el-tapatio","name":"El Tapatío","category":"restaurante","description":"Restaurante mexicano / buffet"},
+    {"id":"venecia","name":"Venecia","category":"restaurante","description":"Restaurante italiano"},
+    {"id":"bellavista","name":"Bellavista","category":"restaurante","description":"Restaurante buffet"},
+    {"id":"latelier","name":"L'Atelier","category":"restaurante","description":"Restaurante gourmet"},
 
-    {"id":"haiku","name":"Haiku","category":"restaurante","description":"Restaurante japonés","source":"plano","verified":false},
-    {"id":"la-brisa","name":"La Brisa Beach Bar","category":"bar","hotelId":"Iberostar Paraíso JOIA","description":"Bar de playa","source":"IHG","verified":false},
-    {"id":"baby-kitchen","name":"Baby Kitchen","category":"servicio","lat":20.758029,"lng":-86.963437,"description":"Cocina para bebés","source":"Google Maps","verified":true});
+    {"id":"haiku","name":"Haiku","category":"restaurante","description":"Restaurante japonés"},
+    {"id":"la-brisa","name":"La Brisa Beach Bar","category":"bar","hotelId":"Iberostar Paraíso JOIA","description":"Bar de playa"},
+    {"id":"baby-kitchen","name":"Baby Kitchen","category":"servicio","lat":20.758029,"lng":-86.963437,"description":"Cocina para bebés"});
   POIS.push(
-    {"id":"sports-bar-corner","name":"Sports Bar Corner","category":"bar","hotelId":"Iberostar Paraíso Lindo","lat":20.7596764,"lng":-86.9634133,"description":"Sports bar","source":"Google Maps","verified":true},
+    {"id":"sports-bar-corner","name":"Sports Bar Corner","category":"bar","hotelId":"Iberostar Paraíso Lindo","lat":20.7596764,"lng":-86.9634133,"description":"Sports bar"},
     // "Heladería El Puente" y "Bar El Puente" son el mismo lugar; quedó un único
     // POI ("bar-el-puente", en 20.757172,-86.960979). El punto de la playa que
     // antes se etiquetó como "Bar El Puente" en realidad es Aqua Bar Las Olas.
     // "Heladería El Mirador" y "Lobby Bar El Mirador" también son el mismo
     // lugar; quedó un único POI ("lobby-bar-el-mirador") con las coords de Google Maps.
-    {"id":"star-rock-cafe","name":"Star Rock Café","category":"bar","description":"Star Rock Café","source":"plano","verified":false},
-    {"id":"pool-bar-las-olas","name":"Pool Bar Las Olas","category":"bar","lat":20.757897,"lng":-86.961767,"description":"Bar de piscina","source":"Google Maps","verified":true},
-    {"id":"lobby-bar-kukulkan","name":"Lobby Bar Kukulkán","category":"bar","hotelId":"Iberostar Paraíso Maya","lat":20.7575018,"lng":-86.9645296,"description":"Lobby bar","source":"Google Maps","verified":true},
-    {"id":"music-bar-rhapsody","name":"Music Bar Rhapsody","category":"bar","lat":20.756312,"lng":-86.962411,"description":"Music bar","source":"Google Maps","verified":true},
-    {"id":"lobby-bar-el-mirador","name":"Lobby Bar El Mirador","category":"bar","hotelId":"Iberostar Paraíso JOIA","lat":20.756335,"lng":-86.962712,"description":"Lobby bar","source":"Google Maps","verified":true},
-    {"id":"aqua-bar-la-sirenita","name":"Aqua Bar La Sirenita","category":"bar","lat":20.754775,"lng":-86.960108,"description":"Aqua bar","source":"Google Maps","verified":true},
-    {"id":"health-bar-spa","name":"Health Bar SPA","category":"bar","lat":20.756025,"lng":-86.961423,"description":"Health bar","source":"Google Maps","verified":true},
-    {"id":"aqua-bar-la-perla","name":"Aqua Bar La Perla","category":"bar","description":"Aqua bar","source":"plano","verified":false},
-    {"id":"bar-teatro","name":"Bar Teatro","category":"bar","hotelId":"Iberostar Paraíso Lindo","lat":20.759376,"lng":-86.962659,"description":"Bar de teatro","source":"Google Maps","verified":true},
-    {"id":"lobby-bar-la-fuente","name":"Lobby Bar La Fuente","category":"bar","description":"Lobby bar","source":"plano","verified":false},
-    {"id":"aqua-bar-las-olas","name":"Aqua Bar Las Olas","category":"bar","lat":20.7586198,"lng":-86.9590972,"description":"Aqua bar (zona de playa)","source":"OpenStreetMap","verified":true},
-    {"id":"lobby-bar-la-cula","name":"Lobby Bar La Cúpula","category":"bar","description":"Lobby bar","source":"plano","verified":false},
-    {"id":"aqua-bar-las-rocas","name":"Aqua Bar Las Rocas","category":"bar","description":"Aqua bar","source":"plano","verified":false},
-    {"id":"lobby-bar-acuario","name":"Lobby Bar Acuario","category":"bar","hotelId":"Iberostar Paraíso Lindo","lat":20.7595512,"lng":-86.963491,"description":"Lobby bar","source":"Google Maps","verified":true},
-    {"id":"cigar-bar","name":"Cigar Bar","category":"bar","description":"Cigar bar","source":"plano","verified":false});
+    {"id":"star-rock-cafe","name":"Star Rock Café","category":"bar","description":"Star Rock Café"},
+    {"id":"pool-bar-las-olas","name":"Pool Bar Las Olas","category":"bar","lat":20.757897,"lng":-86.961767,"description":"Bar de piscina"},
+    {"id":"lobby-bar-kukulkan","name":"Lobby Bar Kukulkán","category":"bar","hotelId":"Iberostar Paraíso Maya","lat":20.7575018,"lng":-86.9645296,"description":"Lobby bar"},
+    {"id":"music-bar-rhapsody","name":"Music Bar Rhapsody","category":"bar","lat":20.756312,"lng":-86.962411,"description":"Music bar"},
+    {"id":"lobby-bar-el-mirador","name":"Lobby Bar El Mirador","category":"bar","hotelId":"Iberostar Paraíso JOIA","lat":20.756335,"lng":-86.962712,"description":"Lobby bar"},
+    {"id":"aqua-bar-la-sirenita","name":"Aqua Bar La Sirenita","category":"bar","lat":20.754775,"lng":-86.960108,"description":"Aqua bar"},
+    {"id":"health-bar-spa","name":"Health Bar SPA","category":"bar","lat":20.756025,"lng":-86.961423,"description":"Health bar"},
+    {"id":"aqua-bar-la-perla","name":"Aqua Bar La Perla","category":"bar","description":"Aqua bar"},
+    {"id":"bar-teatro","name":"Bar Teatro","category":"bar","hotelId":"Iberostar Paraíso Lindo","lat":20.759376,"lng":-86.962659,"description":"Bar de teatro"},
+    {"id":"lobby-bar-la-fuente","name":"Lobby Bar La Fuente","category":"bar","description":"Lobby bar"},
+    {"id":"aqua-bar-las-olas","name":"Aqua Bar Las Olas","category":"bar","lat":20.7586198,"lng":-86.9590972,"description":"Aqua bar (zona de playa)"},
+    {"id":"lobby-bar-la-cula","name":"Lobby Bar La Cúpula","category":"bar","description":"Lobby bar"},
+    {"id":"aqua-bar-las-rocas","name":"Aqua Bar Las Rocas","category":"bar","description":"Aqua bar"},
+    {"id":"lobby-bar-acuario","name":"Lobby Bar Acuario","category":"bar","hotelId":"Iberostar Paraíso Lindo","lat":20.7595512,"lng":-86.963491,"description":"Lobby bar"},
+    {"id":"cigar-bar","name":"Cigar Bar","category":"bar","description":"Cigar bar"});
   POIS.push(
-    {"id":"waterfall-jacuzzi","name":"Cascada y jacuzzi","category":"piscina","lat":20.759539,"lng":-86.960991,"description":"Water fall & jacuzzi","source":"Google Maps","verified":true},
-    {"id":"quiet-pool","name":"Piscina tranquila","category":"piscina","lat":20.759600,"lng":-86.960224,"description":"Quiet pool","source":"Google Maps","verified":true},
-    {"id":"activities-pool","name":"Piscina de actividades","category":"piscina","lat":20.759267,"lng":-86.959714,"description":"Activities pool","source":"Google Maps","verified":true},
-    {"id":"lazy-river","name":"Río lento","category":"piscina","description":"Lazy river","source":"plano","verified":false},
-    {"id":"sports-pool","name":"Piscina deportiva","category":"piscina","description":"Sports pool","source":"plano","verified":false},
-    {"id":"wave-pool","name":"Piscina de olas","category":"piscina","description":"Wave pool","source":"plano","verified":false},
-    {"id":"jacuzzi","name":"Jacuzzi","category":"piscina","lat":20.757415,"lng":-86.960793,"description":"Jacuzzi","source":"Google Maps","verified":true},
-    {"id":"private-pool","name":"Piscina privada","category":"piscina","lat":20.756499,"lng":-86.960229,"description":"Private pool","source":"Google Maps","verified":true},
-    {"id":"indoor-pool","name":"Piscina cubierta","category":"piscina","lat":20.756076,"lng":-86.961331,"description":"Indoor pool","source":"Google Maps","verified":true},
-    {"id":"main-pool","name":"Piscina principal","category":"piscina","lat":20.754701,"lng":-86.960497,"description":"Main pool","source":"Google Maps","verified":true},
-    {"id":"mini-water-playground","name":"Mini parque acuático","category":"piscina","description":"Mini water playground","source":"plano","verified":false},
-    {"id":"massage-palapa","name":"Palapas de masajes","category":"spa","lat":20.758252,"lng":-86.957775,"description":"Massage palapa","source":"Google Maps","verified":true});
+    {"id":"waterfall-jacuzzi","name":"Cascada y jacuzzi","category":"piscina","lat":20.759539,"lng":-86.960991,"description":"Water fall & jacuzzi"},
+    {"id":"quiet-pool","name":"Piscina tranquila","category":"piscina","lat":20.759600,"lng":-86.960224,"description":"Quiet pool"},
+    {"id":"activities-pool","name":"Piscina de actividades","category":"piscina","lat":20.759267,"lng":-86.959714,"description":"Activities pool"},
+    {"id":"lazy-river","name":"Río lento","category":"piscina","description":"Lazy river"},
+    {"id":"sports-pool","name":"Piscina deportiva","category":"piscina","description":"Sports pool"},
+    {"id":"wave-pool","name":"Piscina de olas","category":"piscina","description":"Wave pool"},
+    {"id":"jacuzzi","name":"Jacuzzi","category":"piscina","lat":20.757415,"lng":-86.960793,"description":"Jacuzzi"},
+    {"id":"private-pool","name":"Piscina privada","category":"piscina","lat":20.756499,"lng":-86.960229,"description":"Private pool"},
+    {"id":"indoor-pool","name":"Piscina cubierta","category":"piscina","lat":20.756076,"lng":-86.961331,"description":"Indoor pool"},
+    {"id":"main-pool","name":"Piscina principal","category":"piscina","lat":20.754701,"lng":-86.960497,"description":"Main pool"},
+    {"id":"mini-water-playground","name":"Mini parque acuático","category":"piscina","description":"Mini water playground"},
+    {"id":"massage-palapa","name":"Palapas de masajes","category":"spa","lat":20.758252,"lng":-86.957775,"description":"Massage palapa"});
   POIS.push(
-    {"id":"tennis","name":"Tenis","category":"deportes","lat":20.760289,"lng":-86.964375,"description":"Tennis","source":"Google Maps","verified":true},
-    {"id":"shooting-area","name":"Campo de tiro","category":"deportes","lat":20.761933,"lng":-86.962473,"description":"Shooting area","source":"Google Maps","verified":true},
-    {"id":"diving-center","name":"Centro de buceo","category":"deportes","description":"Diving center","source":"plano","verified":false},
-    {"id":"golf-club-house","name":"Golf Club House","category":"golf","description":"Golf club house","source":"plano","verified":false},
-    {"id":"teatro-music-hall","name":"Teatro Music Hall","category":"entretenimiento","lat":20.7591882,"lng":-86.9627312,"description":"Teatro","source":"Google Maps","verified":true},
-    {"id":"teatro-coliseo","name":"Teatro Coliseo","category":"entretenimiento","hotelId":"Iberostar Paraíso JOIA","lat":20.756739,"lng":-86.962693,"description":"Teatro","source":"Google Maps","verified":true},
-    {"id":"games-room","name":"Sala de juegos","category":"entretenimiento","description":"Games room","source":"plano","verified":false},
+    {"id":"tennis","name":"Tenis","category":"deportes","lat":20.760289,"lng":-86.964375,"description":"Tennis"},
+    {"id":"shooting-area","name":"Campo de tiro","category":"deportes","lat":20.761933,"lng":-86.962473,"description":"Shooting area"},
+    {"id":"diving-center","name":"Centro de buceo","category":"deportes","description":"Diving center"},
+    {"id":"golf-club-house","name":"Golf Club House","category":"golf","description":"Golf club house"},
+    {"id":"teatro-music-hall","name":"Teatro Music Hall","category":"entretenimiento","lat":20.7591882,"lng":-86.9627312,"description":"Teatro"},
+    {"id":"teatro-coliseo","name":"Teatro Coliseo","category":"entretenimiento","hotelId":"Iberostar Paraíso JOIA","lat":20.756739,"lng":-86.962693,"description":"Teatro"},
+    {"id":"games-room","name":"Sala de juegos","category":"entretenimiento","description":"Games room"},
     // El "Casino" del plano es en realidad el "Teatro Mar-Playa" (Google Maps)
-    {"id":"teatro-mar-playa","name":"Teatro Mar-Playa","category":"entretenimiento","lat":20.7608353,"lng":-86.9625428,"description":"Teatro","source":"Google Maps","verified":true},
-    {"id":"shopping-mall","name":"Centro comercial","category":"comer","lat":20.759933,"lng":-86.965830,"description":"Shopping mall","source":"Google Maps","verified":true},
-    {"id":"starmarket","name":"Starmarket","category":"comer","description":"Starmarket","source":"plano","verified":false},
-    {"id":"shop-tienda","name":"Shop / Tienda","category":"comer","lat":20.762215,"lng":-86.963121,"description":"Shop / Tienda","source":"Google Maps","verified":true},
-    {"id":"pool-shop","name":"Tienda de piscina","category":"comer","lat":20.758561,"lng":-86.959673,"description":"Pool shop","source":"Google Maps","verified":true},
-    {"id":"meeting-room","name":"Sala de juntas","category":"conv","lat":20.760629,"lng":-86.963838,"description":"Sala de juntas","source":"Google Maps","verified":true},
-    {"id":"billiards-library","name":"Internet, billar, biblioteca","category":"servicio","lat":20.760721,"lng":-86.963638,"description":"Billiards, library","source":"Google Maps","verified":true},
-    {"id":"medical-center","name":"Centro médico","category":"servicio","lat":20.759144,"lng":-86.964771,"description":"Medical center","source":"Google Maps","verified":true},
-    {"id":"drugstore","name":"Farmacia","category":"servicio","lat":20.759826,"lng":-86.965208,"description":"Drugstore","source":"Google Maps","verified":true},
-    {"id":"preview-gallery","name":"Preview Gallery","category":"club","lat":20.757715,"lng":-86.964923,"description":"Preview Gallery (The Club)","source":"Google Maps","verified":true},
-    {"id":"head-concierge","name":"Head Concierge","category":"concierge","lat":20.759753,"lng":-86.965457,"description":"Head Concierge","source":"Google Maps","verified":true},
-    {"id":"star-prestige-lounge","name":"Star Prestige Lounge","category":"starprestige","hotelId":null,"lat":20.753697,"lng":-86.960424,"description":"Salón exclusivo Star Prestige donde usted descansa con calidez, disfruta de bebidas premium y recibe atención personalizada en un ambiente reservado.","hours":"09:00 - 21:00","amenities":"Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks","services":"Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas","source":"Google Maps","verified":true},
-    {"id":"star-prestige-beach-club","name":"Star Prestige Beach Club","category":"starprestige","hotelId":"Iberostar Paraíso JOIA","lat":20.756829,"lng":-86.958688,"description":"Área exclusiva frente al mar donde usted disfruta de confort, servicio atento y experiencias preferentes en un entorno cálido y distinguido.","hours":"09:00 - 21:00","amenities":"Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks","services":"Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas","source":"Google Maps","verified":true},
-    {"id":"courtesy-room","name":"Duchas de cortesía","category":"servicio","lat":20.758045,"lng":-86.964554,"description":"Courtesy room","source":"Google Maps","verified":true},
-    {"id":"wedding-chapel","name":"Capilla de bodas","category":"servicio","description":"Wedding chapel","source":"plano","verified":false},
-    {"id":"star-friends-desk","name":"Star Friends Desk","category":"kids","lat":20.755117,"lng":-86.961373,"description":"Star Friends Desk","source":"Google Maps","verified":true},
+    {"id":"teatro-mar-playa","name":"Teatro Mar-Playa","category":"entretenimiento","lat":20.7608353,"lng":-86.9625428,"description":"Teatro"},
+    {"id":"shopping-mall","name":"Centro comercial","category":"comer","lat":20.759933,"lng":-86.965830,"description":"Shopping mall"},
+    {"id":"starmarket","name":"Starmarket","category":"comer","description":"Starmarket"},
+    {"id":"shop-tienda","name":"Shop / Tienda","category":"comer","lat":20.762215,"lng":-86.963121,"description":"Shop / Tienda"},
+    {"id":"pool-shop","name":"Tienda de piscina","category":"comer","lat":20.758561,"lng":-86.959673,"description":"Pool shop"},
+    {"id":"meeting-room","name":"Sala de juntas","category":"conv","lat":20.760629,"lng":-86.963838,"description":"Sala de juntas"},
+    {"id":"billiards-library","name":"Internet, billar, biblioteca","category":"servicio","lat":20.760721,"lng":-86.963638,"description":"Billiards, library"},
+    {"id":"medical-center","name":"Centro médico","category":"servicio","lat":20.759144,"lng":-86.964771,"description":"Medical center"},
+    {"id":"drugstore","name":"Farmacia","category":"servicio","lat":20.759826,"lng":-86.965208,"description":"Drugstore"},
+    {"id":"preview-gallery","name":"Preview Gallery","category":"club","lat":20.757715,"lng":-86.964923,"description":"Preview Gallery (The Club)"},
+    {"id":"head-concierge","name":"Head Concierge","category":"concierge","lat":20.759753,"lng":-86.965457,"description":"Head Concierge"},
+    {"id":"star-prestige-lounge","name":"Star Prestige Lounge","category":"starprestige","hotelId":null,"lat":20.753697,"lng":-86.960424,"description":"Salón exclusivo Star Prestige donde usted descansa con calidez, disfruta de bebidas premium y recibe atención personalizada en un ambiente reservado.","hours":"09:00 - 21:00","amenities":"Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks","services":"Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas"},
+    {"id":"star-prestige-beach-club","name":"Star Prestige Beach Club","category":"starprestige","hotelId":"Iberostar Paraíso JOIA","lat":20.756829,"lng":-86.958688,"description":"Área exclusiva frente al mar donde usted disfruta de confort, servicio atento y experiencias preferentes en un entorno cálido y distinguido.","hours":"09:00 - 21:00","amenities":"Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks","services":"Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas"},
+    {"id":"courtesy-room","name":"Duchas de cortesía","category":"servicio","lat":20.758045,"lng":-86.964554,"description":"Courtesy room"},
+    {"id":"wedding-chapel","name":"Capilla de bodas","category":"servicio","description":"Wedding chapel"},
+    {"id":"star-friends-desk","name":"Star Friends Desk","category":"kids","lat":20.755117,"lng":-86.961373,"description":"Star Friends Desk"},
     // --- Nuevos POIs del plano oficial no existentes en catálogo previo ---
-    {"id":"beach-bar","name":"Beach Bar / Bar de playa","category":"bar","lat":20.757856,"lng":-86.958359,"description":"Bar de playa","source":"Google Maps","verified":true},
-    {"id":"bar-el-puente","name":"Bar El Puente","category":"bar","lat":20.757172,"lng":-86.960979,"description":"Bar El Puente (incluye la heladería)","source":"Google Maps","verified":true},
-    {"id":"buffet-la-marina","name":"Buffet La Marina","category":"restaurante","lat":20.757842,"lng":-86.963819,"description":"Buffet restaurante La Marina","source":"Google Maps","verified":true},
-    {"id":"buffet-el-tapatio","name":"Buffet El Tapatío","category":"restaurante","hotelId":"Iberostar Paraíso Maya","lat":20.756848,"lng":-86.960399,"description":"Buffet restaurante El Tapatío","source":"Google Maps","verified":true});
+    {"id":"beach-bar","name":"Beach Bar / Bar de playa","category":"bar","lat":20.757856,"lng":-86.958359,"description":"Bar de playa"},
+    {"id":"bar-el-puente","name":"Bar El Puente","category":"bar","lat":20.757172,"lng":-86.960979,"description":"Bar El Puente (incluye la heladería)"},
+    {"id":"buffet-la-marina","name":"Buffet La Marina","category":"restaurante","lat":20.757842,"lng":-86.963819,"description":"Buffet restaurante La Marina"},
+    {"id":"buffet-el-tapatio","name":"Buffet El Tapatío","category":"restaurante","hotelId":"Iberostar Paraíso Maya","lat":20.756848,"lng":-86.960399,"description":"Buffet restaurante El Tapatío"});
     // Eliminados a petición del usuario (2026-10-22): "surprise-gf", "surprise-2f" y "shushi"
     // (Restaurant Surprise, planta baja y 2º nivel, y Restaurant Shushi, sin coordenadas verificadas).
 
   // Instalaciones por hotel con coordenadas confirmadas manualmente
   // (recorrido del complejo + enlaces de Google Maps).
   POIS.push(
-    {"id":"concierge-lindo","name":"Concierge Paraíso Lindo","category":"concierge","hotelId":"Iberostar Paraíso Lindo","lat":20.759481,"lng":-86.963898,"description":"Concierge del hotel","source":"Google Maps","verified":true},
-    {"id":"star-prestige-maya","name":"Star Prestige Paraíso Maya","category":"starprestige","hotelId":"Iberostar Paraíso Maya","lat":20.757650,"lng":-86.964755,"description":"Área exclusiva Star Prestige en Paraíso Maya donde usted accede a servicios preferentes, ambientes cálidos y atención personalizada durante su estancia.","hours":"09:00 - 21:00","amenities":"Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks","services":"Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas","source":"Google Maps","verified":true},
+    {"id":"concierge-lindo","name":"Concierge Paraíso Lindo","category":"concierge","hotelId":"Iberostar Paraíso Lindo","lat":20.759481,"lng":-86.963898,"description":"Concierge del hotel"},
+    {"id":"star-prestige-maya","name":"Star Prestige Paraíso Maya","category":"starprestige","hotelId":"Iberostar Paraíso Maya","lat":20.757650,"lng":-86.964755,"description":"Área exclusiva Star Prestige en Paraíso Maya donde usted accede a servicios preferentes, ambientes cálidos y atención personalizada durante su estancia.","hours":"09:00 - 21:00","amenities":"Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks","services":"Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas"},
     // "Star Café Maya" era en realidad el Lobby Bar Kukulkán (mismo punto); se
     // consolidó con sus coordenadas verificadas en "lobby-bar-kukulkan".
-    {"id":"spa-joia","name":"Spa JOIA","category":"spa","hotelId":"Iberostar Paraíso JOIA","lat":20.755878,"lng":-86.961372,"description":"Spa del hotel JOIA","source":"Google Maps","verified":true},
-    {"id":"fit-fun-joia","name":"Fit & Fun JOIA","category":"deportes","hotelId":"Iberostar Paraíso JOIA","lat":20.7560274,"lng":-86.9611985,"description":"Gimnasio Fit & Fun","source":"Google Maps","verified":true},
-    {"id":"concierge-joia","name":"Concierge JOIA","category":"concierge","hotelId":"Iberostar Paraíso JOIA","lat":20.756125,"lng":-86.962989,"description":"Concierge del hotel JOIA","source":"Google Maps","verified":true},
-    {"id":"legado","name":"Legado","category":"restaurante","hotelId":"Iberostar Paraíso JOIA","lat":20.754923,"lng":-86.961316,"description":"Restaurante mexicano","source":"Google Maps","verified":true},
-    {"id":"star-prestige-joia","name":"Star Prestige JOIA","category":"starprestige","hotelId":"Iberostar Paraíso JOIA","lat":20.756156,"lng":-86.962287,"description":"Área exclusiva Star Prestige en JOIA donde usted disfruta de lujo, servicio atento y experiencias preferentes en un entorno cálido y distinguido.","hours":"09:00 - 21:00","amenities":"Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks","services":"Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas","source":"Google Maps","verified":true},
-    {"id":"concierge-grand-paraiso","name":"Concierge Grand Paraíso (Edificio 71)","category":"concierge","hotelId":"Iberostar Paraíso JOIA","lat":20.753724,"lng":-86.960434,"description":"Concierge de Grand Paraíso","source":"Google Maps","verified":true},
-    {"id":"spa-grand-paraiso","name":"Spa Grand Paraíso","category":"spa","hotelId":"Iberostar Paraíso JOIA","lat":20.753233,"lng":-86.960193,"description":"Spa de Grand Paraíso","source":"Google Maps","verified":true},
-    {"id":"fit-fun-grand-paraiso","name":"Fit & Fun Grand Paraíso","category":"deportes","hotelId":"Iberostar Paraíso JOIA","lat":20.757618,"lng":-86.958517,"description":"Gimnasio Fit & Fun de Grand Paraíso","source":"Google Maps","verified":true},
-    {"id":"fit-fun-playa-paraiso","name":"Fit & Fun Playa Paraíso","category":"deportes","lat":20.7603125,"lng":-86.9645625,"description":"Gimnasio Fit & Fun en la zona de playa","source":"Google Maps","verified":true},
-    {"id":"el-colonial","name":"El Colonial","category":"restaurante","lat":20.7609943,"lng":-86.963447,"description":"Restaurant","source":"Google Maps","verified":true},
-    {"id":"trattoria","name":"Trattoria","category":"restaurante","lat":20.7589509,"lng":-86.9583723,"description":"Trattoria by El Faro","source":"Google Maps","verified":true}
+    {"id":"spa-joia","name":"Spa JOIA","category":"spa","hotelId":"Iberostar Paraíso JOIA","lat":20.755878,"lng":-86.961372,"description":"Spa del hotel JOIA"},
+    {"id":"fit-fun-joia","name":"Fit & Fun JOIA","category":"deportes","hotelId":"Iberostar Paraíso JOIA","lat":20.7560274,"lng":-86.9611985,"description":"Gimnasio Fit & Fun"},
+    {"id":"concierge-joia","name":"Concierge JOIA","category":"concierge","hotelId":"Iberostar Paraíso JOIA","lat":20.756125,"lng":-86.962989,"description":"Concierge del hotel JOIA"},
+    {"id":"legado","name":"Legado","category":"restaurante","hotelId":"Iberostar Paraíso JOIA","lat":20.754923,"lng":-86.961316,"description":"Restaurante mexicano"},
+    {"id":"star-prestige-joia","name":"Star Prestige JOIA","category":"starprestige","hotelId":"Iberostar Paraíso JOIA","lat":20.756156,"lng":-86.962287,"description":"Área exclusiva Star Prestige en JOIA donde usted disfruta de lujo, servicio atento y experiencias preferentes en un entorno cálido y distinguido.","hours":"09:00 - 21:00","amenities":"Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks","services":"Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas"},
+    {"id":"concierge-grand-paraiso","name":"Concierge Grand Paraíso (Edificio 71)","category":"concierge","hotelId":"Iberostar Paraíso JOIA","lat":20.753724,"lng":-86.960434,"description":"Concierge de Grand Paraíso"},
+    {"id":"spa-grand-paraiso","name":"Spa Grand Paraíso","category":"spa","hotelId":"Iberostar Paraíso JOIA","lat":20.753233,"lng":-86.960193,"description":"Spa de Grand Paraíso"},
+    {"id":"fit-fun-grand-paraiso","name":"Fit & Fun Grand Paraíso","category":"deportes","hotelId":"Iberostar Paraíso JOIA","lat":20.757618,"lng":-86.958517,"description":"Gimnasio Fit & Fun de Grand Paraíso"},
+    {"id":"fit-fun-playa-paraiso","name":"Fit & Fun Playa Paraíso","category":"deportes","lat":20.7603125,"lng":-86.9645625,"description":"Gimnasio Fit & Fun en la zona de playa"},
+    {"id":"el-colonial","name":"El Colonial","category":"restaurante","lat":20.7609943,"lng":-86.963447,"description":"Restaurant"},
+    {"id":"trattoria","name":"Trattoria","category":"restaurante","lat":20.7589509,"lng":-86.9583723,"description":"Trattoria by El Faro"}
   );
 
   // Coordenadas confirmadas con OpenStreetMap. Cada fila es
@@ -1417,7 +1417,7 @@
         }
       }
     } else {
-      btns += '<span class="guide-mobile-actions-note">Ubicación pendiente de verificación: sin ruta.</span>';
+      btns += '<span class="guide-mobile-actions-note">Información en actualización; la ruta estará disponible pronto.</span>';
       if (cat === "restaurante" || cat === "spa" || cat === "golf") {
         var l2 = cat === "restaurante" ? "Reservar" : (cat === "spa" ? "Reservar cita" : "Reservar tee time");
         btns += '<button type="button" class="guide-book" data-id="' + escapeHtml(poi.id) + '" data-cat="' + cat + '">' + l2 + "</button>";
@@ -1509,9 +1509,7 @@
     var zone = poi.hotelId
       ? '<p class="guide-detail-row"><strong>Hotel</strong> ' + escapeHtml(poi.hotelId) + "</p>"
       : (poi.zone ? '<p class="guide-detail-row"><strong>Zona</strong> ' + escapeHtml(poi.zone) + "</p>" : "");
-    var source = poi.source === "osm" ? "OpenStreetMap" : (poi.source === "official" ? "Oficial" : (poi.source === "plano" ? "Plano oficial" : (poi.source || "—")));
     var isArea = poi.kind === "area";
-    if (isArea) source = "Plano oficial (área)";
     var actions;
     // Botones de reserva: disponibles en toda ficha de restaurante, spa o
     // golf, estén o no verificados todavía. Quedan colocados y listos para
@@ -1538,7 +1536,7 @@
         bookingActions +
         "</div>";
     } else {
-      actions = '<p class="guide-pending-note">Ubicación pendiente de verificación: no se muestra en el mapa ni ofrece ruta.</p>' +
+      actions = '<p class="guide-pending-note">La información de este lugar se está actualizando; en breve estará disponible en el mapa y con ruta.</p>' +
         (bookingActions ? '<div class="guide-detail-actions">' + bookingActions + "</div>" : "");
     }
     var extraInfo = "";

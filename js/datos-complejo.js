@@ -1,7 +1,7 @@
-ï»¿// Datos operativos del complejo Playa ParaÃ­so (Iberostar The Club)
+// Datos operativos del complejo Playa Paraíso (Iberostar The Club)
 // ------------------------------------------------------------------
-// Horarios, cartas, tratamientos, paquetes y actividades del dÃ­a.
-// EstÃ¡n listos para funcionar en la web; cuando lleguen los datos reales
+// Horarios, cartas, tratamientos, paquetes y actividades del día.
+// Están listos para funcionar en la web; cuando lleguen los datos reales
 // del complejo basta con sustituir el contenido de este archivo.
 //
 // Claves de horario disponibles:
@@ -55,201 +55,201 @@
   // --- Tipo de servicio por restaurante -----------------------------------
   // tipo: buffet | especialidad | solo_cena | cafeteria
   // cocina: texto mostrado en la ficha
-  // carta: menÃº resumido
+  // carta: menú resumido
   const RESTAURANTES = {
     hashiru: {
       tipo: "solo_cena",
       cocina: "Japonesa",
-      carta: "Sushi y sashimi Â· Udon y ramen Â· Teppanyaki Â· Yakitori Â· Mochi de helado"
+      carta: "Sushi y sashimi · Udon y ramen · Teppanyaki · Yakitori · Mochi de helado"
     },
     "la-dorada": {
       tipo: "especialidad",
-      cocina: "MediterrÃ¡nea",
-      carta: "Hummus y pitÃ¡ Â· Ensalada de falafel Â· Lubina a la espalda Â· Couscous de verduras Â· Baklava"
+      cocina: "Mediterránea",
+      carta: "Hummus y pitá · Ensalada de falafel · Lubina a la espalda · Couscous de verduras · Baklava"
     },
     rodizio: {
       tipo: "especialidad",
-      cocina: "BrasileÃ±a Â· Rodizio de carnes",
-      carta: "Churrasco de ojo de bife Â· Costillar de cerdo Â· Picanha Â· Saladas brasileiras Â· Farofa Â· PudÃ­n de pan"
+      cocina: "Brasileña · Rodizio de carnes",
+      carta: "Churrasco de ojo de bife · Costillar de cerdo · Picanha · Saladas brasileiras · Farofa · Pudín de pan"
     },
     "el-mercado": {
       tipo: "buffet",
       cocina: "Buffet internacional",
-      carta: "Zona de entradas frÃ­as Â· Parrilla Â· Cocina caliente Â· PanaderÃ­a Â· Postres Â· SelecciÃ³n de jugos"
+      carta: "Zona de entradas frías · Parrilla · Cocina caliente · Panadería · Postres · Selección de jugos"
     },
     "la-plaza": {
       tipo: "buffet",
       cocina: "Buffet internacional",
-      carta: "EstaciÃ³n de cocina china Â· TaquerÃ­a Â· Pasta y pizza Â· Parrilla Â· Ensaladas Â· Postres"
+      carta: "Estación de cocina china · Taquería · Pasta y pizza · Parrilla · Ensaladas · Postres"
     },
     "la-hacienda": {
       tipo: "especialidad",
       cocina: "Mexicana",
-      carta: "Tacos de birria Â· Enchiladas mole Â· Carnitas de cerdo Â· Sopa de tortilla Â· Churros con cajeta"
+      carta: "Tacos de birria · Enchiladas mole · Carnitas de cerdo · Sopa de tortilla · Churros con cajeta"
     },
     trattoria: {
       tipo: "especialidad",
       cocina: "Italiana",
-      carta: "Carpaccio de bresaola Â· Risotto funghi Â· LasaÃ±a a la boloÃ±esa Â· Pizza napolitana Â· TiramisÃº"
+      carta: "Carpaccio de bresaola · Risotto funghi · Lasaña a la boloñesa · Pizza napolitana · Tiramisú"
     },
     "el-puerto": {
       tipo: "especialidad",
       cocina: "Mariscos y pescado",
-      carta: "Ceviche de camarÃ³n Â· Tostada de ostiÃ³n Â· Pulpo a la parrilla Â· Pescado zarzuela Â· Arroz con mariscos"
+      carta: "Ceviche de camarón · Tostada de ostión · Pulpo a la parrilla · Pescado zarzuela · Arroz con mariscos"
     },
     "beach-grill": {
       tipo: "especialidad",
       cocina: "Grill de playa",
-      carta: "CamarÃ³n al ajillo Â· Ribs de cerdo glaseados Â· Hamburguesa gourmet Â· Brochetas mixtas Â· Ensalada de la casa"
+      carta: "Camarón al ajillo · Ribs de cerdo glaseados · Hamburguesa gourmet · Brochetas mixtas · Ensalada de la casa"
     },
     burgers: {
       tipo: "cafeteria",
       cocina: "Hamburguesas y cortes",
-      carta: "Hamburguesa clÃ¡sica Â· Cheeseburger Â· Hamburguesa de pulled pork Â· Nuggets Â· Papas Â· Milkshake"
+      carta: "Hamburguesa clásica · Cheeseburger · Hamburguesa de pulled pork · Nuggets · Papas · Milkshake"
     },
     "antojitos-tacos": {
       tipo: "cafeteria",
       cocina: "Antojitos mexicanos",
-      carta: "Tacos al pastor Â· Tacos de cochinita Â· Quesadillas Â· Elote Â· Churros Â· Agua de horchata"
+      carta: "Tacos al pastor · Tacos de cochinita · Quesadillas · Elote · Churros · Agua de horchata"
     },
     crepes: {
       tipo: "cafeteria",
       cocina: "Crepas y helados",
-      carta: "Crepa de Nutella con fresa Â· Crepa de pollo con bechamel Â· Waffles con Chantilly Â· Helados artesanales Â· Smoothies"
+      carta: "Crepa de Nutella con fresa · Crepa de pollo con bechamel · Waffles con Chantilly · Helados artesanales · Smoothies"
     },
     "el-museo": {
       tipo: "especialidad",
       cocina: "Gourmet",
-      carta: "Foie de pato Â· Tataki de atÃºn Â· Ravioli de langosta Â· Filete de res con purÃ© Â· CÃ³ctel del chef"
+      carta: "Foie de pato · Tataki de atún · Ravioli de langosta · Filete de res con puré · Cóctel del chef"
     },
     jambalaya: {
       tipo: "solo_cena",
-      cocina: "CajÃºn y criolla",
-      carta: "Gumbo de camarÃ³n Â· Jambalaya de pollo Â· EtouffÃ© de crawfish Â· Pechuga con andouille Â· Bananas Foster"
+      cocina: "Cajún y criolla",
+      carta: "Gumbo de camarón · Jambalaya de pollo · Etouffé de crawfish · Pechuga con andouille · Bananas Foster"
     },
     "la-pagoda": {
       tipo: "buffet",
       cocina: "Buffet internacional",
-      carta: "Cocina asiÃ¡tica Â· Wok Â· Sushi bar Â· Parrilla Â· Dim sum Â· Postres"
+      carta: "Cocina asiática · Wok · Sushi bar · Parrilla · Dim sum · Postres"
     },
     "el-fogon-steak": {
       tipo: "solo_cena",
       cocina: "Steak house",
-      carta: "Tbone 600 g Â· Ribeye 400 g Â· Filete de bistec a la parrilla Â· ChampiÃ±ones al ajillo Â· CafÃ© y tÃ©"
+      carta: "Tbone 600 g · Ribeye 400 g · Filete de bistec a la parrilla · Champiñones al ajillo · Café y té"
     },
     "el-fogon-italiano": {
       tipo: "solo_cena",
       cocina: "Italiana",
-      carta: "Bruschetta de tomate Â· Burrata y prosciutto Â· LasaÃ±a de carne Â· Saltimbocca Â· Vino tinto de la casa"
+      carta: "Bruschetta de tomate · Burrata y prosciutto · Lasaña de carne · Saltimbocca · Vino tinto de la casa"
     },
     "coco-buffet": {
       tipo: "buffet",
       cocina: "Snack buffet",
-      carta: "SÃ¡ndwiches y wraps Â· Pizza en rebanadas Â· Helados Â· Smoothies de fruta Â· CafÃ© y tÃ©"
+      carta: "Sándwiches y wraps · Pizza en rebanadas · Helados · Smoothies de fruta · Café y té"
     },
     "el-rancho": {
       tipo: "solo_cena",
       cocina: "Steak house y parrilla",
-      carta: "Parrillada para compartir Â· Ribs de res Â· Pechuga rellena Â· Costillar Â· Flan de la casa"
+      carta: "Parrillada para compartir · Ribs de res · Pechuga rellena · Costillar · Flan de la casa"
     },
     "la-geisha": {
       tipo: "solo_cena",
       cocina: "Japonesa",
-      carta: "Udon y soba Â· Sushi de temporada Â· Tempura Â· Gyozas Â· Helado de matcha"
+      carta: "Udon y soba · Sushi de temporada · Tempura · Gyozas · Helado de matcha"
     },
     letoile: {
       tipo: "solo_cena",
       cocina: "Gourmet francesa",
-      carta: "Ensalada de temporada Â· Foie Â· Filete de ternera con vino tinto Â· Lubina con verduras Â· SoufflÃ© de chocolate"
+      carta: "Ensalada de temporada · Foie · Filete de ternera con vino tinto · Lubina con verduras · Soufflé de chocolate"
     },
     "la-marina": {
       tipo: "buffet",
-      cocina: "MediterrÃ¡nea y buffet",
-      carta: "Mesa de entrantes frÃ­os Â· Parrilla mediterrÃ¡nea Â· Paella Â· PastelerÃ­a Â· Helados"
+      cocina: "Mediterránea y buffet",
+      carta: "Mesa de entrantes fríos · Parrilla mediterránea · Paella · Pastelería · Helados"
     },
     "el-tapatio": {
       tipo: "buffet",
       cocina: "Mexicana y buffet",
-      carta: "TaquerÃ­a Â· Comal y plancha Â· Cocina mexicana caliente Â· Salsas y guarniciones Â· Postres mexicanos"
+      carta: "Taquería · Comal y plancha · Cocina mexicana caliente · Salsas y guarniciones · Postres mexicanos"
     },
     venecia: {
       tipo: "especialidad",
       cocina: "Italiana",
-      carta: "Caprese Â· Spaghetti a la boloÃ±esa Â· Risotto milanesa Â· Filete a la marsala Â· Panna cotta"
+      carta: "Caprese · Spaghetti a la boloñesa · Risotto milanesa · Filete a la marsala · Panna cotta"
     },
     bellavista: {
       tipo: "buffet",
       cocina: "Buffet con vista al mar",
-      carta: "Desayuno buffet Â· Comida buffet Â· Parrilla Â· EstaciÃ³n de sushi Â· Postres"
+      carta: "Desayuno buffet · Comida buffet · Parrilla · Estación de sushi · Postres"
     },
     latelier: {
       tipo: "solo_cena",
       cocina: "Gourmet de autor",
-      carta: "MenÃº de temporada Â· Ensalada de la casa Â· Risotto de andouille Â· Course de pescado Â· Postre de la casa"
+      carta: "Menú de temporada · Ensalada de la casa · Risotto de andouille · Course de pescado · Postre de la casa"
     },
     tonis: {
       tipo: "solo_cena",
       cocina: "Surf & turf",
-      carta: "Carpaccio de atÃºn Â· Steak de atÃºn con costillar Â· Ribeye Â· Costillas de cerdo Â· Salsa de la casa"
+      carta: "Carpaccio de atún · Steak de atún con costillar · Ribeye · Costillas de cerdo · Salsa de la casa"
     },
     haiku: {
       tipo: "solo_cena",
       cocina: "Japonesa de autor",
-      carta: "Sushi omakase de temporada Â· Ramen de miso Â· Black cod Â· Gyozas de cerdo Â· Matcha"
+      carta: "Sushi omakase de temporada · Ramen de miso · Black cod · Gyozas de cerdo · Matcha"
     },
     "la-brisa": {
       tipo: "solo_cena",
       cocina: "Raw bar y grill",
-      carta: "Ostras y almejas Â· Ceviche Â· Tartar de atÃºn Â· Pulpo a la parrilla Â· Pescado a la brasa"
+      carta: "Ostras y almejas · Ceviche · Tartar de atún · Pulpo a la parrilla · Pescado a la brasa"
     },
     "baby-kitchen": {
       tipo: "cafeteria",
-      cocina: "Cocina para bebÃ©s y niÃ±os",
-      carta: "PurÃ© de frutas y verduras Â· Papillas Â· Mini hamburguesas Â· Espaguetis Â· Leche y batidos"
+      cocina: "Cocina para bebés y niños",
+      carta: "Puré de frutas y verduras · Papillas · Mini hamburguesas · Espaguetis · Leche y batidos"
     }
   };
 
   // --- Bares ---------------------------------------------------------------
   const BARES = {
-    "sports-bar-corner": { tipo: "bar", cocina: "Sports bar", carta: "Antojitos Â· Hamburguesas Â· Wings Â· Cerveza Â· Snacks" },
+    "sports-bar-corner": { tipo: "bar", cocina: "Sports bar", carta: "Antojitos · Hamburguesas · Wings · Cerveza · Snacks" },
     // "heladeria-el-puente" consolidado: es el mismo lugar que "bar-el-puente"
     // "heladeria-el-mirador" consolidado: es el mismo lugar que "lobby-bar-el-mirador" (JOIA)
-    "star-rock-cafe": { tipo: "bar_cierre_temprano", cocina: "CafÃ© y reposterÃ­a", carta: "CafÃ© de especialidad Â· ReposterÃ­a Â· Bagels Â· Smoothies" },
-    "pool-bar-las-olas": { tipo: "bar", cocina: "Bar de piscina", carta: "CÃ³cteles Â· Bucket de cerveza Â· Botella de agua Â· Snacks" },
-    "lobby-bar-kukulkan": { tipo: "bar", cocina: "Lobby bar", carta: "CoctelerÃ­a de autor Â· Whisky Â· Aperitivos" },
-    "music-bar-rhapsody": { tipo: "bar", cocina: "Music bar", carta: "CoctelerÃ­a Â· Cervezas de autor Â· Snacks Â· MÃºsica en vivo" },
-    "lobby-bar-el-mirador": { tipo: "bar", cocina: "Lobby bar", carta: "CoctelerÃ­a Â· Vinos tintos Â· Tabla de quesos" },
-    "aqua-bar-la-sirenita": { tipo: "bar", cocina: "Aqua bar", carta: "Smoothies y jugos Â· CoctelerÃ­a sin alcohol Â· Snacks" },
-    "health-bar-spa": { tipo: "bar_cierre_temprano", cocina: "Health bar", carta: "Bowls Â· Zumos prensados Â· Ensaladas Â· Infusiones" },
-    "aqua-bar-la-perla": { tipo: "bar", cocina: "Aqua bar", carta: "Smoothies y jugos Â· CoctelerÃ­a sin alcohol Â· Snacks" },
-    "bar-teatro": { tipo: "bar", cocina: "Bar de teatro", carta: "Aperitivos Â· CoctelerÃ­a Â· Cervezas Â· Antes de la funciÃ³n" },
-    "lobby-bar-la-fuente": { tipo: "bar", cocina: "Lobby bar", carta: "CoctelerÃ­a de temporada Â· Aperitivos" },
-    "aqua-bar-las-olas": { tipo: "bar", cocina: "Aqua bar", carta: "Smoothies y jugos Â· CoctelerÃ­a sin alcohol Â· Snacks" },
-    "lobby-bar-la-cula": { tipo: "bar", cocina: "Lobby bar", carta: "CoctelerÃ­a de autor Â· Highballs" },
-    "aqua-bar-las-rocas": { tipo: "bar", cocina: "Aqua bar", carta: "Smoothies y jugos Â· CoctelerÃ­a sin alcohol Â· Snacks" },
-    "lobby-bar-acuario": { tipo: "bar", cocina: "Lobby bar", carta: "CoctelerÃ­a Â· Vinos Â· Aperitivos" },
-    "cigar-bar": { tipo: "bar_cierre_temprano", cocina: "Cigar bar", carta: "Cigarros premium Â· Whisky y ron aÃ±ejo Â· Quesos Â· CafÃ©" }
+    "star-rock-cafe": { tipo: "bar_cierre_temprano", cocina: "Café y repostería", carta: "Café de especialidad · Repostería · Bagels · Smoothies" },
+    "pool-bar-las-olas": { tipo: "bar", cocina: "Bar de piscina", carta: "Cócteles · Bucket de cerveza · Botella de agua · Snacks" },
+    "lobby-bar-kukulkan": { tipo: "bar", cocina: "Lobby bar", carta: "Coctelería de autor · Whisky · Aperitivos" },
+    "music-bar-rhapsody": { tipo: "bar", cocina: "Music bar", carta: "Coctelería · Cervezas de autor · Snacks · Música en vivo" },
+    "lobby-bar-el-mirador": { tipo: "bar", cocina: "Lobby bar", carta: "Coctelería · Vinos tintos · Tabla de quesos" },
+    "aqua-bar-la-sirenita": { tipo: "bar", cocina: "Aqua bar", carta: "Smoothies y jugos · Coctelería sin alcohol · Snacks" },
+    "health-bar-spa": { tipo: "bar_cierre_temprano", cocina: "Health bar", carta: "Bowls · Zumos prensados · Ensaladas · Infusiones" },
+    "aqua-bar-la-perla": { tipo: "bar", cocina: "Aqua bar", carta: "Smoothies y jugos · Coctelería sin alcohol · Snacks" },
+    "bar-teatro": { tipo: "bar", cocina: "Bar de teatro", carta: "Aperitivos · Coctelería · Cervezas · Antes de la función" },
+    "lobby-bar-la-fuente": { tipo: "bar", cocina: "Lobby bar", carta: "Coctelería de temporada · Aperitivos" },
+    "aqua-bar-las-olas": { tipo: "bar", cocina: "Aqua bar", carta: "Smoothies y jugos · Coctelería sin alcohol · Snacks" },
+    "lobby-bar-la-cula": { tipo: "bar", cocina: "Lobby bar", carta: "Coctelería de autor · Highballs" },
+    "aqua-bar-las-rocas": { tipo: "bar", cocina: "Aqua bar", carta: "Smoothies y jugos · Coctelería sin alcohol · Snacks" },
+    "lobby-bar-acuario": { tipo: "bar", cocina: "Lobby bar", carta: "Coctelería · Vinos · Aperitivos" },
+    "cigar-bar": { tipo: "bar_cierre_temprano", cocina: "Cigar bar", carta: "Cigarros premium · Whisky y ron añejo · Quesos · Café" }
   };
 
   // --- Spa, golf y otros servicios ----------------------------------------
   const SERVICIOS = {
     spa: {
       hours: "09:00 - 19:00",
-      treatments: "Masaje relajante 60 min Â· Masaje deportivo 45 min Â· Tratamiento facial 75 min Â· Envoltura de algas 90 min Â· Manicura y pedicura Â· Servicio para parejas",
-      packages: "Paquete Maya Renewal (2 h con desayuno) Â· Paquete Escape de medio dÃ­a Â· Paquete Relax para dos"
+      treatments: "Masaje relajante 60 min · Masaje deportivo 45 min · Tratamiento facial 75 min · Envoltura de algas 90 min · Manicura y pedicura · Servicio para parejas",
+      packages: "Paquete Maya Renewal (2 h con desayuno) · Paquete Escape de medio día · Paquete Relax para dos"
     },
     "massage-palapa": {
       hours: "09:00 - 18:00",
-      treatments: "Masaje de pies 30 min Â· Masaje relajante 60 min Â· Masaje tailandÃ©s 90 min",
-      packages: "Paquete Palapa para dos Â· Paquete de Spa de 60 minutos"
+      treatments: "Masaje de pies 30 min · Masaje relajante 60 min · Masaje tailandés 90 min",
+      packages: "Paquete Palapa para dos · Paquete de Spa de 60 minutos"
     },
     "golf-club-house": {
       hours: "07:00 - 18:00",
-      packages: "Green fee de 18 hoyos Â· Alquiler de equipo Â· Clases privadas con profesional Â· Paquete golf con desayuno y asesor"
+      packages: "Green fee de 18 hoyos · Alquiler de equipo · Clases privadas con profesional · Paquete golf con desayuno y asesor"
     },
     golf: {
       hours: "07:00 - 18:00",
-      packages: "Green fee de 18 hoyos Â· Alquiler de equipo Â· Clases privadas con profesional Â· Paquete golf con desayuno y asesor"
+      packages: "Green fee de 18 hoyos · Alquiler de equipo · Clases privadas con profesional · Paquete golf con desayuno y asesor"
     },
     piscina: {
       hours: "07:00 - 22:00"
@@ -257,56 +257,56 @@
     theclub: {
       hours: "08:00 - 22:00",
       horarioTexto: "08:00 - 22:00",
-      amenities: "Wi-Fi de alta velocidad, Ã¡reas de descanso, terraza, prensa digital, bebidas y snacks",
-      amenidades: "Wi-Fi de alta velocidad, Ã¡reas de descanso, terraza, prensa digital, bebidas y snacks",
-      services: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a Ã¡reas exclusivas",
-      servicios: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a Ã¡reas exclusivas",
-      description: "Espacio exclusivo para socios donde usted disfruta de atenciÃ³n personalizada, ambientes cÃ¡lidos y experiencias preferentes en el corazÃ³n del complejo.",
-      descripcion: "Espacio exclusivo para socios donde usted disfruta de atenciÃ³n personalizada, ambientes cÃ¡lidos y experiencias preferentes en el corazÃ³n del complejo."
+      amenities: "Wi-Fi de alta velocidad, áreas de descanso, terraza, prensa digital, bebidas y snacks",
+      amenidades: "Wi-Fi de alta velocidad, áreas de descanso, terraza, prensa digital, bebidas y snacks",
+      services: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas",
+      servicios: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas",
+      description: "Espacio exclusivo para socios donde usted disfruta de atención personalizada, ambientes cálidos y experiencias preferentes en el corazón del complejo.",
+      descripcion: "Espacio exclusivo para socios donde usted disfruta de atención personalizada, ambientes cálidos y experiencias preferentes en el corazón del complejo."
     },
     "star-prestige-lounge": {
       hours: "09:00 - 21:00",
       horarioTexto: "09:00 - 21:00",
-      amenities: "Ãreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
-      amenidades: "Ãreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
-      services: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a Ã¡reas exclusivas",
-      servicios: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a Ã¡reas exclusivas",
-      description: "SalÃ³n exclusivo Star Prestige donde usted descansa con calidez, disfruta de bebidas premium y recibe atenciÃ³n personalizada en un ambiente reservado.",
-      descripcion: "SalÃ³n exclusivo Star Prestige donde usted descansa con calidez, disfruta de bebidas premium y recibe atenciÃ³n personalizada en un ambiente reservado."
+      amenities: "Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
+      amenidades: "Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
+      services: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas",
+      servicios: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas",
+      description: "Salón exclusivo Star Prestige donde usted descansa con calidez, disfruta de bebidas premium y recibe atención personalizada en un ambiente reservado.",
+      descripcion: "Salón exclusivo Star Prestige donde usted descansa con calidez, disfruta de bebidas premium y recibe atención personalizada en un ambiente reservado."
     },
     "star-prestige-beach-club": {
       hours: "09:00 - 21:00",
       horarioTexto: "09:00 - 21:00",
-      amenities: "Ãreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
-      amenidades: "Ãreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
-      services: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a Ã¡reas exclusivas",
-      servicios: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a Ã¡reas exclusivas",
-      description: "Ãrea exclusiva frente al mar donde usted disfruta de confort, servicio atento y experiencias preferentes en un entorno cÃ¡lido y distinguido.",
-      descripcion: "Ãrea exclusiva frente al mar donde usted disfruta de confort, servicio atento y experiencias preferentes en un entorno cÃ¡lido y distinguido."
+      amenities: "Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
+      amenidades: "Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
+      services: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas",
+      servicios: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas",
+      description: "Área exclusiva frente al mar donde usted disfruta de confort, servicio atento y experiencias preferentes en un entorno cálido y distinguido.",
+      descripcion: "Área exclusiva frente al mar donde usted disfruta de confort, servicio atento y experiencias preferentes en un entorno cálido y distinguido."
     },
     "star-prestige-maya": {
       hours: "09:00 - 21:00",
       horarioTexto: "09:00 - 21:00",
-      amenities: "Ãreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
-      amenidades: "Ãreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
-      services: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a Ã¡reas exclusivas",
-      servicios: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a Ã¡reas exclusivas",
-      description: "Ãrea exclusiva Star Prestige en ParaÃ­so Maya donde usted accede a servicios preferentes, ambientes cÃ¡lidos y atenciÃ³n personalizada durante su estancia.",
-      descripcion: "Ãrea exclusiva Star Prestige en ParaÃ­so Maya donde usted accede a servicios preferentes, ambientes cÃ¡lidos y atenciÃ³n personalizada durante su estancia."
+      amenities: "Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
+      amenidades: "Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
+      services: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas",
+      servicios: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas",
+      description: "Área exclusiva Star Prestige en Paraíso Maya donde usted accede a servicios preferentes, ambientes cálidos y atención personalizada durante su estancia.",
+      descripcion: "Área exclusiva Star Prestige en Paraíso Maya donde usted accede a servicios preferentes, ambientes cálidos y atención personalizada durante su estancia."
     },
     "star-prestige-joia": {
       hours: "09:00 - 21:00",
       horarioTexto: "09:00 - 21:00",
-      amenities: "Ãreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
-      amenidades: "Ãreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
-      services: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a Ã¡reas exclusivas",
-      servicios: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a Ã¡reas exclusivas",
-      description: "Ãrea exclusiva Star Prestige en JOIA donde usted disfruta de lujo, servicio atento y experiencias preferentes en un entorno cÃ¡lido y distinguido.",
-      descripcion: "Ãrea exclusiva Star Prestige en JOIA donde usted disfruta de lujo, servicio atento y experiencias preferentes en un entorno cÃ¡lido y distinguido."
+      amenities: "Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
+      amenidades: "Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
+      services: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas",
+      servicios: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas",
+      description: "Área exclusiva Star Prestige en JOIA donde usted disfruta de lujo, servicio atento y experiencias preferentes en un entorno cálido y distinguido.",
+      descripcion: "Área exclusiva Star Prestige en JOIA donde usted disfruta de lujo, servicio atento y experiencias preferentes en un entorno cálido y distinguido."
     }
   };
 
-  // --- Actividades del dÃ­a -------------------------------------------------
+  // --- Actividades del día -------------------------------------------------
   // IMPORTANTE: los horarios y nombres de esta lista son ILUSTRATIVOS.
   // No se publica un programa diario oficial con horarios en el sitio web de
   // Iberostar; el programa oficial se consulta en la app Iberostar. Cuando se
@@ -322,7 +322,7 @@
     { hora: "11:00", nombre: "Torneo de tenis", lugar: "Tenis", poiId: "tennis" },
     { hora: "12:00", nombre: "Happy hour en el bar de la piscina", lugar: "Pool Bar Las Olas", poiId: "pool-bar-las-olas" },
     { hora: "12:30", nombre: "Comida buffet", lugar: "La Plaza", poiId: "la-plaza" },
-    { hora: "14:00", nombre: "IntroducciÃ³n al buceo", lugar: "Centro de buceo", poiId: "diving-center" },
+    { hora: "14:00", nombre: "Introducción al buceo", lugar: "Centro de buceo", poiId: "diving-center" },
     { hora: "15:00", nombre: "Torneo de golf", lugar: "Golf Club House", poiId: "golf-club-house" },
     { hora: "16:00", nombre: "Snorkel en el arrecife", lugar: "Playa principal", poiId: "playa-mar-caribe" },
     { hora: "16:30", nombre: "Masaje de pies", lugar: "Palapas de masajes", poiId: "massage-palapa" },
@@ -330,7 +330,7 @@
     { hora: "18:00", nombre: "Circuito de campo de tiro", lugar: "Campo de tiro", poiId: "shooting-area" },
     { hora: "18:30", nombre: "Cena en restaurante de especialidad", lugar: "La Dorada", poiId: "la-dorada" },
     { hora: "20:00", nombre: "Show en vivo", lugar: "Teatro Music Hall", poiId: "teatro-music-hall" },
-    { hora: "21:00", nombre: "Noche de mÃºsica", lugar: "Music Bar Rhapsody", poiId: "music-bar-rhapsody" },
+    { hora: "21:00", nombre: "Noche de música", lugar: "Music Bar Rhapsody", poiId: "music-bar-rhapsody" },
     { hora: "22:30", nombre: "Fiesta en la piscina", lugar: "Aqua Bar La Sirenita", poiId: "aqua-bar-la-sirenita" }
   ];
 
