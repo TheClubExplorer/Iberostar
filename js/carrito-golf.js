@@ -29,11 +29,32 @@
     { id: "golf-club-house", name: "Golf Club House", category: "golf", lat: 20.7586073, lng: -86.9658668 }
   ];
 
+  var DESTINATION_CATEGORIES = [
+    { key: "starprestige", label: "Star Prestige" },
+    { key: "club", label: "The Club" },
+    { key: "spa", label: "Spa" },
+    { key: "restaurante", label: "Restaurantes" },
+    { key: "bar", label: "Bares" },
+    { key: "golf", label: "Golf" },
+    { key: "concierge", label: "Lobbies y concierge" },
+    { key: "comer", label: "Tiendas y servicios" },
+    { key: "piscina", label: "Piscinas" },
+    { key: "hotel", label: "Hoteles" }
+  ];
+
+  function destinationCategoryOrder(category) {
+    for (var i = 0; i < DESTINATION_CATEGORIES.length; i += 1) {
+      if (DESTINATION_CATEGORIES[i].key === category) return i;
+    }
+    return DESTINATION_CATEGORIES.length;
+  }
+
   var CART_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
-    '<path d="M3 6h9l2 6h5a1 1 0 0 1 1 1v2h-2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>' +
-    '<path d="M3 6v8a2 2 0 0 0 2 2h9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>' +
-    '<circle cx="7" cy="18" r="2" fill="currentColor"/>' +
-    '<circle cx="17" cy="18" r="2" fill="currentColor"/>' +
+    '<path d="M4 6h14M5 6v6M17 6v6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>' +
+    '<path d="M4 12h15v3H4z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>' +
+    '<path d="M8 12V9h5v3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>' +
+    '<circle cx="8" cy="18.5" r="1.7" fill="currentColor"/>' +
+    '<circle cx="17" cy="18.5" r="1.7" fill="currentColor"/>' +
     '</svg>';
 
   cg._context = null;
@@ -125,7 +146,8 @@
     var list = [];
     var seen = {};
     pois.forEach(function (poi) {
-      if (!poi || (poi.category !== "golf" && poi.category !== "restaurante")) return;
+      if (!poi) return;
+      if (destinationCategoryOrder(poi.category) >= DESTINATION_CATEGORIES.length) return;
       if (!Number.isFinite(poi.lat) || !Number.isFinite(poi.lng)) return;
       if (seen[poi.id]) return;
       seen[poi.id] = true;
@@ -138,7 +160,8 @@
       });
     });
     list.sort(function (a, b) {
-      if (a.category !== b.category) return a.category === "golf" ? -1 : 1;
+      var orderDiff = destinationCategoryOrder(a.category) - destinationCategoryOrder(b.category);
+      if (orderDiff) return orderDiff;
       return String(a.name).localeCompare(String(b.name));
     });
     cg._destinations = list.length ? list : FALLBACK_DESTINATIONS.slice();
@@ -247,7 +270,7 @@
     if (current) {
       return {
         key: "gps",
-        label: "Tu ubicación actual",
+        label: "Su ubicación actual",
         lat: current[0],
         lng: current[1],
         accuracy: currentAccuracy()
@@ -255,7 +278,7 @@
     }
     return {
       key: "hotel",
-      label: context.name ? "Ubicación de " + context.name : "Tu hotel",
+      label: context.name ? "Ubicación de " + context.name : "Su hotel",
       lat: coordinates[0],
       lng: coordinates[1],
       accuracy: null
@@ -272,13 +295,13 @@
       text = "Ubicación GPS activa";
       if (Number.isFinite(position.accuracy)) text += " · precisión ±" + Math.round(position.accuracy) + " m";
     } else if (cg._locationState === "requesting") {
-      text = "Obteniendo tu ubicación exacta…";
+      text = "Obteniendo su ubicación exacta…";
     } else if (cg._locationState === "denied") {
-      text = "Ubicación desactivada: actívala para que el carrito llegue a tu posición exacta.";
+      text = "Active la ubicación para que el carrito llegue a su posición exacta.";
     } else if (cg._locationState === "unavailable") {
-      text = "Este navegador no puede obtener tu ubicación exacta.";
+      text = "La ubicación exacta se comparte desde un navegador con geolocalización.";
     } else {
-      text = "Activa tu ubicación para mostrar exactamente dónde estás.";
+      text = "Active su ubicación para mostrar exactamente dónde está.";
     }
     nodes.forEach(function (node) {
       node.textContent = text;
@@ -303,7 +326,7 @@
     if (request) {
       request.pickup = {
         key: "gps",
-        label: "Tu ubicación actual",
+        label: "Su ubicación actual",
         lat: position.latitude,
         lng: position.longitude,
         accuracy: cg._position.accuracy
@@ -850,7 +873,7 @@
   function pickupIcon() {
     return cg._L.divIcon({
       className: "cart-pickup-marker",
-      html: '<span class="cart-pickup-pin">Tú</span>',
+      html: '<span class="cart-pickup-pin">Usted</span>',
       iconSize: [78, 30],
       iconAnchor: [39, 15]
     });
@@ -923,7 +946,7 @@
       cg._pickupMarker = L.marker([pickup.lat, pickup.lng], {
         icon: pickupIcon(),
         zIndexOffset: 500
-      }).addTo(map).bindTooltip("Tu ubicación exacta");
+      }).addTo(map).bindTooltip("Su ubicación exacta");
       syncAccuracyCircle(pickup);
       cg._fitKey = null;
       syncMap();
@@ -1072,24 +1095,24 @@
           routeMeta(request) + "</span>";
       }
     } else if (request.status === "pickup") {
-      el.innerHTML = "<strong>Carrito en tu ubicación</strong><span>Te lleva a " +
-        escapeHtml(request.destination ? request.destination.name : "tu destino") + "</span>";
+    el.innerHTML = "<strong>Carrito en su ubicación</strong><span>Le lleva a " +
+      escapeHtml(request.destination ? request.destination.name : "su destino") + "</span>";
     } else if (request.status === "riding") {
       if (request.routeStatus === "loading") {
         el.innerHTML = "<strong>En camino a " +
-          escapeHtml(request.destination ? request.destination.name : "tu destino") +
+          escapeHtml(request.destination ? request.destination.name : "su destino") +
           "</strong><span>Trazando la ruta por las calles…</span>";
       } else {
         el.innerHTML = "<strong>En camino a " +
-          escapeHtml(request.destination ? request.destination.name : "tu destino") + "</strong><span>" +
+          escapeHtml(request.destination ? request.destination.name : "su destino") + "</strong><span>" +
           escapeHtml(etaPhrase(request.remainingSeconds)) +
           routeMeta(request) + "</span>";
       }
     } else if (request.status === "completed") {
-      el.innerHTML = "<strong>Llegaste a " +
-        escapeHtml(request.destination ? request.destination.name : "tu destino") + "</strong><span>Disfruta tu visita</span>";
+      el.innerHTML = "<strong>Llegó a " +
+        escapeHtml(request.destination ? request.destination.name : "su destino") + "</strong><span>Disfrute su visita</span>";
     } else if (request.status === "arrived") {
-      el.innerHTML = "<strong>Carrito en tu ubicación</strong><span>" + escapeHtml(request.pickup.label) + "</span>";
+      el.innerHTML = "<strong>Carrito en su ubicación</strong><span>" + escapeHtml(request.pickup.label) + "</span>";
     }
   }
 
@@ -1099,18 +1122,18 @@
     if (!request) {
       return '<div class="cart-status-card is-idle">' +
         '<span class="cart-status-glyph">' + CART_SVG + "</span>" +
-        '<div><p class="cart-status-kicker">SIN SOLICITUD ACTIVA</p>' +
-        "<h3>¿Necesitas moverte por el complejo?</h3>" +
-        "<p>Solicita un carrito y verás en el mapa el más cercano viniendo hacia tu ubicación, con el tiempo estimado de llegada.</p>" +
+        '<div><p class="cart-status-kicker">TRANSPORTE DISPONIBLE</p>' +
+        "<h3>¿Desea moverse por el complejo?</h3>" +
+        "<p>Solicite un carrito y vea en el mapa el más cercano viniendo hacia su ubicación, con el tiempo estimado de llegada.</p>" +
         "</div></div>";
     }
-    var destinationName = request.destination ? request.destination.name : "tu destino";
+    var destinationName = request.destination ? request.destination.name : "su destino";
     if (request.status === "searching") {
       return '<div class="cart-status-card is-searching">' +
         '<p class="cart-status-kicker">SE SOLICITÓ EL CARRITO</p>' +
         "<h3>Buscando el carrito más cercano…</h3>" +
-        "<p>El carrito va hacia <strong>" + escapeHtml(request.pickup.label) + "</strong> y después te lleva a <strong>" +
-        escapeHtml(destinationName) + "</strong>. Te avisaremos en cuanto uno acepte la solicitud.</p>" +
+        "<p>El carrito va hacia <strong>" + escapeHtml(request.pickup.label) + "</strong> y después le lleva a <strong>" +
+        escapeHtml(destinationName) + "</strong>. Le avisaremos en cuanto uno acepte la solicitud.</p>" +
         '<span class="cart-searching-dots" aria-hidden="true"><i></i><i></i><i></i></span>' +
         '<button type="button" class="cart-cancel" data-cart-cancel>Cancelar solicitud</button>' +
         "</div>";
@@ -1119,7 +1142,7 @@
       if (request.routeStatus === "loading") {
         return '<div class="cart-status-card is-assigned">' +
           '<p class="cart-status-kicker">SOLICITUD ACEPTADA</p>' +
-          "<h3>" + escapeHtml(request.cartName) + " va a por ti</h3>" +
+          "<h3>" + escapeHtml(request.cartName) + " va a su encuentro</h3>" +
           "<p>Trazando la ruta por las calles del complejo hasta <strong>" +
           escapeHtml(request.pickup.label) + "</strong>.</p>" +
           '<span class="cart-searching-dots" aria-hidden="true"><i></i><i></i><i></i></span>' +
@@ -1130,8 +1153,8 @@
       }
       return '<div class="cart-status-card is-assigned">' +
         '<p class="cart-status-kicker">SOLICITUD ACEPTADA</p>' +
-        "<h3>" + escapeHtml(request.cartName) + " va a por ti</h3>" +
-        "<p>Va hacia <strong>" + escapeHtml(request.pickup.label) + "</strong>. Después te llevará a <strong>" +
+        "<h3>" + escapeHtml(request.cartName) + " va a su encuentro</h3>" +
+        "<p>Va hacia <strong>" + escapeHtml(request.pickup.label) + "</strong>. Después le llevará a <strong>" +
         escapeHtml(destinationName) + "</strong>.</p>" +
         '<div class="cart-eta-big"><span data-cart-live-eta>' + escapeHtml(etaLabel(request.remainingSeconds)) +
         "</span><small>tiempo estimado</small></div>" +
@@ -1145,9 +1168,9 @@
     }
     if (request.status === "pickup") {
       return '<div class="cart-status-card is-arrived">' +
-        '<p class="cart-status-kicker">CARRITO EN TU UBICACIÓN</p>' +
+        '<p class="cart-status-kicker">CARRITO EN SU UBICACIÓN</p>' +
         "<h3>" + escapeHtml(request.cartName) + " ya llegó</h3>" +
-        "<p>Ya está contigo en <strong>" + escapeHtml(request.pickup.label) + "</strong>. En un momento arranca hacia <strong>" +
+        "<p>Ya está con usted en <strong>" + escapeHtml(request.pickup.label) + "</strong>. En un momento arranca hacia <strong>" +
         escapeHtml(destinationName) + "</strong>.</p>" +
         '<p class="cart-status-meta">Solicitud ' + escapeHtml(request.id) + "</p>" +
         '<button type="button" class="cart-cancel" data-cart-cancel>Cancelar viaje</button>' +
@@ -1156,8 +1179,8 @@
     if (request.status === "riding") {
       if (request.routeStatus === "loading") {
         return '<div class="cart-status-card is-assigned">' +
-          '<p class="cart-status-kicker">EN RUTA A TU DESTINO</p>' +
-          "<h3>Te llevamos a " + escapeHtml(destinationName) + "</h3>" +
+          '<p class="cart-status-kicker">EN RUTA A SU DESTINO</p>' +
+          "<h3>Le llevamos a " + escapeHtml(destinationName) + "</h3>" +
           "<p>Trazando la ruta por las calles del complejo desde <strong>" +
           escapeHtml(request.pickup.label) + "</strong>.</p>" +
           '<span class="cart-searching-dots" aria-hidden="true"><i></i><i></i><i></i></span>' +
@@ -1166,8 +1189,8 @@
           "</div>";
       }
       return '<div class="cart-status-card is-assigned">' +
-        '<p class="cart-status-kicker">EN RUTA A TU DESTINO</p>' +
-        "<h3>Te llevamos a " + escapeHtml(destinationName) + "</h3>" +
+        '<p class="cart-status-kicker">EN RUTA A SU DESTINO</p>' +
+        "<h3>Le llevamos a " + escapeHtml(destinationName) + "</h3>" +
         "<p>Recogida en <strong>" + escapeHtml(request.pickup.label) + "</strong>.</p>" +
         '<div class="cart-eta-big"><span data-cart-live-eta>' + escapeHtml(etaLabel(request.remainingSeconds)) +
         "</span><small>tiempo estimado</small></div>" +
@@ -1181,18 +1204,18 @@
     }
     if (request.status === "completed") {
       return '<div class="cart-status-card is-arrived">' +
-        '<p class="cart-status-kicker">LLEGASTE A TU DESTINO</p>' +
+        '<p class="cart-status-kicker">LLEGÓ A SU DESTINO</p>' +
         "<h3>" + escapeHtml(destinationName) + "</h3>" +
-        "<p>El carrito te dejó en tu destino. Que disfrutes tu visita.</p>" +
+        "<p>El carrito le dejó en su destino. Que disfrute su visita.</p>" +
         '<p class="cart-status-meta">Solicitud ' + escapeHtml(request.id) +
         (request.guest ? " · " + escapeHtml(request.guest) : "") + "</p>" +
         '<button type="button" class="cart-cancel" data-cart-cancel>Pedir otro carrito</button>' +
         "</div>";
     }
     return '<div class="cart-status-card is-arrived">' +
-      '<p class="cart-status-kicker">CARRITO EN TU UBICACIÓN</p>' +
+      '<p class="cart-status-kicker">CARRITO EN SU UBICACIÓN</p>' +
       "<h3>" + escapeHtml(request.cartName) + " ya llegó</h3>" +
-      "<p>Ya está contigo en <strong>" + escapeHtml(request.pickup.label) + "</strong>.</p>" +
+      "<p>Ya está con usted en <strong>" + escapeHtml(request.pickup.label) + "</strong>.</p>" +
       '<p class="cart-status-meta">Solicitud ' + escapeHtml(request.id) + "</p>" +
       '<button type="button" class="cart-cancel" data-cart-cancel>Hacer otra solicitud</button>' +
       "</div>";
@@ -1213,7 +1236,7 @@
       var label = assigned
         ? (request.status === "completed" ? "En destino"
           : request.status === "riding" ? "En ruta"
-          : request.status === "pickup" || request.status === "arrived" ? "Contigo"
+          : request.status === "pickup" || request.status === "arrived" ? "Con usted"
           : "En camino")
         : "Disponible";
       return '<li class="cart-nearby-item' + (assigned ? " is-assigned" : "") + '">' +
@@ -1232,10 +1255,12 @@
     if (!select) return;
     var destinations = getTransportDestinations();
     var current = select.value;
-    var groups = [
-      { label: "Golf", items: destinations.filter(function (item) { return item.category === "golf"; }) },
-      { label: "Restaurantes", items: destinations.filter(function (item) { return item.category === "restaurante"; }) }
-    ];
+    var groups = DESTINATION_CATEGORIES.map(function (group) {
+      return {
+        label: group.label,
+        items: destinations.filter(function (item) { return item.category === group.key; })
+      };
+    });
     select.innerHTML = groups.filter(function (group) {
       return group.items.length > 0;
     }).map(function (group) {

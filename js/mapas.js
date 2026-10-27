@@ -40,11 +40,11 @@
     activate.type = "button";
     activate.className = "map-touch-activate";
     activate.setAttribute("data-i18n-aria", "mapTouchActivate");
-    activate.setAttribute("aria-label", touchGuardText("mapTouchActivate", "Toca para mover el mapa"));
+    activate.setAttribute("aria-label", touchGuardText("mapTouchActivate", "Toque para mover el mapa"));
     const activateLabel = document.createElement("span");
     activateLabel.className = "map-touch-activate-pill";
     activateLabel.setAttribute("data-i18n", "mapTouchActivate");
-    activateLabel.textContent = touchGuardText("mapTouchActivate", "Toca para mover el mapa");
+    activateLabel.textContent = touchGuardText("mapTouchActivate", "Toque para mover el mapa");
     activate.appendChild(activateLabel);
 
     const lock = makeButton("map-touch-lock", "mapTouchLock", "Bloquear mapa");
@@ -357,10 +357,10 @@
   function describeNearbyLocation(coords) {
     const nearby = findNearbyLocation(coords);
     if (nearby?.type === "hotel") {
-      return `Estás aproximadamente a ${formatApproximateDistance(nearby.distance)} de ${nearby.hotel.name}, en ${nearby.destination.name}, ${nearby.country.name}.`;
+      return `Está aproximadamente a ${formatApproximateDistance(nearby.distance)} de ${nearby.hotel.name}, en ${nearby.destination.name}, ${nearby.country.name}.`;
     }
     if (nearby?.type === "destination") {
-      return `Estás en ${nearby.destination.name}, ${nearby.country.name}.`;
+      return `Está en ${nearby.destination.name}, ${nearby.country.name}.`;
     }
     return "Ubicación actual disponible para calcular rutas. No se detectó un destino Iberostar cercano.";
   }
@@ -390,8 +390,8 @@
       ...nearby,
       isSameContext,
       message: nearby.type === "hotel"
-        ? `📍 Parece que estás cerca de ${nearby.hotel.name}.`
-        : `📍 Estás en ${nearby.destination.name}.`,
+        ? `📍 Parece que está cerca de ${nearby.hotel.name}.`
+        : `📍 Está en ${nearby.destination.name}.`,
       actionLabel: nearby.type === "hotel" ? "Explorar hotel" : "Explorar destino",
       currentRoute: currentNormalized
     };
@@ -892,11 +892,11 @@
     const status = document.getElementById("locationStatus");
 
     if (!navigator.geolocation) {
-      status.textContent = "La geolocalización no está disponible en este navegador.";
+      status.textContent = "Active la ubicación desde un navegador compatible.";
       return;
     }
 
-    status.textContent = "Solicitando permiso para detectar tu ubicación...";
+    status.textContent = "Solicitando permiso para detectar su ubicación...";
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -914,8 +914,8 @@
 
         status.textContent = nearby
           ? nearby.type === "hotel"
-            ? `📍 Estás cerca de ${nearby.hotel.name}.`
-            : `📍 Estás en ${nearby.destination.name}.`
+            ? `📍 Está cerca de ${nearby.hotel.name}.`
+            : `📍 Está en ${nearby.destination.name}.`
           : "Ubicación actual disponible para calcular rutas.";
 
         if (state().activeMap && state().userMarker) {
@@ -935,7 +935,7 @@
           const html = '<div class="user-marker-wrap" style="position:relative;width:' + size + 'px;height:' + size + 'px;display:flex;align-items:center;justify-content:center;"><div class="user-marker-pulse" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:72px;height:72px;pointer-events:none;">' + pulseSvg + '</div><div class="user-marker-icon" style="position:relative;z-index:1;line-height:0;">' + personSvg + '</div></div>';
           state().userMarker = L.marker([state().currentPosition.latitude, state().currentPosition.longitude], {
             icon: L.divIcon({ className: "user-marker-div", html: html, iconSize: [size, size], iconAnchor: [size/2, size/2] })
-          }).addTo(state().activeMap).bindTooltip("Tu ubicación actual");
+          }).addTo(state().activeMap).bindTooltip("Su ubicación actual");
         }
 
         if (typeof window.updateGeneralUserMarker === "function") {
@@ -957,7 +957,7 @@
         });
       },
       () => {
-        status.textContent = "Permiso no concedido. Puedes activarlo desde el navegador.";
+        status.textContent = "Active el permiso de ubicación desde el navegador.";
       },
       {
         enableHighAccuracy: true,
@@ -1152,7 +1152,7 @@
     if (!mapElement) return;
 
     if (!state().currentPosition) {
-      if (status) status.textContent = "Necesitamos permiso para calcular la ruta.";
+      if (status) status.textContent = "Active el permiso de ubicación para calcular la ruta.";
       mapas.requestCurrentLocation();
       return;
     }
@@ -1169,7 +1169,7 @@
       }
 
       if (!destinationCoordinates) {
-        if (status) status.textContent = "No tenemos coordenadas verificadas para ese destino.";
+        if (status) status.textContent = "Estamos actualizando la ubicación de ese destino.";
         return;
       }
 
@@ -1250,7 +1250,7 @@
           state().routeLine?.remove();
           state().routeLine = null;
           mapas._directionsRoute = null;
-          if (status) status.textContent = "No se encontró una ruta disponible para ese destino.";
+          if (status) status.textContent = "Seleccione otro destino para calcular la ruta.";
         });
 
       return;
@@ -1259,7 +1259,7 @@
     mapElement.innerHTML = `
       <div class="route-preview">
         <div class="route-preview-header">
-          <strong>Ruta desde tu ubicación</strong>
+          <strong>Ruta desde su ubicación</strong>
           <span>En coche</span>
         </div>
 
@@ -1271,7 +1271,7 @@
           </div>
 
           <span class="route-label route-start-label">
-            Tu ubicación actual
+            Su ubicación actual
           </span>
 
           <span class="route-label route-end-label">
@@ -1519,7 +1519,7 @@
     const html = '<div class="user-marker-wrap" style="position:relative;width:' + size + 'px;height:' + size + 'px;display:flex;align-items:center;justify-content:center;"><div class="user-marker-pulse" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:72px;height:72px;pointer-events:none;">' + pulseSvg + '</div><div class="user-marker-icon" style="position:relative;z-index:1;line-height:0;">' + personSvg + '</div></div>';
     state().userMarker = L.marker([position.latitude, position.longitude], {
       icon: L.divIcon({ className: "user-marker-div", html: html, iconSize: [size, size], iconAnchor: [size/2, size/2] })
-    }).addTo(map).bindTooltip("Tu ubicación actual");
+    }).addTo(map).bindTooltip("Su ubicación actual");
   }
 
   mapas.initializeDestinationMap = function (element, routeInfo = {}) {
