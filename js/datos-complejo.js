@@ -1,4 +1,4 @@
-// Datos operativos del complejo Playa Paraíso (Iberostar The Club)
+﻿// Datos operativos del complejo Playa Paraíso (Iberostar The Club)
 // ------------------------------------------------------------------
 // Horarios, cartas, tratamientos, paquetes y actividades del día.
 // Están listos para funcionar en la web; cuando lleguen los datos reales
@@ -90,7 +90,7 @@
     trattoria: {
       tipo: "especialidad",
       cocina: "Italiana",
-      carta: "Carpaccio de bresa · Risotto funghi · Lasaña a la boloñesa · Pizza napolitana · Tiramisú"
+      carta: "Carpaccio de bresaola · Risotto funghi · Lasaña a la boloñesa · Pizza napolitana · Tiramisú"
     },
     "el-puerto": {
       tipo: "especialidad",
@@ -215,7 +215,7 @@
     // "heladeria-el-puente" consolidado: es el mismo lugar que "bar-el-puente"
     // "heladeria-el-mirador" consolidado: es el mismo lugar que "lobby-bar-el-mirador" (JOIA)
     "star-rock-cafe": { tipo: "bar_cierre_temprano", cocina: "Café y repostería", carta: "Café de especialidad · Repostería · Bagels · Smoothies" },
-    "pool-bar-las-olas": { tipo: "bar", cocina: "Bar de piscina", carta: "Cócteles · Bucket de cerveza · Botellade agua · Snacks" },
+    "pool-bar-las-olas": { tipo: "bar", cocina: "Bar de piscina", carta: "Cócteles · Bucket de cerveza · Botella de agua · Snacks" },
     "lobby-bar-kukulkan": { tipo: "bar", cocina: "Lobby bar", carta: "Coctelería de autor · Whisky · Aperitivos" },
     "music-bar-rhapsody": { tipo: "bar", cocina: "Music bar", carta: "Coctelería · Cervezas de autor · Snacks · Música en vivo" },
     "lobby-bar-el-mirador": { tipo: "bar", cocina: "Lobby bar", carta: "Coctelería · Vinos tintos · Tabla de quesos" },
@@ -253,11 +253,65 @@
     },
     piscina: {
       hours: "07:00 - 22:00"
+    },
+    theclub: {
+      hours: "08:00 - 22:00",
+      horarioTexto: "08:00 - 22:00",
+      amenities: "Wi-Fi de alta velocidad, áreas de descanso, terraza, prensa digital, bebidas y snacks",
+      amenidades: "Wi-Fi de alta velocidad, áreas de descanso, terraza, prensa digital, bebidas y snacks",
+      services: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas",
+      servicios: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas",
+      description: "Espacio exclusivo para socios donde usted disfruta de atención personalizada, ambientes cálidos y experiencias preferentes en el corazón del complejo.",
+      descripcion: "Espacio exclusivo para socios donde usted disfruta de atención personalizada, ambientes cálidos y experiencias preferentes en el corazón del complejo."
+    },
+    "star-prestige-lounge": {
+      hours: "09:00 - 21:00",
+      horarioTexto: "09:00 - 21:00",
+      amenities: "Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
+      amenidades: "Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
+      services: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas",
+      servicios: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas",
+      description: "Salón exclusivo Star Prestige donde usted descansa con calidez, disfruta de bebidas premium y recibe atención personalizada en un ambiente reservado.",
+      descripcion: "Salón exclusivo Star Prestige donde usted descansa con calidez, disfruta de bebidas premium y recibe atención personalizada en un ambiente reservado."
+    },
+    "star-prestige-beach-club": {
+      hours: "09:00 - 21:00",
+      horarioTexto: "09:00 - 21:00",
+      amenities: "Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
+      amenidades: "Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
+      services: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas",
+      servicios: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas",
+      description: "Área exclusiva frente al mar donde usted disfruta de confort, servicio atento y experiencias preferentes en un entorno cálido y distinguido.",
+      descripcion: "Área exclusiva frente al mar donde usted disfruta de confort, servicio atento y experiencias preferentes en un entorno cálido y distinguido."
+    },
+    "star-prestige-maya": {
+      hours: "09:00 - 21:00",
+      horarioTexto: "09:00 - 21:00",
+      amenities: "Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
+      amenidades: "Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
+      services: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas",
+      servicios: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas",
+      description: "Área exclusiva Star Prestige en Paraíso Maya donde usted accede a servicios preferentes, ambientes cálidos y atención personalizada durante su estancia.",
+      descripcion: "Área exclusiva Star Prestige en Paraíso Maya donde usted accede a servicios preferentes, ambientes cálidos y atención personalizada durante su estancia."
+    },
+    "star-prestige-joia": {
+      hours: "09:00 - 21:00",
+      horarioTexto: "09:00 - 21:00",
+      amenities: "Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
+      amenidades: "Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
+      services: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas",
+      servicios: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas",
+      description: "Área exclusiva Star Prestige en JOIA donde usted disfruta de lujo, servicio atento y experiencias preferentes en un entorno cálido y distinguido.",
+      descripcion: "Área exclusiva Star Prestige en JOIA donde usted disfruta de lujo, servicio atento y experiencias preferentes en un entorno cálido y distinguido."
     }
   };
 
   // --- Actividades del día -------------------------------------------------
-  // poiId: al tocar la actividad se selecciona ese lugar en el mapa.
+  // IMPORTANTE: los horarios y nombres de esta lista son ILUSTRATIVOS.
+  // No se publica un programa diario oficial con horarios en el sitio web de
+  // Iberostar; el programa oficial se consulta en la app Iberostar. Cuando se
+  // obtenga el programa oficial (PDF/cliente), sustituir este array y marcar
+  // ACTIVIDADES_OFICIAL = true.
   const ACTIVIDADES = [
     { hora: "07:00", nombre: "Amanecer en la playa", lugar: "Playa principal", poiId: "playa-mar-caribe" },
     { hora: "07:30", nombre: "Yoga al amanecer", lugar: "Piscina tranquila", poiId: "quiet-pool" },
@@ -280,10 +334,18 @@
     { hora: "22:30", nombre: "Fiesta en la piscina", lugar: "Aqua Bar La Sirenita", poiId: "aqua-bar-la-sirenita" }
   ];
 
+  ACTIVIDADES.forEach(function (item) {
+    item.fuente = "ilustrativo";
+    item.official = false;
+  });
+
   datos.HORARIOS = HORARIOS;
   datos.RESTAURANTES = RESTAURANTES;
   datos.BARES = BARES;
   datos.SERVICIOS = SERVICIOS;
   datos.ACTIVIDADES = ACTIVIDADES;
+  datos.ACTIVIDADES_FUENTE = "ilustrativo";
+  datos.ACTIVIDADES_OFICIAL = false;
+  datos.ACTIVIDADES_NOTA = "Horarios ilustrativos: el programa diario oficial se consulta en la app Iberostar.";
   window.RevistaDigital.datosComplejo = datos;
 })();

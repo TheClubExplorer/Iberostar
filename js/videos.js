@@ -78,7 +78,7 @@
               class="video-duration-info"
               id="videosDurationInfo"
             >
-              Selecciona un video para establecer el fragmento.
+              Seleccione un video para establecer el fragmento.
             </div>
 
             <div class="video-time-row">
@@ -362,7 +362,7 @@
     preview.classList.remove("visible");
 
     document.getElementById("videosDurationInfo").textContent =
-      "Selecciona un video para establecer el fragmento.";
+      "Seleccione un video para establecer el fragmento.";
 
     document.getElementById("videosSaveButton").textContent = "PUBLICAR";
   }
@@ -451,12 +451,12 @@
       const end = Number(endInput.value);
 
       if (!title) {
-        alert("Escribe un título.");
+        alert("Escriba un título.");
         return;
       }
 
       if (Number.isNaN(start) || Number.isNaN(end) || start < 0 || end <= start) {
-        alert("Revisa el inicio y el final del fragmento.");
+        alert("Revise el inicio y el final del fragmento.");
         return;
       }
 
@@ -466,7 +466,7 @@
       }
 
       if (!editId && !file) {
-        alert("Selecciona un video.");
+        alert("Seleccione un video.");
         return;
       }
 
