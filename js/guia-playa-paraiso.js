@@ -901,7 +901,7 @@
   }
 
   function canMap(poi) {
-    return !!(poi && poi.verified === true && poi.lat != null && poi.lng != null);
+    return !!(poi && Number.isFinite(poi.lat) && Number.isFinite(poi.lng) && poi.lat != null && poi.lng != null);
   }
 
   function markerFor(poi) {
@@ -1400,7 +1400,7 @@
       if (titleEl) titleEl.textContent = "";
       return;
     }
-    var verified = poi.verified === true;
+    var verified = Number.isFinite(poi.lat) && Number.isFinite(poi.lng);
     var isArea = poi.kind === "area";
     var cat = poi.category;
     var btns = "";
@@ -1505,7 +1505,7 @@
       renderMobileActions(null);
       return;
     }
-    var verified = poi.verified === true;
+    var verified = Number.isFinite(poi.lat) && Number.isFinite(poi.lng);
     var zone = poi.hotelId
       ? '<p class="guide-detail-row"><strong>Hotel</strong> ' + escapeHtml(poi.hotelId) + "</p>"
       : (poi.zone ? '<p class="guide-detail-row"><strong>Zona</strong> ' + escapeHtml(poi.zone) + "</p>" : "");
@@ -1799,7 +1799,7 @@
     var south = Infinity, west = Infinity, north = -Infinity, east = -Infinity;
     (gp.POIS || []).forEach(function (poi) {
       if (!poi || poi.lat == null || poi.lng == null) return;
-      if (poi.verified !== true) return;
+      if (!(Number.isFinite(poi.lat) && Number.isFinite(poi.lng))) return;
       south = Math.min(south, poi.lat);
       north = Math.max(north, poi.lat);
       west = Math.min(west, poi.lng);
@@ -2014,3 +2014,4 @@
     return true;
   };
 })();
+
