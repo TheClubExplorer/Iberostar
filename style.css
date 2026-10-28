@@ -18,7 +18,7 @@
   --white: #ffffff;
   --success: #2e8b57;
   --font-display: "Adobe Garamond Pro", serif;
-  --font-ui: "Echoes Sans", sans-serif;
+  --font-ui: "Echoes Sans", "Segoe UI Symbol", "Apple Symbols", "Noto Sans Symbols", system-ui, sans-serif;
   --font-body: Arial, sans-serif;
 } 
                                                     
@@ -6247,5 +6247,5 @@ body.cart-map-focus-open .hotel-portal-nav { display: none !important; }
 .search-trigger-btn,
 .lang-toggle-btn,
 .portal-map-btn::after {
-  font-family: var(--font-ui), "Segoe UI Symbol", "Apple Symbols", "Noto Sans Symbols", system-ui, sans-serif;
+  font-family: "Echoes Sans", "Segoe UI Symbol", "Apple Symbols", "Noto Sans Symbols", system-ui, sans-serif;
 }
