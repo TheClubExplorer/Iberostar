@@ -1057,7 +1057,7 @@
               <h2>¿Desea llegar más rápido a su destino?</h2>
               <p>¡Solicite el transporte más cercano ahora!</p>
             </div>
-            <a class="hotel-transport-cta" href="${href("/carrito-golf")}" data-app-route="/carrito-golf">Solicitar transporte</a>
+            <a class="hotel-transport-cta" href="#" data-app-route="/carrito-golf">Solicitar transporte</a>
           </div>
         </section>` : "";
 

@@ -2804,7 +2804,7 @@ function showLocationWelcome(coords) {
     hotelBox.hidden = false;
     element.querySelector(".location-welcome-hotel-name").textContent = nearest.hotel.name;
     element.querySelector(".location-welcome-hotel-distance").textContent =
-      `${nearby.matchedLocation && nearby.matchedLocation !== nearest.hotel.name ? nearby.matchedLocation + " · " : ""}a unos ${formatApproximateDistance(nearest.distance)} de ti · ${region.name}, ${country.name}`;
+      `${nearby.matchedLocation && nearby.matchedLocation !== nearest.hotel.name ? nearby.matchedLocation + " · " : ""}a unos ${formatApproximateDistance(nearest.distance)} de usted · ${region.name}, ${country.name}`;
 
     hotelLink.hidden = false;
     hotelLink.href = hotelRoute;

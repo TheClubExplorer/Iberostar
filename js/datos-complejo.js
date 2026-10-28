@@ -1,8 +1,8 @@
-// Datos operativos del complejo Playa Paraíso (Iberostar The Club)
+// Datos operativos del complejo Playa ParaÃ­so (Iberostar The Club)
 // ------------------------------------------------------------------
-// Horarios, cartas, tratamientos, paquetes y actividades del día.
-// Están listos para funcionar en la web; cuando lleguen los datos reales
-// del complejo basta con sustituir el contenido de este archivo.
+// Fuente Ãºnica de datos oficiales: cartas, horarios, tratamientos,
+// paquetes y actividades del dÃ­a. Actualizado con la informaciÃ³n
+// verificada del complejo.
 //
 // Claves de horario disponibles:
 //   breakfast  desayuno   lunch  comida   dinner  cena   late  barra nocturna
@@ -12,19 +12,23 @@
   window.RevistaDigital = window.RevistaDigital || {};
   const datos = window.RevistaDigital.datosComplejo || {};
 
-  // --- Horarios por tipo de servicio -------------------------------------
+  // --- Horarios por tipo de servicio (oficiales) ----------------------------
   const HORARIOS = {
     buffet: {
-      breakfast: "07:00 - 11:30",
+      breakfast: "07:00 - 10:30",
       lunch: "12:30 - 15:30",
       dinner: "18:30 - 22:00"
     },
+    buffet_marina: {
+      breakfast: "07:00 - 10:30",
+      lunch: "13:00 - 15:00",
+      dinner: "18:30 - 22:00"
+    },
     especialidad: {
-      lunch: "13:00 - 16:00",
-      dinner: "18:30 - 23:00"
+      dinner: "18:30 - 22:00"
     },
     solo_cena: {
-      dinner: "18:30 - 23:00"
+      dinner: "18:00 - 22:00"
     },
     cafeteria: {
       breakfast: "07:00 - 11:00",
@@ -42,10 +46,10 @@
       lunch: "11:00 - 22:00"
     },
     spa: {
-      hours: "09:00 - 19:00"
+      hours: "08:00 - 20:00"
     },
     golf: {
-      hours: "07:00 - 18:00"
+      hours: "07:00 - atardecer"
     },
     piscina: {
       hours: "07:00 - 22:00"
@@ -55,201 +59,478 @@
   // --- Tipo de servicio por restaurante -----------------------------------
   // tipo: buffet | especialidad | solo_cena | cafeteria
   // cocina: texto mostrado en la ficha
-  // carta: menú resumido
+  // carta: menÃº resumido
   const RESTAURANTES = {
+    "el-colonial": {
+      tipo: "especialidad",
+      cocina: "Gourmet / Francesa",
+      carta: "Bisque de bogavante al coÃ±ac Â· Magret de pato con reducciÃ³n de frutos rojos Â· Solomillo de res al vino tinto Â· CrÃ¨me brÃ»lÃ©e tradicional",
+      horario: "18:30 - 22:00 h",
+      vestimenta: "Formal elegante",
+      reservas: true,
+      especialidades: "Bisque de bogavante al coÃ±ac, magret de pato con reducciÃ³n de frutos rojos, solomillo de res al vino tinto y crÃ¨me brÃ»lÃ©e tradicional",
+      hotel: "Iberostar ParaÃ­so del Mar"
+    },
     hashiru: {
       tipo: "solo_cena",
-      cocina: "Japonesa",
-      carta: "Sushi y sashimi · Udon y ramen · Teppanyaki · Yakitori · Mochi de helado"
+      cocina: "Japonesa & Teppanyaki",
+      carta: "Sushi y sashimi Â· Teppanyaki en vivo Â· Arroz yakimeshi Â· Helado frito en tempura",
+      horario: "18:00 - 22:00 h",
+      vestimenta: "Casual elegante",
+      reservas: true,
+      especialidades: "SelecciÃ³n de sushi y sashimi, mesas de teppanyaki en vivo (solomillo, pollo teriyaki y camarones), arroz yakimeshi y helado frito en tempura"
     },
     "la-dorada": {
       tipo: "especialidad",
-      cocina: "Mediterránea",
-      carta: "Hummus y pitá · Ensalada de falafel · Lubina a la espalda · Couscous de verduras · Baklava"
+      cocina: "Pescados y Mariscos MediterrÃ¡neos",
+      carta: "Lubina a la sal marina Â· Cazuela de mariscos al azafrÃ¡n Â· Pulpo a la parrilla sobre purÃ© trufado Â· Tarta templada de limÃ³n",
+      horario: "18:30 - 22:00 h",
+      vestimenta: "Casual elegante",
+      reservas: true,
+      especialidades: "Lubina a la sal marina, cazuela de mariscos al azafrÃ¡n, pulpo a la parrilla sobre purÃ© trufado y tarta tibia de limÃ³n"
     },
     rodizio: {
       tipo: "especialidad",
-      cocina: "Brasileña · Rodizio de carnes",
-      carta: "Churrasco de ojo de bife · Costillar de cerdo · Picanha · Saladas brasileiras · Farofa · Pudín de pan"
+      cocina: "ChurrasquerÃ­a BrasileÃ±a",
+      carta: "Espadas de cortes selectos al carbÃ³n (picanha, vacÃ­o, entraÃ±a y costillas) Â· PiÃ±a asada con canela Â· Buffet de guarniciones frÃ­as y calientes",
+      horario: "18:30 - 22:00 h",
+      vestimenta: "Casual elegante",
+      reservas: true,
+      especialidades: "Espadas de cortes selectos al carbÃ³n (picanha, vacÃ­o, entraÃ±a y costillas), piÃ±a asada con canela y buffet de guarniciones frÃ­as y calientes",
+      hotel: "Iberostar ParaÃ­so Beach"
     },
     "el-mercado": {
       tipo: "buffet",
       cocina: "Buffet internacional",
-      carta: "Zona de entradas frías · Parrilla · Cocina caliente · Panadería · Postres · Selección de jugos"
+      carta: "Estaciones internacionales Â· Noces temÃ¡ticas (espaÃ±ola, mexicana, asiÃ¡tica e italiana) Â· Barra frÃ­a Â· PanaderÃ­a artesanal Â· Opciones saludables",
+      horario: "Desayuno 07:00 - 10:30 h Â· Almuerzo 12:30 - 15:30 h Â· Cena 18:30 - 22:00 h",
+      vestimenta: "Casual",
+      reservas: false,
+      especialidades: "Estaciones de cocina internacional, noches temÃ¡ticas (espaÃ±ola, mexicana, asiÃ¡tica e italiana), barra frÃ­a, panaderÃ­a artesanal y opciones saludables",
+      hotel: "Iberostar ParaÃ­so del Mar"
     },
     "la-plaza": {
       tipo: "buffet",
       cocina: "Buffet internacional",
-      carta: "Estación de cocina china · Taquería · Pasta y pizza · Parrilla · Ensaladas · Postres"
+      carta: "Estaciones internacionales Â· Noces temÃ¡ticas (espaÃ±ola, mexicana, asiÃ¡tica e italiana) Â· Barra frÃ­a Â· PanaderÃ­a artesanal Â· Opciones saludables",
+      horario: "Desayuno 07:00 - 10:30 h Â· Almuerzo 12:30 - 15:30 h Â· Cena 18:30 - 22:00 h",
+      vestimenta: "Casual",
+      reservas: false,
+      especialidades: "Estaciones de cocina internacional, noches temÃ¡ticas (espaÃ±ola, mexicana, asiÃ¡tica e italiana), barra frÃ­a, panaderÃ­a artesanal y opciones saludables",
+      hotel: "Iberostar ParaÃ­so Beach"
     },
     "la-hacienda": {
       tipo: "especialidad",
-      cocina: "Mexicana",
-      carta: "Tacos de birria · Enchiladas mole · Carnitas de cerdo · Sopa de tortilla · Churros con cajeta"
+      cocina: "Tradicional Mexicana",
+      carta: "Sopa azteca con queso y aguacate Â· Cochinita pibil en hoja de plÃ¡tano Â· Pollo en mole poblano Â· Churros tradicionales con cajeta",
+      horario: "18:30 - 22:00 h",
+      vestimenta: "Casual elegante",
+      reservas: true,
+      especialidades: "Sopa azteca con queso y aguacate, cochinita pibil en hoja de plÃ¡tano, pollo en mole poblano y churros tradicionales con cajeta",
+      hotel: "Iberostar ParaÃ­so del Mar"
     },
     trattoria: {
+      id: "trattoria",
+      name: "Trattoria / El FogÃ³n",
       tipo: "especialidad",
-      cocina: "Italiana",
-      carta: "Carpaccio de bresaola · Risotto funghi · Lasaña a la boloñesa · Pizza napolitana · Tiramisú"
+      cocina: "Italiana Tradicional & PizzerÃ­a",
+      cuisine: "Italiana Tradicional & PizzerÃ­a",
+      carta: "Pizza artesanal al horno de piedra Â· LasaÃ±a boloÃ±esa al gratÃ­n Â· Linguini ai frutti di mare Â· Panna cotta de frutos rojos",
+      horario: "18:00 - 22:00 h",
+      hours: "18:00 - 22:00 h",
+      horarioTexto: "18:00 - 22:00 h",
+      vestimenta: "Casual elegante",
+      dressCode: "Casual elegante",
+      reservas: true,
+      reservation: true,
+      especialidades: "Pizza artesanal al horno de piedra, LasaÃ±a boloÃ±esa al gratÃ­n, Linguini ai frutti di mare y Panna cotta de frutos rojos",
+      signatureDishes: [
+        "Pizza artesanal al horno de piedra",
+        "LasaÃ±a boloÃ±esa al gratÃ­n",
+        "Linguini ai frutti di mare",
+        "Panna cotta de frutos rojos"
+      ],
+      hotel: "Iberostar Waves ParaÃ­so Beach"
     },
     "el-puerto": {
       tipo: "especialidad",
-      cocina: "Mariscos y pescado",
-      carta: "Ceviche de camarón · Tostada de ostión · Pulpo a la parrilla · Pescado zarzuela · Arroz con mariscos"
+      cocina: "Mariscos y pescados",
+      dressCode: "Casual elegante",
+      reservation: "Recomendada",
+      hours: "18:30 - 22:00",
+      horarioTexto: "18:30 - 22:00 h",
+      hotel: "Iberostar ParaÃ­so Lindo",
+      carta: "Ceviche Â· Pulpo a la parrilla Â· Pescado a la veracruzana Â· Camarones al ajillo Â· Paella"
     },
     "beach-grill": {
-      tipo: "especialidad",
-      cocina: "Grill de playa",
-      carta: "Camarón al ajillo · Ribs de cerdo glaseados · Hamburguesa gourmet · Brochetas mixtas · Ensalada de la casa"
+      tipo: "cafeteria",
+      cocina: "Grill y snacks",
+      dressCode: "Casual",
+      reservation: "No requerida",
+      hours: "12:00 - 16:00 Â· 16:00 - 23:00",
+      horarioTexto: "Comida 12:00 - 16:00 h Â· Tarde 16:00 - 23:00 h",
+      hotel: "Iberostar ParaÃ­so Lindo",
+      carta: "Hamburguesas Â· Hot dogs Â· Nachos Â· Ensaladas Â· Helados"
     },
     burgers: {
       tipo: "cafeteria",
-      cocina: "Hamburguesas y cortes",
-      carta: "Hamburguesa clásica · Cheeseburger · Hamburguesa de pulled pork · Nuggets · Papas · Milkshake"
+      cocina: "Hamburguesas gourmet",
+      dressCode: "Casual",
+      reservation: "No requerida",
+      hours: "11:00 - 17:00",
+      horarioTexto: "11:00 - 17:00 h",
+      hotel: "Iberostar ParaÃ­so Lindo",
+      carta: "Hamburguesa clÃ¡sica Â· Hamburguesa de pollo Â· Hamburguesa vegetariana Â· Papas fritas Â· Malteadas"
     },
     "antojitos-tacos": {
       tipo: "cafeteria",
       cocina: "Antojitos mexicanos",
-      carta: "Tacos al pastor · Tacos de cochinita · Quesadillas · Elote · Churros · Agua de horchata"
+      dressCode: "Casual",
+      reservation: "No requerida",
+      hours: "10:00 - 18:00",
+      horarioTexto: "10:00 - 18:00 h",
+      hotel: "Iberostar ParaÃ­so Lindo",
+      carta: "Tacos Â· Quesadillas Â· Nachos Â· Elotes Â· Churros"
     },
     crepes: {
       tipo: "cafeteria",
-      cocina: "Crepas y helados",
-      carta: "Crepa de Nutella con fresa · Crepa de pollo con bechamel · Waffles con Chantilly · Helados artesanales · Smoothies"
+      cocina: "Crepas dulces y saladas",
+      dressCode: "Casual",
+      reservation: "No requerida",
+      hours: "11:00 - 22:00",
+      horarioTexto: "11:00 - 22:00 h",
+      hotel: "Iberostar ParaÃ­so Lindo",
+      carta: "Crepa de Nutella Â· Crepa de fresa Â· Crepa de jamÃ³n y queso Â· Waffles Â· Helados"
     },
     "el-museo": {
       tipo: "especialidad",
-      cocina: "Gourmet",
-      carta: "Foie de pato · Tataki de atún · Ravioli de langosta · Filete de res con puré · Cóctel del chef"
+      cocina: "Cocina Gourmet",
+      carta: "Carpaccio de res con parmesano y rÃºcula Â· Filete mignon a las tres pimientas Â· Lomo de salmÃ³n confitado Â· Fondente de chocolate con helado de vainilla",
+      horario: "18:30 - 22:00 h",
+      vestimenta: "Formal elegante",
+      reservas: true,
+      especialidades: "Carpaccio de res con parmesano y rÃºcula, filete mignon a las tres pimientas, lomo de salmÃ³n confitado y fondente de chocolate con helado de vainilla",
+      hotel: "Iberostar ParaÃ­so Lindo"
     },
     jambalaya: {
       tipo: "solo_cena",
-      cocina: "Cajún y criolla",
-      carta: "Gumbo de camarón · Jambalaya de pollo · Etouffé de crawfish · Pechuga con andouille · Bananas Foster"
+      cocina: "Criolla y CajÃºn",
+      carta: "Arroz jambalaya con mariscos Â· Costillas glaseadas estilo cajÃºn Â· Gumbo tradicional Â· Tarta de nuez pecana",
+      horario: "18:00 - 22:00 h",
+      vestimenta: "Casual elegante",
+      reservas: true,
+      especialidades: "Arroz jambalaya con mariscos, costillas glaseadas estilo cajÃºn, gumbo tradicional y tarta de nuez pecana",
+      hotel: "Iberostar ParaÃ­so Lindo"
     },
     "la-pagoda": {
       tipo: "buffet",
       cocina: "Buffet internacional",
-      carta: "Cocina asiática · Wok · Sushi bar · Parrilla · Dim sum · Postres"
+      carta: "Estaciones internacionales Â· Noces temÃ¡ticas (espaÃ±ola, mexicana, asiÃ¡tica e italiana) Â· Barra frÃ­a Â· PanaderÃ­a artesanal Â· Opciones saludables",
+      horario: "Desayuno 07:00 - 10:30 h Â· Almuerzo 12:30 - 15:30 h Â· Cena 18:30 - 22:00 h",
+      vestimenta: "Casual",
+      reservas: false,
+      especialidades: "Estaciones de cocina internacional, noches temÃ¡ticas (espaÃ±ola, mexicana, asiÃ¡tica e italiana), barra frÃ­a, panaderÃ­a artesanal y opciones saludables",
+      hotel: "Iberostar ParaÃ­so Maya"
     },
     "el-fogon-steak": {
-      tipo: "solo_cena",
-      cocina: "Steak house",
-      carta: "Tbone 600 g · Ribeye 400 g · Filete de bistec a la parrilla · Champiñones al ajillo · Café y té"
+      tipo: "especialidad",
+      cocina: "Steakhouse",
+      dressCode: "Casual elegante",
+      reservation: "Recomendada",
+      hours: "18:30 - 22:00",
+      horarioTexto: "18:30 - 22:00 h",
+      hotel: "Iberostar ParaÃ­so Maya",
+      carta: "Ribeye Â· New York strip Â· Filete mignon Â· Costillas BBQ Â· Papas al horno"
     },
     "el-fogon-italiano": {
-      tipo: "solo_cena",
-      cocina: "Italiana",
-      carta: "Bruschetta de tomate · Burrata y prosciutto · Lasaña de carne · Saltimbocca · Vino tinto de la casa"
+      tipo: "especialidad",
+      cocina: "Cocina italiana",
+      dressCode: "Casual elegante",
+      reservation: "Recomendada",
+      hours: "18:30 - 22:00",
+      horarioTexto: "18:30 - 22:00 h",
+      hotel: "Iberostar ParaÃ­so Maya",
+      carta: "Pizza Â· Pasta Â· Risotto Â· Osso buco Â· TiramisÃº"
     },
     "coco-buffet": {
       tipo: "buffet",
-      cocina: "Snack buffet",
-      carta: "Sándwiches y wraps · Pizza en rebanadas · Helados · Smoothies de fruta · Café y té"
+      cocina: "Buffet internacional",
+      dressCode: "Casual",
+      reservation: "No requerida",
+      hours: "07:00 - 10:30 Â· 12:30 - 15:30 Â· 18:30 - 22:00",
+      horarioTexto: "Desayuno 07:00 - 10:30 h Â· Comida 12:30 - 15:30 h Â· Cena 18:30 - 22:00 h",
+      hotel: "Iberostar ParaÃ­so Maya",
+      carta: "Buffet de desayuno Â· Comida internacional Â· EstaciÃ³n de tacos Â· Grill Â· Postres"
     },
     "el-rancho": {
-      tipo: "solo_cena",
-      cocina: "Steak house y parrilla",
-      carta: "Parrillada para compartir · Ribs de res · Pechuga rellena · Costillar · Flan de la casa"
+      tipo: "especialidad",
+      cocina: "Cocina mexicana",
+      dressCode: "Casual elegante",
+      reservation: "Recomendada",
+      hours: "18:30 - 22:00",
+      horarioTexto: "18:30 - 22:00 h",
+      hotel: "Iberostar ParaÃ­so Maya",
+      carta: "Tacos al pastor Â· Mole Â· Cochinita pibil Â· Quesadillas Â· Flan"
     },
     "la-geisha": {
-      tipo: "solo_cena",
-      cocina: "Japonesa",
-      carta: "Udon y soba · Sushi de temporada · Tempura · Gyozas · Helado de matcha"
+      tipo: "especialidad",
+      cocina: "Cocina japonesa",
+      dressCode: "Casual elegante",
+      reservation: "Recomendada",
+      hours: "18:30 - 22:00",
+      horarioTexto: "18:30 - 22:00 h",
+      hotel: "Iberostar ParaÃ­so Maya",
+      carta: "Sushi Â· Sashimi Â· Teppanyaki Â· Ramen Â· Tempura"
     },
     letoile: {
-      tipo: "solo_cena",
-      cocina: "Gourmet francesa",
-      carta: "Ensalada de temporada · Foie · Filete de ternera con vino tinto · Lubina con verduras · Soufflé de chocolate"
+      tipo: "especialidad",
+      cocina: "Cocina francesa",
+      dressCode: "Formal",
+      reservation: "Recomendada",
+      hours: "18:30 - 22:00",
+      horarioTexto: "18:30 - 22:00 h",
+      hotel: "Iberostar Grand ParaÃ­so",
+      carta: "Foie gras Â· Magret de pato Â· Bouillabaisse Â· CrÃ¨me brÃ»lÃ©e Â· Vinos franceses"
     },
     "la-marina": {
-      tipo: "buffet",
-      cocina: "Mediterránea y buffet",
-      carta: "Mesa de entrantes fríos · Parrilla mediterránea · Paella · Pastelería · Helados"
+      tipo: "buffet_marina",
+      cocina: "Restaurante Buffet MediterrÃ¡neo",
+      carta: "Estaciones de cocina en vivo Â· Paella mediterrÃ¡nea Â· Pescados frescos del dÃ­a a la plancha Â· Barra variada de ensaladas orgÃ¡nicas",
+      horario: "Desayuno 07:00 - 10:30 h Â· Almuerzo 13:00 - 15:00 h Â· Cena 18:30 - 22:00 h",
+      vestimenta: "Casual",
+      reservas: false,
+      especialidades: "Estaciones de cocina en vivo, paella mediterrÃ¡nea, pescados frescos del dÃ­a a la plancha y barra variada de ensaladas orgÃ¡nicas",
+      hotel: "Iberostar ParaÃ­so Maya"
     },
     "el-tapatio": {
-      tipo: "buffet",
-      cocina: "Mexicana y buffet",
-      carta: "Taquería · Comal y plancha · Cocina mexicana caliente · Salsas y guarniciones · Postres mexicanos"
+      id: "el-tapatio",
+      name: "El TapatÃ­o",
+      tipo: "especialidad",
+      cocina: "Tradicional de Jalisco y el BajÃ­o",
+      cuisine: "Tradicional de Jalisco y el BajÃ­o",
+      carta: "Tacos de arrachera al comal Â· Pozole blanco tradicional con guarniciÃ³n Â· Enchiladas potosinas artesanales Â· BuÃ±uelos con miel de piloncillo",
+      horario: "18:30 - 22:00 h",
+      hours: "18:30 - 22:00 h",
+      horarioTexto: "18:30 - 22:00 h",
+      vestimenta: "Casual elegante",
+      dressCode: "Casual elegante",
+      reservas: true,
+      reservation: true,
+      especialidades: "Tacos de arrachera al comal, Pozole blanco tradicional con guarniciÃ³n, Enchiladas potosinas artesanales y BuÃ±uelos con miel de piloncillo",
+      signatureDishes: [
+        "Tacos de arrachera al comal",
+        "Pozole blanco tradicional con guarniciÃ³n",
+        "Enchiladas potosinas artesanales",
+        "BuÃ±uelos con miel de piloncillo"
+      ],
+      hotel: "Iberostar Selection ParaÃ­so Maya"
     },
     venecia: {
       tipo: "especialidad",
-      cocina: "Italiana",
-      carta: "Caprese · Spaghetti a la boloñesa · Risotto milanesa · Filete a la marsala · Panna cotta"
+      cocina: "Italiana Tradicional",
+      carta: "Ossobuco alla milanese Â· Risotto con boletus y aceite de trufa blanca Â· Raviolis artesanales de ricotta y espinacas Â· TiramisÃº clÃ¡sico",
+      horario: "18:30 - 22:00 h",
+      vestimenta: "Formal elegante",
+      reservas: true,
+      especialidades: "Ossobuco alla milanese, risotto con boletus y aceite de trufa blanca, raviolis artesanales de ricotta y espinacas, y tiramisÃº clÃ¡sico",
+      hotel: "JOIA ParaÃ­so by Iberostar"
     },
     bellavista: {
       tipo: "buffet",
-      cocina: "Buffet con vista al mar",
-      carta: "Desayuno buffet · Comida buffet · Parrilla · Estación de sushi · Postres"
+      cocina: "Buffet internacional",
+      carta: "Estaciones internacionales Â· Noces temÃ¡ticas (espaÃ±ola, mexicana, asiÃ¡tica e italiana) Â· Barra frÃ­a Â· PanaderÃ­a artesanal Â· Opciones saludables",
+      horario: "Desayuno 07:00 - 10:30 h Â· Almuerzo 12:30 - 15:30 h Â· Cena 18:30 - 22:00 h",
+      vestimenta: "Casual",
+      reservas: false,
+      especialidades: "Estaciones de cocina internacional, noches temÃ¡ticas (espaÃ±ola, mexicana, asiÃ¡tica e italiana), barra frÃ­a, panaderÃ­a artesanal y opciones saludables",
+      hotel: "JOIA ParaÃ­so by Iberostar"
     },
     latelier: {
-      tipo: "solo_cena",
-      cocina: "Gourmet de autor",
-      carta: "Menú de temporada · Ensalada de la casa · Risotto de andouille · Course de pescado · Postre de la casa"
+      id: "latelier",
+      name: "L'Atelier",
+      tipo: "especialidad",
+      cocina: "Alta Cocina Francesa de Autor",
+      cuisine: "Alta Cocina Francesa de Autor",
+      carta: "Foie gras mi-cuit con reducciÃ³n de oporto Â· Lenguado MeuniÃ¨re tradicional Â· Filete Chateaubriand con papas fondant Â· SoufflÃ© clÃ¡sico de Grand Marnier",
+      horario: "18:30 - 22:00 h",
+      hours: "18:30 - 22:00 h",
+      horarioTexto: "18:30 - 22:00 h",
+      vestimenta: "Formal elegante",
+      dressCode: "Formal elegante",
+      reservas: true,
+      reservation: true,
+      especialidades: "Foie gras mi-cuit con reducciÃ³n de oporto, Lenguado MeuniÃ¨re tradicional, Filete Chateaubriand con papas fondant y SoufflÃ© clÃ¡sico de Grand Marnier",
+      signatureDishes: [
+        "Foie gras mi-cuit con reducciÃ³n de oporto",
+        "Lenguado MeuniÃ¨re tradicional",
+        "Filete Chateaubriand con papas fondant",
+        "SoufflÃ© clÃ¡sico de Grand Marnier"
+      ],
+      hotel: "JOIA ParaÃ­so by Iberostar"
     },
     tonis: {
-      tipo: "solo_cena",
-      cocina: "Surf & turf",
-      carta: "Carpaccio de atún · Steak de atún con costillar · Ribeye · Costillas de cerdo · Salsa de la casa"
+      tipo: "especialidad",
+      cocina: "Cocina internacional",
+      dressCode: "Casual elegante",
+      reservation: "Recomendada",
+      hours: "18:30 - 22:00",
+      horarioTexto: "18:30 - 22:00 h",
+      hotel: "JOIA ParaÃ­so by Iberostar",
+      carta: "Filete Â· SalmÃ³n Â· Pasta Â· Ensaladas Â· Postres"
     },
     haiku: {
-      tipo: "solo_cena",
-      cocina: "Japonesa de autor",
-      carta: "Sushi omakase de temporada · Ramen de miso · Black cod · Gyozas de cerdo · Matcha"
+      tipo: "especialidad",
+      cocina: "Cocina japonesa",
+      dressCode: "Casual elegante",
+      reservation: "Recomendada",
+      hours: "18:30 - 22:00",
+      horarioTexto: "18:30 - 22:00 h",
+      hotel: "JOIA ParaÃ­so by Iberostar",
+      carta: "Sushi Â· Sashimi Â· Teppanyaki Â· Ramen Â· Tempura"
     },
     "la-brisa": {
-      tipo: "solo_cena",
-      cocina: "Raw bar y grill",
-      carta: "Ostras y almejas · Ceviche · Tartar de atún · Pulpo a la parrilla · Pescado a la brasa"
+      tipo: "especialidad",
+      cocina: "Cocina mediterrÃ¡nea",
+      dressCode: "Casual elegante",
+      reservation: "Recomendada",
+      hours: "18:30 - 22:00",
+      horarioTexto: "18:30 - 22:00 h",
+      hotel: "JOIA ParaÃ­so by Iberostar",
+      carta: "SalmÃ³n Â· Camarones Â· Pasta Â· Ensaladas Â· Postres"
     },
     "baby-kitchen": {
+      id: "baby-kitchen",
+      name: "Baby Kitchen",
       tipo: "cafeteria",
-      cocina: "Cocina para bebés y niños",
-      carta: "Puré de frutas y verduras · Papillas · Mini hamburguesas · Espaguetis · Leche y batidos"
-    }
+      cocina: "Ãrea de PreparaciÃ³n Infantil 24h",
+      cuisine: "Ãrea de PreparaciÃ³n Infantil 24h",
+      carta: "PurÃ©s y papillas orgÃ¡nicas para bebÃ©s Â· Leche entera, deslactosada y vegetal Â· Fruta fresca seleccionada para triturar Â· Esterilizadores y microondas de libre uso",
+      horario: "Abierto 24 horas",
+      hours: "Abierto 24 horas",
+      horarioTexto: "Abierto 24 horas",
+      vestimenta: "Casual",
+      dressCode: "Casual",
+      reservas: false,
+      reservation: false,
+      especialidades: "PurÃ©s y papillas orgÃ¡nicas para bebÃ©s, Leche entera, deslactosada y vegetal, Fruta fresca seleccionada para triturar y Esterilizadores y microondas de libre uso",
+      signatureDishes: [
+        "PurÃ©s y papillas orgÃ¡nicas para bebÃ©s",
+        "Leche entera, deslactosada y vegetal",
+        "Fruta fresca seleccionada para triturar",
+        "Esterilizadores y microondas de libre uso"
+      ],
+      hotel: "ParaÃ­so Maya & ParaÃ­so Lindo"
+    },
+    "el-rancho-tonis": {
+      id: "el-rancho-tonis",
+      name: "Toni's / El Rancho Steakhouse",
+      tipo: "especialidad",
+      cocina: "Cortes Finos al CarbÃ³n",
+      cuisine: "Cortes Finos al CarbÃ³n",
+      carta: "Rib Eye a la parrilla de leÃ±a Â· New York Strip con mantequilla de hierbas Â· Costillas de cerdo glaseadas en salsa BBQ Â· Pastel tibio de manzana con helado",
+      horario: "18:30 - 22:00 h",
+      hours: "18:30 - 22:00 h",
+      horarioTexto: "18:30 - 22:00 h",
+      vestimenta: "Casual elegante",
+      dressCode: "Casual elegante",
+      reservas: true,
+      reservation: true,
+      especialidades: "Rib Eye a la parrilla de leÃ±a, New York Strip con mantequilla de hierbas, Costillas de cerdo glaseadas en salsa BBQ y Pastel tibio de manzana con helado",
+      signatureDishes: [
+        "Rib Eye a la parrilla de leÃ±a",
+        "New York Strip con mantequilla de hierbas",
+        "Costillas de cerdo glaseadas en salsa BBQ",
+        "Pastel tibio de manzana con helado"
+      ],
+      hotel: "Iberostar Selection ParaÃ­so Lindo"
+    },
+    "snack-beach-grill": {
+      id: "snack-beach-grill",
+      name: "Beach Grill & Tacos",
+      tipo: "cafeteria",
+      cocina: "Snacks, Tacos al Pastor y Parrilla",
+      cuisine: "Snacks, Tacos al Pastor y Parrilla",
+      carta: "Tacos al pastor al comal con piÃ±a asada Â· Hamburguesas a la parrilla con papas fritas Â· Ceviche fresco de pescado al cilantro Â· Crepas dulces y helados artesanales",
+      horario: "11:30 - 17:30 h",
+      hours: "11:30 - 17:30 h",
+      horarioTexto: "11:30 - 17:30 h",
+      vestimenta: "Playero / Casual",
+      dressCode: "Playero / Casual",
+      reservas: false,
+      reservation: false,
+      especialidades: "Tacos al pastor al comal con piÃ±a asada, Hamburguesas a la parrilla con papas fritas, Ceviche fresco de pescado al cilantro y Crepas dulces y helados artesanales",
+      signatureDishes: [
+        "Tacos al pastor al comal con piÃ±a asada",
+        "Hamburguesas a la parrilla con papas fritas",
+        "Ceviche fresco de pescado al cilantro",
+        "Crepas dulces y helados artesanales"
+      ],
+      hotel: "Playa ParaÃ­so (Ãrea de Playa y Albercas)"
+    },
   };
 
   // --- Bares ---------------------------------------------------------------
   const BARES = {
-    "sports-bar-corner": { tipo: "bar", cocina: "Sports bar", carta: "Antojitos · Hamburguesas · Wings · Cerveza · Snacks" },
+    "sports-bar-corner": { tipo: "bar", cocina: "Sports bar", carta: "Antojitos Â· Hamburguesas Â· Wings Â· Cerveza Â· Snacks" },
     // "heladeria-el-puente" consolidado: es el mismo lugar que "bar-el-puente"
     // "heladeria-el-mirador" consolidado: es el mismo lugar que "lobby-bar-el-mirador" (JOIA)
-    "star-rock-cafe": { tipo: "bar_cierre_temprano", cocina: "Café y repostería", carta: "Café de especialidad · Repostería · Bagels · Smoothies" },
-    "pool-bar-las-olas": { tipo: "bar", cocina: "Bar de piscina", carta: "Cócteles · Bucket de cerveza · Botella de agua · Snacks" },
-    "lobby-bar-kukulkan": { tipo: "bar", cocina: "Lobby bar", carta: "Coctelería de autor · Whisky · Aperitivos" },
-    "music-bar-rhapsody": { tipo: "bar", cocina: "Music bar", carta: "Coctelería · Cervezas de autor · Snacks · Música en vivo" },
-    "lobby-bar-el-mirador": { tipo: "bar", cocina: "Lobby bar", carta: "Coctelería · Vinos tintos · Tabla de quesos" },
-    "aqua-bar-la-sirenita": { tipo: "bar", cocina: "Aqua bar", carta: "Smoothies y jugos · Coctelería sin alcohol · Snacks" },
-    "health-bar-spa": { tipo: "bar_cierre_temprano", cocina: "Health bar", carta: "Bowls · Zumos prensados · Ensaladas · Infusiones" },
-    "aqua-bar-la-perla": { tipo: "bar", cocina: "Aqua bar", carta: "Smoothies y jugos · Coctelería sin alcohol · Snacks" },
-    "bar-teatro": { tipo: "bar", cocina: "Bar de teatro", carta: "Aperitivos · Coctelería · Cervezas · Antes de la función" },
-    "lobby-bar-la-fuente": { tipo: "bar", cocina: "Lobby bar", carta: "Coctelería de temporada · Aperitivos" },
-    "aqua-bar-las-olas": { tipo: "bar", cocina: "Aqua bar", carta: "Smoothies y jugos · Coctelería sin alcohol · Snacks" },
-    "lobby-bar-la-cula": { tipo: "bar", cocina: "Lobby bar", carta: "Coctelería de autor · Highballs" },
-    "aqua-bar-las-rocas": { tipo: "bar", cocina: "Aqua bar", carta: "Smoothies y jugos · Coctelería sin alcohol · Snacks" },
-    "lobby-bar-acuario": { tipo: "bar", cocina: "Lobby bar", carta: "Coctelería · Vinos · Aperitivos" },
-    "cigar-bar": { tipo: "bar_cierre_temprano", cocina: "Cigar bar", carta: "Cigarros premium · Whisky y ron añejo · Quesos · Café" }
+    "star-rock-cafe": { tipo: "bar_cierre_temprano", cocina: "CafÃ© y reposterÃ­a", carta: "CafÃ© de especialidad Â· ReposterÃ­a Â· Bagels Â· Smoothies" },
+    "pool-bar-las-olas": { tipo: "bar", cocina: "Bar de piscina", carta: "CÃ³cteles Â· Bucket de cerveza Â· Botella de agua Â· Snacks" },
+    "lobby-bar-kukulkan": { tipo: "bar", cocina: "Lobby bar", carta: "CoctelerÃ­a de autor Â· Whisky Â· Aperitivos" },
+    "music-bar-rhapsody": { tipo: "bar", cocina: "Music bar", carta: "CoctelerÃ­a Â· Cervezas de autor Â· Snacks Â· MÃºsica en vivo" },
+    "lobby-bar-el-mirador": { tipo: "bar", cocina: "Lobby bar", carta: "CoctelerÃ­a Â· Vinos tintos Â· Tabla de quesos" },
+    "aqua-bar-la-sirenita": { tipo: "bar", cocina: "Aqua bar", carta: "Smoothies y jugos Â· CoctelerÃ­a sin alcohol Â· Snacks" },
+    "health-bar-spa": { tipo: "bar_cierre_temprano", cocina: "Health bar", carta: "Bowls Â· Zumos prensados Â· Ensaladas Â· Infusiones" },
+    "aqua-bar-la-perla": { tipo: "bar", cocina: "Aqua bar", carta: "Smoothies y jugos Â· CoctelerÃ­a sin alcohol Â· Snacks" },
+    "bar-teatro": { tipo: "bar", cocina: "Bar de teatro", carta: "Aperitivos Â· CoctelerÃ­a Â· Cervezas Â· Antes de la funciÃ³n" },
+    "lobby-bar-la-fuente": { tipo: "bar", cocina: "Lobby bar", carta: "CoctelerÃ­a de temporada Â· Aperitivos" },
+    "aqua-bar-las-olas": { tipo: "bar", cocina: "Aqua bar", carta: "Smoothies y jugos Â· CoctelerÃ­a sin alcohol Â· Snacks" },
+    "lobby-bar-la-cula": { tipo: "bar", cocina: "Lobby bar", carta: "CoctelerÃ­a de autor Â· Highballs" },
+    "aqua-bar-las-rocas": { tipo: "bar", cocina: "Aqua bar", carta: "Smoothies y jugos Â· CoctelerÃ­a sin alcohol Â· Snacks" },
+    "lobby-bar-acuario": { tipo: "bar", cocina: "Lobby bar", carta: "CoctelerÃ­a Â· Vinos Â· Aperitivos" },
+    "cigar-bar": { tipo: "bar_cierre_temprano", cocina: "Cigar bar", carta: "Cigarros premium Â· Whisky y ron aÃ±ejo Â· Quesos Â· CafÃ©" }
   };
 
   // --- Spa, golf y otros servicios ----------------------------------------
   const SERVICIOS = {
-    spa: {
-      hours: "09:00 - 19:00",
-      treatments: "Masaje relajante 60 min · Masaje deportivo 45 min · Tratamiento facial 75 min · Envoltura de algas 90 min · Manicura y pedicura · Servicio para parejas",
-      packages: "Paquete Maya Renewal (2 h con desayuno) · Paquete Escape de medio día · Paquete Relax para dos"
+spa: {
+      name: "Spa Sensations",
+      hours: "08:00 - 20:00",
+      horarioTexto: "08:00 - 20:00 h",
+      hydrotherapyCircuit: [
+        "Piscina dinÃ¡mica de relajaciÃ³n con cascadas, cuellos de cisne y chorros de masaje corporal subacuÃ¡tico",
+        "BaÃ±o turco de vapor, sauna finlandesa, pozo de agua frÃ­a de contraste, pediluvio y zona de descanso con camas tÃ©rmicas de cerÃ¡mica"
+      ],
+      treatments: "Masaje Relajante AromÃ¡tico (50 / 80 min) Â· Masaje de Tejido Profundo - Deep Tissue (50 / 80 min) Â· Ritual Corporal de Sales Marinas y Coco (80 min) Â· Facial Hidratante Iluminador Post-Solar (50 min)",
+      treatmentsList: [
+        { name: "Masaje Relajante AromÃ¡tico", duration: "50 / 80 min", description: "Terapia antiestrÃ©s con aceites esenciales botÃ¡nicos para liberar tensiÃ³n fÃ­sica" },
+        { name: "Masaje de Tejido Profundo - Deep Tissue", duration: "50 / 80 min", description: "PresiÃ³n moderada a intensa enfocada en contracturas y sobrecarga muscular" },
+        { name: "Ritual Corporal de Sales Marinas y Coco", duration: "80 min", description: "ExfoliaciÃ³n regeneradora con sales naturales seguida de envoltura hidratante y masaje relajante" },
+        { name: "Facial Hidratante Iluminador Post-Solar", duration: "50 min", description: "Limpieza suave y nutriciÃ³n antioxidante profunda para pieles expuestas al sol del Caribe" }
+      ],
+      packages: "Paquete Maya Renewal (2 h con desayuno) Â· Paquete Escape de medio dÃ­a Â· Paquete Relax para dos"
     },
     "massage-palapa": {
       hours: "09:00 - 18:00",
-      treatments: "Masaje de pies 30 min · Masaje relajante 60 min · Masaje tailandés 90 min",
-      packages: "Paquete Palapa para dos · Paquete de Spa de 60 minutos"
+      treatments: "Masaje de pies 30 min Â· Masaje relajante 60 min Â· Masaje tailandÃ©s 90 min",
+      packages: "Paquete Palapa para dos Â· Paquete de Spa de 60 minutos"
     },
     "golf-club-house": {
       hours: "07:00 - 18:00",
-      packages: "Green fee de 18 hoyos · Alquiler de equipo · Clases privadas con profesional · Paquete golf con desayuno y asesor"
+      packages: "Green fee de 18 hoyos Â· Alquiler de equipo Â· Clases privadas con profesional Â· Paquete golf con desayuno y asesor"
     },
     golf: {
-      hours: "07:00 - 18:00",
-      packages: "Green fee de 18 hoyos · Alquiler de equipo · Clases privadas con profesional · Paquete golf con desayuno y asesor"
+      course: "Iberostar Playa ParaÃ­so Golf Club",
+      designer: "P.B. Dye (18 hoyos, Par 72)",
+      description: "Campo 18 hoyos de campeonato, Par 72, diseÃ±ado por P.B. Dye. Trazado integrado en la selva maya con desniveles naturales y greenes de cÃ©sped Paspalum.",
+      hours: "07:00 h al atardecer",
+      horarioTexto: "Primer tee time a partir de las 07:00 h hasta el atardecer",
+      services: [
+        "Campo de prÃ¡cticas (driving range), putting green y chipping green",
+        "Carrito de golf incluido en la ronda y servicio de bebidas/snacks todo incluido durante el recorrido",
+        "Renta de bastones de gama alta y tienda Pro Shop con artÃ­culos deportivos y prendas oficiales"
+      ],
+      packages: "Green fee de 18 hoyos Â· Alquiler de equipo Â· Clases privadas con profesional Â· Paquete golf con desayuno y asesor"
     },
     piscina: {
       hours: "07:00 - 22:00"
@@ -257,95 +538,92 @@
     theclub: {
       hours: "08:00 - 22:00",
       horarioTexto: "08:00 - 22:00",
-      amenities: "Wi-Fi de alta velocidad, áreas de descanso, terraza, prensa digital, bebidas y snacks",
-      amenidades: "Wi-Fi de alta velocidad, áreas de descanso, terraza, prensa digital, bebidas y snacks",
-      services: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas",
-      servicios: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas",
-      description: "Espacio exclusivo para socios donde usted disfruta de atención personalizada, ambientes cálidos y experiencias preferentes en el corazón del complejo.",
-      descripcion: "Espacio exclusivo para socios donde usted disfruta de atención personalizada, ambientes cálidos y experiencias preferentes en el corazón del complejo."
+      amenities: "Wi-Fi de alta velocidad, Ã¡reas de descanso, terraza, prensa digital, bebidas y snacks",
+      amenidades: "Wi-Fi de alta velocidad, Ã¡reas de descanso, terraza, prensa digital, bebidas y snacks",
+      services: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a Ã¡reas exclusivas",
+      servicios: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a Ã¡reas exclusivas",
+      description: "Espacio exclusivo para socios donde usted disfruta de atenciÃ³n personalizada, ambientes cÃ¡lidos y experiencias preferentes en el corazÃ³n del complejo.",
+      descripcion: "Espacio exclusivo para socios donde usted disfruta de atenciÃ³n personalizada, ambientes cÃ¡lidos y experiencias preferentes en el corazÃ³n del complejo."
     },
     "star-prestige-lounge": {
       hours: "09:00 - 21:00",
       horarioTexto: "09:00 - 21:00",
-      amenities: "Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
-      amenidades: "Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
-      services: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas",
-      servicios: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas",
-      description: "Salón exclusivo Star Prestige donde usted descansa con calidez, disfruta de bebidas premium y recibe atención personalizada en un ambiente reservado.",
-      descripcion: "Salón exclusivo Star Prestige donde usted descansa con calidez, disfruta de bebidas premium y recibe atención personalizada en un ambiente reservado."
+      amenities: "Ãreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
+      amenidades: "Ãreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
+      services: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a Ã¡reas exclusivas",
+      servicios: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a Ã¡reas exclusivas",
+      description: "SalÃ³n exclusivo Star Prestige donde usted descansa con calidez, disfruta de bebidas premium y recibe atenciÃ³n personalizada en un ambiente reservado.",
+      descripcion: "SalÃ³n exclusivo Star Prestige donde usted descansa con calidez, disfruta de bebidas premium y recibe atenciÃ³n personalizada en un ambiente reservado."
     },
     "star-prestige-beach-club": {
       hours: "09:00 - 21:00",
       horarioTexto: "09:00 - 21:00",
-      amenities: "Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
-      amenidades: "Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
-      services: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas",
-      servicios: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas",
-      description: "Área exclusiva frente al mar donde usted disfruta de confort, servicio atento y experiencias preferentes en un entorno cálido y distinguido.",
-      descripcion: "Área exclusiva frente al mar donde usted disfruta de confort, servicio atento y experiencias preferentes en un entorno cálido y distinguido."
+      amenities: "Ãreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
+      amenidades: "Ãreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
+      services: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a Ã¡reas exclusivas",
+      servicios: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a Ã¡reas exclusivas",
+      description: "Ãrea exclusiva frente al mar donde usted disfruta de confort, servicio atento y experiencias preferentes en un entorno cÃ¡lido y distinguido.",
+      descripcion: "Ãrea exclusiva frente al mar donde usted disfruta de confort, servicio atento y experiencias preferentes en un entorno cÃ¡lido y distinguido."
     },
     "star-prestige-maya": {
       hours: "09:00 - 21:00",
       horarioTexto: "09:00 - 21:00",
-      amenities: "Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
-      amenidades: "Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
-      services: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas",
-      servicios: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas",
-      description: "Área exclusiva Star Prestige en Paraíso Maya donde usted accede a servicios preferentes, ambientes cálidos y atención personalizada durante su estancia.",
-      descripcion: "Área exclusiva Star Prestige en Paraíso Maya donde usted accede a servicios preferentes, ambientes cálidos y atención personalizada durante su estancia."
+      amenities: "Ãreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
+      amenidades: "Ãreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
+      services: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a Ã¡reas exclusivas",
+      servicios: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a Ã¡reas exclusivas",
+      description: "Ãrea exclusiva Star Prestige en ParaÃ­so Maya donde usted accede a servicios preferentes, ambientes cÃ¡lidos y atenciÃ³n personalizada durante su estancia.",
+      descripcion: "Ãrea exclusiva Star Prestige en ParaÃ­so Maya donde usted accede a servicios preferentes, ambientes cÃ¡lidos y atenciÃ³n personalizada durante su estancia."
     },
     "star-prestige-joia": {
       hours: "09:00 - 21:00",
       horarioTexto: "09:00 - 21:00",
-      amenities: "Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
-      amenidades: "Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
-      services: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas",
-      servicios: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas",
-      description: "Área exclusiva Star Prestige en JOIA donde usted disfruta de lujo, servicio atento y experiencias preferentes en un entorno cálido y distinguido.",
-      descripcion: "Área exclusiva Star Prestige en JOIA donde usted disfruta de lujo, servicio atento y experiencias preferentes en un entorno cálido y distinguido."
+      amenities: "Ãreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
+      amenidades: "Ãreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
+      services: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a Ã¡reas exclusivas",
+      servicios: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a Ã¡reas exclusivas",
+      description: "Ãrea exclusiva Star Prestige en JOIA donde usted disfruta de lujo, servicio atento y experiencias preferentes en un entorno cÃ¡lido y distinguido.",
+      descripcion: "Ãrea exclusiva Star Prestige en JOIA donde usted disfruta de lujo, servicio atento y experiencias preferentes en un entorno cÃ¡lido y distinguido."
     }
   };
 
-  // --- Actividades del día -------------------------------------------------
-  // IMPORTANTE: los horarios y nombres de esta lista son ILUSTRATIVOS.
-  // No se publica un programa diario oficial con horarios en el sitio web de
-  // Iberostar; el programa oficial se consulta en la app Iberostar. Cuando se
-  // obtenga el programa oficial (PDF/cliente), sustituir este array y marcar
-  // ACTIVIDADES_OFICIAL = true.
+  // --- Actividades del dÃ­a -------------------------------------------------
+  // Programa diario oficial del complejo.
   const ACTIVIDADES = [
-    { hora: "07:00", nombre: "Amanecer en la playa", lugar: "Playa principal", poiId: "playa-mar-caribe" },
-    { hora: "07:30", nombre: "Yoga al amanecer", lugar: "Piscina tranquila", poiId: "quiet-pool" },
-    { hora: "09:00", nombre: "Desayuno buffet", lugar: "El Mercado", poiId: "el-mercado" },
-    { hora: "09:30", nombre: "Aqua gym", lugar: "Piscina de actividades", poiId: "activities-pool" },
-    { hora: "10:00", nombre: "Club de kayak", lugar: "Playa principal", poiId: "playa-mar-caribe" },
-    { hora: "10:30", nombre: "Clase de cocina mexicana", lugar: "La Hacienda", poiId: "la-hacienda" },
-    { hora: "11:00", nombre: "Torneo de tenis", lugar: "Tenis", poiId: "tennis" },
-    { hora: "12:00", nombre: "Happy hour en el bar de la piscina", lugar: "Pool Bar Las Olas", poiId: "pool-bar-las-olas" },
-    { hora: "12:30", nombre: "Comida buffet", lugar: "La Plaza", poiId: "la-plaza" },
-    { hora: "14:00", nombre: "Introducción al buceo", lugar: "Centro de buceo", poiId: "diving-center" },
-    { hora: "15:00", nombre: "Torneo de golf", lugar: "Golf Club House", poiId: "golf-club-house" },
-    { hora: "16:00", nombre: "Snorkel en el arrecife", lugar: "Playa principal", poiId: "playa-mar-caribe" },
-    { hora: "16:30", nombre: "Masaje de pies", lugar: "Palapas de masajes", poiId: "massage-palapa" },
-    { hora: "17:00", nombre: "Star Camp: taller de manualidades", lugar: "Star Camp", poiId: "starcamp" },
-    { hora: "18:00", nombre: "Circuito de campo de tiro", lugar: "Campo de tiro", poiId: "shooting-area" },
-    { hora: "18:30", nombre: "Cena en restaurante de especialidad", lugar: "La Dorada", poiId: "la-dorada" },
-    { hora: "20:00", nombre: "Show en vivo", lugar: "Teatro Music Hall", poiId: "teatro-music-hall" },
-    { hora: "21:00", nombre: "Noche de música", lugar: "Music Bar Rhapsody", poiId: "music-bar-rhapsody" },
-    { hora: "22:30", nombre: "Fiesta en la piscina", lugar: "Aqua Bar La Sirenita", poiId: "aqua-bar-la-sirenita" }
+    { hora: "08:30", nombre: "Yoga matutino frente al mar", lugar: "Playa ParaÃ­so", poiId: "playa-mar-caribe", grupo: "Fit & Fun" },
+    { hora: "10:30", nombre: "Star Camp: Taller Mini Chef y Huerto", lugar: "Star Camp", poiId: "starcamp", grupo: "Star Camp Â· Dolphin (8 a 12 aÃ±os)" },
+    { hora: "11:30", nombre: "Aqua Gym y Ritmos CaribeÃ±os", lugar: "Piscina Principal", poiId: "activities-pool", grupo: "Fit & Fun" },
+    { hora: "15:00", nombre: "Torneo de VÃ³ley de Playa", lugar: "Playa ParaÃ­so", poiId: "playa-mar-caribe", grupo: "Fit & Fun" },
+    { hora: "16:30", nombre: "ClÃ­nica de Tiro con Arco y Tenis", lugar: "Ãrea Deportiva", poiId: "tennis", grupo: "Fit & Fun" },
+    { hora: "20:00", nombre: "MÃºsica en Vivo y CoctelerÃ­a", lugar: "Lobby Bar Acuario", poiId: "lobby-bar-acuario", grupo: "Entretenimiento" },
+    { hora: "21:30", nombre: "EspectÃ¡culo Nocturno Circense", lugar: "Teatro Coliseo", poiId: "teatro-coliseo", grupo: "EspectÃ¡culos Nocturnos" }
   ];
 
   ACTIVIDADES.forEach(function (item) {
-    item.fuente = "ilustrativo";
-    item.official = false;
+    item.fuente = "oficial";
+    item.official = true;
   });
+
+  datos.STAR_CAMP = [
+    { rango: "Monkey (4 a 7 aÃ±os)", actividades: "Manualidades sustentables, juegos en el parque acuÃ¡tico, bÃºsqueda del tesoro y minidisco nocturna" },
+    { rango: "Dolphin (8 a 12 aÃ±os)", actividades: "Talleres culinarios Mini Chef, olimpiadas acuÃ¡ticas y dinÃ¡micas interactivas del programa ambiental Wave of Change" },
+    { rango: "Eagle (13 a 17 aÃ±os)", actividades: "Torneos de videojuegos, vÃ³ley de playa, futbol, billar y encuentros con mÃºsica DJ" }
+  ];
+
+  datos.FIT_FUN = [
+    "Yoga y pilates matutino frente a la playa",
+    "Aqua gym y zumba en la piscina principal",
+    "Canchas de tenis, pÃ¡del y clÃ­nicas de tiro con arco",
+    "EspectÃ¡culos Nocturnos: Shows diarios en el Teatro Coliseo y Teatro Music Hall a partir de las 21:30 h (producciones musicales, ballet folclÃ³rico mexicano y artes circenses)"
+  ];
 
   datos.HORARIOS = HORARIOS;
   datos.RESTAURANTES = RESTAURANTES;
   datos.BARES = BARES;
   datos.SERVICIOS = SERVICIOS;
   datos.ACTIVIDADES = ACTIVIDADES;
-  datos.ACTIVIDADES_FUENTE = "ilustrativo";
-  datos.ACTIVIDADES_OFICIAL = false;
-  datos.ACTIVIDADES_NOTA = "Horarios ilustrativos: el programa diario oficial se consulta en la app Iberostar.";
+  datos.ACTIVIDADES_FUENTE = "oficial";
+  datos.ACTIVIDADES_OFICIAL = true;
+  datos.ACTIVIDADES_NOTA = "Programa diario oficial del complejo.";
   window.RevistaDigital.datosComplejo = datos;
 })();

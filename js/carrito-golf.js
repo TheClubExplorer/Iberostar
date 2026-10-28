@@ -1,6 +1,6 @@
-// SimulaciÛn de reserva y seguimiento de carritos dentro del complejo (estilo Uber).
-// No hay backend de carritos: las posiciones, la aceptaciÛn y el ETA son
-// simulados en el navegador para mostrar el flujo completo al huÈsped.
+// Simulaci√≥n de reserva y seguimiento de carritos dentro del complejo (estilo Uber).
+// No hay backend de carritos: las posiciones, la aceptaci√≥n y el ETA son
+// simulados en el navegador para mostrar el flujo completo al hu√©sped.
 (function () {
   "use strict";
   window.RevistaDigital = window.RevistaDigital || {};
@@ -8,7 +8,7 @@
 
   var SPEED_MPS = 4.2;        // velocidad media estimada del carrito
   var DETOUR_FACTOR = 1.35;   // rodeo por los caminos del complejo
-  var TIME_SCALE = 8;         // aceleraciÛn de la simulaciÛn
+  var TIME_SCALE = 8;         // aceleraci√≥n de la simulaci√≥n
   var TICK_MS = 200;
   var ACCEPT_MIN_MS = 1200;
   var ACCEPT_MAX_MS = 2600;
@@ -25,40 +25,19 @@
   ];
 
   var FALLBACK_DESTINATIONS = [
-    { id: "golf", name: "Iberostar Playa ParaÌso Golf Club", category: "golf", lat: 20.75946, lng: -86.96714 },
+    { id: "golf", name: "Iberostar Playa Para√≠so Golf Club", category: "golf", lat: 20.75946, lng: -86.96714 },
     { id: "golf-club-house", name: "Golf Club House", category: "golf", lat: 20.7586073, lng: -86.9658668 }
   ];
 
-  // Destinos adicionales con coordenadas estimadas (basadas en la ubicaciÛn del hotel correspondiente)
-  // para incluir Lounge The Club, Star Prestige, Spa, Lobbies y accesos que no tienen coordenadas verificadas.
+  // Destinos adicionales no presentes como POI en la gu√≠a interactiva (lobbies de hoteles).
+  // El resto de destinos se toma directamente de la gu√≠a para evitar duplicados.
   var ADDITIONAL_DESTINATIONS = [
-    // --- The Club ---
-    { id: "the-club-lounge", name: "Lounge The Club", category: "club", lat: 20.7598333, lng: -86.9652778 },
-    { id: "the-club-bar", name: "Bar The Club", category: "club", lat: 20.7598000, lng: -86.9653000 },
-
-    // --- Star Prestige (coordenadas aproximadas, no tocar las de ParaÌso Maya ni Star Prestige Lounge) ---
-    { id: "star-prestige-beach-club", name: "Star Prestige Beach Club", category: "starprestige", lat: 20.756829, lng: -86.958688 },
-    { id: "star-prestige-joia", name: "Star Prestige JOIA", category: "starprestige", lat: 20.756156, lng: -86.962287 },
-
-    // --- Spa Sensations y spas de hoteles ---
-    { id: "spa-sensations", name: "Spa Sensations", category: "spa", lat: 20.76032, lng: -86.96629 },
-    { id: "spa-joia", name: "Spa JOIA", category: "spa", lat: 20.755878, lng: -86.961372 },
-    { id: "spa-grand-paraiso", name: "Spa Grand ParaÌso", category: "spa", lat: 20.753233, lng: -86.960193 },
-    { id: "massage-palapa", name: "Palapas de masajes", category: "spa", lat: 20.758252, lng: -86.957775 },
-
-    // --- Lobbies principales de los 5 hoteles ---
-    { id: "lobby-del-mar", name: "Lobby Iberostar Waves ParaÌso del Mar", category: "concierge", lat: 20.7612389, lng: -86.9640931 },
-    { id: "lobby-beach", name: "Lobby Iberostar Waves ParaÌso Beach", category: "concierge", lat: 20.7584, lng: -86.9585 },
-    { id: "lobby-lindo", name: "Lobby Iberostar Selection ParaÌso Lindo", category: "concierge", lat: 20.7596096, lng: -86.9639649 },
-    { id: "lobby-maya", name: "Lobby Iberostar Selection ParaÌso Maya", category: "concierge", lat: 20.7578835, lng: -86.9648766 },
-    { id: "lobby-joia", name: "Lobby JOIA ParaÌso by Iberostar", category: "concierge", lat: 20.7563073, lng: -86.9629786 },
-
-// --- Hoteles del complejo (destinos de carrito) ---
-    { id: "hotel-del-mar", name: "Iberostar Waves ParaÌso del Mar", category: "hotel", lat: 20.7612389, lng: -86.9640931 },
-    { id: "hotel-beach", name: "Iberostar Waves ParaÌso Beach", category: "hotel", lat: 20.7584, lng: -86.9585 },
-    { id: "hotel-lindo", name: "Iberostar Selection ParaÌso Lindo", category: "hotel", lat: 20.7596096, lng: -86.9639649 },
-    { id: "hotel-maya", name: "Iberostar Selection ParaÌso Maya", category: "hotel", lat: 20.7578835, lng: -86.9648766 },
-    { id: "hotel-joia", name: "JOIA ParaÌso by Iberostar", category: "hotel", lat: 20.7563073, lng: -86.9629786 }
+    // --- Lobbies principales de los 5 hoteles (no tienen POI en la gu√≠a) ---
+    { id: "lobby-del-mar", name: "Lobby Iberostar Waves Para√≠so del Mar", category: "concierge", lat: 20.7612389, lng: -86.9640931 },
+    { id: "lobby-beach", name: "Lobby Iberostar Waves Para√≠so Beach", category: "concierge", lat: 20.7584, lng: -86.9585 },
+    { id: "lobby-lindo", name: "Lobby Iberostar Selection Para√≠so Lindo", category: "concierge", lat: 20.7596096, lng: -86.9639649 },
+    { id: "lobby-maya", name: "Lobby Iberostar Selection Para√≠so Maya", category: "concierge", lat: 20.7578835, lng: -86.9648766 },
+    { id: "lobby-joia", name: "Lobby JOIA Para√≠so by Iberostar", category: "concierge", lat: 20.7563073, lng: -86.9629786 }
   ];
 
   var DESTINATION_CATEGORIES = [
@@ -70,6 +49,7 @@
     { key: "golf", label: "Golf" },
     { key: "concierge", label: "Lobbies y concierge" },
     { key: "comer", label: "Tiendas y servicios" },
+    { key: "servicio", label: "Servicios" },
     { key: "piscina", label: "Piscinas" },
     { key: "hotel", label: "Hoteles" }
   ];
@@ -81,8 +61,8 @@
     return DESTINATION_CATEGORIES.length;
   }
 
-// Õcono de carrito de golf: body, ruedas, palos cruzados y pelota.
-  // DiseÒo propio que representa claramente un carrito de golf (no un carrito de compras).
+// √çcono de carrito de golf: body, ruedas, palos cruzados y pelota.
+  // Dise√±o propio que representa claramente un carrito de golf (no un carrito de compras).
   var CART_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" width="22" height="22" fill="none" xmlns="http://www.w3.org/2000/svg">' +
     // Chasis del carrito (body)
     '<rect x="3" y="9" width="13" height="6" rx="2" fill="#B9A385" stroke="#8A7758" stroke-width="0.8"/>' +
@@ -190,7 +170,7 @@
     var pois = (window.RevistaDigital.guiapa && window.RevistaDigital.guiapa.POIS) || [];
     var list = [];
     var seen = {};
-    // Primero agregar los POIs de la guÌa
+    // Primero agregar los POIs de la gu√≠a
     pois.forEach(function (poi) {
       if (!poi) return;
       if (destinationCategoryOrder(poi.category) >= DESTINATION_CATEGORIES.length) return;
@@ -266,7 +246,7 @@
   }
 
   function distanceLabel(meters) {
-    if (!Number.isFinite(meters)) return "ó";
+    if (!Number.isFinite(meters)) return "‚Äî";
     if (meters < 1000) return Math.max(10, Math.round(meters / 10) * 10) + " m";
     return (meters / 1000).toFixed(1) + " km";
   }
@@ -323,7 +303,7 @@
     if (current) {
       return {
         key: "gps",
-        label: "Su ubicaciÛn actual",
+        label: "Su ubicaci√≥n actual",
         lat: current[0],
         lng: current[1],
         accuracy: currentAccuracy()
@@ -331,7 +311,7 @@
     }
     return {
       key: "hotel",
-      label: context.name ? "UbicaciÛn de " + context.name : "Su hotel",
+      label: context.name ? "Ubicaci√≥n de " + context.name : "Su hotel",
       lat: coordinates[0],
       lng: coordinates[1],
       accuracy: null
@@ -345,16 +325,16 @@
     if (!nodes.length && !buttons.length) return;
     var text;
     if (position) {
-      text = "UbicaciÛn GPS activa";
-      if (Number.isFinite(position.accuracy)) text += " ∑ precisiÛn ±" + Math.round(position.accuracy) + " m";
+      text = "Ubicaci√≥n GPS activa";
+      if (Number.isFinite(position.accuracy)) text += " ¬∑ precisi√≥n ¬∑" + Math.round(position.accuracy) + " m";
     } else if (cg._locationState === "requesting") {
-      text = "Obteniendo su ubicaciÛn exactaÖ";
+      text = "Obteniendo su ubicaci√≥n exacta‚Ä¶";
     } else if (cg._locationState === "denied") {
-      text = "Active la ubicaciÛn para que el carrito llegue a su posiciÛn exacta.";
+      text = "Active la ubicaci√≥n para que el carrito llegue a su posici√≥n exacta.";
     } else if (cg._locationState === "unavailable") {
-      text = "La ubicaciÛn exacta se comparte desde un navegador con geolocalizaciÛn.";
+      text = "La ubicaci√≥n exacta se comparte desde un navegador con geolocalizaci√≥n.";
     } else {
-      text = "Active su ubicaciÛn para mostrar exactamente dÛnde est·.";
+      text = "Active su ubicaci√≥n para mostrar exactamente d√≥nde est√°.";
     }
     nodes.forEach(function (node) {
       node.textContent = text;
@@ -379,7 +359,7 @@
     if (request) {
       request.pickup = {
         key: "gps",
-        label: "Su ubicaciÛn actual",
+        label: "Su ubicaci√≥n actual",
         lat: position.latitude,
         lng: position.longitude,
         accuracy: cg._position.accuracy
@@ -420,7 +400,7 @@
   }
 
   function startLocationTracking() {
-    // Las vistas previas de la guÌa usan el carrito como demostraciÛn dentro
+    // Las vistas previas de la gu√≠a usan el carrito como demostraci√≥n dentro
     // de un iframe. No deben iniciar rastreo GPS ni mostrar un permiso.
     if (document.documentElement.dataset.tourPreview === "true") return;
     if (cg._watchId != null) return;
@@ -720,7 +700,7 @@
           scheduleRide(slug, request.id);
         } else {
           request.status = "arrived";
-          if (cart) cart.status = "llegÛ";
+          if (cart) cart.status = "lleg√≥";
           if (contextSlug() === slug) {
             render();
             syncMap();
@@ -772,7 +752,7 @@
     promise.then(function (result) {
       if (!isCurrentRoute(slug, requestId, token)) return;
       var coordinates = normalizeRouteCoordinates(origin, destination, result && result.coordinates);
-      if (coordinates.length < 3) throw new Error("La ruta no tiene geometrÌa suficiente.");
+      if (coordinates.length < 3) throw new Error("La ruta no tiene geometr√≠a suficiente.");
       applyRoute(slug, requestId, leg, coordinates, result);
     }).catch(function (error) {
       if (isAbortError(error)) return;
@@ -982,7 +962,7 @@
       }).setView(center, 16);
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 19,
-        attribution: "© OpenStreetMap contributors"
+        attribution: "¬© OpenStreetMap contributors"
       }).addTo(map);
       cg._map = map;
       cg._L = L;
@@ -999,7 +979,7 @@
       cg._pickupMarker = L.marker([pickup.lat, pickup.lng], {
         icon: pickupIcon(),
         zIndexOffset: 500
-      }).addTo(map).bindTooltip("Su ubicaciÛn exacta");
+      }).addTo(map).bindTooltip("Su ubicaci√≥n exacta");
       syncAccuracyCircle(pickup);
       cg._fitKey = null;
       syncMap();
@@ -1121,10 +1101,10 @@
   }
 
   function routeMeta(request) {
-    if (request.routeStatus === "fallback") return " ∑ ruta aproximada";
-    if (request.routeDirect) return " ∑ ruta interna directa";
-    if (request.routeAccess) return " ∑ acceso directo";
-    return " ∑ ruta por calles";
+    if (request.routeStatus === "fallback") return " ¬∑ ruta aproximada";
+    if (request.routeDirect) return " ¬∑ ruta interna directa";
+    if (request.routeAccess) return " ¬∑ acceso directo";
+    return " ¬∑ ruta por calles";
   }
 
   function updateMapEta(request) {
@@ -1138,23 +1118,23 @@
     }
     el.hidden = false;
     if (request.status === "searching") {
-      el.innerHTML = "<strong>Buscando carritoÖ</strong><span>Calculando el m·s cercano</span>";
+      el.innerHTML = "<strong>Buscando carrito‚Ä¶</strong><span>Calculando el m√°s cercano</span>";
     } else if (request.status === "assigned") {
       if (request.routeStatus === "loading") {
-        el.innerHTML = "<strong>" + escapeHtml(request.cartName) + "</strong><span>Trazando la ruta por las callesÖ</span>";
+        el.innerHTML = "<strong>" + escapeHtml(request.cartName) + "</strong><span>Trazando la ruta por las calles‚Ä¶</span>";
       } else {
         el.innerHTML = "<strong>" + escapeHtml(request.cartName) + "</strong><span>" +
           escapeHtml(etaPhrase(request.remainingSeconds)) +
           routeMeta(request) + "</span>";
       }
     } else if (request.status === "pickup") {
-    el.innerHTML = "<strong>Carrito en su ubicaciÛn</strong><span>Le lleva a " +
+    el.innerHTML = "<strong>Carrito en su ubicaci√≥n</strong><span>Le lleva a " +
       escapeHtml(request.destination ? request.destination.name : "su destino") + "</span>";
     } else if (request.status === "riding") {
       if (request.routeStatus === "loading") {
         el.innerHTML = "<strong>En camino a " +
           escapeHtml(request.destination ? request.destination.name : "su destino") +
-          "</strong><span>Trazando la ruta por las callesÖ</span>";
+          "</strong><span>Trazando la ruta por las calles‚Ä¶</span>";
       } else {
         el.innerHTML = "<strong>En camino a " +
           escapeHtml(request.destination ? request.destination.name : "su destino") + "</strong><span>" +
@@ -1162,10 +1142,10 @@
           routeMeta(request) + "</span>";
       }
     } else if (request.status === "completed") {
-      el.innerHTML = "<strong>LlegÛ a " +
+      el.innerHTML = "<strong>Lleg√≥ a " +
         escapeHtml(request.destination ? request.destination.name : "su destino") + "</strong><span>Disfrute su visita</span>";
     } else if (request.status === "arrived") {
-      el.innerHTML = "<strong>Carrito en su ubicaciÛn</strong><span>" + escapeHtml(request.pickup.label) + "</span>";
+      el.innerHTML = "<strong>Carrito en su ubicaci√≥n</strong><span>" + escapeHtml(request.pickup.label) + "</span>";
     }
   }
 
@@ -1176,16 +1156,16 @@
       return '<div class="cart-status-card is-idle">' +
         '<span class="cart-status-glyph">' + CART_SVG + "</span>" +
         '<div><p class="cart-status-kicker">TRANSPORTE DISPONIBLE</p>' +
-        "<h3>øDesea moverse por el complejo?</h3>" +
-        "<p>Solicite un carrito y vea en el mapa el m·s cercano viniendo hacia su ubicaciÛn, con el tiempo estimado de llegada.</p>" +
+        "<h3>¬øDesea moverse por el complejo?</h3>" +
+        "<p>Solicite un carrito y vea en el mapa el m√°s cercano viniendo hacia su ubicaci√≥n, con el tiempo estimado de llegada.</p>" +
         "</div></div>";
     }
     var destinationName = request.destination ? request.destination.name : "su destino";
 if (request.status === "searching") {
       return '<div class="cart-status-card is-searching">' +
         '<p class="cart-status-kicker">SU TRANSPORTE HA SIDO SOLICITADO</p>' +
-        "<h3>Buscando el carrito m·s cercano para ustedÖ</h3>" +
-        "<p>El carrito va hacia <strong>" + escapeHtml(request.pickup.label) + "</strong> y despuÈs le lleva a <strong>" +
+        "<h3>Buscando el carrito m√°s cercano para usted‚Ä¶</h3>" +
+        "<p>El carrito va hacia <strong>" + escapeHtml(request.pickup.label) + "</strong> y despu√©s le lleva a <strong>" +
         escapeHtml(destinationName) + "</strong>. Le notificaremos en cuanto un carrito acepte su solicitud.</p>" +
         '<span class="cart-searching-dots" aria-hidden="true"><i></i><i></i><i></i></span>' +
         '<button type="button" class="cart-cancel" data-cart-cancel>Eliminar solicitud</button>' +
@@ -1200,30 +1180,30 @@ if (request.routeStatus === "loading") {
           escapeHtml(request.pickup.label) + "</strong>.</p>" +
           '<span class="cart-searching-dots" aria-hidden="true"><i></i><i></i><i></i></span>' +
           '<p class="cart-status-meta">Solicitud ' + escapeHtml(request.id) +
-          (request.guest ? " ∑ " + escapeHtml(request.guest) : "") + "</p>" +
+          (request.guest ? " ¬∑ " + escapeHtml(request.guest) : "") + "</p>" +
           '<button type="button" class="cart-cancel" data-cart-cancel>Eliminar solicitud</button>' +
           "</div>";
       }
       return '<div class="cart-status-card is-assigned">' +
         '<p class="cart-status-kicker">SOLICITUD ACEPTADA</p>' +
         "<h3>" + escapeHtml(request.cartName) + " va a su encuentro</h3>" +
-        "<p>El carrito va hacia <strong>" + escapeHtml(request.pickup.label) + "</strong>. Le llevar· a <strong>" +
+        "<p>El carrito va hacia <strong>" + escapeHtml(request.pickup.label) + "</strong>. Le llevar√° a <strong>" +
         escapeHtml(destinationName) + "</strong>.</p>" +
         '<div class="cart-eta-big"><span data-cart-live-eta>' + escapeHtml(etaLabel(request.remainingSeconds)) +
         "</span><small>tiempo estimado</small></div>" +
         '<div class="cart-progress" role="progressbar" aria-label="Progreso del carrito"><span data-cart-progress style="width:' +
         Math.round((request.progress || 0) * 100) + '%"></span></div>' +
         '<p class="cart-status-meta">Solicitud ' + escapeHtml(request.id) +
-        (request.guest ? " ∑ " + escapeHtml(request.guest) : "") +
+        (request.guest ? " ¬∑ " + escapeHtml(request.guest) : "") +
         routeMeta(request) + "</p>" +
         '<button type="button" class="cart-cancel" data-cart-cancel>Cancelar solicitud</button>' +
         "</div>";
     }
     if (request.status === "pickup") {
       return '<div class="cart-status-card is-arrived">' +
-        '<p class="cart-status-kicker">CARRITO EN SU UBICACI”N</p>' +
-        "<h3>" + escapeHtml(request.cartName) + " ya llegÛ</h3>" +
-        "<p>Ya est· con usted en <strong>" + escapeHtml(request.pickup.label) + "</strong>. En un momento arranca hacia <strong>" +
+        '<p class="cart-status-kicker">CARRITO EN SU UBICACI√ìN</p>' +
+        "<h3>" + escapeHtml(request.cartName) + " ya lleg√≥</h3>" +
+        "<p>Ya est√° con usted en <strong>" + escapeHtml(request.pickup.label) + "</strong>. En un momento arranca hacia <strong>" +
         escapeHtml(destinationName) + "</strong>.</p>" +
         '<p class="cart-status-meta">Solicitud ' + escapeHtml(request.id) + "</p>" +
         '<button type="button" class="cart-cancel" data-cart-cancel>Cancelar viaje</button>' +
@@ -1250,25 +1230,25 @@ if (request.routeStatus === "loading") {
         '<div class="cart-progress" role="progressbar" aria-label="Progreso del viaje"><span data-cart-progress style="width:' +
         Math.round((request.progress || 0) * 100) + '%"></span></div>' +
         '<p class="cart-status-meta">Solicitud ' + escapeHtml(request.id) +
-        (request.distance ? " ∑ " + escapeHtml(String(request.distance)) + " m" : "") +
+        (request.distance ? " ¬∑ " + escapeHtml(String(request.distance)) + " m" : "") +
         routeMeta(request) + "</p>" +
         '<button type="button" class="cart-cancel" data-cart-cancel>Cancelar viaje</button>' +
         "</div>";
     }
     if (request.status === "completed") {
       return '<div class="cart-status-card is-arrived">' +
-        '<p class="cart-status-kicker">LLEG” A SU DESTINO</p>' +
+        '<p class="cart-status-kicker">LLEG√ì A SU DESTINO</p>' +
         "<h3>" + escapeHtml(destinationName) + "</h3>" +
-        "<p>El carrito le dejÛ en su destino. Que disfrute su visita.</p>" +
+        "<p>El carrito le dej√≥ en su destino. Que disfrute su visita.</p>" +
         '<p class="cart-status-meta">Solicitud ' + escapeHtml(request.id) +
-        (request.guest ? " ∑ " + escapeHtml(request.guest) : "") + "</p>" +
+        (request.guest ? " ¬∑ " + escapeHtml(request.guest) : "") + "</p>" +
         '<button type="button" class="cart-cancel" data-cart-cancel>Solicitar otro carrito</button>' +
         "</div>";
     }
     return '<div class="cart-status-card is-arrived">' +
-      '<p class="cart-status-kicker">CARRITO EN SU UBICACI”N</p>' +
-      "<h3>" + escapeHtml(request.cartName) + " ya llegÛ</h3>" +
-      "<p>Ya est· con usted en <strong>" + escapeHtml(request.pickup.label) + "</strong>.</p>" +
+      '<p class="cart-status-kicker">CARRITO EN SU UBICACI√ìN</p>' +
+      "<h3>" + escapeHtml(request.cartName) + " ya lleg√≥</h3>" +
+      "<p>Ya est√° con usted en <strong>" + escapeHtml(request.pickup.label) + "</strong>.</p>" +
       '<p class="cart-status-meta">Solicitud ' + escapeHtml(request.id) + "</p>" +
       '<button type="button" class="cart-cancel" data-cart-cancel>Solicitar otro carrito</button>' +
       "</div>";
@@ -1294,10 +1274,10 @@ if (request.routeStatus === "loading") {
         : "Disponible";
       return '<li class="cart-nearby-item' + (assigned ? " is-assigned" : "") + '">' +
         '<span class="cart-nearby-name">' + escapeHtml(cart.name) + "</span>" +
-        '<span class="cart-nearby-meta">' + escapeHtml(distanceLabel(distance)) + " ∑ " + escapeHtml(label) + "</span>" +
+        '<span class="cart-nearby-meta">' + escapeHtml(distanceLabel(distance)) + " ¬∑ " + escapeHtml(label) + "</span>" +
         "</li>";
     }).join("");
-    return '<div class="cart-nearby-head"><h3>Carritos cerca de ti</h3><span>' +
+    return '<div class="cart-nearby-head"><h3>Carritos cerca de usted</h3><span>' +
       escapeHtml(free) + (free === 1 ? " disponible" : " disponibles") + "</span></div>" +
       '<ul class="cart-nearby-list">' + items + "</ul>" +
       '<p class="cart-nearby-note">Posiciones y tiempos simulados para mostrar el servicio.</p>';

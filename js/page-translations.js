@@ -139,14 +139,14 @@
     "Notas": "Notes",
     "Cancelar solicitud": "Cancel request",
     "Cancelar viaje": "Cancel ride",
-    "Carritos cerca de ti": "Carts near you",
+    "Carritos cerca de usted": "Carts near you",
     "Disponible": "Available",
     "En camino": "On the way",
     "En ruta": "On route",
     "Llegando": "Arriving",
     "Llegó a su destino": "You’ve arrived at your destination",
     "Llegó a": "You’ve arrived at",
-    "va a por ti": "is on the way to pick you up",
+    "va a por usted": "is on the way to pick you up",
     "Buscando carrito…": "Finding a cart…",
     "Calculando el más cercano": "Finding the nearest cart",
     "Trazando la ruta por las calles…": "Mapping a route through the resort…",
@@ -501,8 +501,8 @@
     "Solicite un carrito, siga cómo llega hasta su ubicación exacta y le lleva al destino que elija.": "Request a golf cart, watch it come to your exact location, and ride to the destination of your choice.",
     "Active su ubicación para mostrar exactamente dónde está.": "Turn on location to show exactly where you are.",
     "Hotel del complejo": "Resort hotel",
-    "El carrito sale desde su posición actual, le recoge donde estés y le lleva a su destino.": "The cart starts from its current position, picks you up wherever you are, and takes you to your destination.",
-    "El carrito le recoge en su ubicación y le lleva al destino que elijas.": "The cart picks you up at your location and takes you to your chosen destination.",
+    "El carrito sale desde su posición actual, le recoge donde esté y le lleva a su destino.": "The cart starts from its current position, picks you up wherever you are, and takes you to your destination.",
+    "El carrito le recoge en su ubicación y le lleva al destino que elija.": "The cart picks you up at your location and takes you to your chosen destination.",
     "Servicio simulado: verá cómo el carrito le recoge y le lleva a su destino.": "Simulated service: watch the cart pick you up and take you to your destination.",
     "Ubicarme": "Locate me",
     "trazar la ruta.": "plot a route.",
@@ -608,18 +608,18 @@
     "a pie": "on foot",
     "en coche": "by car",
     "marcada dentro del mapa": "shown on the map",
-    "El carrito le dejó en su destino. Que disfrutes su visita.": "The cart has dropped you off. Enjoy your visit.",
+    "El carrito le dejó en su destino. Que disfrute su visita.": "The cart has dropped you off. Enjoy your visit.",
     "ya llegó": "has arrived",
     "Búsqueda": "Search",
     "Buscar restaurantes, bares y más…": "Search restaurants, bars, and more…",
     "Todos los lugares": "All places",
     "Puntos de interés": "Points of interest",
     "Ver disponibilidad": "Check availability",
-    "No se pudo cargar el menú. Inténtalo de nuevo.": "Could not load the menu. Please try again.",
+    "No se pudo cargar el menú. Inténtelo de nuevo.": "Could not load the menu. Please try again.",
     "Ver menú": "View menu",
     "Consulte la carta digital en el hotel.": "This restaurant’s digital menu isn’t available yet. Please ask at the hotel.",
     "La confirmación se realiza en recepción del hotel.": "Confirmation is handled at the hotel reception.",
-    "Asómate a": "Take a look at",
+    "Asómese a": "Take a look at",
     "restaurantes, exteriores, playa y piscinas en panorámica 360°.": "restaurants, outdoor spaces, the beach, and pools in a 360° panorama.",
     "Exploración 360°": "360° Exploration",
     "Complejo Playa Paraíso · Riviera Maya": "Playa Paraíso Resort · Riviera Maya",
@@ -912,7 +912,7 @@
     if (match) return "1 hotel found";
     match = value.match(/^(\d+) opciones$/i);
     if (match) return match[1] + " options";
-    match = value.match(/^Carrito (\d+) va a por ti$/i);
+    match = value.match(/^Carrito (\d+) va a por usted$/i);
     if (match) return "Cart " + match[1] + " is on the way to pick you up";
     match = value.match(/^Carrito (\d+) ya llegó$/i);
     if (match) return "Cart " + match[1] + " has arrived";
@@ -939,9 +939,9 @@
     if (match) return "Welcome! We’re glad to have you near " + match[1] + ". We’ve prepared everything to make your visit special.";
     match = value.match(/^Solicitud ([\w-]+)(?: · (.+?))?(?: · ruta por calles)?$/i);
     if (match) return "Request " + match[1] + (match[2] ? " · " + match[2] : "") + (value.endsWith("ruta por calles") ? " · route through resort roads" : "");
-    match = value.match(/^a unos (\d+) m de ti · (.+)$/i);
+    match = value.match(/^a unos (\d+) m de usted · (.+)$/i);
     if (match) return "about " + match[1] + " m from you · " + match[2];
-    match = value.match(/^([\wÀ-ÿ .'-]+) · a unos (\d+) m de ti · (.+)$/i);
+    match = value.match(/^([\wÀ-ÿ .'-]+) · a unos (\d+) m de usted · (.+)$/i);
     if (match) return match[1] + " · about " + match[2] + " m from you · " + match[3];
     match = value.match(/^Ubicación detectada · (.+)$/i);
     if (match) return "Location detected · " + match[1];

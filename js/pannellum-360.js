@@ -796,7 +796,7 @@ const RESTAURANTES_PARAISO = {
         <div class="hotel-360-heading">
           <small>RECORRIDO VIRTUAL</small>
           <h2>Exploración 360°</h2>
-          <p>Asómate a ${escapeHtml(hotelName)}: restaurantes, exteriores, playa y piscinas en panorámica 360°.</p>
+          <p>Asómese a ${escapeHtml(hotelName)}: restaurantes, exteriores, playa y piscinas en panorámica 360°.</p>
         </div>
         <div class="pano-360-list">
           ${cards}

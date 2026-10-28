@@ -1017,6 +1017,9 @@
   };
 
   // Proveedor peatonal: Valhalla (costing pedestrian), geometría polyline6.
+  // costing_options evita que el peatón salga a calzadas vehiculares y prioriza
+  // andadores, senderos y caminos iluminados. search_radius acota el snapping
+  // para que los puntos no se anclen a la vía exterior más cercana.
   mapas.requestPedestrianRoute = function (origin, destination, signal) {
     if (signal && signal.aborted) return Promise.reject(makeAbortError());
     const payload = {
@@ -1025,6 +1028,15 @@
         { lat: destination[0], lon: destination[1] }
       ],
       costing: "pedestrian",
+      costing_options: {
+        pedestrian: {
+          use_roads: 0,
+          use_trails: 1.0,
+          use_lit: 1.0,
+          walking_speed: 4.5
+        }
+      },
+      search_radius: 40,
       units: "kilometers"
     };
 
