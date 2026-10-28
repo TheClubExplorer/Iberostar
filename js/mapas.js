@@ -749,6 +749,65 @@
         console.warn("No se pudo parchar la reposición de popups rotados.", error);
       }
 
+      // Pivot estricto al centro del mapa + ciclo rotatestart/rotateend.
+      // leaflet-rotate 0.2.8 no dispara rotatestart/rotateend ni acepta pivot,
+      // por lo que se sobrescribe setBearing para:
+      //   - girar siempre sobre el centro (o el usuario en modo navegacion),
+      //   - exponer map.setBearing(angle, { pivot: map.getCenter() }),
+      //   - emitir rotatestart al iniciar y rotateend al terminar (debounce).
+      try {
+        const originalSetBearing = L.Map.prototype.setBearing;
+        L.Map.prototype.setBearing = function (theta, options) {
+          if (!L.Browser.any3d || !this._rotate) {
+            try { return originalSetBearing.call(this, theta, options); } catch (e) { return this; }
+          }
+          options = options || {};
+          const bearing = L.Util.wrapNum(theta, [0, 360]) * L.DomUtil.DEG_TO_RAD;
+          let center = this.getSize().divideBy(2);
+          const pivotOption = options.pivot;
+          if (pivotOption) {
+            if (pivotOption instanceof L.LatLng) center = this.latLngToContainerPoint(pivotOption);
+            else if (pivotOption && pivotOption.lat !== undefined && pivotOption.lng !== undefined) center = this.latLngToContainerPoint(pivotOption);
+            else if (pivotOption instanceof L.Point) center = pivotOption;
+            else if (typeof pivotOption === "object" && "x" in pivotOption && "y" in pivotOption) center = L.point(pivotOption.x, pivotOption.y);
+            else center = this.getSize().divideBy(2);
+          } else if (this._navigationMode && this._userLatLng) {
+            try { center = this.latLngToContainerPoint(this._userLatLng); } catch (e) { center = this.getSize().divideBy(2); }
+          }
+          // equivalente solicitado: map.setBearing(angle, { pivot: map.getCenter() })
+          if (options.pivot === undefined && this._forceCenterPivot) {
+            center = this.latLngToContainerPoint(this.getCenter());
+          }
+          const oldPos = this._getRotatePanePos().rotateFrom(-this._bearing, center);
+          const newPos = oldPos.rotateFrom(bearing, center);
+          L.DomUtil.setPosition(this._rotatePane, oldPos, bearing, center);
+          this._pivot = center;
+          this._bearing = bearing;
+          this._rotatePanePos = newPos;
+          if (!this._mapRotationActive) {
+            this._mapRotationActive = true;
+            this.fire("rotatestart");
+          }
+          if (this._mapRotationEndTimer) clearTimeout(this._mapRotationEndTimer);
+          this._mapRotationEndTimer = setTimeout(() => {
+            this._mapRotationActive = false;
+            this.fire("rotateend");
+          }, 150);
+          this.fire("rotate");
+          return this;
+        };
+      } catch (error) {
+        console.warn("No se pudo sobrescribir setBearing para pivot/ciclo de rotacion.", error);
+      }
+
+      // Asegura transform-origin: center center en panes/renderers para evitar
+      // desaparicion de marcadores al rotar.
+      try {
+        const rotationStyle = document.createElement("style");
+        rotationStyle.textContent = ".leaflet-marker-pane,.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-popup-pane,.leaflet-tooltip-pane,.leaflet-rotate-pane,.leaflet-overlay-pane svg,.leaflet-overlay-pane canvas{transform-origin:center center !important;} .leaflet-popup-pane{z-index:1300 !important;} .leaflet-tooltip-pane{z-index:1290 !important;}";
+        document.head.appendChild(rotationStyle);
+      } catch (error) { /* ignore */ }
+
       // Re-anclado de lo que vive en panes sin rotar. Nota: leaflet-rotate 0.2.8
       // no dispara 'rotateend', solo 'rotate' en cada setBearing (incluye cada
       // fotograma del gesto táctil). 
@@ -786,6 +845,34 @@
             const popup = map._popup;
             if (isOpenOverlay(popup) && typeof popup.update === "function") popup.update();
           };
+          // Gestion de popups durante la rotacion: se cierran al iniciar
+          // rotatestart y se reabren suavemente en rotateend.
+          let savedRotationPopup = null;
+          map.on("rotatestart", function () {
+            try {
+              const popup = map._popup;
+              if (popup && popup._map && popup._container && popup._container.parentNode) {
+                savedRotationPopup = {
+                  latlng: popup.getLatLng(),
+                  content: popup.getContent(),
+                  options: popup.options
+                };
+                map.closePopup(popup);
+              }
+            } catch (error) { /* ignore */ }
+          });
+          map.on("rotateend", function () {
+            try {
+              if (savedRotationPopup) {
+                L.popup(savedRotationPopup.options)
+                  .setLatLng(savedRotationPopup.latlng)
+                  .setContent(savedRotationPopup.content)
+                  .openOn(map);
+                savedRotationPopup = null;
+              }
+            } catch (error) { /* ignore */ }
+            try { map.invalidateSize({ pan: false }); } catch (error) { /* ignore */ }
+          });
           map.on("rotate", reflowOverlaysOnly);
           map.on("zoomend", reflowOverlaysAndMarkers);
         });
@@ -1663,6 +1750,14 @@
       map.setMinZoom(countryOverride ? Math.max(1, boundsZoom - 1) : boundsZoom);
       setTimeout(() => { try { map.invalidateSize(); } catch (e) { /* ignore */ } }, 0);
     }).catch((error) => console.warn("No se pudo cargar el mapa general de hoteles.", error));
+  };
+
+  mapas.rotateMapTo = function (map, angle, options) {
+    if (!map) return;
+    options = options || {};
+    try { map.setBearing(angle, { pivot: map.getCenter(), ...options }); } catch (error) {
+      try { map.setBearing(angle); } catch (e) { /* ignore */ }
+    }
   };
 
   if (typeof window.loadLeaflet !== "function") {
