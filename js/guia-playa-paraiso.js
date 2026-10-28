@@ -995,9 +995,6 @@
   // Si el mapa queda fuera de la pantalla (móvil), se trae a la vista.
   function revealMap(map) {
     if (!map || typeof map.getContainer !== "function") return;
-    // En móvil no desplazamos la página: el mapa ya está a la vista y moverla
-    // hace que el panel de la guía "salte".
-    if (isMobileGuide()) return;
     var rect = map.getContainer().getBoundingClientRect();
     var visible = rect.bottom > 90 && rect.top < window.innerHeight - 20;
     if (visible) return;
@@ -1303,15 +1300,20 @@
         html += '<button type="button" class="guide-route-cancel">Cancelar ruta</button>';
         box.innerHTML = notice + html;
         if (!skipReveal) revealFeedback(box);
+        // El estado de ruta cambia la altura del menú flotante: lo recolocamos.
+        if (isMobileGuide() && state.mobilePoi) positionMobileActions(state.mobilePoi);
       }
     }
     renderMobileRouteStatus();
   }
 
   // Lleva el bloque de ruta/reserva a la vista (queda sticky arriba del panel).
-  // En móvil el estado de ruta vive en el menú flotante, así que no desplazamos.
+  // En móvil el estado de ruta vive en el menú flotante: desplazamos su caja
+  // de ruta para que sea visible y recolocamos el menú al cambiar su altura.
   function revealFeedback(node) {
-    if (!node || isMobileGuide()) return;
+    if (!node) return;
+    // Se desplaza el panel de la guía (también en móvil) para que la caja de
+    // ruta/reserva quede visible. El menú flotante móvil se recoloca aparte.
     var target = node.closest ? node.closest(".guide-detail-feedback") : null;
     target = target || node;
     try {
@@ -1330,6 +1332,17 @@
   function routeToPoi(id) {
     var poi = findPoi(id);
     if (!poi) return;
+    // En móvil, al trazar una ruta salimos de la vista ampliada de la guía
+    // para que el mapa y la ruta trazada queden visibles.
+    if (isMobileGuide()) {
+      try {
+        var r = window.RevistaDigital && window.RevistaDigital.routes;
+        if (r && typeof r.setGuidePanelExpanded === "function") r.setGuidePanelExpanded(false);
+      } catch (e) { /* ignore */ }
+      if (state.mobilePoi && typeof positionMobileActions === "function") {
+        try { positionMobileActions(state.mobilePoi); } catch (e) { /* ignore */ }
+      }
+    }
     if (poi.kind === "area") {
       setRouteStatus("error", id, poi.name, "Seleccione un punto de acceso del complejo para calcular la ruta.");
       return;
@@ -1476,7 +1489,10 @@
       : "";
     if (!route || route.status === "idle") {
       box.innerHTML = notice;
-      if (isMobileGuide()) positionMobileActions(state.mobilePoi);
+      if (isMobileGuide()) {
+        try { box.scrollIntoView({ block: "nearest", behavior: "smooth" }); } catch (e) { /* ignore */ }
+        positionMobileActions(state.mobilePoi);
+      }
       return;
     }
     var name = escapeHtml(route.targetName || "el destino");
@@ -1493,7 +1509,10 @@
     html += '<button type="button" class="guide-route-cancel">Cancelar ruta</button>';
     box.innerHTML = notice + html;
     // El estado de ruta cambia la altura del menú: lo recolocamos sobre el panel.
-    if (isMobileGuide()) positionMobileActions(state.mobilePoi);
+    if (isMobileGuide()) {
+      try { box.scrollIntoView({ block: "nearest", behavior: "smooth" }); } catch (e) { /* ignore */ }
+      positionMobileActions(state.mobilePoi);
+    }
   }
 
   function renderDetail(poi) {
@@ -1702,6 +1721,10 @@
               tracker.openPage(document.body.dataset.hotelSlug || "");
             });
             revealFeedback(box);
+            if (isMobileGuide()) {
+              try { box.scrollIntoView({ block: "nearest", behavior: "smooth" }); } catch (e) { /* ignore */ }
+              if (state.mobilePoi) positionMobileActions(state.mobilePoi);
+            }
             return;
           }
         }
@@ -1717,6 +1740,10 @@
       cancel.addEventListener("click", function () { box.innerHTML = ""; });
     }
     revealFeedback(box);
+    // En móvil, llevamos también a la vista la caja de reserva del menú flotante.
+    if (isMobileGuide()) {
+      try { box.scrollIntoView({ block: "nearest", behavior: "smooth" }); } catch (e) { /* ignore */ }
+    }
     // El formulario cambia la altura del menú: lo recolocamos sobre el panel.
     if (isMobileGuide()) positionMobileActions(state.mobilePoi);
   }
