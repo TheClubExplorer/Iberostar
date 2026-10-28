@@ -577,6 +577,9 @@
     cg._requests[slug] = request;
     render();
     syncMap();
+    var focusSection = document.getElementById("hotel-carrito");
+    if (focusSection && isMobileCartViewport()) setCartMapFocus(focusSection, true);
+
     cg._timers[slug] = cg._timers[slug] || {};
     cg._timers[slug].accept = window.setTimeout(function () {
       acceptRequest(slug, request.id);
@@ -830,6 +833,9 @@
     delete cg._requests[slug];
     render();
     syncMap();
+    var cancelSection = document.getElementById("hotel-carrito");
+    if (cancelSection) setCartMapFocus(cancelSection, false);
+
   };
 
   cg.getRequest = function () {
@@ -958,12 +964,29 @@
       var map = L.map(current, {
         scrollWheelZoom: true,
         zoomControl: true,
-        attributionControl: true
+        attributionControl: true,
+        rotate: true,
+        bearing: 0,
+        touchRotate: true,
+        rotateControl: { closeOnZeroBearing: false, position: "bottomright" }
       }).setView(center, 16);
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 19,
         attribution: "© OpenStreetMap contributors"
       }).addTo(map);
+      // Límites de zoom y desplazamiento + máscara del complejo (igual que
+      // en los 5 mapas de Playa Paraíso): solo se visualiza el complejo.
+      try {
+        var complexBounds = [[20.7525065, -86.9710573], [20.7654525, -86.9560717]];
+        map.setMaxBounds(complexBounds);
+        map.setMaxBoundsViscosity(1.0);
+        map.setMaxZoom(19);
+        map.setMinZoom(map.getBoundsZoom(L.latLngBounds(complexBounds)));
+      } catch (e) { /* ignore */ }
+      try {
+        var guide = window.RevistaDigital && window.RevistaDigital.guiapa;
+        if (guide && typeof guide.addComplexMask === "function") guide.addComplexMask(map);
+      } catch (e) { /* ignore */ }
       cg._map = map;
       cg._L = L;
       cg._markers = {};
@@ -1359,6 +1382,10 @@ if (request.routeStatus === "loading") {
       return;
     }
     if (event.target.closest("[data-cart-cancel]")) cg.cancel();
+    if (event.target.closest("[data-cart-map-exit]")) {
+      setCartMapFocus(document.getElementById("hotel-carrito"), false);
+      return;
+    }
   }
 
   document.addEventListener("click", function (event) {
@@ -1371,6 +1398,29 @@ if (request.routeStatus === "loading") {
     event.preventDefault();
     cg.requestLocation();
   });
+
+  function isMobileCartViewport() {
+    return !!(window.matchMedia && window.matchMedia("(max-width: 850px)").matches);
+  }
+
+  function setCartMapFocus(section, active) {
+    section = section || document.getElementById("hotel-carrito");
+    if (!section) return false;
+    if (active && !isMobileCartViewport()) return false;
+    section.classList.toggle("is-map-focus", !!active);
+    if (document.body) document.body.classList.toggle("cart-map-focus-open", !!active);
+    var exit = section.querySelector("[data-cart-map-exit]");
+    if (exit) exit.hidden = !active;
+    cg._mapFocus = !!active;
+    var refresh = function () {
+      if (typeof cg.refreshMapLayout === "function") cg.refreshMapLayout();
+    };
+    window.setTimeout(refresh, 80);
+    window.setTimeout(refresh, 280);
+    return true;
+  }
+
+  cg.setMapFocus = setCartMapFocus;
 
   cg.init = function (root, context) {
     var section = root && typeof root.querySelector === "function"
@@ -1390,7 +1440,10 @@ if (request.routeStatus === "loading") {
       section.addEventListener("submit", onFormSubmit);
       section.addEventListener("click", onSectionClick);
       section.addEventListener("change", function (event) {
-        if (event.target.closest("[data-cart-destination]")) syncMap();
+        if (event.target.closest("[data-cart-destination]")) {
+          syncMap();
+          if (isMobileCartViewport()) setCartMapFocus(section, true);
+        }
       });
     }
     startLocationTracking();
@@ -1404,5 +1457,11 @@ if (request.routeStatus === "loading") {
     destroyMap();
     cg._context = null;
   };
+  window.addEventListener("resize", function () {
+    if (cg._mapFocus && !isMobileCartViewport()) {
+      setCartMapFocus(document.getElementById("hotel-carrito"), false);
+    }
+  });
+
 })();
 

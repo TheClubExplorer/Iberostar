@@ -330,7 +330,7 @@
       var tipo = entry.tipo;
       var horario = entry.horario || (tipo ? horarios[tipo] : null);
       if (horario) {
-        poi.hours = formato(horario);
+        poi.hours = (typeof horario === "string") ? horario : formato(horario);
         if (horario.breakfast) poi.breakfast = horario.breakfast;
         if (horario.lunch) poi.lunch = horario.lunch;
         if (horario.dinner) poi.dinner = horario.dinner;
@@ -349,6 +349,29 @@
        if (entry.amenities || entry.amenidades) poi.amenities = entry.amenities || entry.amenidades;
        if (entry.services || entry.servicios) poi.services = entry.services || entry.servicios;
        if (entry.description || entry.descripcion) poi.description = entry.description || entry.descripcion;
+  // Vestimenta / codigo de vestimenta.
+  if (entry.vestimenta || entry.dressCode) {
+    poi.vestimenta = entry.vestimenta || entry.dressCode;
+    poi.dressCode = entry.dressCode || entry.vestimenta;
+  }
+  // Requerimiento de reserva.
+  if (entry.reservation !== undefined) poi.reservation = entry.reservation;
+  if (entry.reservas !== undefined) poi.reservas = entry.reservas;
+  if (poi.reservation === undefined && poi.reservas !== undefined) poi.reservation = poi.reservas;
+  if (poi.reservas === undefined && poi.reservation !== undefined) poi.reservas = poi.reservation;
+  // Especialidades / platillos insignia / cocteles.
+  if (entry.especialidades || entry.especialidad) poi.especialidades = entry.especialidades || entry.especialidad;
+  if (entry.signatureDishes || entry.platillosInsignia) {
+    poi.signatureDishes = entry.signatureDishes || entry.platillosInsignia;
+    poi.platillosInsignia = entry.platillosInsignia || entry.signatureDishes;
+  }
+  if (entry.cocteles || entry.cocktails || entry.bebidas) poi.cocteles = entry.cocteles || entry.cocktails || entry.bebidas;
+  if (entry.menu) poi.menu = entry.menu;
+  // Hotel / ubicacion de referencia.
+  if (entry.hotel) {
+    poi.hotel = entry.hotel;
+    if (!poi.hotelId) poi.hotelId = entry.hotel;
+  }
     }
   })();
 
@@ -736,6 +759,7 @@
   // El borde se difumina con un trazo ancho semitransparente.
   gp.addComplexMask = function (map, options) {
     if (!map || !window.L || !gp.COMPLEX_RING || gp.COMPLEX_RING.length < 3) return null;
+    if (map._complexMaskApplied) return gp._complexMask || null;
     var L = window.L;
     var opts = options || {};
     var color = opts.color || "#f5f0e7"; // tono del sitio (--paper)
@@ -787,6 +811,7 @@
     if (renderer) featherSoftOpts.renderer = renderer;
     var featherSoft = L.polygon(ring, featherSoftOpts).addTo(map);
     gp._complexMask = { mask: mask, feather: feather, featherSoft: featherSoft };
+    map._complexMaskApplied = true;
     if (!map._maskInteractionHook) {
       map._maskInteractionHook = true;
       var maskContainer = map.getContainer();
@@ -1180,6 +1205,21 @@
     // al usuario que está caminando.
     if (options && options.keepView) return;
     try {
+      // En móvil, con la guía colapsada, encuadramos toda la ruta para que
+      // el trazado quede visible en el área despejada del mapa.
+      if (isMobileGuide()) {
+        map.stop();
+        var routeLine = gp._route.line;
+        if (routeLine && typeof routeLine.getBounds === "function") {
+          var routeBounds = routeLine.getBounds();
+          if (routeBounds && typeof routeBounds.isValid === "function" && routeBounds.isValid()) {
+            map.fitBounds(routeBounds, { padding: [60, 20] });
+          }
+        }
+        gp._userFocusedMap = map;
+        revealMap(map);
+        return;
+      }
       // Prioriza el destino con un zoom cercano en lugar de alejar el mapa para
       // encuadrar toda la ruta; el usuario puede alejar con los controles.
       map.stop();
@@ -1337,7 +1377,8 @@
     if (isMobileGuide()) {
       try {
         var r = window.RevistaDigital && window.RevistaDigital.routes;
-        if (r && typeof r.setGuidePanelExpanded === "function") r.setGuidePanelExpanded(false);
+        if (r && typeof r.setGuidePanelOpen === "function") { r.setGuidePanelOpen(false); }
+        else if (r && typeof r.setGuidePanelExpanded === "function") { r.setGuidePanelExpanded(false); }
       } catch (e) { /* ignore */ }
       if (state.mobilePoi && typeof positionMobileActions === "function") {
         try { positionMobileActions(state.mobilePoi); } catch (e) { /* ignore */ }
@@ -1367,6 +1408,15 @@
     if (!engine || typeof engine.computeRoute !== "function") {
       setRouteStatus("error", id, poi.name, "Estamos actualizando el servicio de rutas. Intente de nuevo.");
       return;
+    }
+    // En móvil abrimos el mapa a pantalla completa para ver el trazado completo.
+    if (isMobileGuide() && !(document.body && document.body.classList.contains("map-fullscreen-open"))) {
+      try {
+        var fsMap = window.RevistaDigital && window.RevistaDigital.state && window.RevistaDigital.state.activeMap;
+        var fsContainer = fsMap && typeof fsMap.getContainer === "function" ? fsMap.getContainer() : null;
+        var fsButton = fsContainer && fsContainer.querySelector(".map-touch-fullscreen");
+        if (fsButton) fsButton.click();
+      } catch (e) { /* ignore */ }
     }
     var controller = typeof AbortController === "function" ? new AbortController() : null;
     gp._route.abort = controller;
@@ -1440,7 +1490,8 @@
       }
     }
     if (titleEl) titleEl.textContent = poi.name || "";
-    body.innerHTML = '<div class="guide-mobile-actions-buttons">' + btns + "</div>" +
+    body.innerHTML = mobilePoiInfoHtml(poi) +
+      '<div class="guide-mobile-actions-buttons">' + btns + "</div>" +
       '<div class="guide-route-box" id="guideMobileRouteBox" role="status" aria-live="polite"></div>' +
       '<div class="guide-book-box" id="guideMobileBookBox"></div>';
     panel.hidden = false;
@@ -1525,8 +1576,8 @@
       return;
     }
     var verified = Number.isFinite(poi.lat) && Number.isFinite(poi.lng);
-    var zone = poi.hotelId
-      ? '<p class="guide-detail-row"><strong>Hotel</strong> ' + escapeHtml(poi.hotelId) + "</p>"
+    var zone = (poi.hotelId || poi.hotel)
+      ? '<p class="guide-detail-row"><strong>Hotel</strong> ' + escapeHtml(poi.hotelId || poi.hotel) + "</p>"
       : (poi.zone ? '<p class="guide-detail-row"><strong>Zona</strong> ' + escapeHtml(poi.zone) + "</p>" : "");
     var isArea = poi.kind === "area";
     var actions;
@@ -1621,10 +1672,11 @@
       '</div>' +
       '<span class="guide-dot guide-dot--lg" style="background:' + categoryColor(poi.category) + '"></span>' +
       '<h3 class="guide-detail-title">' + escapeHtml(poi.name) + "</h3>" +
-      '<p class="guide-detail-cat">' + escapeHtml(categoryLabel(poi.category)) + "</p>" +
+      '<p class="guide-detail-cat">' + escapeHtml(categoryLabel(poi.category)) + ((poi.hotelId || poi.hotel || poi.zone) ? ' · ' + escapeHtml(poi.hotelId || poi.hotel || poi.zone) : '') + "</p>" +
       (poi.description ? '<p class="guide-detail-desc">' + escapeHtml(poi.description) + "</p>" : "") +
       zone +
       extraInfo +
+      poiCommonInfoHtml(poi) +
       actions;
     renderRouteStatus();
     renderMobileActions(poi);
@@ -1835,6 +1887,68 @@
     if (!isFinite(south)) return null;
     return [[south, west], [north, east]];
   };
+
+function mobilePoiInfoHtml(poi) {
+  if (!poi) return "";
+  var rows = [];
+  var location = poi.hotel || poi.hotelId || poi.zone || "";
+  if (poi.hours) rows.push(["Horario", poi.hours]);
+  if (poi.cuisine) rows.push([poi.category === "restaurante" ? "Cocina" : "Concepto", poi.cuisine]);
+  if (poi.menu) rows.push([poi.category === "bar" ? "Carta" : "Menú", poi.menu]);
+  var specialties = "";
+  if (poi.especialidades) specialties = String(poi.especialidades);
+  else if (Array.isArray(poi.signatureDishes)) specialties = poi.signatureDishes.join(", ");
+  else if (poi.signatureDishes) specialties = String(poi.signatureDishes);
+  else if (Array.isArray(poi.platillosInsignia)) specialties = poi.platillosInsignia.join(", ");
+  else if (poi.platillosInsignia) specialties = String(poi.platillosInsignia);
+  if (specialties && specialties !== poi.menu) rows.push(["Especialidades", specialties]);
+  var cocteles = poi.cocteles || poi.cocktails || poi.bebidas || poi.coctelesInsignia;
+  if (cocteles) rows.push(["Cócteles", Array.isArray(cocteles) ? cocteles.join(", ") : String(cocteles)]);
+  if (poi.treatments) rows.push(["Tratamientos", poi.treatments]);
+  if (poi.packages) rows.push(["Paquetes", poi.packages]);
+  if (poi.teeTimes) rows.push(["Tee times", poi.teeTimes]);
+  var amenities = Array.isArray(poi.amenities) ? poi.amenities.join(", ") : (poi.amenities ? String(poi.amenities) : "");
+  if (amenities) rows.push(["Amenidades", amenities]);
+  var services = Array.isArray(poi.services) ? poi.services.join(", ") : (poi.services ? String(poi.services) : "");
+  if (services) rows.push(["Servicios", services]);
+  var dress = poi.dressCode || poi.vestimenta;
+  if (dress) rows.push(["Código de vestimenta", dress]);
+  var r = (poi.reservation !== undefined ? poi.reservation : poi.reservas);
+  var reservationText = "";
+  if (r !== undefined && r !== null && r !== "") reservationText = (typeof r === "boolean") ? (r ? "Recomendada" : "No requerida") : String(r);
+  if (reservationText) rows.push(["Reservas", reservationText]);
+  if (poi.description) rows.push(["Descripción", poi.description]);
+  if (!rows.length) return "";
+  var html = '<div class="guide-mobile-actions-info">';
+  html += '<p class="guide-mobile-actions-cat">' + escapeHtml(categoryLabel(poi.category)) + (location ? ' · ' + escapeHtml(location) : '') + '</p>';
+  html += rows.map(function (row) { return '<p class="guide-detail-row"><strong>' + escapeHtml(row[0]) + '</strong> ' + escapeHtml(row[1]) + '</p>'; }).join("");
+  html += '</div>';
+  return html;
+}
+
+function poiCommonInfoHtml(poi) {
+  if (!poi) return "";
+  var rows = [];
+  var specialties = "";
+  if (poi.especialidades) specialties = String(poi.especialidades);
+  else if (Array.isArray(poi.signatureDishes)) specialties = poi.signatureDishes.join(", ");
+  else if (poi.signatureDishes) specialties = String(poi.signatureDishes);
+  else if (Array.isArray(poi.platillosInsignia)) specialties = poi.platillosInsignia.join(", ");
+  else if (poi.platillosInsignia) specialties = String(poi.platillosInsignia);
+  if (specialties && specialties !== poi.menu) rows.push(["Especialidades", specialties]);
+  var cocteles = poi.cocteles || poi.cocktails || poi.bebidas || poi.coctelesInsignia;
+  if (cocteles) rows.push(["Cócteles", Array.isArray(cocteles) ? cocteles.join(", ") : String(cocteles)]);
+  var dress = poi.dressCode || poi.vestimenta;
+  if (dress) rows.push(["Código de vestimenta", dress]);
+  var r = (poi.reservation !== undefined ? poi.reservation : poi.reservas);
+  var reservationText = "";
+  if (r !== undefined && r !== null && r !== "") reservationText = (typeof r === "boolean") ? (r ? "Recomendada" : "No requerida") : String(r);
+  if (reservationText) rows.push(["Reservas", reservationText]);
+  if (!rows.length) return "";
+  return '<div class="guide-extra-info guide-common-info">' + rows.map(function (row) {
+    return '<p class="guide-detail-row"><strong>' + escapeHtml(row[0]) + '</strong> ' + escapeHtml(row[1]) + '</p>';
+  }).join("") + '</div>';
+}
 
   gp.renderExplorer = function (mount, options) {
     if (!mount) return null;

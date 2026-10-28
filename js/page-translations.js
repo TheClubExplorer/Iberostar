@@ -178,8 +178,6 @@
     "Carta": "Menu",
     "Menú": "Menu",
     "Cocina": "Cuisine",
-    "Fuente": "Source",
-    "Estado": "Status",
     "Área geográfica": "Geographic area",
     "Verificado": "Verified",
     "Pendiente de verificación": "Pending verification",

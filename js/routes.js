@@ -562,6 +562,7 @@
           </div>
           <div class="hotel-cart-map-wrap">
             <div id="cartTrackingMap" class="hotel-cart-map" role="application" aria-label="Mapa de seguimiento del carrito de golf"></div>
+            <button type="button" class="cart-map-exit" data-cart-map-exit hidden>Salir del mapa</button>
             <div class="hotel-cart-eta" data-cart-eta hidden></div>
           </div>
         </div>
@@ -1072,7 +1073,7 @@
             <div class="hotel-complex-actions">${portalMapActions([hotel])}</div>
             <div class="hotel-complex-map-wrap" data-guide-wrap>
               <div id="hotelPortalMap" class="hotel-portal-map hotel-portal-map--complex" role="application" aria-label="Mapa de ${escapeHtml(displayName)}"></div>
-              <button type="button" class="hotel-guide-open" data-guide-toggle aria-expanded="false" aria-controls="hotelGuidePanel">Lugares del complejo</button>
+              <button type="button" class="hotel-guide-open" data-guide-toggle aria-expanded="false" aria-controls="hotelGuidePanel">Mostrar guía</button>
               <aside class="hotel-guide-panel" id="hotelGuidePanel" data-guide-overlay aria-label="Lugares del complejo, rutas y reservas">
                 <div class="hotel-guide-panel-head">
                   <p class="portal-kicker">GUÍA INTERACTIVA · THE CLUB</p>
@@ -1930,4 +1931,53 @@
   } else {
     document.addEventListener("DOMContentLoaded", initializeRouteHandler);
   }
+
+  // Límites de zoom y desplazamiento para el mapa del carrito de golf.
+  // Se aplican desde routes.js (sin tocar carrito-golf.js) cuando el mapa
+  // de Leaflet termina de inicializar, para que el socio no pueda alejarse
+  // del complejo ni zoom excesivo.
+  (function constrainCartMap() {
+    const COMPLEX_BOUNDS = [
+      [20.7525065, -86.9710573],
+      [20.7654525, -86.9560717]
+    ];
+    let applied = false;
+
+    function applyBounds() {
+      if (applied) return;
+      const cg = window.RevistaDigital && window.RevistaDigital.carritoGolf;
+      if (!cg || !cg._map || !window.L) return;
+      try {
+        const map = cg._map;
+        map.setMaxBounds(COMPLEX_BOUNDS);
+        map.setMaxBoundsViscosity(1.0);
+        map.setMinZoom(map.getBoundsZoom(window.L.latLngBounds(COMPLEX_BOUNDS)));
+        map.setMaxZoom(19);
+        const guide = window.RevistaDigital && window.RevistaDigital.guiapa;
+        if (guide && typeof guide.addComplexMask === "function") guide.addComplexMask(map);
+      } catch (e) { /* ignore */ }
+      applied = true;
+    }
+
+    function watchContainer() {
+      const host = document.getElementById("cartTrackingMap");
+      if (!host) return;
+      const observer = new MutationObserver(function () {
+        applyBounds();
+      });
+      observer.observe(host, { childList: true, subtree: true, attributes: true, attributeFilter: ["class"] });
+      // Reintentar por si el mapa se crea justo después de conectar el observador.
+      const retry = setInterval(function () {
+        applyBounds();
+        if (applied) clearInterval(retry);
+      }, 500);
+      setTimeout(function () { clearInterval(retry); }, 8000);
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", watchContainer);
+    } else {
+      watchContainer();
+    }
+  })();
 })();
