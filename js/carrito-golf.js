@@ -1491,8 +1491,8 @@ if (request.routeStatus === "loading") {
               });
               document.body.style.overflow = "";
               document.documentElement.style.overflow = "";
-              setTimeout(function () { try { if (cg._map) cg._map.invalidateSize(); } catch(e){} }, 100);
-              try { if (cg.refreshMapLayout) cg.refreshMapLayout(); } catch(e){}
+              setTimeout(function () { try { if (cg._map) cg._map.invalidateSize(); } catch(e){} }, 300);
+              setTimeout(function () { try { if (cg.refreshMapLayout) cg.refreshMapLayout(); } catch(e){} }, 400);
             });
             cartMapContainer.appendChild(btn);
           }
