@@ -1485,6 +1485,12 @@ if (request.routeStatus === "loading") {
             btn.addEventListener('click', function () {
               cartMapContainer.classList.remove('map-fullscreen');
               try { if (document.fullscreenElement) document.exitFullscreen().catch(function(){}); } catch(e){}
+              ["no-scroll","modal-open","fullscreen-active","is-fullscreen","map-fullscreen"].forEach(function (cls) {
+                document.body.classList.remove(cls);
+                document.documentElement.classList.remove(cls);
+              });
+              document.body.style.overflow = "";
+              document.documentElement.style.overflow = "";
               setTimeout(function () { try { if (cg._map) cg._map.invalidateSize(); } catch(e){} }, 100);
               try { if (cg.refreshMapLayout) cg.refreshMapLayout(); } catch(e){}
             });
