@@ -1485,7 +1485,7 @@ if (request.routeStatus === "loading") {
             btn.addEventListener('click', function () {
               cartMapContainer.classList.remove('map-fullscreen');
               try { if (document.fullscreenElement) document.exitFullscreen().catch(function(){}); } catch(e){}
-              ["no-scroll","modal-open","fullscreen-active","is-fullscreen","map-fullscreen"].forEach(function (cls) {
+              ["no-scroll","modal-open","fullscreen-active","is-fullscreen","map-fullscreen","map-fullscreen-open"].forEach(function (cls) {
                 document.body.classList.remove(cls);
                 document.documentElement.classList.remove(cls);
               });
