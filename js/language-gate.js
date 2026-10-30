@@ -24,7 +24,8 @@
   var browserLanguage = browserLocales.map(function (locale) {
     return String(locale).toLowerCase().split(/[-_]/)[0];
   }).find(function (code) { return available.indexOf(code) >= 0; });
-  var savedLanguage = localStorage.getItem("revista_lang");
+  var savedLanguage = null;
+  try { savedLanguage = localStorage.getItem("revista_lang"); } catch (e) { savedLanguage = null; }
   var selected = available.indexOf(savedLanguage) >= 0
     ? savedLanguage
     : (browserLanguage || i18n.getLang() || available[0]);

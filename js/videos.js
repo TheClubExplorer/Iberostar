@@ -216,7 +216,6 @@
           class="media-card-video"
           controls
           preload="none"
-          loading="lazy"
           poster="${posterPlaceholder}"
           data-video-start="${item.start}"
           data-video-end="${item.end}"

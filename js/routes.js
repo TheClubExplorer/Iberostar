@@ -402,8 +402,10 @@
   }
 
   function renderCards(records, getPath, type) {
+    var eyebrow = type === "hotel" ? "HOTEL" : type === "country" ? "PAÍS" : "DESTINO";
+    var cta = type === "hotel" ? "Explorar →" : type === "country" ? "Ver destinos →" : "Explorar →";
     return records.map((item) => `<a class="destination-card ${type}" href="${escapeHtml(href(getPath(item)))}" data-app-route="${escapeHtml(getPath(item))}">
-      ${RI.img(item.image || "src/JOIA2.jpg", { alt: "", sizes: "(max-width:600px) 92vw, (max-width:850px) 46vw, 40vw" })}<span class="destination-card-copy"><small>${type === "hotel" ? "HOTEL" : "DESTINO"}</small><strong>${escapeHtml(item.name)}</strong><span>${escapeHtml(item.description || item.tagline || "Descubra el hotel y sus experiencias.")}</span><b>Explorar →</b></span></a>`).join("");
+      ${RI.img(item.image || "src/JOIA2.jpg", { alt: "", sizes: "(max-width:600px) 92vw, (max-width:850px) 46vw, 40vw" })}<span class="destination-card-copy"><small>${eyebrow}</small><strong>${escapeHtml(item.name)}</strong><span>${escapeHtml(item.description || item.tagline || "Descubra el hotel y sus experiencias.")}</span><b>${cta}</b></span></a>`).join("");
   }
   function findHotelPortalRoute(hotelName) {
     const targetSlug = slugify(hotelName);
@@ -534,7 +536,8 @@
             <span>Hotel del complejo</span>
             <select data-cart-hotel-select>${options}</select>
           </label>
-          <p class="cart-page-hotel-note">El carrito sale desde su posición actual, le recoge donde está y le lleva a su destino.</p>
+          <p class="cart-page-hotel-note">El carrito sale desde su posiciÃ³n actual, le recoge donde estÃ¡ y le lleva a su destino.</p>
+          <button type="button" class="cart-back-to-trip" data-cart-back-to-trip>Volver al viaje</button>
         </div>
         <div class="hotel-cart-tracker" data-cart-tracker>
           <div class="hotel-cart-panel">
@@ -662,7 +665,9 @@
     if (isHome || (countryData && parts.length === 1)) {
       document.body.dataset.appMode = "portal";
       document.body.dataset.routeManaged = "true";
-      const countryCards = Object.entries(catalog).map(([key, item]) => ({ name: item.name, image: item.image, description: `${item.destinations.length} destinos para explorar.`, route: `/${key}` }));
+      const countryCards = Object.entries(catalog).map(([key, item]) => ({ name: item.name, image: item.image, description: `${item.destinations.length} destinos · ${(item.destinations || []).reduce((sum, destination) => sum + (destination.hotels ? destination.hotels.length : 0), 0)} hoteles para explorar.`, route: `/${key}`, destinations: item.destinations.length, hotels: (item.destinations || []).reduce((sum, destination) => sum + (destination.hotels ? destination.hotels.length : 0), 0) }));
+      const totalDestinations = countryCards.reduce((sum, item) => sum + item.destinations, 0);
+      const totalHotels = countryCards.reduce((sum, item) => sum + item.hotels, 0);
       let heading = "Encuentre su próximo destino";
       let intro = "Explore hoteles y destinos Iberostar. Elija un país para comenzar.";
       let cards = renderCards(countryCards, (item) => item.route, "country");
@@ -684,11 +689,11 @@
           countryMapMarkup = `<section class="portal-map-section"><div><p class="portal-kicker">UBICACIÓN</p><h2>Mapa de ${escapeHtml(countryData.name)}</h2><p>Explore los hoteles disponibles en los destinos de ${escapeHtml(countryData.name)}.</p></div><div class="portal-map-frame"><div class="portal-destination-map" id="countryMap" role="application" aria-label="Mapa de hoteles en ${escapeHtml(countryData.name)}"></div>${portalMapActions(countryHotels)}</div></section>`;
         }
       }
-      view.innerHTML = `<main class="portal-page">${!isHome ? portalNav(getPortalNavModel(route)) : ""}<section class="portal-hero"><div><p class="portal-kicker">${breadcrumb}</p><h1>${heading}</h1><p>${intro}</p>${!isHome ? "" : `<a class="portal-hero-link" href="${href("/mexico/riviera-maya")}" data-app-route="/mexico/riviera-maya">Conozca Iberostar Playa Paraíso <span>→</span></a>`}</div>${RI.img(isHome ? "src/paraiso-del-mar/banner/ParaisoDelMar.jpg" : countryData.image, {
+      view.innerHTML = `<main class="portal-page">${!isHome ? portalNav(getPortalNavModel(route)) : ""}<section class="portal-hero"><div><p class="portal-kicker">${breadcrumb}</p><h1>${heading}</h1><p>${intro}</p>${!isHome ? "" : `<a class="portal-hero-link" href="${href("/mexico/riviera-maya")}" data-app-route="/mexico/riviera-maya">Conozca Iberostar Playa Paraíso <span>→</span></a><div class="portal-hero-stats" aria-label="Resumen de destinos"><span><strong>${Object.keys(catalog).length}</strong> países</span><span><strong>${totalDestinations}</strong> destinos</span><span><strong>${totalHotels}</strong> hoteles</span></div>`}</div>${RI.img(isHome ? "src/paraiso-del-mar/banner/ParaisoDelMar.jpg" : countryData.image, {
           alt: "Paisaje de destino",
           priority: true,
           sizes: "(max-width:600px) 100vw, 45vw"
-        })}</section>${countryMapMarkup}<section class="portal-section"><div class="portal-section-heading"><div><p class="portal-kicker">${isHome ? "NUESTROS PAÍSES" : "DESTINOS"}</p><h2>${isHome ? "Viaje a su manera" : "Elija dónde hospedarse"}</h2></div>${!isHome ? `<a href="${href("/")}" data-app-route="/">Todos los países</a>` : ""}</div><div class="destination-grid">${cards}</div></section></main>`;
+        })}</section>${countryMapMarkup}<section class="portal-section"><div class="portal-section-heading"><div><p class="portal-kicker">${isHome ? "NUESTROS PAÍSES" : "DESTINOS"}</p><h2>${isHome ? "Viaje a su manera" : "Elija dónde hospedarse"}</h2></div>${!isHome ? `<a href="${href("/")}" data-app-route="/">Todos los países</a>` : ""}</div>${isHome ? `<div class="portal-country-chips" aria-label="Acceso rápido a países">${countryCards.map((item) => `<a class="portal-country-chip" href="${escapeHtml(href(item.route))}" data-app-route="${escapeHtml(item.route)}">${escapeHtml(item.name)}<span>${item.destinations}</span></a>`).join("")}</div>` : ""}<div class="destination-grid portal-card-carousel">${cards}</div></section></main>`;
       const countryMap = view.querySelector("#countryMap");
       if (countryMap) {
         window.RevistaDigital.mapas?.initializeAllHotelsMap(countryMap, countryHotels, { countrySlug: country });
@@ -709,7 +714,7 @@
           alt: "",
           priority: true,
           sizes: "(max-width:600px) 100vw, 45vw"
-        })}<div><p class="portal-kicker">${escapeHtml(countryData.name).toUpperCase()} · DESTINO</p><h1>${escapeHtml(destination.name)}</h1><p>${escapeHtml(destination.description)}</p>${destination.complex ? `<a class="portal-hero-link" href="${href("/mexico/riviera-maya")}" data-app-route="/mexico/riviera-maya">Ver el complejo Playa Paraíso →</a>` : ""}</div></section><section class="portal-section"><div class="portal-section-heading"><div><p class="portal-kicker">ALOJAMIENTOS</p><h2>Hoteles en ${escapeHtml(destination.name)}</h2></div></div><div class="destination-grid destination-grid--hotels">${renderCards(hotels, (hotel) => `/${country}/${destination.slug}/${hotel.slug}`, "hotel")}</div></section></main>`;
+        })}<div><p class="portal-kicker">${escapeHtml(countryData.name).toUpperCase()} · DESTINO</p><h1>${escapeHtml(destination.name)}</h1><p>${escapeHtml(destination.description)}</p>${destination.complex ? `<a class="portal-hero-link" href="${href("/mexico/riviera-maya")}" data-app-route="/mexico/riviera-maya">Ver el complejo Playa Paraíso →</a>` : ""}</div></section><section class="portal-section"><div class="portal-section-heading"><div><p class="portal-kicker">ALOJAMIENTOS</p><h2>Hoteles en ${escapeHtml(destination.name)}</h2></div></div><div class="destination-grid destination-grid--hotels portal-card-carousel">${renderCards(hotels, (hotel) => `/${country}/${destination.slug}/${hotel.slug}`, "hotel")}</div></section></main>`;
       const mapElement = view.querySelector("#destinationMap");
       if (mapElement) window.RevistaDigital.mapas?.initializeDestinationMap(mapElement, { countrySlug: country, destination });
       return true;
@@ -1690,6 +1695,54 @@
       window.RevistaDigital.routeTarget = resolveRouteTarget(route);
       refreshCurrentAppContext(route);
       if (!route.startsWith("/restaurantes/")) delete document.body.dataset.restaurantReturnRoute;
+
+      // AISLAMIENTO DE VISTAS AL ENTRAR/SALIR DE /carrito-golf
+      if (route === "/carrito-golf") {
+        try {
+          // Ocultar cualquier mapa/guía anterior que pueda seguir montado
+          document.querySelectorAll(
+            ".hotel-complex-stage, #hotel-guia, .guide-explorer, .guide-explorer-mount, #guideExplorer, " +
+            ".hotel-portal-map, .portal-complex-map, .map-container, .mapbox-map, .leaflet-container, " +
+            ".hotel-complex-map-wrap"
+          ).forEach((el) => {
+            if (!el) return;
+            if (el.id === "cartTrackingMap" || el.closest("#hotel-carrito") || el.closest(".cart-page")) return;
+            el.style.setProperty("display", "none", "important");
+            el.setAttribute("data-route-hidden", "carrito-golf");
+          });
+
+          // Intentar desmontar instancias activas
+          const gp = window.RevistaDigital.guiapa;
+          if (gp) {
+            try { if (typeof gp.teardown === "function") gp.teardown(); } catch (e) {}
+            try { if (typeof gp.destroyMap === "function") gp.destroyMap(); } catch (e) {}
+            try { if (gp._map && typeof gp._map.remove === "function") { gp._map.remove(); gp._map = null; } } catch (e) {}
+            try { if (gp.map && typeof gp.map.remove === "function") { gp.map.remove(); gp.map = null; } } catch (e) {}
+          }
+          const mapas = window.RevistaDigital.mapas;
+          if (mapas) {
+            try { if (typeof mapas.destroyActiveMap === "function") mapas.destroyActiveMap(); } catch (e) {}
+            try { if (mapas.activeMap && typeof mapas.activeMap.remove === "function") { mapas.activeMap.remove(); mapas.activeMap = null; } } catch (e) {}
+            try { if (mapas._map && typeof mapas._map.remove === "function") { mapas._map.remove(); mapas._map = null; } } catch (e) {}
+          }
+
+          // Limpiar banners/residuos de solicitud de transporte
+          document.querySelectorAll(".guide-book-done, #guideBookBox, #guideMobileBookBox, .guide-book-confirm, .hotel-transport-banner, [class*='transport-banner']").forEach((el) => {
+            try { el.innerHTML = ""; } catch (e) {}
+            try { el.remove(); } catch (e) {}
+          });
+        } catch (e) { /* ignore */ }
+      } else {
+        try {
+          document.querySelectorAll('[data-route-hidden="carrito-golf"]').forEach((el) => {
+            try {
+              el.style.removeProperty("display");
+              el.removeAttribute("data-route-hidden");
+            } catch (e) {}
+          });
+        } catch (e) {}
+      }
+
       if (renderPortal(route)) {
         state().activeRestaurantMenuIndex = null;
         state().activeHotelDetail = null;

@@ -118,7 +118,8 @@
     }
   };
 
-  let currentLang = localStorage.getItem("revista_lang") || "es";
+  let currentLang = "es";
+  try { currentLang = localStorage.getItem("revista_lang") || "es"; } catch (e) { currentLang = "es"; }
   if (!translations[currentLang]) currentLang = "es";
 
   function t(key, defaultVal = "") {
@@ -168,7 +169,7 @@
   function setLanguage(lang) {
     if (!translations[lang]) return;
     currentLang = lang;
-    localStorage.setItem("revista_lang", lang);
+    try { localStorage.setItem("revista_lang", lang); } catch (e) { /* ignore */ }
     applyTranslations();
   }
 

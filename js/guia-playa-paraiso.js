@@ -1772,18 +1772,21 @@
             box.querySelector("[data-guide-cart-track]")?.addEventListener("click", function () {
               try { if (document.fullscreenElement) document.exitFullscreen().catch(function () {}); } catch (e) {}
               try {
-                ["is-fullscreen","map-fullscreen","modal-open","no-scroll","fullscreen-active","pnlm-fullscreen"].forEach(function (cls) {
+                ["is-fullscreen","map-fullscreen","modal-open","no-scroll","fullscreen-active","pnlm-fullscreen","map-fullscreen-open","pnlm-fullscreen-open"].forEach(function (cls) {
                   document.body.classList.remove(cls);
                   document.documentElement.classList.remove(cls);
                   document.querySelectorAll("*").forEach(function (el) { try { el.classList.remove(cls); } catch (e) {} });
                 });
                 // reset inline styles aplicados por fullscreen en contenedores de mapa
-                document.querySelectorAll(".map-container,.mapbox-map,.guide-map-wrap,[class*='map']").forEach(function (el) {
-                  try { el.style.position = ""; el.style.top = ""; el.style.left = ""; el.style.width = ""; el.style.height = ""; el.style.zIndex = ""; } catch (e) {}
+                document.querySelectorAll(".map-container,.mapbox-map,.guide-map-wrap,[class*='map'], .leaflet-container").forEach(function (el) {
+                  try { el.style.position = ""; el.style.top = ""; el.style.left = ""; el.style.width = ""; el.style.height = ""; el.style.zIndex = ""; el.style.maxHeight = ""; } catch (e) {}
                 });
+                document.body.style.overflow = "";
+                document.documentElement.style.overflow = "";
               } catch (e) {}
+              try { document.querySelectorAll('.modal, .popup, .leaflet-popup, [role="dialog"]').forEach(function (el) { try { el.remove(); } catch (e) {} }); } catch (e) {}
               try {
-                document.querySelectorAll('.modal, .popup, .leaflet-popup, [role="dialog"]').forEach(function (el) { try { el.remove(); } catch (e) {} });
+                document.querySelectorAll('.guide-book-done, #guideBookBox, #guideMobileBookBox, .hotel-transport-banner, [class*="transport-banner"]').forEach(function(el){ try{ el.innerHTML = ''; }catch(e){} try{ el.remove(); }catch(e){} });
               } catch (e) {}
               try { sessionStorage.setItem('auto_fullscreen_transporte', 'true'); } catch (e) {}
               tracker.openPage(document.body.dataset.hotelSlug || "");

@@ -6661,29 +6661,88 @@ const mobileNavClose = document.getElementById("mobileNavClose");
 const siteNav = document.getElementById("siteNav");
 const navOverlay = document.getElementById("navOverlay");
 const mobileNavMedia = window.matchMedia("(max-width: 850px)");
+let mobileNavSavedScrollY = 0;
+
+function lockBodyScrollForMobileNav() {
+  mobileNavSavedScrollY = window.scrollY || document.documentElement.scrollTop || 0;
+  document.body.style.position = "fixed";
+  document.body.style.top = `-${mobileNavSavedScrollY}px`;
+  document.body.style.left = "0";
+  document.body.style.right = "0";
+  document.body.style.width = "100%";
+  document.body.style.overflow = "hidden";
+}
+
+function unlockBodyScrollForMobileNav() {
+  document.body.style.position = "";
+  document.body.style.top = "";
+  document.body.style.left = "";
+  document.body.style.right = "";
+  document.body.style.width = "";
+  document.body.style.overflow = "";
+  window.scrollTo(0, mobileNavSavedScrollY);
+}
+
+function getMobileNavFocusableElements() {
+  if (!siteNav) return [];
+  return Array.from(siteNav.querySelectorAll("a, button, summary, [tabindex]:not([tabindex='-1'])"))
+    .filter((element) => !element.hasAttribute("disabled") && element.getClientRects().length > 0);
+}
+
+function updateMobileNavActiveState() {
+  if (!siteNav) return;
+  const currentRoute = document.body.dataset.currentRoute ||
+    window.RevistaDigital?.routes?.getCurrentRoute?.() ||
+    "/";
+
+  siteNav.querySelectorAll("a[data-app-route]").forEach((link) => {
+    const route = link.getAttribute("data-app-route");
+    const isActive = route === "/"
+      ? currentRoute === "/"
+      : currentRoute === route || currentRoute.startsWith(`${route}/`);
+    link.classList.toggle("is-active", isActive);
+  });
+
+  siteNav.querySelectorAll("details.site-tools").forEach((details) => {
+    const summary = details.querySelector("summary");
+    const hasActiveChild = Boolean(details.querySelector("a.is-active"));
+    summary?.classList.toggle("is-active", hasActiveChild);
+  });
+}
 
 function openMobileNav() {
   if (!siteNav) return;
+  updateMobileNavActiveState();
   siteNav.classList.add("is-open");
   document.body.classList.add("mobile-nav-open");
+  mobileMenuButton?.classList.add("is-open");
   if (navOverlay) {
     navOverlay.hidden = false;
     requestAnimationFrame(() => navOverlay.classList.add("is-open"));
   }
   mobileMenuButton?.setAttribute("aria-expanded", "true");
-  document.body.style.overflow = "hidden";
+  mobileMenuButton?.setAttribute("aria-label", "Cerrar menú");
+  lockBodyScrollForMobileNav();
+
+  window.requestAnimationFrame(() => {
+    const focusable = getMobileNavFocusableElements();
+    (focusable[0] || mobileNavClose || mobileMenuButton)?.focus?.();
+  });
 }
 
 function closeMobileNav() {
   if (!siteNav || !siteNav.classList.contains("is-open")) return;
   siteNav.classList.remove("is-open");
   document.body.classList.remove("mobile-nav-open");
+  mobileMenuButton?.classList.remove("is-open");
   if (navOverlay) {
     navOverlay.classList.remove("is-open");
     window.setTimeout(() => { navOverlay.hidden = true; }, 280);
   }
   mobileMenuButton?.setAttribute("aria-expanded", "false");
-  document.body.style.overflow = "";
+  mobileMenuButton?.setAttribute("aria-label", "Abrir menú");
+  unlockBodyScrollForMobileNav();
+  mobileMenuButton?.focus?.();
 }
 
 mobileMenuButton?.addEventListener("click", () => {
@@ -6693,11 +6752,59 @@ mobileMenuButton?.addEventListener("click", () => {
 mobileNavClose?.addEventListener("click", closeMobileNav);
 navOverlay?.addEventListener("click", closeMobileNav);
 document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape") closeMobileNav();
+  if (event.key === "Escape") {
+    closeMobileNav();
+    return;
+  }
+
+  if (event.key !== "Tab" || !siteNav?.classList.contains("is-open")) return;
+  const focusable = getMobileNavFocusableElements();
+  if (!focusable.length) return;
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first.focus();
+  }
+});
+siteNav?.addEventListener("keydown", (event) => {
+  if (event.key !== "Tab" || !siteNav.classList.contains("is-open")) return;
+  const focusable = getMobileNavFocusableElements();
+  if (!focusable.length) return;
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first.focus();
+  }
 });
 mobileNavMedia?.addEventListener("change", (event) => {
   if (!event.matches) closeMobileNav();
 });
+
+// Acordeón: solo un bloque <details> abierto a la vez en móvil.
+siteNav?.querySelectorAll("details.site-tools").forEach((details) => {
+  details.addEventListener("toggle", () => {
+    if (!details.open) return;
+    siteNav.querySelectorAll("details.site-tools").forEach((other) => {
+      if (other !== details) other.open = false;
+    });
+  });
+});
+
+// Actualiza el estado activo cuando cambia la ruta (SPA).
+const mobileNavRouteObserver = new MutationObserver(() => {
+  if (siteNav?.classList.contains("is-open")) updateMobileNavActiveState();
+});
+mobileNavRouteObserver.observe(document.body, { attributes: true, attributeFilter: ["data-current-route"] });
 window.RevistaDigital.startLocationServices = startLocationServices;
 if (typeof window.RevistaDigital.routes?.restoreCurrentRoute === "function") {
   if (document.body.dataset.routeManaged !== "true") {

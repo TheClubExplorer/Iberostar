@@ -865,13 +865,21 @@
     if (document.getElementById("hotel-carrito")) {
       var section = document.getElementById("hotel-carrito");
       if (cg._map) {
-        try { cg._map.invalidateSize(); } catch (e) { /* ignore */ }
+        try { cg._map.invalidateSize({pan:false, animate:false}); } catch (e) { /* ignore */ }
       }
       try {
         section.scrollIntoView({ behavior: "smooth", block: "start" });
       } catch (e) {
         try { section.scrollIntoView(); } catch (inner) { /* ignore */ }
       }
+      // Asegurar vista enfocada en móvil si hay solicitud activa
+      try {
+        if (isMobileCartViewport() && activeRequest()) {
+          setCartMapFocus(section, true);
+          if (typeof cg._cartMapInvalidate === "function") cg._cartMapInvalidate(true);
+          [100,250,500].forEach(function(d){ setTimeout(function(){ if(typeof cg._cartMapInvalidate==='function') cg._cartMapInvalidate(true); else if(cg._map){try{cg._map.invalidateSize({pan:false,animate:false});}catch(e){}} }, d); });
+        }
+      } catch(e){}
       return true;
     }
     return cg.openPage();
@@ -894,6 +902,17 @@
     cg._accuracyCircle = null;
     cg._fitKey = null;
   }
+
+  cg._cartMapInvalidate = function (force) {
+    try {
+      if (!cg._map || !window.L) return;
+      setTimeout(function () {
+        try {
+          cg._map.invalidateSize({ pan: false, animate: false });
+        } catch (e) { /* ignore */ }
+      }, force ? 50 : 200);
+    } catch (e) { /* ignore */ }
+  };
 
   function syncAccuracyCircle(pickup) {
     if (!cg._map || !cg._L) return;
@@ -1025,7 +1044,8 @@
       syncAccuracyCircle(pickup);
       cg._fitKey = null;
       syncMap();
-      try { map.invalidateSize(); } catch (e) { /* ignore */ }
+      try { map.invalidateSize({pan:false, animate:false}); } catch (e) { /* ignore */ }
+      [50,150,300,500,800].forEach(function(d){ setTimeout(function(){ try { map.invalidateSize({pan:false, animate:false}); }catch(e){} }, d); });
       return map;
     }).catch(function (error) {
       console.warn("No se pudo cargar el mapa del carrito.", error);
@@ -1400,9 +1420,68 @@ if (request.routeStatus === "loading") {
       cg.requestLocation();
       return;
     }
-    if (event.target.closest("[data-cart-cancel]")) cg.cancel();
+    if (event.target.closest("[data-cart-cancel]")) {
+      cg.cancel();
+      try {
+        document.querySelectorAll(".guide-book-done, #guideBookBox, #guideMobileBookBox, .hotel-transport-banner, [class*='transport-banner']").forEach((el) => { try { el.innerHTML = ""; } catch(e){} try { el.remove(); } catch(e){} });
+      } catch(e){}
+      return;
+    }
+    if (event.target.closest("[data-cart-back-to-trip]")) {
+      try {
+        var sec = document.getElementById("hotel-carrito");
+        if (isMobileCartViewport()) {
+          setCartMapFocus(sec, true);
+        } else {
+          if (sec) sec.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+        var cgInstTrip = window.RevistaDigital && window.RevistaDigital.carritoGolf;
+        if (cgInstTrip && cgInstTrip._map) {
+          try {
+            cgInstTrip._map.invalidateSize({pan:false, animate:false});
+            setTimeout(function(){ try { cgInstTrip._map.invalidateSize({pan:false, animate:true}); }catch(e){} setTimeout(function(){ try { cgInstTrip._map.invalidateSize({pan:false, animate:false}); }catch(e){} }, 80); }, 60);
+          } catch(e){}
+        }
+        if (cgInstTrip && typeof cgInstTrip._cartMapInvalidate === "function") { cgInstTrip._cartMapInvalidate(true); [80,200,400].forEach(function(d){ setTimeout(function(){ try{ cgInstTrip._cartMapInvalidate(true); if(cgInstTrip._map){try{cgInstTrip._map.invalidateSize({pan:false,animate:false});}catch(e){}} }catch(e){} }, d); }); }
+        else if (cgInstTrip && cgInstTrip._map){ try { [80,200,400].forEach(function(d){ setTimeout(function(){ try { cgInstTrip._map.invalidateSize({pan:false,animate:false}); }catch(e){} }, d); }); }catch(e){} }
+        try { if (cgInstTrip && typeof cgInstTrip.refreshMapLayout === 'function') cgInstTrip.refreshMapLayout(); } catch(e){}
+        setTimeout(function(){ try { if (cgInstTrip && cgInstTrip._map) cgInstTrip._map.invalidateSize({pan:false,animate:false}); }catch(e){} if (cgInstTrip && typeof cgInstTrip._cartMapInvalidate==='function') cgInstTrip._cartMapInvalidate(true); }, 600);
+      } catch(e){}
+      return;
+    }
     if (event.target.closest("[data-cart-map-exit]")) {
-      setCartMapFocus(document.getElementById("hotel-carrito"), false);
+      var exitSection = document.getElementById("hotel-carrito");
+      setCartMapFocus(exitSection, false);
+      try {
+        ["is-fullscreen","map-fullscreen","modal-open","no-scroll","fullscreen-active","pnlm-fullscreen","map-fullscreen-open"].forEach(function (cls) {
+          document.body.classList.remove(cls);
+          document.documentElement.classList.remove(cls);
+          document.querySelectorAll("*").forEach(function (el){ try{ el.classList.remove(cls); }catch(e){} });
+        });
+        document.querySelectorAll(".map-container,.mapbox-map,.guide-map-wrap,[class*='map'], .leaflet-container").forEach(function (el){
+          try{ el.style.position=""; el.style.top=""; el.style.left=""; el.style.width=""; el.style.height=""; el.style.zIndex=""; el.style.maxHeight=""; el.style.transform=""; }catch(e){}
+        });
+        document.querySelectorAll(".guide-book-done, #guideBookBox, #guideMobileBookBox, .hotel-transport-banner, [class*='transport-banner']").forEach(function(el){ try{ el.innerHTML=""; }catch(e){} try{ el.remove(); }catch(e){} });
+        document.body.style.overflow = "";
+        document.documentElement.style.overflow = "";
+      } catch(e){}
+      var cgInstExit3 = window.RevistaDigital && window.RevistaDigital.carritoGolf;
+      if (cgInstExit3) {
+        try { if (typeof cgInstExit3.refreshMapLayout === 'function') cgInstExit3.refreshMapLayout(); } catch(e){}
+        if (cgInstExit3._map) {
+          try {
+            cgInstExit3._map.invalidateSize({pan:false, animate:false});
+            setTimeout(function(){ try { cgInstExit3._map.invalidateSize({pan:false, animate:true}); }catch(e){} setTimeout(function(){ try { cgInstExit3._map.invalidateSize({pan:false, animate:false}); }catch(e){} }, 90); }, 40);
+          } catch(e){}
+        }
+        if (typeof cgInstExit3._cartMapInvalidate === "function") { 
+          cgInstExit3._cartMapInvalidate(true); 
+          [40,120,220,340,520,760,1000].forEach(function(d){ setTimeout(function(){ try{ cgInstExit3._cartMapInvalidate(true); if (d>=220 && cgInstExit3._map){ try{ cgInstExit3._map.invalidateSize({pan:false,animate:false}); }catch(e){} } if (d>=340 && cgInstExit3._map){ try{ cgInstExit3._map.invalidateSize({pan:false,animate:true}); setTimeout(function(){ try{ cgInstExit3._map.invalidateSize({pan:false,animate:false}); }catch(e){} }, 90); }catch(e){} } if (d>=520 && typeof cgInstExit3.refreshMapLayout==='function'){ try{ cgInstExit3.refreshMapLayout(); }catch(e){} } }catch(e){} }, d); });
+        } else if (cgInstExit3._map){ 
+          try { [40,120,220,340,520,760,1000].forEach(function(d){ setTimeout(function(){ try { cgInstExit3._map.invalidateSize({pan:false,animate:false}); if (d>=340){ try{ cgInstExit3._map.invalidateSize({pan:false,animate:true}); setTimeout(function(){ try{ cgInstExit3._map.invalidateSize({pan:false,animate:false}); }catch(e){} }, 90); }catch(e){} } if (d>=520 && typeof cgInstExit3.refreshMapLayout==='function'){ try{ cgInstExit3.refreshMapLayout(); }catch(e){} } }catch(e){} }, d); }); }catch(e){} 
+        }
+        setTimeout(function(){ try { if (cgInstExit3._map) { cgInstExit3._map.invalidateSize({pan:false,animate:false}); cgInstExit3._map.invalidateSize({pan:false,animate:true}); setTimeout(function(){ try{ cgInstExit3._map.invalidateSize({pan:false,animate:false}); }catch(e){} }, 100); } if (typeof cgInstExit3.refreshMapLayout==='function') cgInstExit3.refreshMapLayout(); if (typeof cgInstExit3._cartMapInvalidate==='function') cgInstExit3._cartMapInvalidate(true); }catch(e){} }, 1200);
+      }
       return;
     }
   }
@@ -1433,9 +1512,13 @@ if (request.routeStatus === "loading") {
     cg._mapFocus = !!active;
     var refresh = function () {
       if (typeof cg.refreshMapLayout === "function") cg.refreshMapLayout();
+      if (typeof cg._cartMapInvalidate === "function") cg._cartMapInvalidate(true);
+      else if (cg._map) { try { setTimeout(function(){ try { cg._map.invalidateSize({pan:false,animate:false}); } catch(e){} }, 50); } catch(e){} }
     };
-    window.setTimeout(refresh, 80);
-    window.setTimeout(refresh, 280);
+    window.setTimeout(refresh, 50);
+    window.setTimeout(refresh, 150);
+    window.setTimeout(refresh, 300);
+    window.setTimeout(refresh, 500);
     return true;
   }
 
@@ -1468,7 +1551,9 @@ if (request.routeStatus === "loading") {
     startLocationTracking();
     render();
     buildMap();
-    // Auto-fullscreen en móvil al venir desde "Ver el transporte"
+    if (typeof cg._cartMapInvalidate === "function") cg._cartMapInvalidate(true);
+    else if (cg._map) { try { [60,200,400].forEach(function(d){ setTimeout(function(){ try { cg._map.invalidateSize({pan:false,animate:false}); }catch(e){} }, d); }); }catch(e){} }
+    // Auto-fullscreen en mÃ³vil al venir desde "Ver el transporte"
     try {
       if (window.innerWidth <= 768 && sessionStorage.getItem('auto_fullscreen_transporte') === 'true') {
         sessionStorage.removeItem('auto_fullscreen_transporte');
@@ -1491,16 +1576,25 @@ if (request.routeStatus === "loading") {
               });
               document.body.style.overflow = "";
               document.documentElement.style.overflow = "";
-              [100, 300, 600, 1000].forEach(function (d) {
-                setTimeout(function () { try { if (cg._map) cg._map.invalidateSize(); } catch(e){} }, d);
-              });
-              setTimeout(function () { try { if (cg.refreshMapLayout) cg.refreshMapLayout(); } catch(e){} }, 1100);
+              var cgInstFs = window.RevistaDigital && window.RevistaDigital.carritoGolf;
+              if (cgInstFs) {
+                try { if (typeof cgInstFs.refreshMapLayout === 'function') cgInstFs.refreshMapLayout(); } catch(e){}
+                [50,150,250,400,650,900].forEach(function (d) {
+                setTimeout(function () { 
+                  try { if (cgInst5b && cgInst5b._map) cgInst5b._map.invalidateSize({pan:false, animate:false}); } catch(e){} 
+                  if (typeof cgInst5b._cartMapInvalidate==='function') cgInst5b._cartMapInvalidate(true);
+                  if (typeof cgInst5b.refreshMapLayout==='function' && d > 400) cgInst5b.refreshMapLayout();
+                  if (d > 650 && cgInst5b._map) { try { cgInst5b._map.invalidateSize({pan:false, animate:true}); setTimeout(function(){ try { cgInst5b._map.invalidateSize({pan:false, animate:false}); }catch(e){} }, 100); }catch(e){} }
+                }, d);
+                });
+              }
             });
             cartMapContainer.appendChild(btn);
           }
         }
         setTimeout(function () {
-          try { if (cg._map) cg._map.invalidateSize(); } catch (e) {}
+          try { if (cg._map) cg._map.invalidateSize({pan:false, animate:false}); } catch (e) {}
+          if (typeof cg._cartMapInvalidate==='function') cg._cartMapInvalidate(true);
         }, 50);
       }
     } catch (e) {}
@@ -1512,11 +1606,34 @@ if (request.routeStatus === "loading") {
     destroyMap();
     cg._context = null;
   };
-  window.addEventListener("resize", function () {
-    if (cg._mapFocus && !isMobileCartViewport()) {
-      setCartMapFocus(document.getElementById("hotel-carrito"), false);
-    }
-  });
+  (function bindCartMapInvalidation() {
+    if (window._cartMapInvalidateBound) return;
+    window._cartMapInvalidateBound = true;
+
+    var handler = function () {
+      try {
+        var cgInst = window.RevistaDigital && window.RevistaDigital.carritoGolf;
+        if (cgInst && typeof cgInst._cartMapInvalidate === "function") {
+          cgInst._cartMapInvalidate();
+        } else if (cgInst && cgInst._map) {
+          setTimeout(function(){ try { cgInst._map.invalidateSize({ pan:false, animate:false }); } catch(e){} }, 200);
+        }
+      } catch(e){}
+    };
+    window.addEventListener("resize", handler, { passive: true });
+    document.addEventListener("fullscreenchange", handler);
+    document.addEventListener("webkitfullscreenchange", handler);
+    document.addEventListener("mozfullscreenchange", handler);
+    document.addEventListener("MSFullscreenChange", handler);
+
+    var last = 0;
+    window.addEventListener("scroll", function () {
+      var now = Date.now();
+      if (now - last < 250) return;
+      last = now;
+      if (document.getElementById("hotel-carrito")) handler();
+    }, { passive: true });
+  })();
 
 })();
 
