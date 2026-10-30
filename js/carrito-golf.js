@@ -1491,8 +1491,10 @@ if (request.routeStatus === "loading") {
               });
               document.body.style.overflow = "";
               document.documentElement.style.overflow = "";
-              setTimeout(function () { try { if (cg._map) cg._map.invalidateSize(); } catch(e){} }, 300);
-              setTimeout(function () { try { if (cg.refreshMapLayout) cg.refreshMapLayout(); } catch(e){} }, 400);
+              [100, 300, 600, 1000].forEach(function (d) {
+                setTimeout(function () { try { if (cg._map) cg._map.invalidateSize(); } catch(e){} }, d);
+              });
+              setTimeout(function () { try { if (cg.refreshMapLayout) cg.refreshMapLayout(); } catch(e){} }, 1100);
             });
             cartMapContainer.appendChild(btn);
           }
