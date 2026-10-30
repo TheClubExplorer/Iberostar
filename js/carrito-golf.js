@@ -453,12 +453,31 @@
   };
 
   cg.openPage = function (value) {
-    cg.setPreferredHotel(value);
+    try { cg.setPreferredHotel && cg.setPreferredHotel(value); } catch (e) {}
+    // Salir de pantalla completa antes de navegar
+    try { if (document.fullscreenElement) document.exitFullscreen().catch(function () {}); } catch (e) {}
+    try {
+      ["no-scroll","modal-open","fullscreen-active","is-fullscreen","map-fullscreen"].forEach(function (cls) {
+        document.body.classList.remove(cls);
+        document.documentElement.classList.remove(cls);
+      });
+      // cerrar/desmontar modales y popups abiertos
+      document.querySelectorAll('.modal, .popup, .leaflet-popup, [role="dialog"]').forEach(function (el) { try { el.remove(); } catch (e) {} });
+    } catch (e) {}
+    try {
+      var banners = document.querySelectorAll('#locationStatus, .location-status, [class*="nearby"]');
+      banners.forEach(function (b) { try { b.style.display = 'none'; b.remove(); } catch (e) {} });
+    } catch (e) {}
+    try {
+      if (window.RevistaDigital && window.RevistaDigital.mapas && typeof window.RevistaDigital.mapas.closeMapFullscreenAndRestoreScroll === 'function') {
+        window.RevistaDigital.mapas.closeMapFullscreenAndRestoreScroll();
+      }
+    } catch (e) {}
     var routes = window.RevistaDigital.routes;
-    if (routes && typeof routes.navigate === "function") {
-      routes.navigate("/carrito-golf");
+    if (routes && typeof routes.navigate === 'function') {
+      routes.navigate('/carrito-golf');
     } else {
-      window.location.href = "/carrito-golf";
+      window.location.href = '/carrito-golf';
     }
     return true;
   };
@@ -1449,6 +1468,34 @@ if (request.routeStatus === "loading") {
     startLocationTracking();
     render();
     buildMap();
+    // Auto-fullscreen en móvil al venir desde "Ver el transporte"
+    try {
+      if (window.innerWidth <= 768 && sessionStorage.getItem('auto_fullscreen_transporte') === 'true') {
+        sessionStorage.removeItem('auto_fullscreen_transporte');
+        var cartMapContainer = document.querySelector('#cartMap, .cart-map-container, #cartTrackingMap');
+        if (cartMapContainer) {
+          cartMapContainer.style.position = 'relative';
+          cartMapContainer.classList.add('map-fullscreen');
+          if (!cartMapContainer.querySelector('.cart-map-exit-fullscreen')) {
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'cart-map-exit-fullscreen';
+            btn.textContent = 'SALIR DEL MAPA';
+            btn.style.cssText = 'position:absolute;top:12px;right:12px;z-index:1000;padding:8px 14px;background:rgba(255,255,255,0.95);color:#0b3d66;border:none;border-radius:999px;cursor:pointer;font-size:12px;font-weight:700;letter-spacing:.06em;box-shadow:0 4px 12px rgba(0,0,0,0.25);';
+            btn.addEventListener('click', function () {
+              cartMapContainer.classList.remove('map-fullscreen');
+              try { if (document.fullscreenElement) document.exitFullscreen().catch(function(){}); } catch(e){}
+              setTimeout(function () { try { if (cg._map) cg._map.invalidateSize(); } catch(e){} }, 100);
+              try { if (cg.refreshMapLayout) cg.refreshMapLayout(); } catch(e){}
+            });
+            cartMapContainer.appendChild(btn);
+          }
+        }
+        setTimeout(function () {
+          try { if (cg._map) cg._map.invalidateSize(); } catch (e) {}
+        }, 50);
+      }
+    } catch (e) {}
     return true;
   };
 
