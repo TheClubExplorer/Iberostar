@@ -66,6 +66,14 @@
     }
 
     .mapboxgl-marker { z-index: 99999 !important; }
+    .mapboxgl-popup { z-index: 100000 !important; }
+    .mapboxgl-popup-content { z-index: 100001 !important; position: relative; }
+    .mapboxgl-popup-close-button { z-index: 100002 !important; }
+    .mapboxgl-popup-tip { z-index: 100001 !important; }
+    /* Marcador de ubicación del usuario */
+    .user-location-marker { width: 20px; height: 20px; border-radius: 50%; background: #007bff; border: 3px solid #ffffff; box-shadow: 0 0 0 rgba(0,123,255,0.4); animation: user-pulse 2s infinite; cursor: pointer; }
+    .user-location-accuracy { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 30px; height: 30px; border-radius: 50%; border: 2px solid rgba(0,123,255,0.35); background: rgba(0,123,255,0.1); pointer-events: none; }
+    @keyframes user-pulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0,123,255,0.7); } 70% { transform: scale(1.4); box-shadow: 0 0 0 10px rgba(0,123,255,0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0,123,255,0); } }
     .gp-marker-container { width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; background: transparent; }
     .gp-club-wrap { position: relative; width: 30px; height: 30px; }
     .gp-club-pulse { position: absolute; inset: -7px; border-radius: 50%; border: 2px solid rgba(212,175,55,0.85); opacity: 0; z-index: 0; transform: scale(0.6); animation: gpClubPulse 2.4s ease-out infinite; }
@@ -279,6 +287,7 @@
       showOnlyComplex();
       setTimeout(function(){ try{ applyNightAndClean(); showOnlyComplex(); }catch(e){} }, 200);
       setTimeout(function(){ try{ applyNightAndClean(); showOnlyComplex(); }catch(e){} }, 800);
+      try { initUserLocation(); } catch(e){ console.warn('initUserLocation falló:', e); }
     });
 
       map.on('idle', function(){
@@ -291,7 +300,86 @@
     window.addEventListener('resize', function(){ map.resize(); });
     window.irAlPunto = function(nombre, lat, lng){
       try { sessionStorage.setItem('destino_solicitado', JSON.stringify({nombre:nombre, lat:lat, lng:lng})); } catch(e){}
-      window.location.href = 'carrito-golf.html';
+      var userLat = window.RevistaDigital && window.RevistaDigital.userLocation ? window.RevistaDigital.userLocation.lat : null;
+      var userLng = window.RevistaDigital && window.RevistaDigital.userLocation ? window.RevistaDigital.userLocation.lng : null;
+      var destName = encodeURIComponent(nombre || 'Destino');
+      if(userLat != null && userLng != null){
+        // Abrir Google Maps con ruta desde ubicación actual hasta el POI
+        window.location.href = 'https://www.google.com/maps/dir/?api=1&origin='+userLat+','+userLng+'&destination='+lat+','+lng+'&destination='+destName+'&travelmode=driving';
+      } else {
+        // Fallback: abrir Google Maps directo al destino
+        window.location.href = 'https://www.google.com/maps/search/?api=1&query='+lat+','+lng+'&query='+destName;
+      }
+    };
+
+    // --- Geolocalización del usuario en tiempo real -------------------------
+    window.initUserLocation = function(){
+      if(!navigator.geolocation){
+        console.warn('Geolocalización no soportada por este navegador');
+        return;
+      }
+      var userMarker = null;
+      var userAccuracyCircle = null;
+      var watchId = null;
+
+      function crearMarcador(lat, lng, accuracy){
+        // Remover marcador anterior si existe
+        if(userMarker){ userMarker.remove(); }
+        if(userAccuracyCircle){ userAccuracyCircle.remove(); }
+
+        var el = document.createElement('div');
+        el.className = 'user-location-marker';
+        el.title = 'Tu ubicación';
+
+        var accuracyEl = document.createElement('div');
+        accuracyEl.className = 'user-location-accuracy';
+        if(accuracy){
+          var size = Math.max(10, Math.min(accuracy * 2, 200)); // círculo entre 10px y 200px
+          accuracyEl.style.width = size + 'px';
+          accuracyEl.style.height = size + 'px';
+        }
+        el.appendChild(accuracyEl);
+
+        userMarker = new mapboxgl.Marker({ element: el, anchor: 'center' })
+          .setLngLat([lng, lat])
+          .addTo(map);
+
+        // Guardar ubicación para usarla en irAlPunto
+        window.RevistaDigital = window.RevistaDigital || {};
+        window.RevistaDigital.userLocation = { lat: lat, lng: lng, accuracy: accuracy || 0 };
+
+        // Centrar mapa la primera vez (solo si el usuario está dentro de los bounds)
+        if(!window.__userLocationCentered){
+          try {
+            map.flyTo({ center: [lng, lat], zoom: 17, duration: 1500 });
+            window.__userLocationCentered = true;
+          } catch(e){}
+        }
+      }
+
+      function onSuccess(pos){
+        var lat = pos.coords.latitude;
+        var lng = pos.coords.longitude;
+        var acc = pos.coords.accuracy || 0;
+        crearMarcador(lat, lng, acc);
+      }
+
+      function onError(err){
+        console.warn('Geolocalización denegada o falló:', err.message);
+      }
+
+      var options = { enableHighAccuracy: true, timeout: 10000, maximumAge: 5000 };
+
+      // Primera solicitud inmediata
+      navigator.geolocation.getCurrentPosition(onSuccess, onError, options);
+
+      // Seguimiento continuo (tiempo real)
+      watchId = navigator.geolocation.watchPosition(onSuccess, onError, options);
+
+      // Limpiar al salir de la página
+      window.addEventListener('beforeunload', function(){
+        if(watchId != null) navigator.geolocation.clearWatch(watchId);
+      });
     };
   </script>
 
