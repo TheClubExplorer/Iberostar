@@ -72,8 +72,20 @@
     .mapboxgl-popup-close-button { z-index: 100002 !important; }
     .mapboxgl-popup-tip { z-index: 100001 !important; }
     /* Marcador de destino (Cómo llegar) */
-    .destino-marker { width: 24px; height: 24px; border-radius: 50%; background: #ff3b30; border: 3px solid #ffffff; box-shadow: 0 0 0 rgba(255,59,48,0.6); animation: destino-pulse 2s infinite; cursor: pointer; }
+    .destino-marker { width: 24px; height: 24px; border-radius: 50%; background: #ff3b30; border: 3px solid #ffffff; box-shadow: 0 0 0 rgba(255,59,48,0.6); animation: destino-pulse 2s infinite; cursor: pointer; z-index: 100; }
     @keyframes destino-pulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255,59,48,0.7); } 70% { transform: scale(1.5); box-shadow: 0 0 0 12px rgba(255,59,48,0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255,59,48,0); } }
+
+    /* Panel de información de ruta */
+    .route-info { position: fixed; bottom: 24px; left: 24px; z-index: 200000; background: rgba(255,255,255,0.95); border-radius: 12px; padding: 14px 18px; box-shadow: 0 6px 24px rgba(0,0,0,0.35); font-family: var(--font-display); min-width: 200px; display: none; }
+    .route-info.is-visible { display: block; }
+    .route-info h4 { margin: 0 0 8px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.14em; color: #5a3e1b; font-weight: 700; }
+    .route-info .route-stats { display: flex; gap: 16px; margin-bottom: 10px; }
+    .route-info .stat { text-align: center; }
+    .route-info .stat-value { font-size: 16px; font-weight: 700; color: #caa867; font-family: var(--font-display); }
+    .route-info .stat-label { font-size: 10px; color: #8c734b; text-transform: uppercase; letter-spacing: 0.1em; }
+    .route-info .route-note { font-size: 11px; color: #5a3e1b; margin: 0; }
+    .route-info .btn-recalcular { margin-top: 10px; padding: 8px 14px; border: 1px solid #caa867; background: transparent; color: #caa867; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; font-family: var(--font-display); text-transform: uppercase; letter-spacing: 0.1em; }
+    .route-info .btn-recalcular:hover { background: #caa867; color: #ffffff; }
     /* Marcador de ubicación del usuario - persona dorada con pulso (igual que Leaflet) */
     .user-location-marker { width: 28px; height: 28px; position: relative; cursor: pointer; }
     .user-marker-wrap { position: relative; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; }
@@ -148,6 +160,22 @@
   </div>
 
   <div id="map"></div>
+
+  <div id="route-info" class="route-info">
+    <h4>Ruta hacia: <span id="route-dest-name"></span></h4>
+    <div class="route-stats">
+      <div class="stat">
+        <div class="stat-value">-- km</div>
+        <div class="stat-label">Distancia</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">-- min</div>
+        <div class="stat-label">Tiempo</div>
+      </div>
+    </div>
+    <p class="route-note">Ruta por calles · Se recalcula al moverse</p>
+    <button class="btn-recalcular" onclick="recalcularRuta()">Recalcular</button>
+  </div>
 
   <button class="guide-toggle" id="guideToggle">Mostrar guía</button>
 
@@ -313,13 +341,26 @@
     function limpiarRuta(){
       if(destinoMarker){ destinoMarker.remove(); destinoMarker = null; }
       if(rutaLinea){
-        try { map.removeLayer('ruta-linea'); map.removeSource('ruta-src'); } catch(e){}
+        try {
+          map.removeLayer('ruta-puntos');
+          map.removeLayer('ruta-linea');
+          map.removeSource('ruta-src');
+        } catch(e){}
         rutaLinea = null;
       }
+      // Ocultar panel de información
+      var panel = document.getElementById('route-info');
+      if(panel) panel.classList.remove('is-visible');
+      rutaActiva = null;
     }
 
-    function dibujarRuta(userLat, userLng, destLat, destLng){
+    // Estado de ruta activa para recalcular al moverse
+    var rutaActiva = null; // {userLat,userLng,destLat,destLng,destName}
+
+    function dibujarRuta(userLat, userLng, destLat, destLng, destName){
       limpiarRuta();
+      rutaActiva = { userLat: userLat, userLng: userLng, destLat: destLat, destLng: destLng, destName: destName };
+
       // Marcar destino
       var destEl = document.createElement('div');
       destEl.className = 'destino-marker';
@@ -328,7 +369,88 @@
         .setLngLat([destLng, destLat])
         .addTo(map);
 
-      // Dibujar línea desde usuario hasta destino
+      // Llamar a Mapbox Directions API para ruta real por calles
+      var accessToken = mapboxgl.accessToken;
+      var url = 'https://api.mapbox.com/directions/v5/mapbox/driving/' +
+        userLng + ',' + userLat + ';' + destLng + ',' + destLat +
+        '?geometries=geojson&steps=false&overview=full&access_token=' + accessToken;
+
+      fetch(url)
+        .then(function(res){ return res.json(); })
+        .then(function(data){
+          if(data.code === 'Ok' && data.routes && data.routes.length > 0){
+            var route = data.routes[0];
+            var coords = route.geometry.coordinates; // [[lng,lat], ...]
+            var distanceKm = (route.distance / 1000).toFixed(1);
+            var durationMin = Math.round(route.duration / 60);
+
+            // Mostrar panel de información de ruta
+            var panel = document.getElementById('route-info');
+            var destNameEl = document.getElementById('route-dest-name');
+            if(panel){
+              if(destNameEl && destName) destNameEl.textContent = destName;
+              panel.querySelector('.stat-value').textContent = distanceKm + ' km';
+              panel.querySelector('.stat-label').textContent = 'DISTANCIA';
+              var timeStat = panel.querySelector('.stat-value:nth-of-type(2)');
+              if(timeStat) timeStat.textContent = durationMin + ' min';
+              panel.classList.add('is-visible');
+            }
+
+            // Dibujar la geometría de la ruta por calles
+            map.addSource('ruta-src', {
+              type: 'geojson',
+              data: {
+                type: 'Feature',
+                geometry: {
+                  type: 'LineString',
+                  coordinates: coords
+                }
+              }
+            });
+            map.addLayer({
+              id: 'ruta-linea',
+              type: 'line',
+              source: 'ruta-src',
+              paint: {
+                'line-color': '#caa867',
+                'line-width': 5,
+                'line-opacity': 0.9,
+                'line-join': 'round',
+                'line-cap': 'round'
+              }
+            });
+            // Capa de puntos de la ruta para mejor visibilidad
+            map.addLayer({
+              id: 'ruta-puntos',
+              type: 'circle',
+              source: 'ruta-src',
+              paint: {
+                'circle-radius': 3,
+                'circle-color': '#caa867',
+                'circle-opacity': 0.7,
+                'circle-stroke-width': 1,
+                'circle-stroke-color': '#ffffff'
+              }
+            });
+            rutaLinea = true;
+
+            // Ajustar vista para incluir ruta completa
+            try {
+              map.fitBounds([coords[0], coords[coords.length-1]], { padding: 60, duration: 1000 });
+            } catch(e){}
+          } else {
+            console.warn('Directions API no devolvió ruta:', data.message);
+            // Fallback: línea recta si falla la API
+            dibujarLineaRecta(userLat, userLng, destLat, destLng);
+          }
+        })
+        .catch(function(err){
+          console.warn('Error llamando a Directions API:', err);
+          dibujarLineaRecta(userLat, userLng, destLat, destLng);
+        });
+    }
+
+    function dibujarLineaRecta(userLat, userLng, destLat, destLng){
       try {
         map.addSource('ruta-src', {
           type: 'geojson',
@@ -353,6 +475,14 @@
         });
         rutaLinea = true;
       } catch(e){ console.warn('No se pudo dibujar la ruta:', e); }
+    }
+
+    function recalcularRuta(){
+      if(!rutaActiva) return;
+      var userLoc = window.RevistaDigital && window.RevistaDigital.userLocation;
+      if(userLoc && userLoc.lat != null && userLoc.lng != null){
+        dibujarRuta(userLoc.lat, userLoc.lng, rutaActiva.destLat, rutaActiva.destLng, rutaActiva.destName);
+      }
     }
 
     window.irAlPunto = function(nombre, lat, lng){
@@ -386,7 +516,7 @@
       // Dibujar ruta desde ubicación del usuario si existe
       var userLoc = window.RevistaDigital && window.RevistaDigital.userLocation;
       if(userLoc && userLoc.lat != null && userLoc.lng != null){
-        dibujarRuta(userLoc.lat, userLoc.lng, lat, lng);
+        dibujarRuta(userLoc.lat, userLoc.lng, lat, lng, nombre);
       }
     };
 
@@ -439,11 +569,20 @@
         }
       }
 
+      var lastRecalcTime = 0;
+
       function onSuccess(pos){
         var lat = pos.coords.latitude;
         var lng = pos.coords.longitude;
         var acc = pos.coords.accuracy || 0;
         crearMarcador(lat, lng, acc);
+
+        // Recalcular ruta automáticamente si hay una activa y han pasado al menos 15 segundos
+        var now = Date.now();
+        if(rutaActiva && (now - lastRecalcTime) > 15000){
+          lastRecalcTime = now;
+          try { recalcularRuta(); } catch(e){ console.warn('Recalculo automático falló:', e); }
+        }
       }
 
       function onError(err){

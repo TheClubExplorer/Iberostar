@@ -3937,6 +3937,65 @@ body.pano-360-open { overflow: hidden; }
 .pano-360-stage #pano360Stage { position: absolute; inset: 0; width: 100%; height: 100%; }
 @media (max-width: 992px) { .pano-360-floating-menu { padding: 12px; } .pano-360-floating-panel { width: min(92vw, 620px); } .pano-360-modal { padding: 10px 8px; justify-content: flex-start; background: rgba(6,12,22,0.98); } .pano-360-bar { width: calc(100% - 16px); margin: 0 8px; border-radius: 10px 10px 0 0; padding: 10px 14px; font-size: clamp(14px, 3.8vw, 16px); } .pano-360-stage { width: calc(100% - 16px); margin: 0 8px 8px; height: clamp(240px, 56.25vw, 380px); border-radius: 0 0 10px 10px; } }
 @media (max-width: 620px) { .pano-360-menu-content { padding: 24px 22px 26px; } .pano-360-menu-content h3 { font-size: 30px; } .pano-360-menu-header { padding: 16px 20px; } }
+@media (max-width: 620px), (max-height: 500px) {
+  .pano-360-modal {
+    height: 100vh;
+    height: 100dvh;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .pano-360-bar {
+    display: grid;
+    flex: none;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+    width: 100%;
+    margin: 0;
+    padding: calc(env(safe-area-inset-top, 0px) + 8px) 10px 8px;
+    border-radius: 0;
+  }
+
+  .pano-360-bar strong {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .pano-360-bar-actions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) 40px;
+    gap: 6px;
+    width: 100%;
+  }
+
+  .pano-360-bar-actions > button:not(.pano-360-close) {
+    min-width: 0;
+    min-height: 42px;
+    padding: 7px 4px;
+    font-size: clamp(9px, 2.8vw, 11px);
+    line-height: 1.15;
+    letter-spacing: .02em;
+    text-align: center;
+    white-space: normal;
+  }
+
+  .pano-360-close {
+    width: 40px;
+    height: 40px;
+  }
+
+  .pano-360-stage {
+    flex: 1 1 0;
+    width: 100%;
+    min-height: 0;
+    height: auto;
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+}
 @media (max-width: 960px) {
   .pano-360-list {
     grid-template-columns: repeat(2, 1fr);
@@ -7063,7 +7122,7 @@ body.cart-map-focus-open .hotel-portal-nav { display: none !important; }
   box-shadow: none;
 }
 
-.cart-page-hero--compact > .cart-hero-inner {
+.cart-page .cart-page-hero--compact > .cart-hero-inner {
   display: flex;
   max-width: none;
   gap: 10px;
@@ -7500,7 +7559,7 @@ body.cart-map-focus-open .hotel-portal-nav { display: none !important; }
     margin-bottom: 6px;
   }
 
-  .cart-page-hero--compact > .cart-hero-inner {
+  .cart-page .cart-page-hero--compact > .cart-hero-inner {
     gap: 7px;
     padding-bottom: 8px;
   }
@@ -7508,7 +7567,12 @@ body.cart-map-focus-open .hotel-portal-nav { display: none !important; }
   .cart-hero-top {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
     gap: 8px;
+  }
+
+  .cart-hero-head {
+    min-width: 0;
   }
 
   .cart-hero-head .portal-kicker,
@@ -7518,18 +7582,23 @@ body.cart-map-focus-open .hotel-portal-nav { display: none !important; }
 
   .cart-hero-head h1 {
     margin: 0;
-    font-size: clamp(25px, 7vw, 30px);
+    font-size: clamp(18px, 5.5vw, 24px);
+    line-height: 1.1;
+    white-space: nowrap;
   }
 
   .cart-hero-actions {
     display: flex;
+    min-width: 0;
     max-width: none;
     gap: 6px;
+    justify-content: flex-end;
   }
 
   .cart-location-pill.is-active {
     display: block;
-    max-width: 150px;
+    width: clamp(96px, 32vw, 138px);
+    max-width: none;
     min-height: 40px;
     overflow: hidden;
     padding: 9px 10px;
