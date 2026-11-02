@@ -407,9 +407,23 @@
     return records.map((item) => `<a class="destination-card ${type}" href="${escapeHtml(href(getPath(item)))}" data-app-route="${escapeHtml(getPath(item))}">
       ${RI.img(item.image || "src/JOIA2.jpg", { alt: "", sizes: "(max-width:600px) 92vw, (max-width:850px) 46vw, 40vw" })}<span class="destination-card-copy"><small>${eyebrow}</small><strong>${escapeHtml(item.name)}</strong><span>${escapeHtml(item.description || item.tagline || "Descubra el hotel y sus experiencias.")}</span><b>${cta}</b></span></a>`).join("");
   }
+  function renderPortalQuickLinks(records, getPath, ariaLabel, getCount = null) {
+    return `<div class="portal-country-chips" aria-label="${escapeHtml(ariaLabel)}">${records.map((item) => {
+      const path = getPath(item);
+      const count = getCount ? getCount(item) : null;
+      return `<a class="portal-country-chip" href="${escapeHtml(href(path))}" data-app-route="${escapeHtml(path)}">${escapeHtml(item.name)}${count === null ? "" : `<span>${count}</span>`}</a>`;
+    }).join("")}</div>`;
+  }
   const initializedPortalCarousels = new WeakSet();
   function renderPortalHeroCarousel(images, label, className = "", imageClass = "", sizes = "(max-width:850px) 100vw, 45vw") {
-    const sources = [...new Set((images || []).filter((image) => typeof image === "string" && image.trim()))].slice(0, 6);
+    const seenImages = new Set();
+    const sources = (images || []).filter((image) => {
+      if (typeof image !== "string" || !image.trim()) return false;
+      const sourceKey = image.trim().replace(/%20/gi, " ").replace(/\\/g, "/").toLowerCase().replace(/\.(?:jpe?g|png|webp)$/i, "");
+      if (seenImages.has(sourceKey)) return false;
+      seenImages.add(sourceKey);
+      return true;
+    }).slice(0, 6);
     if (!sources.length) return "";
     const slides = sources.map((src, index) => `<div class="portal-hero-carousel-slide${index === 0 ? " is-active" : ""}" aria-hidden="${index !== 0}">
       ${RI.img(src, {
@@ -421,21 +435,21 @@
       })}
     </div>`).join("");
     const controls = sources.length > 1 ? `<div class="portal-hero-carousel-controls">
-      <button type="button" class="portal-hero-carousel-arrow" data-carousel-prev aria-label="Imagen anterior">‹</button>
-      <div class="portal-hero-carousel-dots" aria-label="Seleccionar imagen">${sources.map((_, index) => `<button type="button" class="portal-hero-carousel-dot${index === 0 ? " is-active" : ""}" data-carousel-slide="${index}" aria-label="Mostrar imagen ${index + 1}" aria-current="${index === 0 ? "true" : "false"}"></button>`).join("")}</div>
-      <button type="button" class="portal-hero-carousel-arrow" data-carousel-next aria-label="Imagen siguiente">›</button>
+      <div class="portal-hero-carousel-dots" data-i18n-aria="carouselSelectImage" aria-label="Seleccionar imagen">${sources.map((_, index) => `<button type="button" class="portal-hero-carousel-dot${index === 0 ? " is-active" : ""}" data-carousel-slide="${index}" data-i18n-aria="carouselShowImage${index + 1}" aria-label="Mostrar imagen ${index + 1}" aria-current="${index === 0 ? "true" : "false"}"></button>`).join("")}</div>
     </div>` : "";
-    return `<div class="portal-hero-carousel ${className}" data-portal-hero-carousel role="region" aria-roledescription="carrusel" aria-label="Imágenes de ${escapeHtml(label)}">${slides}${controls}</div>`;
+    return `<div class="portal-hero-carousel ${className}" data-portal-hero-carousel data-i18n-aria="carouselRegion" role="region" aria-roledescription="carrusel" aria-label="Carrusel de imágenes: ${escapeHtml(label)}">${slides}${controls}</div>`;
   }
   function initPortalHeroCarousels(root) {
     if (!root) return;
+    window.RevistaDigital.i18n?.applyTranslations?.();
     root.querySelectorAll("[data-portal-hero-carousel]").forEach((carousel) => {
       if (initializedPortalCarousels.has(carousel)) return;
       initializedPortalCarousels.add(carousel);
       const slides = [...carousel.querySelectorAll(".portal-hero-carousel-slide")];
       if (slides.length < 2) return;
       const dots = [...carousel.querySelectorAll("[data-carousel-slide]")];
-      const desktopQuery = window.matchMedia("(min-width: 851px) and (prefers-reduced-motion: no-preference)");
+      const autoPlayQuery = window.matchMedia("(prefers-reduced-motion: no-preference)");
+      const hoverQuery = window.matchMedia("(hover: hover) and (pointer: fine)");
       let activeIndex = 0;
       let timer = null;
       const update = () => {
@@ -462,35 +476,50 @@
       };
       const start = () => {
         stop();
-        if (desktopQuery.matches && !document.hidden && !carousel.matches(":hover") && !carousel.contains(document.activeElement)) {
+        if (autoPlayQuery.matches && !(hoverQuery.matches && carousel.matches(":hover")) && !carousel.contains(document.activeElement)) {
           timer = window.setInterval(() => {
-            if (!document.hidden) goTo(activeIndex + 1);
+            if (!carousel.isConnected) {
+              stop();
+              return;
+            }
+            if (autoPlayQuery.matches && !document.hidden) goTo(activeIndex + 1);
           }, 6000);
         }
       };
-      carousel.querySelector("[data-carousel-prev]")?.addEventListener("click", () => {
-        goTo(activeIndex - 1);
+      let touchStartX = null;
+      carousel.addEventListener("touchstart", (event) => {
+        touchStartX = event.changedTouches[0]?.clientX ?? null;
+        stop();
+      }, { passive: true });
+      carousel.addEventListener("touchend", (event) => {
+        const touchEndX = event.changedTouches[0]?.clientX;
+        if (touchStartX !== null && Number.isFinite(touchEndX)) {
+          const delta = touchEndX - touchStartX;
+          if (Math.abs(delta) > 40) goTo(activeIndex + (delta < 0 ? 1 : -1));
+        }
+        touchStartX = null;
         start();
-      });
-      carousel.querySelector("[data-carousel-next]")?.addEventListener("click", () => {
-        goTo(activeIndex + 1);
+      }, { passive: true });
+      carousel.addEventListener("touchcancel", () => {
+        touchStartX = null;
         start();
+      }, { passive: true });
+      autoPlayQuery.addEventListener("change", (event) => {
+        if (event.matches) start();
+        else stop();
       });
       dots.forEach((dot) => dot.addEventListener("click", () => {
         goTo(Number(dot.dataset.carouselSlide));
         start();
       }));
-      carousel.addEventListener("mouseenter", stop);
+      carousel.addEventListener("mouseenter", () => {
+        if (hoverQuery.matches) stop();
+      });
       carousel.addEventListener("mouseleave", start);
       carousel.addEventListener("focusin", stop);
       carousel.addEventListener("focusout", (event) => {
         if (!carousel.contains(event.relatedTarget)) start();
       });
-      if (typeof desktopQuery.addEventListener === "function") {
-        desktopQuery.addEventListener("change", start);
-      } else {
-        desktopQuery.addListener(start);
-      }
       start();
     });
   }
@@ -712,7 +741,7 @@
         const complexCards = renderCards(complexHotels, (hotel) => `/${countrySlug}/${destination.slug}/${hotel.slug}`, "hotel");
         view.innerHTML = `<main class="portal-page">
           ${portalNav(getPortalNavModel(route))}
-          <section class="portal-destination-hero portal-complex-hero">
+          <section class="portal-destination-hero portal-complex-hero portal-hero--fullbleed">
             ${renderPortalHeroCarousel([
               destination.image || "src/paraiso-del-mar/banner/ParaisoDelMar.jpg",
               ...complexHotels.map((hotel) => hotel.image)
@@ -795,7 +824,10 @@
           countryMapMarkup = `<section class="portal-map-section"><div><p class="portal-kicker">UBICACIÓN</p><h2>Mapa de ${escapeHtml(countryData.name)}</h2><p>Explore los hoteles disponibles en los destinos de ${escapeHtml(countryData.name)}.</p></div><div class="portal-map-frame"><div class="portal-destination-map" id="countryMap" role="application" aria-label="Mapa de hoteles en ${escapeHtml(countryData.name)}"></div>${portalMapActions(countryHotels)}</div></section>`;
         }
       }
-      view.innerHTML = `<main class="portal-page">${!isHome ? portalNav(getPortalNavModel(route)) : ""}<section class="portal-hero"><div><p class="portal-kicker">${breadcrumb}</p><h1>${heading}</h1><p>${intro}</p>${!isHome ? "" : `<a class="portal-hero-link" href="${href("/mexico/riviera-maya")}" data-app-route="/mexico/riviera-maya">Conozca Iberostar Playa Paraíso <span>→</span></a><div class="portal-hero-stats" aria-label="Resumen de destinos"><span><strong>${Object.keys(catalog).length}</strong> países</span><span><strong>${totalDestinations}</strong> destinos</span><span><strong>${totalHotels}</strong> hoteles</span></div>`}</div>${renderPortalHeroCarousel(heroImages, isHome ? "nuestros destinos" : countryData.name)}</section>${countryMapMarkup}<section class="portal-section"><div class="portal-section-heading"><div><p class="portal-kicker">${isHome ? "NUESTROS PAÍSES" : "DESTINOS"}</p><h2>${isHome ? "Viaje a su manera" : "Elija dónde hospedarse"}</h2></div>${!isHome ? `<a href="${href("/")}" data-app-route="/">Todos los países</a>` : ""}</div>${isHome ? `<div class="portal-country-chips" aria-label="Acceso rápido a países">${countryCards.map((item) => `<a class="portal-country-chip" href="${escapeHtml(href(item.route))}" data-app-route="${escapeHtml(item.route)}">${escapeHtml(item.name)}<span>${item.destinations}</span></a>`).join("")}</div>` : ""}<div class="destination-grid portal-card-carousel">${cards}</div></section></main>`;
+      const quickLinks = isHome
+        ? renderPortalQuickLinks(countryCards, (item) => item.route, "Acceso rápido a países", (item) => item.destinations)
+        : renderPortalQuickLinks(countryData.destinations, (item) => `/${country}/${item.slug}`, "Acceso rápido a destinos", (item) => item.hotels.length);
+      view.innerHTML = `<main class="portal-page">${!isHome ? portalNav(getPortalNavModel(route)) : ""}<section class="portal-hero portal-hero--fullbleed"><div><p class="portal-kicker">${breadcrumb}</p><h1>${heading}</h1><p>${intro}</p>${!isHome ? "" : `<a class="portal-hero-link" href="${href("/mexico/riviera-maya")}" data-app-route="/mexico/riviera-maya">Conozca Iberostar Playa Paraíso <span>→</span></a><div class="portal-hero-stats" aria-label="Resumen de destinos"><span><strong>${Object.keys(catalog).length}</strong> países</span><span><strong>${totalDestinations}</strong> destinos</span><span><strong>${totalHotels}</strong> hoteles</span></div>`}</div>${renderPortalHeroCarousel(heroImages, isHome ? "nuestros destinos" : countryData.name)}</section>${countryMapMarkup}<section class="portal-section"><div class="portal-section-heading"><div><p class="portal-kicker">${isHome ? "NUESTROS PAÍSES" : "DESTINOS"}</p><h2>${isHome ? "Viaje a su manera" : "Elija dónde hospedarse"}</h2></div>${!isHome ? `<a href="${href("/")}" data-app-route="/">Todos los países</a>` : ""}</div>${quickLinks}<div class="destination-grid portal-card-carousel">${cards}</div></section></main>`;
       initPortalHeroCarousels(view);
       const countryMap = view.querySelector("#countryMap");
       if (countryMap) {
@@ -813,7 +845,7 @@
       document.body.dataset.appMode = "portal";
       document.body.dataset.routeManaged = "true";
       const mapDescription = destination.mapNotice || "Seleccione un marcador para abrir la ficha del hotel.";
-      view.innerHTML = `<main class="portal-page">${portalNav(getPortalNavModel(route))}<section class="portal-destination-hero">${renderPortalHeroCarousel([destination.image, ...hotels.map((hotel) => hotel.image)], destination.name)}<div><p class="portal-kicker">${escapeHtml(countryData.name).toUpperCase()} · DESTINO</p><h1>${escapeHtml(destination.name)}</h1><p>${escapeHtml(destination.description)}</p>${destination.complex ? `<a class="portal-hero-link" href="${href("/mexico/riviera-maya")}" data-app-route="/mexico/riviera-maya">Ver el complejo Playa Paraíso →</a>` : ""}</div></section><section class="portal-section"><div class="portal-section-heading"><div><p class="portal-kicker">ALOJAMIENTOS</p><h2>Hoteles en ${escapeHtml(destination.name)}</h2></div></div><div class="destination-grid destination-grid--hotels portal-card-carousel">${renderCards(hotels, (hotel) => `/${country}/${destination.slug}/${hotel.slug}`, "hotel")}</div></section></main>`;
+      view.innerHTML = `<main class="portal-page">${portalNav(getPortalNavModel(route))}<section class="portal-destination-hero portal-hero--fullbleed">${renderPortalHeroCarousel([destination.image, ...hotels.map((hotel) => hotel.image)], destination.name)}<div><p class="portal-kicker">${escapeHtml(countryData.name).toUpperCase()} · DESTINO</p><h1>${escapeHtml(destination.name)}</h1><p>${escapeHtml(destination.description)}</p>${destination.complex ? `<a class="portal-hero-link" href="${href("/mexico/riviera-maya")}" data-app-route="/mexico/riviera-maya">Ver el complejo Playa Paraíso →</a>` : ""}</div></section><section class="portal-section"><div class="portal-section-heading"><div><p class="portal-kicker">ALOJAMIENTOS</p><h2>Hoteles en ${escapeHtml(destination.name)}</h2></div></div>${renderPortalQuickLinks(hotels, (hotel) => `/${country}/${destination.slug}/${hotel.slug}`, "Acceso rápido a hoteles")}<div class="destination-grid destination-grid--hotels portal-card-carousel">${renderCards(hotels, (hotel) => `/${country}/${destination.slug}/${hotel.slug}`, "hotel")}</div></section></main>`;
       initPortalHeroCarousels(view);
       const mapElement = view.querySelector("#destinationMap");
       if (mapElement) window.RevistaDigital.mapas?.initializeDestinationMap(mapElement, { countrySlug: country, destination });
