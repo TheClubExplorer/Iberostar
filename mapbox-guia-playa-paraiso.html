@@ -355,99 +355,219 @@
     }
 
     // Estado de ruta activa para recalcular al moverse
-    var rutaActiva = null; // {userLat,userLng,destLat,destLng,destName}
+    var rutaActiva = null; // {userLat,userLng,destLat,destLng,destName,abortController}
+
+    // Límites del complejo Playa Paraíso para decidir perfil de ruta
+    var COMPLEX_BOUNDS = [[20.7525065, -86.9710573], [20.7654525, -86.9560717]];
+
+    function isComplexDestination(lat, lng){
+      return lat >= COMPLEX_BOUNDS[0][0] && lat <= COMPLEX_BOUNDS[1][0] &&
+             lng >= COMPLEX_BOUNDS[0][1] && lng <= COMPLEX_BOUNDS[1][1];
+    }
+
+    // Decodifica polyline codificada (precisión 6, como Valhalla)
+    function decodePolyline(encoded, precision){
+      var factor = Math.pow(10, precision || 6);
+      var coordinates = [];
+      var index = 0;
+      var latitude = 0;
+      var longitude = 0;
+      var length = encoded ? encoded.length : 0;
+
+      while(index < length){
+        var shift = 0, result = 0, byte;
+        do {
+          byte = encoded.charCodeAt(index++) - 63;
+          result |= (byte & 0x1f) << shift;
+          shift += 5;
+        } while(byte >= 0x20);
+        latitude += (result & 1) ? ~(result >> 1) : (result >> 1);
+
+        shift = 0; result = 0;
+        do {
+          byte = encoded.charCodeAt(index++) - 63;
+          result |= (byte & 0x1f) << shift;
+          shift += 5;
+        } while(byte >= 0x20);
+        longitude += (result & 1) ? ~(result >> 1) : (result >> 1);
+
+        coordinates.push([latitude / factor, longitude / factor]);
+      }
+      return coordinates;
+    }
+
+    // Obtiene ruta peatonal usando Valhalla (mejor para dentro del complejo)
+    function requestPedestrianRoute(origin, destination, signal){
+      var payload = {
+        locations: [
+          { lat: origin[0], lon: origin[1] },
+          { lat: destination[0], lon: destination[1] }
+        ],
+        costing: "pedestrian",
+        costing_options: {
+          pedestrian: {
+            use_roads: 0,
+            use_trails: 1.0,
+            use_lit: 1.0,
+            walking_speed: 4.5
+          }
+        },
+        search_radius: 40,
+        units: "kilometers"
+      };
+
+      return fetch("https://valhalla1.openstreetmap.de/route", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        signal: signal
+      })
+      .then(function(response){
+        if(!response.ok) throw new Error("Valhalla no disponible (" + response.status + ").");
+        return response.json();
+      })
+      .then(function(data){
+        var trip = data && data.trip;
+        if(!trip || trip.status !== 0 || !Array.isArray(trip.legs) || !trip.legs.length){
+          throw new Error("Valhalla no encontró una ruta peatonal.");
+        }
+        var encodedShape = trip.legs.map(function(leg){ return leg.shape || ""; }).join("");
+        var coordinates = decodePolyline(encodedShape, 6);
+        if(!coordinates.length) throw new Error("Valhalla devolvió geometría vacía.");
+        var summary = trip.summary || {};
+        return {
+          provider: "valhalla",
+          profile: "pedestrian",
+          distance: typeof summary.length === "number" ? summary.length * 1000 : null,
+          duration: typeof summary.time === "number" ? summary.time : null,
+          coordinates: coordinates
+        };
+      });
+    }
+
+    // Obtiene ruta en coche usando OSRM (mejor para rutas largas/vehiculares)
+    function requestDrivingRoute(origin, destination, signal){
+      var start = origin[1] + "," + origin[0];
+      var end = destination[1] + "," + destination[0];
+      var requestUrl = "https://router.project-osrm.org/route/v1/driving/" + start + ";" + end + "?overview=full&geometries=geojson";
+
+      return fetch(requestUrl, signal ? { signal: signal } : undefined)
+      .then(function(response){
+        if(!response.ok) throw new Error("OSRM no disponible (" + response.status + ").");
+        return response.json();
+      })
+      .then(function(route){
+        var best = Array.isArray(route.routes) && route.routes.length ? route.routes[0] : null;
+        var geometry = best?.geometry?.coordinates;
+        if(!best || !Array.isArray(geometry) || !geometry.length){
+          throw new Error("OSRM no encontró una ruta en coche.");
+        }
+        return {
+          provider: "osrm",
+          profile: "driving",
+          distance: best.distance,
+          duration: best.duration,
+          coordinates: geometry.map(function(c){ return [c[1], c[0]]; })
+        };
+      });
+    }
+
+    // Decide el perfil de ruta: peatonal si ambos puntos están dentro del complejo
+    function getPreferredRouteProfile(origin, destination){
+      var originComplex = isComplexDestination(origin[0], origin[1]);
+      var destComplex = isComplexDestination(destination[0], destination[1]);
+      return (originComplex && destComplex) ? "pedestrian" : "driving";
+    }
+
+    function renderRouteOnMap(coordinates, distanceKm, durationMin, profile){
+      try {
+        if(map.getLayer('ruta-linea')) map.removeLayer('ruta-linea');
+        if(map.getLayer('ruta-puntos')) map.removeLayer('ruta-puntos');
+        if(map.getSource('ruta-src')) map.removeSource('ruta-src');
+      } catch(e){}
+      var mapboxCoords = coordinates.map(function(c){ return [c[1], c[0]]; });
+      map.addSource('ruta-src', {
+        type: 'geojson',
+        data: {
+          type: 'Feature',
+          geometry: { type: 'LineString', coordinates: mapboxCoords }
+        }
+      });
+      map.addLayer({
+        id: 'ruta-linea', type: 'line', source: 'ruta-src',
+        paint: { 'line-color': '#caa867', 'line-width': 5, 'line-opacity': 0.9, 'line-join': 'round', 'line-cap': 'round' }
+      });
+      map.addLayer({
+        id: 'ruta-puntos', type: 'circle', source: 'ruta-src',
+        paint: { 'circle-radius': 3, 'circle-color': '#caa867', 'circle-opacity': 0.7, 'circle-stroke-width': 1, 'circle-stroke-color': '#ffffff' }
+      });
+      var panel = document.getElementById('route-info');
+      var destNameEl = document.getElementById('route-dest-name');
+      if(panel){
+        if(destNameEl && rutaActiva && rutaActiva.destName) destNameEl.textContent = rutaActiva.destName;
+        panel.querySelector('.stat-value').textContent = distanceKm + ' km';
+        panel.querySelector('.stat-label').textContent = 'DISTANCIA';
+        var timeStat = panel.querySelector('.stat-value:nth-of-type(2)');
+        if(timeStat) timeStat.textContent = durationMin + ' min';
+        panel.classList.add('is-visible');
+      }
+      try { map.fitBounds([mapboxCoords[0], mapboxCoords[mapboxCoords.length-1]], { padding: 60, duration: 1000 }); } catch(e){}
+      rutaLinea = true;
+    }
 
     function dibujarRuta(userLat, userLng, destLat, destLng, destName){
       limpiarRuta();
-      rutaActiva = { userLat: userLat, userLng: userLng, destLat: destLat, destLng: destLng, destName: destName };
-
-      // Marcar destino
+      rutaActiva = { userLat: userLat, userLng: userLng, destLat: destLat, destLng: destLng, destName: destName, abortController: null };
       var destEl = document.createElement('div');
       destEl.className = 'destino-marker';
       destEl.title = 'Destino';
       destinoMarker = new mapboxgl.Marker({ element: destEl, anchor: 'center' })
-        .setLngLat([destLng, destLat])
-        .addTo(map);
-
-      // Llamar a Mapbox Directions API para ruta real por calles
-      var accessToken = mapboxgl.accessToken;
-      var url = 'https://api.mapbox.com/directions/v5/mapbox/driving/' +
-        userLng + ',' + userLat + ';' + destLng + ',' + destLat +
-        '?geometries=geojson&steps=false&overview=full&access_token=' + accessToken;
-
-      fetch(url)
-        .then(function(res){ return res.json(); })
-        .then(function(data){
+        .setLngLat([destLng, destLat]).addTo(map);
+      var origin = [userLat, userLng];
+      var destination = [destLat, destLng];
+      var prefer = getPreferredRouteProfile(origin, destination);
+      var statusText = prefer === "pedestrian" ? "Calculando ruta a pie..." : "Calculando ruta...";
+      var statusEl = document.getElementById('route-status');
+      if(statusEl) statusEl.textContent = statusText;
+      var abortController = new AbortController();
+      rutaActiva.abortController = abortController;
+      var routePromise = (prefer === "pedestrian")
+        ? requestPedestrianRoute(origin, destination, abortController.signal)
+        : requestDrivingRoute(origin, destination, abortController.signal);
+      routePromise.then(function(result){
+        var routeCoordinates = [[userLat, userLng], ...result.coordinates, [destLat, destLng]];
+        var distanceKm = (result.distance / 1000).toFixed(1);
+        var durationMin = Math.round(result.duration / 60);
+        renderRouteOnMap(routeCoordinates, distanceKm, durationMin, result.profile);
+        var statusEl2 = document.getElementById('route-status');
+        if(statusEl2) statusEl2.textContent = "Ruta " + (result.profile === "pedestrian" ? "a pie" : "en coche") + " marcada: " + distanceKm + " km · " + durationMin + " min";
+      }).catch(function(err){
+        if(err.name === "AbortError") return;
+        console.warn("Error calculando ruta:", err);
+        var accessToken = mapboxgl.accessToken;
+        var url = 'https://api.mapbox.com/directions/v5/mapbox/' + prefer + '/' +
+          userLng + ',' + userLat + ';' + destLng + ',' + destLat +
+          '?geometries=geojson&steps=false&overview=full&access_token=' + accessToken;
+        fetch(url).then(function(res){ return res.json(); }).then(function(data){
           if(data.code === 'Ok' && data.routes && data.routes.length > 0){
             var route = data.routes[0];
-            var coords = route.geometry.coordinates; // [[lng,lat], ...]
+            var coords = route.geometry.coordinates;
+            var routeLatLng = coords.map(function(c){ return [c[1], c[0]]; });
+            var routeCoordinates = [[userLat, userLng], ...routeLatLng, [destLat, destLng]];
             var distanceKm = (route.distance / 1000).toFixed(1);
             var durationMin = Math.round(route.duration / 60);
-
-            // Mostrar panel de información de ruta
-            var panel = document.getElementById('route-info');
-            var destNameEl = document.getElementById('route-dest-name');
-            if(panel){
-              if(destNameEl && destName) destNameEl.textContent = destName;
-              panel.querySelector('.stat-value').textContent = distanceKm + ' km';
-              panel.querySelector('.stat-label').textContent = 'DISTANCIA';
-              var timeStat = panel.querySelector('.stat-value:nth-of-type(2)');
-              if(timeStat) timeStat.textContent = durationMin + ' min';
-              panel.classList.add('is-visible');
-            }
-
-            // Dibujar la geometría de la ruta por calles
-            map.addSource('ruta-src', {
-              type: 'geojson',
-              data: {
-                type: 'Feature',
-                geometry: {
-                  type: 'LineString',
-                  coordinates: coords
-                }
-              }
-            });
-            map.addLayer({
-              id: 'ruta-linea',
-              type: 'line',
-              source: 'ruta-src',
-              paint: {
-                'line-color': '#caa867',
-                'line-width': 5,
-                'line-opacity': 0.9,
-                'line-join': 'round',
-                'line-cap': 'round'
-              }
-            });
-            // Capa de puntos de la ruta para mejor visibilidad
-            map.addLayer({
-              id: 'ruta-puntos',
-              type: 'circle',
-              source: 'ruta-src',
-              paint: {
-                'circle-radius': 3,
-                'circle-color': '#caa867',
-                'circle-opacity': 0.7,
-                'circle-stroke-width': 1,
-                'circle-stroke-color': '#ffffff'
-              }
-            });
-            rutaLinea = true;
-
-            // Ajustar vista para incluir ruta completa
-            try {
-              map.fitBounds([coords[0], coords[coords.length-1]], { padding: 60, duration: 1000 });
-            } catch(e){}
+            renderRouteOnMap(routeCoordinates, distanceKm, durationMin, "driving");
+            var statusEl3 = document.getElementById('route-status');
+            if(statusEl3) statusEl3.textContent = "Ruta en coche marcada: " + distanceKm + " km · " + durationMin + " min";
           } else {
-            console.warn('Directions API no devolvió ruta:', data.message);
-            // Fallback: línea recta si falla la API
+            console.warn("Directions API no devolvió ruta:", data.message);
             dibujarLineaRecta(userLat, userLng, destLat, destLng);
           }
-        })
-        .catch(function(err){
-          console.warn('Error llamando a Directions API:', err);
+        }).catch(function(err2){
+          console.warn("Error en Directions API:", err2);
           dibujarLineaRecta(userLat, userLng, destLat, destLng);
         });
+      });
     }
 
     function dibujarLineaRecta(userLat, userLng, destLat, destLng){
@@ -479,6 +599,7 @@
 
     function recalcularRuta(){
       if(!rutaActiva) return;
+      try { if(rutaActiva.abortController) rutaActiva.abortController.abort(); } catch(e){}
       var userLoc = window.RevistaDigital && window.RevistaDigital.userLocation;
       if(userLoc && userLoc.lat != null && userLoc.lng != null){
         dibujarRuta(userLoc.lat, userLoc.lng, rutaActiva.destLat, rutaActiva.destLng, rutaActiva.destName);
