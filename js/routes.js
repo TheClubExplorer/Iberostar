@@ -416,6 +416,7 @@
         cls: imageClass,
         alt: "",
         priority: index === 0,
+        loading: "eager",
         sizes
       })}
     </div>`).join("");
