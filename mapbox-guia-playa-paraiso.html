@@ -73,10 +73,12 @@
     /* Marcador de destino (Cómo llegar) */
     .destino-marker { width: 24px; height: 24px; border-radius: 50%; background: #ff3b30; border: 3px solid #ffffff; box-shadow: 0 0 0 rgba(255,59,48,0.6); animation: destino-pulse 2s infinite; cursor: pointer; }
     @keyframes destino-pulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255,59,48,0.7); } 70% { transform: scale(1.5); box-shadow: 0 0 0 12px rgba(255,59,48,0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255,59,48,0); } }
-    /* Marcador de ubicación del usuario */
-    .user-location-marker { width: 20px; height: 20px; border-radius: 50%; background: #007bff; border: 3px solid #ffffff; box-shadow: 0 0 0 rgba(0,123,255,0.4); animation: user-pulse 2s infinite; cursor: pointer; }
-    .user-location-accuracy { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 30px; height: 30px; border-radius: 50%; border: 2px solid rgba(0,123,255,0.35); background: rgba(0,123,255,0.1); pointer-events: none; }
-    @keyframes user-pulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0,123,255,0.7); } 70% { transform: scale(1.4); box-shadow: 0 0 0 10px rgba(0,123,255,0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0,123,255,0); } }
+    /* Marcador de ubicación del usuario - persona dorada con pulso (igual que Leaflet) */
+    .user-location-marker { width: 28px; height: 28px; position: relative; cursor: pointer; }
+    .user-marker-wrap { position: relative; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; }
+    .user-marker-pulse { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 72px; height: 72px; pointer-events: none; z-index: 0; }
+    .user-marker-icon { position: relative; z-index: 1; line-height: 0; }
+    .user-location-accuracy { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 30px; height: 30px; border-radius: 50%; border: 2px solid rgba(212,175,55,0.35); background: rgba(212,175,55,0.1); pointer-events: none; }
     .gp-marker-container { width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; background: transparent; }
     .gp-club-wrap { position: relative; width: 30px; height: 30px; }
     .gp-club-pulse { position: absolute; inset: -7px; border-radius: 50%; border: 2px solid rgba(212,175,55,0.85); opacity: 0; z-index: 0; transform: scale(0.6); animation: gpClubPulse 2.4s ease-out infinite; }
@@ -400,9 +402,13 @@
         if(userMarker){ userMarker.remove(); }
         if(userAccuracyCircle){ userAccuracyCircle.remove(); }
 
+        var size = 28;
+        var personSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="' + size + '" height="' + size + '"><circle cx="12" cy="8" r="4" fill="#d4af37"/><path d="M12 14c-4.41 0-8 2.59-8 6h16c0-3.41-3.59-6-8-6z" fill="#d4af37"/></svg>';
+        var pulseSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" width="72" height="72"><circle cx="36" cy="36" r="18" fill="none" stroke="#d4af37" stroke-width="2" opacity="0.6"><animate attributeName="r" from="18" to="32" dur="1.5s" repeatCount="indefinite"/><animate attributeName="opacity" from="0.6" to="0" dur="1.5s" repeatCount="indefinite"/></circle></svg>';
         var el = document.createElement('div');
         el.className = 'user-location-marker';
         el.title = 'Tu ubicación';
+        el.innerHTML = '<div class="user-marker-wrap" style="position:relative;width:' + size + 'px;height:' + size + 'px;display:flex;align-items:center;justify-content:center;"><div class="user-marker-pulse" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:72px;height:72px;pointer-events:none;">' + pulseSvg + '</div><div class="user-marker-icon" style="position:relative;z-index:1;line-height:0;">' + personSvg + '</div></div>';
 
         var accuracyEl = document.createElement('div');
         accuracyEl.className = 'user-location-accuracy';
