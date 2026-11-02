@@ -2174,4 +2174,3 @@ function poiCommonInfoHtml(poi) {
     return true;
   };
 })();
-

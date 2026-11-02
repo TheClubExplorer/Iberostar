@@ -514,39 +514,47 @@
     document.body.dataset.routeManaged = "true";
     view.innerHTML = `<main class="portal-page cart-page">
       ${portalNav(getPortalNavModel(route))}
-      <section class="portal-destination-hero cart-page-hero">
-        ${RI.img("src/paraiso-del-mar/banner/ParaisoDelMar.jpg", {
-          alt: "",
-          priority: true,
-          sizes: "(max-width:600px) 100vw, 45vw"
-        })}
-        <div>
-          <p class="portal-kicker">MOVILIDAD · THE CLUB</p>
-          <h1>Carrito de golf</h1>
-          <p>Solicite un carrito, siga cómo llega hasta su ubicación exacta y le lleva al destino que elija.</p>
-          <div class="cart-page-location">
-            <span class="cart-location-status" data-cart-location-status>Active su ubicación para mostrar exactamente dónde está.</span>
-            <button type="button" class="cart-locate-btn" data-cart-locate>Usar mi ubicación</button>
+      <section class="portal-destination-hero cart-page-hero cart-page-hero--compact">
+        <div class="cart-hero-inner">
+          <div class="cart-hero-top">
+            <div class="cart-hero-head">
+              <p class="portal-kicker">MOVILIDAD · THE CLUB</p>
+              <h1>Carrito de golf</h1>
+              <p class="cart-hero-sub">Solicita un carrito y síguelo en tiempo real hasta tu destino.</p>
+            </div>
+            <div class="cart-hero-actions">
+              <span class="cart-location-pill" data-cart-location-status>Activa tu ubicación para pedirlo con mayor precisión</span>
+              <button type="button" class="cart-locate-pill" data-cart-locate>Usar mi ubicación</button>
+            </div>
+          </div>
+          <div class="cart-quick-bar">
+            <label class="cart-quick-select">
+              <span>Hotel</span>
+              <select data-cart-hotel-select>${options}</select>
+            </label>
+            <button type="button" class="cart-back-to-trip" data-cart-back-to-trip>Ampliar mapa</button>
           </div>
         </div>
       </section>
       <section class="hotel-portal-section hotel-cart-section cart-page-section" id="hotel-carrito">
-        <div class="cart-page-toolbar">
-          <label class="cart-page-hotel-field">
-            <span>Hotel del complejo</span>
-            <select data-cart-hotel-select>${options}</select>
-          </label>
-          <p class="cart-page-hotel-note">El carrito sale desde su posición actual, le recoge donde está y le lleva a su destino.</p>
-          <button type="button" class="cart-back-to-trip" data-cart-back-to-trip>Volver al viaje</button>
-        </div>
         <div class="hotel-cart-tracker" data-cart-tracker>
           <div class="hotel-cart-panel">
+            <div class="cart-panel-handle">
+              <span aria-hidden="true"></span>
+              <button type="button" class="cart-panel-hide" data-cart-panel-toggle aria-expanded="true">Ocultar panel</button>
+            </div>
             <div class="hotel-cart-status" data-cart-status></div>
             <form class="hotel-cart-form" data-cart-form>
-              <p class="hotel-cart-form-note">El carrito le recoge en su ubicación y le lleva al destino que elija.</p>
+              <header class="hotel-cart-form-header">
+                <div>
+                  <p class="hotel-cart-form-kicker">Solicitud</p>
+                  <h2 class="hotel-cart-form-title">Pide tu carrito</h2>
+                </div>
+                <p class="hotel-cart-form-note">Te recoge en tu ubicación y te lleva al destino que elijas.</p>
+              </header>
               <div class="hotel-cart-row">
                 <label class="hotel-cart-field"><span>Nombre</span>
-                  <input type="text" name="nombre" autocomplete="name" placeholder="Su nombre" />
+                  <input type="text" name="nombre" autocomplete="name" placeholder="Tu nombre" />
                 </label>
                 <label class="hotel-cart-field"><span>Habitación</span>
                   <input type="text" name="habitacion" inputmode="numeric" placeholder="Ej. 1204" />
@@ -555,16 +563,21 @@
               <label class="hotel-cart-field"><span>Destino</span>
                 <select name="destino" data-cart-destination></select>
               </label>
-              <label class="hotel-cart-field"><span>Notas</span>
-                <textarea name="notas" rows="2" placeholder="Personas, equipaje o referencia del punto"></textarea>
-              </label>
+              <details class="hotel-cart-notes">
+                <summary>Agregar indicaciones (opcional)</summary>
+                <label class="hotel-cart-field"><span>Personas, equipaje o punto de encuentro</span>
+                  <textarea name="notas" rows="2" placeholder="Escribe aquí tus indicaciones"></textarea>
+                </label>
+              </details>
               <button type="submit" class="hotel-cart-submit">Solicitar carrito</button>
-              <p class="hotel-cart-form-note">Servicio simulado: verá cómo el carrito le recoge y le lleva a su destino.</p>
+              <p class="hotel-cart-form-footnote">Servicio simulado · Posiciones y tiempos aproximados</p>
             </form>
             <div class="hotel-cart-nearby" data-cart-nearby></div>
           </div>
           <div class="hotel-cart-map-wrap">
             <div id="cartTrackingMap" class="hotel-cart-map" role="application" aria-label="Mapa de seguimiento del carrito de golf"></div>
+            <button type="button" class="cart-map-expand" data-cart-back-to-trip>Ampliar mapa</button>
+            <button type="button" class="cart-panel-reopen" data-cart-panel-toggle aria-expanded="false">Mostrar solicitud</button>
             <button type="button" class="cart-map-exit" data-cart-map-exit hidden>Salir del mapa</button>
             <div class="hotel-cart-eta" data-cart-eta hidden></div>
           </div>
@@ -1286,6 +1299,8 @@
         navBounds: framingNav,
         focusBounds: focusBounds || framingPerimeter,
         minZoomBounds: framingPerimeter,
+        zoomOffset: 2,
+        minZoomOffset: 1,
         // Los tiles OSM llegan nativos hasta 19: se permite un nivel de
         // zoom más que el límite previo (18) en los complejos con guía.
         maxZoom: hasComplexGuide ? 19 : 18
@@ -1401,11 +1416,18 @@
     const perimeter = (rdState && rdState.complexPerimeter) ? L.latLngBounds(rdState.complexPerimeter) : regionBounds;
     const navBounds = (rdState && rdState.complexBounds) ? L.latLngBounds(rdState.complexBounds) : (regionBounds ? regionBounds.pad(0.05) : null);
     if (perimeter && window.RevistaDigital && typeof window.RevistaDigital.setupComplexMapFraming === "function") {
-      window.RevistaDigital.setupComplexMapFraming(map, L, { perimeter, navBounds });
+      window.RevistaDigital.setupComplexMapFraming(map, L, {
+        perimeter,
+        navBounds,
+        focusBounds: regionBounds || perimeter,
+        minZoomBounds: perimeter,
+        zoomOffset: 3,
+        maxZoom: 19
+      });
     } else if (regionBounds) {
-      map.setMinZoom(map.getBoundsZoom(regionBounds));
+      map.setMinZoom(Math.max(16, map.getBoundsZoom(perimeter || regionBounds)));
       map.setMaxZoom(18);
-      map.fitBounds(regionBounds, { animate: false });
+      map.fitBounds(regionBounds, { animate: false, maxZoom: 17 });
     } else {
       map.setView(hotels[0].coordinates, 13);
     }

@@ -695,6 +695,11 @@
   window.RevistaDigital.location.syncUserMarkerPosition = mapas.syncUserMarkerPosition;
   window.RevistaDigital.location.autoNavigateNearbyContext = false;
 
+  function libraryUrl(relativePath) {
+    const base = (document.querySelector("base") && document.querySelector("base").href) || document.baseURI;
+    return new URL(relativePath, base).href;
+  }
+
   mapas.loadLeafletRotate = function () {
     if (window.L && typeof window.L.Map.prototype.setBearing === "function") {
       return Promise.resolve(window.L);
@@ -706,7 +711,7 @@
 
     window.leafletRotatePromise = new Promise((resolve) => {
       const script = document.createElement("script");
-      script.src = "https://unpkg.com/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js";
+      script.src = libraryUrl("libs/leaflet-rotate/leaflet-rotate-src.js");
       script.onload = () => resolve(window.L);
       script.onerror = () => resolve(window.L);
       document.head.appendChild(script);
@@ -899,11 +904,11 @@
     window.leafletPromise = new Promise((resolve, reject) => {
       const stylesheet = document.createElement("link");
       stylesheet.rel = "stylesheet";
-      stylesheet.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+      stylesheet.href = libraryUrl("libs/leaflet/leaflet.css");
       document.head.appendChild(stylesheet);
 
       const script = document.createElement("script");
-      script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+      script.src = libraryUrl("libs/leaflet/leaflet.js");
       script.onload = () => resolve(window.L);
       script.onerror = reject;
       document.head.appendChild(script);
@@ -934,11 +939,11 @@
       ["MarkerCluster.css", "MarkerCluster.Default.css"].forEach((file) => {
         const stylesheet = document.createElement("link");
         stylesheet.rel = "stylesheet";
-        stylesheet.href = `https://unpkg.com/leaflet.markercluster@1.5.3/dist/${file}`;
+        stylesheet.href = libraryUrl(`libs/leaflet-markercluster/${file}`);
         document.head.appendChild(stylesheet);
       });
       const script = document.createElement("script");
-      script.src = "https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js";
+      script.src = libraryUrl("libs/leaflet-markercluster/leaflet.markercluster.js");
       script.onload = () => resolve(window.L || L);
       script.onerror = () => resolve(window.L || L);
       document.head.appendChild(script);

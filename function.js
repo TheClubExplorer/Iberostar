@@ -287,6 +287,8 @@ function frameComplexMap(map, L, options = {}) {
   const paddingTopLeft = opts.paddingTopLeft || L.point(padding, padding);
   const paddingBottomRight = opts.paddingBottomRight || L.point(padding, padding);
   const maxZoom = typeof opts.maxZoom === "number" ? opts.maxZoom : 18;
+  const zoomOffset = typeof opts.zoomOffset === "number" ? opts.zoomOffset : 0;
+  const minZoomOffset = typeof opts.minZoomOffset === "number" ? opts.minZoomOffset : 0;
 
   map.options.maxBoundsViscosity = 1.0;
   map.setMaxBounds(navBounds);
@@ -300,7 +302,7 @@ function frameComplexMap(map, L, options = {}) {
   const availableHeight = Math.max(size.y - paddingTopLeft.y - paddingBottomRight.y, 32);
   const rawZoom = boundsZoomFor(focusBounds, L, availableWidth, availableHeight);
   // Mismo redondeo que Leaflet: se trunca al nivel entero inferior.
-  const zoom = Math.max(1, Math.min(maxZoom, Math.floor(rawZoom)));
+  const zoom = Math.max(1, Math.min(maxZoom, Math.floor(rawZoom) + zoomOffset));
 
   // El centro se desplaza la mitad de la diferencia de los rellenos para
   // que el contenido quede centrado en la zona libre del mapa.
@@ -326,7 +328,7 @@ function frameComplexMap(map, L, options = {}) {
       L,
       Math.max(size.x - padding * 2, 32),
       Math.max(size.y - padding * 2, 32)
-    ));
+    )) + minZoomOffset;
     map.setMinZoom(Math.max(1, Math.min(minZoom, zoom)));
   } else {
     map.setMinZoom(zoom);
@@ -2461,6 +2463,11 @@ function initializeHotelCarousel(root) {
    LEAFLET
    ========================================================= */
 
+function leafletLibraryUrl(relativePath) {
+  const base = (document.querySelector("base") && document.querySelector("base").href) || document.baseURI;
+  return new URL(relativePath, base).href;
+}
+
 function loadLeafletRotate() {
   if (typeof window.loadLeafletRotate === "function") {
     return window.loadLeafletRotate();
@@ -2473,7 +2480,7 @@ function loadLeafletRotate() {
   if (!window.leafletRotatePromise) {
     window.leafletRotatePromise = new Promise((resolve) => {
       const script = document.createElement("script");
-      script.src = "https://unpkg.com/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js";
+      script.src = leafletLibraryUrl("libs/leaflet-rotate/leaflet-rotate-src.js");
       script.onload = () => resolve(window.L);
       script.onerror = () => resolve(window.L);
       document.head.appendChild(script);
@@ -2500,7 +2507,7 @@ function loadLeaflet() {
       stylesheet.rel = "stylesheet";
 
       stylesheet.href =
-        "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+        leafletLibraryUrl("libs/leaflet/leaflet.css");
 
       document.head.appendChild(
         stylesheet
@@ -2510,7 +2517,7 @@ function loadLeaflet() {
         document.createElement("script");
 
       script.src =
-        "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+        leafletLibraryUrl("libs/leaflet/leaflet.js");
 
       script.onload = () =>
         resolve(window.L);
