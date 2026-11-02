@@ -495,11 +495,11 @@
       });
       map.addLayer({
         id: 'ruta-linea', type: 'line', source: 'ruta-src',
-        paint: { 'line-color': '#caa867', 'line-width': 5, 'line-opacity': 0.9, 'line-join': 'round', 'line-cap': 'round' }
+        paint: { 'line-color': '#caa867', 'line-width': 6, 'line-opacity': 1, 'line-join': 'round', 'line-cap': 'round' }
       });
       map.addLayer({
         id: 'ruta-puntos', type: 'circle', source: 'ruta-src',
-        paint: { 'circle-radius': 3, 'circle-color': '#caa867', 'circle-opacity': 0.7, 'circle-stroke-width': 1, 'circle-stroke-color': '#ffffff' }
+        paint: { 'circle-radius': 4, 'circle-color': '#caa867', 'circle-opacity': 0.9, 'circle-stroke-width': 2, 'circle-stroke-color': '#ffffff' }
       });
       var panel = document.getElementById('route-info');
       var destNameEl = document.getElementById('route-dest-name');
@@ -587,7 +587,7 @@
           type: 'line',
           source: 'ruta-src',
           paint: {
-            'line-color': '#007bff',
+            'line-color': '#caa867',
             'line-width': 4,
             'line-opacity': 0.8,
             'line-dasharray': [4, 2]
