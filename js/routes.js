@@ -407,6 +407,92 @@
     return records.map((item) => `<a class="destination-card ${type}" href="${escapeHtml(href(getPath(item)))}" data-app-route="${escapeHtml(getPath(item))}">
       ${RI.img(item.image || "src/JOIA2.jpg", { alt: "", sizes: "(max-width:600px) 92vw, (max-width:850px) 46vw, 40vw" })}<span class="destination-card-copy"><small>${eyebrow}</small><strong>${escapeHtml(item.name)}</strong><span>${escapeHtml(item.description || item.tagline || "Descubra el hotel y sus experiencias.")}</span><b>${cta}</b></span></a>`).join("");
   }
+  const initializedPortalCarousels = new WeakSet();
+  function renderPortalHeroCarousel(images, label, className = "", imageClass = "", sizes = "(max-width:850px) 100vw, 45vw") {
+    const sources = [...new Set((images || []).filter((image) => typeof image === "string" && image.trim()))].slice(0, 6);
+    if (!sources.length) return "";
+    const slides = sources.map((src, index) => `<div class="portal-hero-carousel-slide${index === 0 ? " is-active" : ""}" aria-hidden="${index !== 0}">
+      ${RI.img(src, {
+        cls: imageClass,
+        alt: "",
+        priority: index === 0,
+        sizes
+      })}
+    </div>`).join("");
+    const controls = sources.length > 1 ? `<div class="portal-hero-carousel-controls">
+      <button type="button" class="portal-hero-carousel-arrow" data-carousel-prev aria-label="Imagen anterior">‹</button>
+      <div class="portal-hero-carousel-dots" aria-label="Seleccionar imagen">${sources.map((_, index) => `<button type="button" class="portal-hero-carousel-dot${index === 0 ? " is-active" : ""}" data-carousel-slide="${index}" aria-label="Mostrar imagen ${index + 1}" aria-current="${index === 0 ? "true" : "false"}"></button>`).join("")}</div>
+      <button type="button" class="portal-hero-carousel-arrow" data-carousel-next aria-label="Imagen siguiente">›</button>
+    </div>` : "";
+    return `<div class="portal-hero-carousel ${className}" data-portal-hero-carousel role="region" aria-roledescription="carrusel" aria-label="Imágenes de ${escapeHtml(label)}">${slides}${controls}</div>`;
+  }
+  function initPortalHeroCarousels(root) {
+    if (!root) return;
+    root.querySelectorAll("[data-portal-hero-carousel]").forEach((carousel) => {
+      if (initializedPortalCarousels.has(carousel)) return;
+      initializedPortalCarousels.add(carousel);
+      const slides = [...carousel.querySelectorAll(".portal-hero-carousel-slide")];
+      if (slides.length < 2) return;
+      const dots = [...carousel.querySelectorAll("[data-carousel-slide]")];
+      const desktopQuery = window.matchMedia("(min-width: 851px) and (prefers-reduced-motion: no-preference)");
+      let activeIndex = 0;
+      let timer = null;
+      const update = () => {
+        slides.forEach((slide, index) => {
+          const active = index === activeIndex;
+          slide.classList.toggle("is-active", active);
+          slide.setAttribute("aria-hidden", String(!active));
+        });
+        dots.forEach((dot, index) => {
+          const active = index === activeIndex;
+          dot.classList.toggle("is-active", active);
+          dot.setAttribute("aria-current", String(active));
+        });
+      };
+      const goTo = (index) => {
+        activeIndex = (index + slides.length) % slides.length;
+        update();
+      };
+      const stop = () => {
+        if (timer !== null) {
+          window.clearInterval(timer);
+          timer = null;
+        }
+      };
+      const start = () => {
+        stop();
+        if (desktopQuery.matches && !document.hidden && !carousel.matches(":hover") && !carousel.contains(document.activeElement)) {
+          timer = window.setInterval(() => {
+            if (!document.hidden) goTo(activeIndex + 1);
+          }, 6000);
+        }
+      };
+      carousel.querySelector("[data-carousel-prev]")?.addEventListener("click", () => {
+        goTo(activeIndex - 1);
+        start();
+      });
+      carousel.querySelector("[data-carousel-next]")?.addEventListener("click", () => {
+        goTo(activeIndex + 1);
+        start();
+      });
+      dots.forEach((dot) => dot.addEventListener("click", () => {
+        goTo(Number(dot.dataset.carouselSlide));
+        start();
+      }));
+      carousel.addEventListener("mouseenter", stop);
+      carousel.addEventListener("mouseleave", start);
+      carousel.addEventListener("focusin", stop);
+      carousel.addEventListener("focusout", (event) => {
+        if (!carousel.contains(event.relatedTarget)) start();
+      });
+      if (typeof desktopQuery.addEventListener === "function") {
+        desktopQuery.addEventListener("change", start);
+      } else {
+        desktopQuery.addListener(start);
+      }
+      start();
+    });
+  }
   function findHotelPortalRoute(hotelName) {
     const targetSlug = slugify(hotelName);
     const catalog = getDestinationCatalog();
@@ -626,11 +712,10 @@
         view.innerHTML = `<main class="portal-page">
           ${portalNav(getPortalNavModel(route))}
           <section class="portal-destination-hero portal-complex-hero">
-            ${RI.img(destination.image || "src/paraiso-del-mar/banner/ParaisoDelMar.jpg", {
-              alt: "",
-              priority: true,
-              sizes: "(max-width:600px) 100vw, 45vw"
-            })}
+            ${renderPortalHeroCarousel([
+              destination.image || "src/paraiso-del-mar/banner/ParaisoDelMar.jpg",
+              ...complexHotels.map((hotel) => hotel.image)
+            ], destination.name)}
             <div>
               <p class="portal-kicker">${escapeHtml(complexPage.kicker || `EL COMPLEJO · ${destination.name.toUpperCase()}`)}</p>
               <h1>${escapeHtml(complexPage.title || destination.name)}</h1>
@@ -662,6 +747,7 @@
         </main>`;
         const complexMap = view.querySelector("#complexPortalMap");
         const complexLegend = view.querySelector("#complexPortalLegend");
+        initPortalHeroCarousels(view);
         window.RevistaDigital.guiapa?.renderCategoryLegend?.(complexLegend);
         if (complexMap) initComplexPortalMap(complexMap, countrySlug, destination);
         return true;
@@ -684,6 +770,7 @@
       let heading = "Encuentre su próximo destino";
       let intro = "Explore hoteles y destinos Iberostar. Elija un país para comenzar.";
       let cards = renderCards(countryCards, (item) => item.route, "country");
+      let heroImages = countryCards.map((item) => item.image);
       let breadcrumb = "IBEROSTAR · DESTINOS";
       let countryMapMarkup = "";
       let countryHotels = [];
@@ -691,6 +778,11 @@
         heading = countryData.name; intro = `Descubra los destinos de ${countryData.name}.`;
         breadcrumb = `DESTINOS · ${countryData.name.toUpperCase()}`;
         cards = renderCards(countryData.destinations, (item) => `/${country}/${item.slug}`, "destination");
+        heroImages = [
+          countryData.image,
+          ...countryData.destinations.map((destination) => destination.image),
+          ...countryData.destinations.flatMap((destination) => destination.hotels.map((hotel) => hotel.image))
+        ];
         countryHotels = countryData.destinations.flatMap((destination) => destination.hotels.map((hotel) => ({
           ...hotel,
           countrySlug: country,
@@ -702,11 +794,8 @@
           countryMapMarkup = `<section class="portal-map-section"><div><p class="portal-kicker">UBICACIÓN</p><h2>Mapa de ${escapeHtml(countryData.name)}</h2><p>Explore los hoteles disponibles en los destinos de ${escapeHtml(countryData.name)}.</p></div><div class="portal-map-frame"><div class="portal-destination-map" id="countryMap" role="application" aria-label="Mapa de hoteles en ${escapeHtml(countryData.name)}"></div>${portalMapActions(countryHotels)}</div></section>`;
         }
       }
-      view.innerHTML = `<main class="portal-page">${!isHome ? portalNav(getPortalNavModel(route)) : ""}<section class="portal-hero"><div><p class="portal-kicker">${breadcrumb}</p><h1>${heading}</h1><p>${intro}</p>${!isHome ? "" : `<a class="portal-hero-link" href="${href("/mexico/riviera-maya")}" data-app-route="/mexico/riviera-maya">Conozca Iberostar Playa Paraíso <span>→</span></a><div class="portal-hero-stats" aria-label="Resumen de destinos"><span><strong>${Object.keys(catalog).length}</strong> países</span><span><strong>${totalDestinations}</strong> destinos</span><span><strong>${totalHotels}</strong> hoteles</span></div>`}</div>${RI.img(isHome ? "src/paraiso-del-mar/banner/ParaisoDelMar.jpg" : countryData.image, {
-          alt: "Paisaje de destino",
-          priority: true,
-          sizes: "(max-width:600px) 100vw, 45vw"
-        })}</section>${countryMapMarkup}<section class="portal-section"><div class="portal-section-heading"><div><p class="portal-kicker">${isHome ? "NUESTROS PAÍSES" : "DESTINOS"}</p><h2>${isHome ? "Viaje a su manera" : "Elija dónde hospedarse"}</h2></div>${!isHome ? `<a href="${href("/")}" data-app-route="/">Todos los países</a>` : ""}</div>${isHome ? `<div class="portal-country-chips" aria-label="Acceso rápido a países">${countryCards.map((item) => `<a class="portal-country-chip" href="${escapeHtml(href(item.route))}" data-app-route="${escapeHtml(item.route)}">${escapeHtml(item.name)}<span>${item.destinations}</span></a>`).join("")}</div>` : ""}<div class="destination-grid portal-card-carousel">${cards}</div></section></main>`;
+      view.innerHTML = `<main class="portal-page">${!isHome ? portalNav(getPortalNavModel(route)) : ""}<section class="portal-hero"><div><p class="portal-kicker">${breadcrumb}</p><h1>${heading}</h1><p>${intro}</p>${!isHome ? "" : `<a class="portal-hero-link" href="${href("/mexico/riviera-maya")}" data-app-route="/mexico/riviera-maya">Conozca Iberostar Playa Paraíso <span>→</span></a><div class="portal-hero-stats" aria-label="Resumen de destinos"><span><strong>${Object.keys(catalog).length}</strong> países</span><span><strong>${totalDestinations}</strong> destinos</span><span><strong>${totalHotels}</strong> hoteles</span></div>`}</div>${renderPortalHeroCarousel(heroImages, isHome ? "nuestros destinos" : countryData.name)}</section>${countryMapMarkup}<section class="portal-section"><div class="portal-section-heading"><div><p class="portal-kicker">${isHome ? "NUESTROS PAÍSES" : "DESTINOS"}</p><h2>${isHome ? "Viaje a su manera" : "Elija dónde hospedarse"}</h2></div>${!isHome ? `<a href="${href("/")}" data-app-route="/">Todos los países</a>` : ""}</div>${isHome ? `<div class="portal-country-chips" aria-label="Acceso rápido a países">${countryCards.map((item) => `<a class="portal-country-chip" href="${escapeHtml(href(item.route))}" data-app-route="${escapeHtml(item.route)}">${escapeHtml(item.name)}<span>${item.destinations}</span></a>`).join("")}</div>` : ""}<div class="destination-grid portal-card-carousel">${cards}</div></section></main>`;
+      initPortalHeroCarousels(view);
       const countryMap = view.querySelector("#countryMap");
       if (countryMap) {
         window.RevistaDigital.mapas?.initializeAllHotelsMap(countryMap, countryHotels, { countrySlug: country });
@@ -723,11 +812,8 @@
       document.body.dataset.appMode = "portal";
       document.body.dataset.routeManaged = "true";
       const mapDescription = destination.mapNotice || "Seleccione un marcador para abrir la ficha del hotel.";
-      view.innerHTML = `<main class="portal-page">${portalNav(getPortalNavModel(route))}<section class="portal-destination-hero">${RI.img(destination.image, {
-          alt: "",
-          priority: true,
-          sizes: "(max-width:600px) 100vw, 45vw"
-        })}<div><p class="portal-kicker">${escapeHtml(countryData.name).toUpperCase()} · DESTINO</p><h1>${escapeHtml(destination.name)}</h1><p>${escapeHtml(destination.description)}</p>${destination.complex ? `<a class="portal-hero-link" href="${href("/mexico/riviera-maya")}" data-app-route="/mexico/riviera-maya">Ver el complejo Playa Paraíso →</a>` : ""}</div></section><section class="portal-section"><div class="portal-section-heading"><div><p class="portal-kicker">ALOJAMIENTOS</p><h2>Hoteles en ${escapeHtml(destination.name)}</h2></div></div><div class="destination-grid destination-grid--hotels portal-card-carousel">${renderCards(hotels, (hotel) => `/${country}/${destination.slug}/${hotel.slug}`, "hotel")}</div></section></main>`;
+      view.innerHTML = `<main class="portal-page">${portalNav(getPortalNavModel(route))}<section class="portal-destination-hero">${renderPortalHeroCarousel([destination.image, ...hotels.map((hotel) => hotel.image)], destination.name)}<div><p class="portal-kicker">${escapeHtml(countryData.name).toUpperCase()} · DESTINO</p><h1>${escapeHtml(destination.name)}</h1><p>${escapeHtml(destination.description)}</p>${destination.complex ? `<a class="portal-hero-link" href="${href("/mexico/riviera-maya")}" data-app-route="/mexico/riviera-maya">Ver el complejo Playa Paraíso →</a>` : ""}</div></section><section class="portal-section"><div class="portal-section-heading"><div><p class="portal-kicker">ALOJAMIENTOS</p><h2>Hoteles en ${escapeHtml(destination.name)}</h2></div></div><div class="destination-grid destination-grid--hotels portal-card-carousel">${renderCards(hotels, (hotel) => `/${country}/${destination.slug}/${hotel.slug}`, "hotel")}</div></section></main>`;
+      initPortalHeroCarousels(view);
       const mapElement = view.querySelector("#destinationMap");
       if (mapElement) window.RevistaDigital.mapas?.initializeDestinationMap(mapElement, { countrySlug: country, destination });
       return true;
@@ -742,6 +828,7 @@
       document.body.dataset.routeManaged = "true";
       document.body.dataset.returnRoute = `/${country}/${destination.slug}`;
       view.innerHTML = renderHotelPortal({ countrySlug: country, countryData, destination, hotel });
+      initPortalHeroCarousels(view);
       initHotelPortalMap(view, hotel, destination, countryData, country);
       const hotelGuideMount = view.querySelector("#guideExplorer");
       if (hotelGuideMount && window.RevistaDigital.guiapa && typeof window.RevistaDigital.guiapa.renderExplorer === "function") {
@@ -1007,14 +1094,13 @@
     if (services.length) navItems.push(["servicios", "Servicios"]);
 
     const heroMarkup = `
-        <section class="hotel-portal-hero">
-          ${RI.img(heroImage, {
-            cls: "hotel-portal-hero-bg",
-            alt: displayName,
-            priority: true,
-            sizes: "100vw"
-          })}
-          <div class="hotel-portal-hero-scrim"></div>
+      <section class="hotel-portal-hero">
+        ${renderPortalHeroCarousel([
+          heroImage,
+          ...bannerImages,
+          ...Object.values(official || {}).filter(Array.isArray).flat()
+        ], displayName, "hotel-portal-hero-carousel", "hotel-portal-hero-bg", "100vw")}
+        <div class="hotel-portal-hero-scrim"></div>
           <div class="hotel-portal-hero-content">
             <p class="portal-kicker">${escapeHtml(countryData.name).toUpperCase()} · ${escapeHtml(destination.name).toUpperCase()}</p>
             <h1>${escapeHtml(displayName)}</h1>
