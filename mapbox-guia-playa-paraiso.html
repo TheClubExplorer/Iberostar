@@ -70,6 +70,9 @@
     .mapboxgl-popup-content { z-index: 100001 !important; position: relative; }
     .mapboxgl-popup-close-button { z-index: 100002 !important; }
     .mapboxgl-popup-tip { z-index: 100001 !important; }
+    /* Marcador de destino (Cómo llegar) */
+    .destino-marker { width: 24px; height: 24px; border-radius: 50%; background: #ff3b30; border: 3px solid #ffffff; box-shadow: 0 0 0 rgba(255,59,48,0.6); animation: destino-pulse 2s infinite; cursor: pointer; }
+    @keyframes destino-pulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255,59,48,0.7); } 70% { transform: scale(1.5); box-shadow: 0 0 0 12px rgba(255,59,48,0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255,59,48,0); } }
     /* Marcador de ubicación del usuario */
     .user-location-marker { width: 20px; height: 20px; border-radius: 50%; background: #007bff; border: 3px solid #ffffff; box-shadow: 0 0 0 rgba(0,123,255,0.4); animation: user-pulse 2s infinite; cursor: pointer; }
     .user-location-accuracy { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 30px; height: 30px; border-radius: 50%; border: 2px solid rgba(0,123,255,0.35); background: rgba(0,123,255,0.1); pointer-events: none; }
@@ -298,17 +301,87 @@
     });
 
     window.addEventListener('resize', function(){ map.resize(); });
+    // Marcador de destino y línea de ruta dentro del mapa
+    var destinoMarker = null;
+    var rutaLinea = null;
+
+    function limpiarRuta(){
+      if(destinoMarker){ destinoMarker.remove(); destinoMarker = null; }
+      if(rutaLinea){
+        try { map.removeLayer('ruta-linea'); map.removeSource('ruta-src'); } catch(e){}
+        rutaLinea = null;
+      }
+    }
+
+    function dibujarRuta(userLat, userLng, destLat, destLng){
+      limpiarRuta();
+      // Marcar destino
+      var destEl = document.createElement('div');
+      destEl.className = 'destino-marker';
+      destEl.title = 'Destino';
+      destinoMarker = new mapboxgl.Marker({ element: destEl, anchor: 'center' })
+        .setLngLat([destLng, destLat])
+        .addTo(map);
+
+      // Dibujar línea desde usuario hasta destino
+      try {
+        map.addSource('ruta-src', {
+          type: 'geojson',
+          data: {
+            type: 'Feature',
+            geometry: {
+              type: 'LineString',
+              coordinates: [[userLng, userLat], [destLng, destLat]]
+            }
+          }
+        });
+        map.addLayer({
+          id: 'ruta-linea',
+          type: 'line',
+          source: 'ruta-src',
+          paint: {
+            'line-color': '#007bff',
+            'line-width': 4,
+            'line-opacity': 0.8,
+            'line-dasharray': [4, 2]
+          }
+        });
+        rutaLinea = true;
+      } catch(e){ console.warn('No se pudo dibujar la ruta:', e); }
+    }
+
     window.irAlPunto = function(nombre, lat, lng){
       try { sessionStorage.setItem('destino_solicitado', JSON.stringify({nombre:nombre, lat:lat, lng:lng})); } catch(e){}
-      var userLat = window.RevistaDigital && window.RevistaDigital.userLocation ? window.RevistaDigital.userLocation.lat : null;
-      var userLng = window.RevistaDigital && window.RevistaDigital.userLocation ? window.RevistaDigital.userLocation.lng : null;
-      var destName = encodeURIComponent(nombre || 'Destino');
-      if(userLat != null && userLng != null){
-        // Abrir Google Maps con ruta desde ubicación actual hasta el POI
-        window.location.href = 'https://www.google.com/maps/dir/?api=1&origin='+userLat+','+userLng+'&destination='+lat+','+lng+'&destination='+destName+'&travelmode=driving';
-      } else {
-        // Fallback: abrir Google Maps directo al destino
-        window.location.href = 'https://www.google.com/maps/search/?api=1&query='+lat+','+lng+'&query='+destName;
+      lat = parseFloat(lat);
+      lng = parseFloat(lng);
+      if(isNaN(lat) || isNaN(lng)) return;
+
+      // Limpiar ruta anterior
+      limpiarRuta();
+
+      // Volar el mapa al destino
+      map.flyTo({ center: [lng, lat], zoom: 17, pitch: 45, bearing: 0, duration: 1200 });
+
+      // Buscar el POI por coordenadas y abrir su popup
+      var guiapa = window.RevistaDigital && window.RevistaDigital.guiapa;
+      if(guiapa && guiapa.POIS && guiapa.markers){
+        var poi = guiapa.POIS.find(function(p){
+          return p && p.lat != null && p.lng != null &&
+                 Math.abs(parseFloat(p.lat) - lat) < 0.0001 &&
+                 Math.abs(parseFloat(p.lng) - lng) < 0.0001;
+        });
+        if(poi && poi.id){
+          var m = guiapa.markers[poi.id];
+          if(m && m.getPopup){
+            try{ m.togglePopup(); }catch(e){}
+          }
+        }
+      }
+
+      // Dibujar ruta desde ubicación del usuario si existe
+      var userLoc = window.RevistaDigital && window.RevistaDigital.userLocation;
+      if(userLoc && userLoc.lat != null && userLoc.lng != null){
+        dibujarRuta(userLoc.lat, userLoc.lng, lat, lng);
       }
     };
 
@@ -449,6 +522,13 @@
         if(Object.keys(markers).length > 0) markersRendered = true;
         var lblStatus = document.getElementById('lblStatus');
         if(lblStatus) lblStatus.textContent = Object.keys(markers).length + ' POIs';
+        // Exponer para acceso global desde irAlPunto
+        try {
+          window.RevistaDigital = window.RevistaDigital || {};
+          window.RevistaDigital.guiapa = window.RevistaDigital.guiapa || {};
+          window.RevistaDigital.guiapa.markers = markers;
+          window.RevistaDigital.guiapa.POIS = POIS;
+        } catch(e){}
       }
       window.renderPPMarkers = function(){ try { renderMarkers(); } catch(e){} };
 
