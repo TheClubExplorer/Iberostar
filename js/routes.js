@@ -536,7 +536,7 @@
             <span>Hotel del complejo</span>
             <select data-cart-hotel-select>${options}</select>
           </label>
-          <p class="cart-page-hotel-note">El carrito sale desde su posiciÃ³n actual, le recoge donde estÃ¡ y le lleva a su destino.</p>
+          <p class="cart-page-hotel-note">El carrito sale desde su posición actual, le recoge donde está y le lleva a su destino.</p>
           <button type="button" class="cart-back-to-trip" data-cart-back-to-trip>Volver al viaje</button>
         </div>
         <div class="hotel-cart-tracker" data-cart-tracker>
