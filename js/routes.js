@@ -907,10 +907,10 @@
     if (!groups.length) return `<p class="restaurant-count-note">Todavía no hay restaurantes registrados para este país.</p>`;
     return `<div class="restaurant-country-list">${groups.map((group) => `<article class="restaurant-group">
       <header class="restaurant-group-head">
-        <div><small>${escapeHtml(group.destinationName).toUpperCase()}</small><a href="${href(group.hotelRoute)}" data-app-route="${group.hotelRoute}">${escapeHtml(group.hotelName)}</a></div>
+        <div><small>${escapeHtml(group.destinationName).toUpperCase()}</small><a href="${href(group.hotelRoute)}" data-app-route="${escapeHtml(group.hotelRoute)}">${escapeHtml(group.hotelName)}</a></div>
         <span>${group.restaurants.length} ${group.restaurants.length === 1 ? "restaurante" : "restaurantes"}</span>
       </header>
-      <ul class="restaurant-rows">${group.restaurants.map(([name, cuisine]) => `<li><a href="${href(group.hotelRoute)}" data-app-route="${group.hotelRoute}">${escapeHtml(name)}</a><em>${escapeHtml(cuisine || "Cocina de autor")}</em></li>`).join("")}</ul>
+      <ul class="restaurant-rows">${group.restaurants.map(([name, cuisine]) => `<li><a href="${href(group.hotelRoute)}" data-app-route="${escapeHtml(group.hotelRoute)}">${escapeHtml(name)}</a><em>${escapeHtml(cuisine || "Cocina de autor")}</em></li>`).join("")}</ul>
     </article>`).join("")}</div>`;
   }
 

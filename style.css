@@ -4025,10 +4025,29 @@ body.pano-360-open { overflow: hidden; }
 .restaurant-group-head > span:last-child { color:var(--gold-deep); font:600 11px/1.4 var(--font-ui); letter-spacing:.1em; text-transform:uppercase; white-space:nowrap; }
 .restaurant-rows { margin:12px 0 0; padding:0; list-style:none; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:2px 26px; }
 .restaurant-rows li { display:flex; flex-wrap:wrap; gap:4px 12px; align-items:baseline; padding:7px 0; border-bottom:1px solid #efe7d8; }
-.restaurant-rows li a { flex:1 1 auto; min-width:0; color:var(--green); font:15px/1.35 var(--font-display); text-decoration:none; }
+.restaurant-rows li > a { flex:1 1 auto; min-width:0; color:var(--green); font:15px/1.35 var(--font-display); text-decoration:none; }
 .restaurant-rows li a:hover,.restaurant-rows li a:focus-visible { color:var(--gold-deep); text-decoration:underline; }
 .restaurant-rows em { color:var(--muted); font:600 10px/1.4 var(--font-ui); font-style:normal; letter-spacing:.1em; text-transform:uppercase; }
 .restaurant-count-note { color:var(--muted); font:13px/1.6 var(--font-ui); }
+.portal-page .portal-section .restaurant-count-note > a {
+  display:inline-flex;
+  align-items:center;
+  min-height:40px;
+  padding:8px 14px;
+  border:1px solid var(--gold-deep);
+  border-radius:999px;
+  background-color:var(--gold);
+  color:var(--green-deep);
+  font:600 12px/1.4 var(--font-ui);
+  text-decoration:none;
+  transition:background .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+.portal-page .portal-section .restaurant-count-note > a:hover,
+.portal-page .portal-section .restaurant-count-note > a:focus-visible {
+  background-color:#c9b392;
+  box-shadow:0 6px 16px rgba(64,54,46,.14);
+  transform:translateY(-1px);
+}
 .restaurant-chip-row { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
 .restaurant-chip { padding:3px 9px; border:1px solid #d9c9ae; border-radius:999px; background:var(--paper-alt); color:var(--green); font:600 11px/1.4 var(--font-ui); }
 .restaurant-chip-more { border-style:dashed; color:var(--gold-deep); }
