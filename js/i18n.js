@@ -70,6 +70,12 @@
     en: {
       siteTitle: "Iberostar | Destinations & Hotels",
       brandDestinations: "Destinations",
+      continue: "Continue",
+      gateNote: "You can change it later from the menu.",
+      openMenu: "Open menu",
+      closeMenu: "Close menu",
+      closeSearch: "Close search",
+      searchExit: "Press ESC to exit",
       navDestinos: "Destinations",
       navMexico: "Mexico",
       navJamaica: "Jamaica",

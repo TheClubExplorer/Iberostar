@@ -58,8 +58,8 @@
         <h1 id="languageGateTitle">Elija su idioma</h1>
         <p class="language-gate-country" id="languageGateCountry">Sugerencia según el idioma de su dispositivo</p>
         <div class="language-gate-options" id="languageGateOptions" role="radiogroup" aria-label="Idioma"></div>
-        <button class="language-gate-continue" id="languageGateContinue" type="button">Continuar</button>
-        <p class="language-gate-note">Después podrá cambiarlo desde el menú.</p>
+        <button class="language-gate-continue" id="languageGateContinue" type="button" data-i18n="continue">Continuar</button>
+        <p class="language-gate-note" data-i18n="gateNote">Después podrá cambiarlo desde el menú.</p>
       </section>
     </div>
     <header class="site-header" id="siteHeader">
@@ -72,15 +72,15 @@
           />
           <img src="branding/IB_THE_CLUB_VV_POS_RGB.png" alt="Iberostar The Club" loading="eager" decoding="async" />
         </picture>
-        <span>Destinos</span>
+        <span data-i18n="brandDestinations">Destinos</span>
       </a>
-      <button type="button" class="mobile-menu-btn" id="mobileMenuButton" aria-label="Abrir menú" aria-expanded="false" aria-controls="siteNav">
+      <button type="button" class="mobile-menu-btn" id="mobileMenuButton" aria-label="Abrir menú" data-i18n-aria="openMenu" aria-expanded="false" aria-controls="siteNav">
         <span class="mobile-menu-line" aria-hidden="true"></span>
         <span class="mobile-menu-line" aria-hidden="true"></span>
         <span class="mobile-menu-line" aria-hidden="true"></span>
       </button>
       <nav class="site-nav" id="siteNav" aria-label="Navegación principal">
-        <button type="button" class="mobile-nav-close" id="mobileNavClose" aria-label="Cerrar menú">
+        <button type="button" class="mobile-nav-close" id="mobileNavClose" aria-label="Cerrar menú" data-i18n-aria="closeMenu">
           <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
             <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
           </svg>
@@ -125,9 +125,7 @@
 
     <nav class="pager" id="pager" aria-label="Navegación de páginas"></nav>
 
-    <p class="location-status" id="locationStatus" role="status" data-i18n="locationStatusInitial">
-      Use “Usar mi ubicación” para encontrar un hotel cercano o calcular una ruta.
-    </p>
+    <p class="location-status" id="locationStatus" role="status" data-i18n="locationStatusInitial"></p>
 
     <!-- MODAL DE BÚSQUEDA Y FILTROS -->
     <div class="search-modal" id="searchModal" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Buscar hoteles">
@@ -137,7 +135,7 @@
             <span aria-hidden="true">🔍</span>
             <input type="text" id="searchInputField" placeholder="Buscar por hotel, destino, categoría..." data-i18n-placeholder="searchPlaceholder" autocomplete="off" />
           </div>
-          <button type="button" class="search-modal-close" id="searchCloseButton" aria-label="Cerrar búsqueda">×</button>
+          <button type="button" class="search-modal-close" id="searchCloseButton" aria-label="Cerrar búsqueda" data-i18n-aria="closeSearch">×</button>
         </div>
 
         <div class="search-filters">
@@ -160,7 +158,7 @@
 
         <div class="search-meta-bar">
           <span id="searchResultCount">0 hoteles encontrados</span>
-          <small>ESC para salir</small>
+          <small data-i18n="searchExit">ESC para salir</small>
         </div>
 
         <div class="search-results-container" id="searchResultsList"></div>
