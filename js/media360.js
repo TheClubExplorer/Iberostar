@@ -52,7 +52,9 @@
 
   function render360() {
     return `
-      <div class="spread media-spread media360-spread">
+      <div class="spread media-spread media360-s">
+        <button class="media360-back-btn" aria-label="Volver">← Volver</button>
+        <div class="media360-stage-panel">pread">
         <div class="media360-content">
           <header class="media360-hero">
             <div class="media360-heading">

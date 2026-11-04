@@ -1820,7 +1820,26 @@ button {
   justify-content: space-between;
   gap: 20px;
   margin-bottom: 20px;
+}\n.media360-back-btn {
+  position: absolute;
+  top: 28px;
+  left: 28px;
+  z-index: 10;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  background: transparent;
+  color: var(--navy);
+  font-size: 20px;
+  cursor: pointer;
+  transition: transform .2s ease;
 }
+
+.media360-back-btn:hover {
+  transform: scale(1.1);
+}
+
+.workspace-header small,
 
 .workspace-header small,
 .media-header small {
