@@ -44,12 +44,15 @@ Esta ampliación se contrasta con `js/guia-playa-paraiso.js`, que refleja los ca
 - **Teatro Mar-Playa (antes "Casino") (2026-10-22):** el usuario confirmó que el punto que el plano etiquetaba "Casino" es en realidad el **"Teatro Mar-Playa"** (`20.7608353,-86.9625428`, place `0x8f4e6100099b7827:0xd7d0b35592b80108`). Se sustituyó la entrada `casino` por `teatro-mar-playa` (`category:"entretenimiento"`, `source:"Google Maps"`, `verified:true`).
 - **Health Bar SPA (`health-bar-spa`):** `20.756025,-86.961423`, `source:"Google Maps"`, `verified:true`. Coordenada confirmada por el usuario el 2026-10-22; sustituye la entrada de plano sin coordenadas (`verified:false`) que tenía. Hotel pendiente de confirmar (zona coincide con el sector JOIA: spa-joia/fit-fun-joia).
 - **Restaurant La Marina (`la-marina`):** `20.7577902,-86.9640737`, `source:"Google Maps"`, `verified:true`. Ubicación de Google Maps del "Restaurant La Marina" proporcionada por el usuario el 2026-10-22 (place `0x8f4e6134896ed84f:0x19a130465789f386`); sustituye la asignación de `OSM_COORDS` (`20.7578746,-86.9638876`), cuya fila se eliminó al quedar la coordenada propia en el POI.
+- **The Olivetti (`olivetti`):** `20.7567218,-86.9604135`, `source:"Google Maps"`, `verified:true`. Restaurante italiano – Spaghetti Factory, coordenada proporcionada por el usuario.
+- **Lemon & Spices (`lemon-spices`):** `20.7589139,-86.96355`, `source:"Google Maps"`, `verified:true`. Restaurante asiático, coordenada proporcionada por el usuario.
+- **America Seafood Grill Under the Sea (`under-the-sea`):** `20.75687,-86.95974`, `source:"Google Maps"`, `verified:true`. Restaurante de mariscos, coordenada proporcionada por el usuario.
 
 Estos estados describen lo implementado en el código; las fuentes Google Maps se consignan según el propio registro y no implican una nueva verificación independiente durante esta actualización. El listado histórico de pendientes que sigue abajo queda supersedido. Pendiente: regenerar `inventory_final.json` y el listado/conteo completo desde el catálogo activo para reemplazarlo.
 
 ### Recuento del catálogo activo (actualizado 2026-10-23)
 
-Conteo actualizado ejecutando `node scripts/generate_inventory.js` sobre el catálogo activo en `js/guia-playa-paraiso.js` y aplicando las asignaciones de `OSM_COORDS`: **110 registros marcados verificados con coordenadas y 1 pendiente de coordenadas**, de **111 registros** en total (incluye los 5 hoteles). No hay registros activos con coordenadas pero sin verificar. Este resultado reemplaza los recuentos históricos de 96/18 y 111/3.
+Conteo actualizado ejecutando `node scripts/generate_inventory.js` sobre el catálogo activo en `js/guia-playa-paraiso.js` y aplicando las asignaciones de `OSM_COORDS`: **113 registros marcados verificados con coordenadas y 1 pendiente de coordenadas**, de **114 registros** en total (incluye los 5 hoteles). No hay registros activos con coordenadas pero sin verificar. Este resultado reemplaza los recuentos históricos de 96/18 y 111/3.
 
 Pendientes de coordenadas:
 

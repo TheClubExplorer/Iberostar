@@ -7841,6 +7841,57 @@ body.cart-map-focus-open .hotel-portal-nav { display: none !important; }
 /* =========================================================
    EXPERIENCIA 360°
    ========================================================= */
+/* Barra superior y boton volver en 360 */
+.media360-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 12px;
+  position: relative;
+  z-index: 5;
+}
+
+.media360-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  border: 1px solid rgba(185, 163, 133, 0.45);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--gold-deep);
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(64, 54, 46, 0.06);
+  transition: all .2s ease;
+}
+
+.media360-back-btn:hover,
+.media360-back-btn:focus-visible {
+  background: var(--brown);
+  border-color: var(--brown);
+  color: #f0d8ad;
+  transform: translateX(-3px);
+  box-shadow: 0 4px 14px rgba(9, 4, 3, 0.16);
+}
+
+.media360-back-btn svg {
+  flex-shrink: 0;
+  stroke: currentColor;
+  transition: transform .2s ease;
+}
+
+.media360-back-btn:hover svg {
+  transform: translateX(-2px);
+}
+
 .spread.media-spread.media360-spread {
   position: relative;
   overflow: hidden !important;
@@ -8227,6 +8278,11 @@ body.cart-map-focus-open .hotel-portal-nav { display: none !important; }
 
 .media360-zone.media-zone-button {
   display: grid;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px;
+  background: transparent;
+  transition: all .2s ease;
   grid-template-columns: 36px minmax(0, 1fr) 14px;
   align-items: center;
   gap: 9px;
@@ -8294,6 +8350,16 @@ body.cart-map-focus-open .hotel-portal-nav { display: none !important; }
 }
 
 @media (max-width: 1100px) {
+  .media360-top-bar {
+    margin-bottom: 6px;
+  }
+
+  .media360-back-btn {
+    padding: 6px 14px;
+    font-size: 10px;
+    gap: 6px;
+  }
+
   .spread.media-spread.media360-spread {
     padding: 16px;
   }
@@ -8881,4 +8947,14 @@ body.cart-map-focus-open .hotel-portal-nav { display: none !important; }
     padding-top: 8px;
     font-size: 9px;
   }
+}
+.media360-zone.media-zone-button:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.media360-zone.media-zone-button.is-active,
+.media360-zone.media-zone-button.active {
+  border-color: var(--gold-deep);
+  box-shadow: inset 0 0 0 1px var(--gold-deep);
 }

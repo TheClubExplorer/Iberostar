@@ -124,6 +124,9 @@
     {"id":"latelier","name":"L'Atelier","category":"restaurante","description":"Restaurante gourmet"},
 
     {"id":"haiku","name":"Haiku","category":"restaurante","description":"Restaurante japonés"},
+    {"id":"olivetti","name":"The Olivetti","category":"restaurante","lat":20.7567218,"lng":-86.9604135,"description":"Restaurante italiano – Spaghetti Factory","source":"Google Maps","verified":true},
+    {"id":"lemon-spices","name":"Lemon & Spices","category":"restaurante","lat":20.7589139,"lng":-86.96355,"description":"Restaurante asiático","source":"Google Maps","verified":true},
+    {"id":"under-the-sea","name":"America Seafood Grill Under the Sea","category":"restaurante","lat":20.75687,"lng":-86.95974,"description":"Restaurante de mariscos","source":"Google Maps","verified":true},
     {"id":"la-brisa","name":"La Brisa Beach Bar","category":"bar","hotelId":"Iberostar Paraíso JOIA","description":"Bar de playa"},
     {"id":"baby-kitchen","name":"Baby Kitchen","category":"servicio","lat":20.758029,"lng":-86.963437,"description":"Cocina para bebés"});
   POIS.push(
@@ -152,11 +155,11 @@
     {"id":"waterfall-jacuzzi","name":"Cascada y jacuzzi","category":"piscina","lat":20.759539,"lng":-86.960991,"description":"Water fall & jacuzzi"},
     {"id":"quiet-pool","name":"Piscina tranquila","category":"piscina","lat":20.759600,"lng":-86.960224,"description":"Quiet pool"},
     {"id":"activities-pool","name":"Piscina de actividades","category":"piscina","lat":20.759267,"lng":-86.959714,"description":"Activities pool"},
-    {"id":"lazy-river","name":"Río lento","category":"piscina","description":"Lazy river"},
+    {"id":"lazy-river","name":"Río lento","nameEn":"Lazy river","category":"piscina","description":"Río lento","descriptionEn":"Lazy river"},
     {"id":"sports-pool","name":"Piscina deportiva","category":"piscina","description":"Sports pool"},
     {"id":"wave-pool","name":"Piscina de olas","category":"piscina","description":"Wave pool"},
     {"id":"jacuzzi","name":"Jacuzzi","category":"piscina","lat":20.757415,"lng":-86.960793,"description":"Jacuzzi"},
-    {"id":"private-pool","name":"Piscina privada","category":"piscina","lat":20.756499,"lng":-86.960229,"description":"Private pool"},
+    {"id":"private-pool","name":"Piscina privada","nameEn":"Private pool","category":"piscina","lat":20.756499,"lng":-86.960229,"description":"Piscina privada","descriptionEn":"Private pool"},
     {"id":"indoor-pool","name":"Piscina cubierta","category":"piscina","lat":20.756076,"lng":-86.961331,"description":"Indoor pool"},
     {"id":"main-pool","name":"Piscina principal","category":"piscina","lat":20.754701,"lng":-86.960497,"description":"Main pool"},
     {"id":"mini-water-playground","name":"Mini parque acuático","category":"piscina","description":"Mini water playground"},
@@ -258,7 +261,10 @@
     ["diving-center", 20.7588638, -86.9575332, "Dressel Divers"],
     ["latelier", 20.7551676, -86.9609817, "L'Atelier"],
     ["star-rock-cafe", 20.7618856, -86.9627721, "Star Rock Café"],
-    ["theclub", 20.7598333, -86.9652778, "THE CLUB"]
+    ["theclub", 20.7598333, -86.9652778, "THE CLUB"],
+    ["olivetti", 20.7567218, -86.9604135, "The Olivetti"],
+    ["lemon-spices", 20.7589139, -86.96355, "Lemon & Spices"],
+    ["under-the-sea", 20.75687, -86.95974, "America Seafood Grill Under the Sea"]
   ];
   OSM_COORDS.forEach(function (row) {
     for (var i = 0; i < POIS.length; i += 1) {

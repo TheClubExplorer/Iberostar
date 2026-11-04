@@ -53,6 +53,11 @@
   function render360() {
     return `
       <div class="spread media-spread media360-spread">
+        <div class="media360-top-bar">
+          <button type="button" class="media360-back-btn">Volver</button>
+          </button>
+        </div>
+
         <div class="media360-content">
           <header class="media360-hero">
             <div class="media360-heading">
@@ -188,6 +193,24 @@
 
   function wire360() {
     render360Cards();
+
+    const backBtn = document.querySelector(".media360-back-btn");
+    if (backBtn && !backBtn.dataset.wired) {
+      backBtn.dataset.wired = "true";
+      backBtn.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (window.RevistaDigital?.router?.go) {
+          window.RevistaDigital.router.go("/restaurantes");
+          return;
+        }
+        if (window.history.length > 1) {
+          window.history.back();
+          return;
+        }
+        window.location.hash = "#/restaurantes";
+      });
+    }
 
     const currentRoute = window.RevistaDigital.appContext?.route || document.body.dataset.currentRoute;
     if (currentRoute !== "/360") return;
