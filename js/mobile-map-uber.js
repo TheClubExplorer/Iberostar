@@ -21,6 +21,13 @@
       .replace(/'/g, "&#39;");
   }
 
+  function getEn() {
+    try { return window.RevistaDigital.i18n.getLang() === "en"; } catch (e) { return false; }
+  }
+  function t(es, en) {
+    return getEn() ? en : es;
+  }
+
   function getWrap() {
     return document.querySelector(".hotel-complex-map-wrap[data-guide-wrap]");
   }
@@ -108,7 +115,7 @@
       handle.className = "uber-sheet-handle";
       handle.innerHTML =
         '<span class="uber-sheet-pill" aria-hidden="true"></span>' +
-        '<div class="uber-sheet-collapsed-bar">¿A dónde desea ir en el complejo?</div>';
+        '<div class="uber-sheet-collapsed-bar">' + t("¿A dónde desea ir en el complejo?", "Where would you like to go in the resort?") + '</div>';
       panel.insertBefore(handle, panel.firstChild);
 
       handle.addEventListener("click", function () {
@@ -243,14 +250,14 @@
     }
 
     const poi = findPoiByName(name);
-    const hours = (poi && (poi.hours || poi.horario)) ? (poi.hours || poi.horario) : "Consultar horario";
-    let walk = "A pie: —";
+    const hours = (poi && (poi.hours || poi.horario)) ? (poi.hours || poi.horario) : t("Consultar horario", "Check hours");
+    let walk = t("A pie: —", "On foot: —");
     const pos = window.RevistaDigital && window.RevistaDigital.state ? window.RevistaDigital.state.currentPosition : null;
     if (pos && poi && Number.isFinite(Number(poi.lat)) && Number.isFinite(Number(poi.lng)) &&
         Number.isFinite(Number(pos.latitude)) && Number.isFinite(Number(pos.longitude))) {
       const dist = haversine(Number(pos.latitude), Number(pos.longitude), Number(poi.lat), Number(poi.lng));
       const mins = Math.max(1, Math.round(dist / 80));
-      walk = "Aprox. " + mins + " min a pie";
+      walk = t("Aprox. ", "Approx. ") + mins + " " + t("min a pie", "min walk");
     }
 
     card.innerHTML =
@@ -259,7 +266,7 @@
         '<span class="uber-poi-card-hours">' + escapeHtml(hours) + '</span>' +
       '</div>' +
       '<div class="uber-poi-card-meta">' + escapeHtml(walk) + '</div>' +
-      '<button type="button" class="uber-poi-card-btn" data-uber-transport>Solicitar transporte</button>';
+      '<button type="button" class="uber-poi-card-btn" data-uber-transport>' + t("Solicitar transporte", "Request transport") + '</button>';
 
     card.hidden = false;
 

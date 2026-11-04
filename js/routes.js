@@ -1053,12 +1053,12 @@
       let intro = en ? "Explore Iberostar hotels and destinations. Choose a country to get started." : "Explore hoteles y destinos Iberostar. Elija un país para comenzar.";
       let cards = renderCards(countryCards, (item) => item.route, "country");
       let heroImages = countryCards.map((item) => item.image);
-      let breadcrumb = "IBEROSTAR · DESTINOS";
+      let breadcrumb = en ? "IBEROSTAR · DESTINATIONS" : "IBEROSTAR · DESTINOS";
       let countryMapMarkup = "";
       let countryHotels = [];
       if (!isHome) {
         heading = countryData.name; intro = en ? `Discover the destinations of ${countryData.name}.` : `Descubra los destinos de ${countryData.name}.`;
-        breadcrumb = `DESTINOS · ${countryData.name.toUpperCase()}`;
+        breadcrumb = en ? `DESTINATIONS · ${countryData.name.toUpperCase()}` : `DESTINOS · ${countryData.name.toUpperCase()}`;
         cards = renderCards(countryData.destinations, (item) => `/${country}/${item.slug}`, "destination");
         heroImages = [
           countryData.image,

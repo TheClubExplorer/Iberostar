@@ -82,6 +82,13 @@
     '<path d="M17 4h4M17 4v3" stroke="#8A7758" stroke-width="1.2" stroke-linecap="round"/>' +
     '</svg>';
 
+  function getEn() {
+    try { return window.RevistaDigital.i18n.getLang() === "en"; } catch (e) { return false; }
+  }
+  function t(es, en) {
+    return getEn() ? en : es;
+  }
+
   cg._context = null;
   cg._useMapbox = false;
   cg._mapboxFrame = null;
@@ -266,16 +273,16 @@
 
   function etaLabel(seconds) {
     var value = Math.max(0, Number(seconds) || 0);
-    if (value <= 20) return "Ahora";
-    if (value <= 45) return "Llegando";
+    if (value <= 20) return t("Ahora", "Now");
+    if (value <= 45) return t("Llegando", "Arriving");
     return Math.max(1, Math.ceil(value / 60)) + " min";
   }
 
   function etaPhrase(seconds) {
     var value = Math.max(0, Number(seconds) || 0);
-    if (value <= 20) return "Ahora";
-    if (value <= 45) return "Llegando";
-    return "Llega en " + Math.max(1, Math.ceil(value / 60)) + " min";
+    if (value <= 20) return t("Ahora", "Now");
+    if (value <= 45) return t("Llegando", "Arriving");
+    return t("Llega en ", "Arriving in ") + Math.max(1, Math.ceil(value / 60)) + " min";
   }
 
   function getCarts() {
@@ -316,7 +323,7 @@
     if (current) {
       return {
         key: "gps",
-        label: "Su ubicación actual",
+        label: t("Su ubicación actual", "Your current location"),
         lat: current[0],
         lng: current[1],
         accuracy: currentAccuracy()
@@ -324,7 +331,7 @@
     }
     return {
       key: "hotel",
-      label: context.name ? "Ubicación de " + context.name : "Su hotel",
+      label: context.name ? t("Ubicación de ", "Location of ") + context.name : t("Su hotel", "Your hotel"),
       lat: coordinates[0],
       lng: coordinates[1],
       accuracy: null
@@ -338,16 +345,16 @@
     if (!nodes.length && !buttons.length) return;
     var text;
     if (position) {
-      text = "Ubicación GPS activa";
-      if (Number.isFinite(position.accuracy)) text += " · precisión ·" + Math.round(position.accuracy) + " m";
+      text = t("Ubicación GPS activa", "GPS location active");
+      if (Number.isFinite(position.accuracy)) text += t(" · precisión ·", " · accuracy ·") + Math.round(position.accuracy) + " m";
     } else if (cg._locationState === "requesting") {
-      text = "Obteniendo su ubicación exacta…";
+      text = t("Obteniendo su ubicación exacta…", "Getting your exact location…");
     } else if (cg._locationState === "denied") {
-      text = "Active la ubicación para que el carrito llegue a su posición exacta.";
+      text = t("Active la ubicación para que el carrito llegue a su posición exacta.", "Enable location so the cart can reach your exact position.");
     } else if (cg._locationState === "unavailable") {
-      text = "La ubicación exacta se comparte desde un navegador con geolocalización.";
+      text = t("La ubicación exacta se comparte desde un navegador con geolocalización.", "Exact location is shared from a browser with geolocation.");
     } else {
-      text = "Active su ubicación para mostrar exactamente dónde está.";
+      text = t("Active su ubicación para mostrar exactamente dónde está.", "Enable your location to show exactly where you are.");
     }
     nodes.forEach(function (node) {
       node.textContent = text;
@@ -1303,10 +1310,10 @@
   }
 
   function routeMeta(request) {
-    if (request.routeStatus === "fallback") return " · ruta aproximada";
-    if (request.routeDirect) return " · ruta interna directa";
-    if (request.routeAccess) return " · acceso directo";
-    return " · ruta por calles";
+    if (request.routeStatus === "fallback") return t(" · ruta aproximada", " · approximate route");
+    if (request.routeDirect) return t(" · ruta interna directa", " · direct internal route");
+    if (request.routeAccess) return t(" · acceso directo", " · direct access");
+    return t(" · ruta por calles", " · route via streets");
   }
 
   function updateMapEta(request) {
@@ -1357,102 +1364,106 @@
     if (!request) {
       return '<div class="cart-status-card is-idle">' +
         '<span class="cart-status-glyph">' + CART_SVG + "</span>" +
-        '<div><p class="cart-status-kicker">TRANSPORTE DISPONIBLE</p>' +
-        "<h3>¿Desea moverse por el complejo?</h3>" +
-        "<p>Solicite un carrito y vea en el mapa el más cercano viniendo hacia su ubicación, con el tiempo estimado de llegada.</p>" +
+        '<div><p class="cart-status-kicker">' + t("TRANSPORTE DISPONIBLE", "TRANSPORT AVAILABLE") + '</p>' +
+        "<h3>" + t("¿Desea moverse por el complejo?", "Want to move around the resort?") + "</h3>" +
+        "<p>" + t("Solicite un carrito y vea en el mapa el más cercano viniendo hacia su ubicación, con el tiempo estimado de llegada.", "Request a cart and see on the map the nearest one coming to your location, with estimated arrival time.") + "</p>" +
         "</div></div>";
     }
-    var destinationName = request.destination ? request.destination.name : "su destino";
-if (request.status === "searching") {
+    var destinationName = request.destination ? request.destination.name : t("su destino", "your destination");
+    if (request.status === "searching") {
       return '<div class="cart-status-card is-searching">' +
-        '<p class="cart-status-kicker">SU TRANSPORTE HA SIDO SOLICITADO</p>' +
-        "<h3>Buscando el carrito más cercano para usted…</h3>" +
-        "<p>El carrito va hacia <strong>" + escapeHtml(request.pickup.label) + "</strong> y después le lleva a <strong>" +
-        escapeHtml(destinationName) + "</strong>. Le notificaremos en cuanto un carrito acepte su solicitud.</p>" +
+        '<p class="cart-status-kicker">' + t("SU TRANSPORTE HA SIDO SOLICITADO", "YOUR TRANSPORT HAS BEEN REQUESTED") + '</p>' +
+        "<h3>" + t("Buscando el carrito más cercano para usted…", "Finding the nearest cart for you…") + "</h3>" +
+        "<p>" + t("El carrito va hacia ", "The cart is heading to ") + "<strong>" + escapeHtml(request.pickup.label) + "</strong> " +
+        t("y después le lleva a ", "and then will take you to ") + "<strong>" +
+        escapeHtml(destinationName) + "</strong>. " +
+        t("Le notificaremos en cuanto un carrito acepte su solicitud.", "We will notify you as soon as a cart accepts your request.") + "</p>" +
         '<span class="cart-searching-dots" aria-hidden="true"><i></i><i></i><i></i></span>' +
-        '<button type="button" class="cart-cancel" data-cart-cancel>Eliminar solicitud</button>' +
+        '<button type="button" class="cart-cancel" data-cart-cancel>' + t("Eliminar solicitud", "Cancel request") + '</button>' +
         "</div>";
     }
     if (request.status === "assigned") {
-if (request.routeStatus === "loading") {
+      if (request.routeStatus === "loading") {
         return '<div class="cart-status-card is-assigned">' +
-          '<p class="cart-status-kicker">SOLICITUD ACEPTADA</p>' +
-          "<h3>" + escapeHtml(request.cartName) + " va a su encuentro</h3>" +
-          "<p>Trazando la ruta por las calles del complejo hasta <strong>" +
+          '<p class="cart-status-kicker">' + t("SOLICITUD ACEPTADA", "REQUEST ACCEPTED") + '</p>' +
+          "<h3>" + escapeHtml(request.cartName) + " " + t("va a su encuentro", "is coming to meet you") + "</h3>" +
+          "<p>" + t("Trazando la ruta por las calles del complejo hasta ", "Tracing the route through the resort streets to ") + "<strong>" +
           escapeHtml(request.pickup.label) + "</strong>.</p>" +
           '<span class="cart-searching-dots" aria-hidden="true"><i></i><i></i><i></i></span>' +
-          '<p class="cart-status-meta">Solicitud ' + escapeHtml(request.id) +
+          '<p class="cart-status-meta">' + t("Solicitud ", "Request ") + escapeHtml(request.id) +
           (request.guest ? " · " + escapeHtml(request.guest) : "") + "</p>" +
-          '<button type="button" class="cart-cancel" data-cart-cancel>Eliminar solicitud</button>' +
+          '<button type="button" class="cart-cancel" data-cart-cancel>' + t("Eliminar solicitud", "Cancel request") + '</button>' +
           "</div>";
       }
       return '<div class="cart-status-card is-assigned">' +
-        '<p class="cart-status-kicker">SOLICITUD ACEPTADA</p>' +
-        "<h3>" + escapeHtml(request.cartName) + " va a su encuentro</h3>" +
-        "<p>El carrito va hacia <strong>" + escapeHtml(request.pickup.label) + "</strong>. Le llevará a <strong>" +
+        '<p class="cart-status-kicker">' + t("SOLICITUD ACEPTADA", "REQUEST ACCEPTED") + '</p>' +
+        "<h3>" + escapeHtml(request.cartName) + " " + t("va a su encuentro", "is coming to meet you") + "</h3>" +
+        "<p>" + t("El carrito va hacia ", "The cart is heading to ") + "<strong>" + escapeHtml(request.pickup.label) + "</strong>. " +
+        t("Le llevará a ", "It will take you to ") + "<strong>" +
         escapeHtml(destinationName) + "</strong>.</p>" +
         '<div class="cart-eta-big"><span data-cart-live-eta>' + escapeHtml(etaLabel(request.remainingSeconds)) +
-        "</span><small>tiempo estimado</small></div>" +
-        '<div class="cart-progress" role="progressbar" aria-label="Progreso del carrito"><span data-cart-progress style="width:' +
+        "</span><small>" + t("tiempo estimado", "estimated time") + "</small></div>" +
+        '<div class="cart-progress" role="progressbar" aria-label="' + t("Progreso del carrito", "Cart progress") + '"><span data-cart-progress style="width:' +
         Math.round((request.progress || 0) * 100) + '%"></span></div>' +
-        '<p class="cart-status-meta">Solicitud ' + escapeHtml(request.id) +
+        '<p class="cart-status-meta">' + t("Solicitud ", "Request ") + escapeHtml(request.id) +
         (request.guest ? " · " + escapeHtml(request.guest) : "") +
         routeMeta(request) + "</p>" +
-        '<button type="button" class="cart-cancel" data-cart-cancel>Cancelar solicitud</button>' +
+        '<button type="button" class="cart-cancel" data-cart-cancel>' + t("Cancelar solicitud", "Cancel request") + '</button>' +
         "</div>";
     }
     if (request.status === "pickup") {
       return '<div class="cart-status-card is-arrived">' +
-        '<p class="cart-status-kicker">CARRITO EN SU UBICACIÓN</p>' +
-        "<h3>" + escapeHtml(request.cartName) + " ya llegó</h3>" +
-        "<p>Ya está con usted en <strong>" + escapeHtml(request.pickup.label) + "</strong>. En un momento arranca hacia <strong>" +
+        '<p class="cart-status-kicker">' + t("CARRITO EN SU UBICACIÓN", "CART AT YOUR LOCATION") + '</p>' +
+        "<h3>" + escapeHtml(request.cartName) + " " + t("ya llegó", "has arrived") + "</h3>" +
+        "<p>" + t("Ya está con usted en ", "It is already with you at ") + "<strong>" + escapeHtml(request.pickup.label) + "</strong>. " +
+        t("En un momento arranca hacia ", "In a moment it will head to ") + "<strong>" +
         escapeHtml(destinationName) + "</strong>.</p>" +
-        '<p class="cart-status-meta">Solicitud ' + escapeHtml(request.id) + "</p>" +
-        '<button type="button" class="cart-cancel" data-cart-cancel>Cancelar viaje</button>' +
+        '<p class="cart-status-meta">' + t("Solicitud ", "Request ") + escapeHtml(request.id) + "</p>" +
+        '<button type="button" class="cart-cancel" data-cart-cancel>' + t("Cancelar viaje", "Cancel trip") + '</button>' +
         "</div>";
     }
     if (request.status === "riding") {
       if (request.routeStatus === "loading") {
         return '<div class="cart-status-card is-assigned">' +
-          '<p class="cart-status-kicker">EN RUTA A SU DESTINO</p>' +
-          "<h3>Le llevamos a " + escapeHtml(destinationName) + "</h3>" +
-          "<p>Trazando la ruta por las calles del complejo desde <strong>" +
+          '<p class="cart-status-kicker">' + t("EN RUTA A SU DESTINO", "EN ROUTE TO YOUR DESTINATION") + '</p>' +
+          "<h3>" + t("Le llevamos a ", "We are taking you to ") + escapeHtml(destinationName) + "</h3>" +
+          "<p>" + t("Trazando la ruta por las calles del complejo desde ", "Tracing the route through the resort streets from ") + "<strong>" +
           escapeHtml(request.pickup.label) + "</strong>.</p>" +
           '<span class="cart-searching-dots" aria-hidden="true"><i></i><i></i><i></i></span>' +
-          '<p class="cart-status-meta">Solicitud ' + escapeHtml(request.id) + "</p>" +
-          '<button type="button" class="cart-cancel" data-cart-cancel>Cancelar viaje</button>' +
+          '<p class="cart-status-meta">' + t("Solicitud ", "Request ") + escapeHtml(request.id) + "</p>" +
+          '<button type="button" class="cart-cancel" data-cart-cancel>' + t("Cancelar viaje", "Cancel trip") + '</button>' +
           "</div>";
       }
       return '<div class="cart-status-card is-assigned">' +
-        '<p class="cart-status-kicker">EN RUTA A SU DESTINO</p>' +
-        "<h3>Le llevamos a " + escapeHtml(destinationName) + "</h3>" +
-        "<p>Recogida en <strong>" + escapeHtml(request.pickup.label) + "</strong>.</p>" +
+        '<p class="cart-status-kicker">' + t("EN RUTA A SU DESTINO", "EN ROUTE TO YOUR DESTINATION") + '</p>' +
+        "<h3>" + t("Le llevamos a ", "We are taking you to ") + escapeHtml(destinationName) + "</h3>" +
+        "<p>" + t("Recogida en ", "Pickup at ") + "<strong>" + escapeHtml(request.pickup.label) + "</strong>.</p>" +
         '<div class="cart-eta-big"><span data-cart-live-eta>' + escapeHtml(etaLabel(request.remainingSeconds)) +
-        "</span><small>tiempo estimado</small></div>" +
-        '<div class="cart-progress" role="progressbar" aria-label="Progreso del viaje"><span data-cart-progress style="width:' +
+        "</span><small>" + t("tiempo estimado", "estimated time") + "</small></div>" +
+        '<div class="cart-progress" role="progressbar" aria-label="' + t("Progreso del viaje", "Trip progress") + '"><span data-cart-progress style="width:' +
         Math.round((request.progress || 0) * 100) + '%"></span></div>' +
-        '<p class="cart-status-meta">Solicitud ' + escapeHtml(request.id) +
+        '<p class="cart-status-meta">' + t("Solicitud ", "Request ") + escapeHtml(request.id) +
         (request.distance ? " · " + escapeHtml(String(request.distance)) + " m" : "") +
         routeMeta(request) + "</p>" +
-        '<button type="button" class="cart-cancel" data-cart-cancel>Cancelar viaje</button>' +
+        '<button type="button" class="cart-cancel" data-cart-cancel>' + t("Cancelar viaje", "Cancel trip") + '</button>' +
         "</div>";
     }
     if (request.status === "completed") {
       return '<div class="cart-status-card is-arrived">' +
-        '<p class="cart-status-kicker">LLEGÓ A SU DESTINO</p>' +
+        '<p class="cart-status-kicker">' + t("LLEGÓ A SU DESTINO", "ARRIVED AT YOUR DESTINATION") + '</p>' +
         "<h3>" + escapeHtml(destinationName) + "</h3>" +
-        "<p>El carrito le dejó en su destino. Que disfrute su visita.</p>" +
-        '<p class="cart-status-meta">Solicitud ' + escapeHtml(request.id) +
+        "<p>" + t("El carrito le dejó en su destino. Que disfrute su visita.", "The cart dropped you off at your destination. Enjoy your visit.") + "</p>" +
+        '<p class="cart-status-meta">' + t("Solicitud ", "Request ") + escapeHtml(request.id) +
         (request.guest ? " · " + escapeHtml(request.guest) : "") + "</p>" +
-        '<button type="button" class="cart-cancel" data-cart-cancel>Solicitar otro carrito</button>' +
+        '<button type="button" class="cart-cancel" data-cart-cancel>' + t("Solicitar otro carrito", "Request another cart") + '</button>' +
         "</div>";
     }
     return '<div class="cart-status-card is-arrived">' +
-      '<p class="cart-status-kicker">CARRITO EN SU UBICACIÓN</p>' +
-      "<h3>" + escapeHtml(request.cartName) + " ya llegó</h3>" +
-      "<p>Ya está con usted en <strong>" + escapeHtml(request.pickup.label) + "</strong>.</p>" +
-      '<p class="cart-status-meta">Solicitud ' + escapeHtml(request.id) + "</p>" +
-      '<button type="button" class="cart-cancel" data-cart-cancel>Solicitar otro carrito</button>' +
+      '<p class="cart-status-kicker">' + t("CARRITO EN SU UBICACIÓN", "CART AT YOUR LOCATION") + '</p>' +
+      "<h3>" + escapeHtml(request.cartName) + " " + t("ya llegó", "has arrived") + "</h3>" +
+      "<p>" + t("Ya está con usted en ", "It is already with you at ") + "<strong>" + escapeHtml(request.pickup.label) + "</strong>.</p>" +
+      '<p class="cart-status-meta">' + t("Solicitud ", "Request ") + escapeHtml(request.id) + "</p>" +
+      '<button type="button" class="cart-cancel" data-cart-cancel>' + t("Solicitar otro carrito", "Request another cart") + '</button>' +
       "</div>";
   }
 
@@ -1469,20 +1480,20 @@ if (request.routeStatus === "loading") {
       var distance = haversine([cart.lat, cart.lng], [pickup.lat, pickup.lng]);
       var assigned = !!(request && request.cartId === cart.id);
       var label = assigned
-        ? (request.status === "completed" ? "En destino"
-          : request.status === "riding" ? "En ruta"
-          : request.status === "pickup" || request.status === "arrived" ? "Con usted"
-          : "En camino")
-        : "Disponible";
+        ? (request.status === "completed" ? t("En destino", "At destination")
+          : request.status === "riding" ? t("En ruta", "En route")
+          : request.status === "pickup" || request.status === "arrived" ? t("Con usted", "With you")
+          : t("En camino", "On the way"))
+        : t("Disponible", "Available");
       return '<li class="cart-nearby-item' + (assigned ? " is-assigned" : "") + '">' +
         '<span class="cart-nearby-name">' + escapeHtml(cart.name) + "</span>" +
         '<span class="cart-nearby-meta">' + escapeHtml(distanceLabel(distance)) + " · " + escapeHtml(label) + "</span>" +
         "</li>";
     }).join("");
-    return '<div class="cart-nearby-head"><h3>Carritos cerca de usted</h3><span>' +
-      escapeHtml(free) + (free === 1 ? " disponible" : " disponibles") + "</span></div>" +
+    return '<div class="cart-nearby-head"><h3>' + t("Carritos cerca de usted", "Carts near you") + '</h3><span>' +
+      escapeHtml(free) + (free === 1 ? " " + t("disponible", "available") : " " + t("disponibles", "available")) + "</span></div>" +
       '<ul class="cart-nearby-list">' + items + "</ul>" +
-      '<p class="cart-nearby-note">Posiciones y tiempos simulados para mostrar el servicio.</p>';
+      '<p class="cart-nearby-note">' + t("Posiciones y tiempos simulados para mostrar el servicio.", "Positions and times simulated to show the service.") + '</p>';
   }
 
   function syncDestinationOptions(section) {
