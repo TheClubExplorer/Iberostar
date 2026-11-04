@@ -131,15 +131,16 @@
     document.body.dataset.hotelSlug = routeContext.hotel || target.hotelSlug || "";
     document.body.dataset.routeKind = routeContext.kind || target.kind || "default";
 
+    const en = window.RevistaDigital.i18n.getLang() === "en";
     const routeLabels = {
-      "/": "Inicio",
+      "/": en ? "Home" : "Inicio",
       "/workspace": "Workspace",
       "/360": "360°",
       "/videos": "Videos"
     };
 
     const currentLabel = routeLabels[getAppRoute(pathname)] ||
-      (routeContext.country ? routeContext.country : "Destino");
+      (routeContext.country ? routeContext.country : en ? "Destination" : "Destino");
 
     document.body.dataset.currentRouteLabel = currentLabel;
     document.body.dataset.currentRoute = getAppRoute(pathname);
@@ -148,6 +149,7 @@
   }
 
   function getBreadcrumbs(pathname = window.location.pathname) {
+    const en = window.RevistaDigital.i18n.getLang() === "en";
     const target = resolveRouteTarget(pathname);
     const context = target.context || getRouteContext(pathname);
     const breadcrumbs = [];
@@ -174,7 +176,7 @@
     }
 
     if (!breadcrumbs.length) {
-      breadcrumbs.push({ label: "Inicio", route: "/" });
+      breadcrumbs.push({ label: en ? "Home" : "Inicio", route: "/" });
     }
 
     return breadcrumbs;
@@ -200,14 +202,15 @@
      destino de regreso (explícito, nunca history.back). portalNav pinta un único
      botón de regreso; las migas de pan duplicadas se retiraron a propósito. */
   function getPortalNavModel(route = getAppRoute()) {
-    const home = { label: "Inicio", route: "/" };
+    const en = window.RevistaDigital.i18n.getLang() === "en";
+    const home = { label: en ? "Home" : "Inicio", route: "/" };
 
     if (!route || route === "/") return { back: null, trail: [] };
 
     if (route === "/complejo-playa-paraiso") {
       return {
-        back: { label: "Volver a destinos", route: "/" },
-        trail: [home, { label: "El Complejo" }]
+        back: { label: en ? "Back to destinations" : "Volver a destinos", route: "/" },
+        trail: [home, { label: en ? "The Complex" : "El Complejo" }]
       };
     }
 
@@ -223,12 +226,12 @@
         : null;
       if (hotel) {
         return {
-          back: { label: `Volver a ${hotel.name}`, route: `/mexico/riviera-maya/${hotel.slug}` },
+          back: { label: en ? `Back to ${hotel.name}` : `Volver a ${hotel.name}`, route: `/mexico/riviera-maya/${hotel.slug}` },
           trail: [{ label: "México", route: "/mexico" }, { label: "Riviera Maya", route: "/mexico/riviera-maya" }, { label: hotel.name }]
         };
       }
       return {
-        back: { label: "Volver a Riviera Maya", route: "/mexico/riviera-maya" },
+        back: { label: en ? "Back to Riviera Maya" : "Volver a Riviera Maya", route: "/mexico/riviera-maya" },
         trail: [{ label: "México", route: "/mexico" }, { label: "Riviera Maya" }]
       };
     }
@@ -237,13 +240,13 @@
 
     if (parts[0] === "restaurantes") {
       const api = window.RevistaDigital.restaurantes;
-      const restaurantes = { label: "Restaurantes", route: "/restaurantes" };
+      const restaurantes = { label: en ? "Restaurants" : "Restaurantes", route: "/restaurantes" };
       if (parts.length >= 2 && typeof api?.getRestaurantHotel === "function") {
         const hotelMatch = api.getRestaurantHotel(parts[1]);
         if (hotelMatch) {
           const countryRoute = `/restaurantes/${hotelMatch.country.slug}`;
           return {
-            back: { label: `Volver a restaurantes de ${hotelMatch.country.name}`, route: countryRoute },
+            back: { label: en ? `Back to restaurants in ${hotelMatch.country.name}` : `Volver a restaurantes de ${hotelMatch.country.name}`, route: countryRoute },
             trail: [
               restaurantes,
               { label: hotelMatch.country.name, route: countryRoute },
@@ -256,13 +259,13 @@
         const country = api.getCountryDirectory(parts[1]);
         if (country) {
           return {
-            back: { label: "Volver a restaurantes", route: "/restaurantes" },
+            back: { label: en ? "Back to restaurants" : "Volver a restaurantes", route: "/restaurantes" },
             trail: [restaurantes, { label: country.name }]
           };
         }
       }
       return {
-        back: { label: "Volver al inicio", route: "/" },
+        back: { label: en ? "Back to home" : "Volver al inicio", route: "/" },
         trail: [home, restaurantes]
       };
     }
@@ -271,14 +274,14 @@
     const countryData = catalog[parts[0]];
     if (!countryData) {
       const sectionLabels = {
-        "/360": "Contenido 360°",
+        "/360": en ? "360° Content" : "Contenido 360°",
         "/videos": "Videos",
         "/workspace": "Workspace",
-        "/mapa-hoteles": "Mapa general de hoteles"
+        "/mapa-hoteles": en ? "General hotel map" : "Mapa general de hoteles"
       };
       if (sectionLabels[route]) {
         return {
-          back: { label: "Volver al inicio", route: "/" },
+          back: { label: en ? "Back to home" : "Volver al inicio", route: "/" },
           trail: [home, { label: sectionLabels[route] }]
         };
       }
@@ -289,7 +292,7 @@
 
     if (parts.length === 1) {
       return {
-        back: { label: "Volver a destinos", route: "/" },
+        back: { label: en ? "Back to destinations" : "Volver a destinos", route: "/" },
         trail: [home, { label: countryData.name }]
       };
     }
@@ -297,7 +300,7 @@
     const destination = (countryData.destinations || []).find((item) => item.slug === parts[1]);
     if (parts.length === 2) {
       return {
-        back: { label: `Volver a ${countryData.name}`, route: countryRoute },
+        back: { label: en ? `Back to ${countryData.name}` : `Volver a ${countryData.name}`, route: countryRoute },
         trail: destination ? [countryCrumb, { label: destination.name }] : [home, countryCrumb]
       };
     }
@@ -308,7 +311,7 @@
     const destinationRoute = destination ? `${countryRoute}/${destination.slug}` : countryRoute;
     return {
       back: {
-        label: `Volver a ${destination ? destination.name : countryData.name}`,
+        label: en ? `Back to ${destination ? destination.name : countryData.name}` : `Volver a ${destination ? destination.name : countryData.name}`,
         route: destination ? `${countryRoute}/${destination.slug}` : countryRoute
       },
       trail: [
