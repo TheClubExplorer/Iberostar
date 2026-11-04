@@ -83,6 +83,10 @@
     '</svg>';
 
   cg._context = null;
+  cg._useMapbox = false;
+  cg._mapboxFrame = null;
+  cg._mapboxReady = false;
+  cg._mapboxFitKey = null;
   cg._carts = {};
   cg._requests = {};
   cg._timers = {};
@@ -100,6 +104,15 @@
   cg._position = null;
   cg._watchId = null;
   cg._locationState = "idle";
+
+  window.addEventListener("message", function (event) {
+    if (!cg._mapboxFrame || event.source !== cg._mapboxFrame.contentWindow ||
+        event.origin !== window.location.origin || !event.data ||
+        event.data.type !== "mapbox-ready" || event.data.mode !== "cart") return;
+    cg._mapboxReady = true;
+    cg._cartMapInvalidate(true);
+    syncMap();
+  });
 
   function escapeHtml(value) {
     return String(value == null ? "" : value)
@@ -454,13 +467,20 @@
 
   cg.openPage = function (value) {
     try { cg.setPreferredHotel && cg.setPreferredHotel(value); } catch (e) {}
+    // Al entrar desde "Ver el transporte", el mapa del carrito abre a pantalla completa.
+    try { sessionStorage.setItem("auto_fullscreen_transporte", "true"); } catch (e) {}
     // Salir de pantalla completa antes de navegar
     try { if (document.fullscreenElement) document.exitFullscreen().catch(function () {}); } catch (e) {}
     try {
-      ["no-scroll","modal-open","fullscreen-active","is-fullscreen","map-fullscreen"].forEach(function (cls) {
+      ["no-scroll","modal-open","fullscreen-active","is-fullscreen","map-fullscreen","map-fullscreen-open"].forEach(function (cls) {
         document.body.classList.remove(cls);
         document.documentElement.classList.remove(cls);
       });
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.left = "";
+      document.body.style.right = "";
+      document.body.style.width = "";
       // cerrar/desmontar modales y popups abiertos
       document.querySelectorAll('.modal, .popup, .leaflet-popup, [role="dialog"]').forEach(function (el) { try { el.remove(); } catch (e) {} });
     } catch (e) {}
@@ -604,6 +624,16 @@
       acceptRequest(slug, request.id);
     }, request.tourDemo ? 350 : ACCEPT_MIN_MS + Math.random() * (ACCEPT_MAX_MS - ACCEPT_MIN_MS));
     return request;
+  };
+
+  cg.requestForHotel = function (slug, options) {
+    var context = resolveHotelContext(slug);
+    if (!context) return null;
+    context.mapType = "mapbox";
+    cg._context = context;
+    cg._useMapbox = true;
+    cg.setPreferredHotel(slug);
+    return cg.request(options);
   };
 
   function acceptRequest(slug, requestId) {
@@ -889,6 +919,13 @@
 
   function destroyMap() {
     cg._mapToken += 1;
+    if (cg._mapboxFrame) {
+      cg._mapboxFrame.hidden = true;
+      cg._mapboxFrame.removeAttribute("src");
+    }
+    cg._mapboxFrame = null;
+    cg._mapboxReady = false;
+    cg._mapboxFitKey = null;
     if (cg._map) {
       try { cg._map.remove(); } catch (e) { /* ignore */ }
     }
@@ -904,6 +941,14 @@
   }
 
   cg._cartMapInvalidate = function (force) {
+    if (cg._mapboxFrame && cg._mapboxFrame.contentWindow) {
+      try {
+        cg._mapboxFrame.contentWindow.postMessage({ type: "mapbox-command", command: "resize" }, window.location.origin);
+      } catch (error) {
+        console.warn("No se pudo actualizar el tamaño del mapa 3D del carrito.", error);
+      }
+      return;
+    }
     try {
       if (!cg._map || !window.L) return;
       setTimeout(function () {
@@ -991,6 +1036,26 @@
   function buildMap() {
     var host = document.getElementById("cartTrackingMap");
     if (!host) return;
+    if (cg._useMapbox) {
+      var frame = host.querySelector(".cart-mapbox-frame");
+      if (!frame) {
+        console.warn("No se encontró el contenedor del mapa 3D del carrito.");
+        return;
+      }
+      cg._mapboxFrame = frame;
+      frame.hidden = false;
+      frame.src = frame.dataset.mapboxSrc || "";
+      if (!frame.src) {
+        console.warn("No se configuró la dirección del mapa 3D del carrito.");
+        return;
+      }
+      frame.addEventListener("load", function () {
+        if (cg._mapboxFrame !== frame) return;
+        cg._cartMapInvalidate(true);
+        syncMap();
+      }, { once: true });
+      return;
+    }
     if (!window.RevistaDigital.mapas || typeof window.RevistaDigital.mapas.loadLeaflet !== "function") return;
     var token = ++cg._mapToken;
     cg._mapPromise = window.RevistaDigital.mapas.loadLeaflet().then(function (L) {
@@ -1050,7 +1115,72 @@
     });
   }
 
+  function syncMapbox() {
+    if (!cg._mapboxFrame) return;
+    var request = activeRequest();
+    var pickup = request ? request.pickup : userLocation();
+    var assigned = request && request.cartId ? findCart(request.cartId, request.slug) : null;
+    var destination = request ? request.destination : currentDestination();
+    var line = null;
+    var dashed = false;
+    if (request && request.routeStatus !== "loading" && request.routeCoordinates &&
+        (request.status === "assigned" || request.status === "riding" ||
+         request.status === "pickup" || request.status === "completed")) {
+      line = request.routeCoordinates;
+      dashed = request.routeStatus === "fallback";
+    } else if (assigned && request.status === "assigned") {
+      line = [[assigned.lat, assigned.lng], [pickup.lat, pickup.lng]];
+      dashed = true;
+    } else if (assigned && request.status === "riding" && destination) {
+      line = [[assigned.lat, assigned.lng], [destination.lat, destination.lng]];
+      dashed = true;
+    } else if (request && request.status === "pickup" && destination) {
+      line = [[pickup.lat, pickup.lng], [destination.lat, destination.lng]];
+      dashed = true;
+    } else if (request && request.status === "completed" && destination) {
+      line = [[pickup.lat, pickup.lng], [destination.lat, destination.lng]];
+      dashed = true;
+    }
+    var fitKey = (cg._context ? cg._context.slug : "") + ":" + (request ? request.id : "idle") +
+      ":" + (destination ? destination.id : "none") + ":" + (request ? request.status || "" : "idle") +
+      ":" + (request ? request.routeStatus || "" : "idle");
+    var fitPoints = [];
+    if (request && request.tourDemo && request.routeCoordinates) {
+      fitPoints = request.routeCoordinates.slice();
+    } else {
+      fitPoints = getCarts().map(function (cart) { return [cart.lat, cart.lng]; });
+      fitPoints.push([pickup.lat, pickup.lng]);
+      if (destination) fitPoints.push([destination.lat, destination.lng]);
+      if (request && request.routeCoordinates) fitPoints = fitPoints.concat(request.routeCoordinates);
+    }
+    if (assigned) fitPoints.push([assigned.lat, assigned.lng]);
+    var state = {
+      carts: getCarts().map(function (cart) {
+        return {
+          id: cart.id,
+          position: [cart.lat, cart.lng],
+          assigned: !!(request && request.cartId === cart.id)
+        };
+      }),
+      pickup: [pickup.lat, pickup.lng],
+      destination: destination ? [destination.lat, destination.lng] : null,
+      route: line,
+      routeDashed: dashed,
+      fitKey: fitKey,
+      fitPoints: cg._mapboxReady && cg._mapboxFitKey === fitKey ? [] : fitPoints
+    };
+    if (cg._mapboxReady && cg._mapboxFrame.contentWindow) {
+      cg._mapboxFrame.contentWindow.postMessage({ type: "cart-map-update", state: state }, window.location.origin);
+      cg._mapboxFitKey = fitKey;
+    }
+    updateMapEta(request);
+  }
+
   function syncMap() {
+    if (cg._useMapbox) {
+      syncMapbox();
+      return;
+    }
     if (!cg._map || !cg._L) return;
     var request = activeRequest();
     var pickup = request ? request.pickup : userLocation();
@@ -1139,6 +1269,12 @@
   }
 
   cg.refreshMapLayout = function () {
+    if (cg._useMapbox) {
+      cg._mapboxFitKey = null;
+      cg._cartMapInvalidate(true);
+      syncMap();
+      return;
+    }
     if (!cg._map) return;
     try { cg._map.invalidateSize({ pan: false, animate: false }); } catch (error) { /* ignore */ }
     cg._fitKey = null;
@@ -1146,6 +1282,10 @@
   };
 
   function updateMapProgress(request) {
+    if (cg._useMapbox) {
+      syncMapbox();
+      return;
+    }
     if (!cg._map || !cg._L || !request) return;
     if (request.status !== "assigned" && request.status !== "riding") return;
     if (!cg._context || request.slug !== cg._context.slug) return;
@@ -1440,11 +1580,7 @@ if (request.routeStatus === "loading") {
     if (event.target.closest("[data-cart-back-to-trip]")) {
       try {
         var sec = document.getElementById("hotel-carrito");
-        if (isMobileCartViewport()) {
-          setCartMapFocus(sec, true);
-        } else {
-          if (sec) sec.scrollIntoView({ behavior: "smooth", block: "start" });
-        }
+        if (!setCartMapFocus(sec, true) && sec) sec.scrollIntoView({ behavior: "smooth", block: "start" });
         var cgInstTrip = window.RevistaDigital && window.RevistaDigital.carritoGolf;
         if (cgInstTrip && cgInstTrip._map) {
           try {
@@ -1474,6 +1610,12 @@ if (request.routeStatus === "loading") {
         document.querySelectorAll(".guide-book-done, #guideBookBox, #guideMobileBookBox, .hotel-transport-banner, [class*='transport-banner']").forEach(function(el){ try{ el.innerHTML=""; }catch(e){} try{ el.remove(); }catch(e){} });
         document.body.style.overflow = "";
         document.documentElement.style.overflow = "";
+      } catch(e){}
+      // Al salir, mantenemos visible el mapa con la simulación en curso.
+      try {
+        setTimeout(function () {
+          if (exitSection) exitSection.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 120);
       } catch(e){}
       var cgInstExit3 = window.RevistaDigital && window.RevistaDigital.carritoGolf;
       if (cgInstExit3) {
@@ -1511,10 +1653,19 @@ if (request.routeStatus === "loading") {
     return !!(window.matchMedia && window.matchMedia("(max-width: 850px)").matches);
   }
 
+  document.addEventListener("click", function (event) {
+    var expandButton = event.target.closest(".cart-page [data-cart-back-to-trip]");
+    if (!expandButton || expandButton.closest("#hotel-carrito")) return;
+    var section = document.getElementById("hotel-carrito");
+    if (!setCartMapFocus(section, true) && section) {
+      section.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  });
+
   function setCartMapFocus(section, active) {
     section = section || document.getElementById("hotel-carrito");
     if (!section) return false;
-    if (active && !isMobileCartViewport()) return false;
+    if (active && !isMobileCartViewport() && !section.classList.contains("cart-page-section")) return false;
     section.classList.toggle("is-map-focus", !!active);
     if (!active) {
       section.classList.remove("is-panel-collapsed");
@@ -1553,9 +1704,11 @@ if (request.routeStatus === "loading") {
     cg._context = {
       slug: context && context.slug ? context.slug : "",
       name: context && context.name ? context.name : "",
-      coordinates: context && Array.isArray(context.coordinates) ? context.coordinates : null
+      coordinates: context && Array.isArray(context.coordinates) ? context.coordinates : null,
+      mapType: context && context.mapType === "mapbox" ? "mapbox" : "leaflet"
     };
     if (!cg._context.slug) return false;
+    cg._useMapbox = cg._context.mapType === "mapbox";
     cg.setPreferredHotel(cg._context.slug);
     destroyMap();
     if (!section.getAttribute("data-cart-bound")) {
@@ -1574,54 +1727,16 @@ if (request.routeStatus === "loading") {
     buildMap();
     if (typeof cg._cartMapInvalidate === "function") cg._cartMapInvalidate(true);
     else if (cg._map) { try { [60,200,400].forEach(function(d){ setTimeout(function(){ try { cg._map.invalidateSize({pan:false,animate:false}); }catch(e){} }, d); }); }catch(e){} }
-    // Auto-fullscreen en mÃ³vil al venir desde "Ver el transporte"
+    // Auto-fullscreen del mapa al venir desde "Ver el transporte".
+    // Usa el mismo modo de enfoque que "Ampliar mapa" para que salir y volver
+    // a entrar conserve la simulación del carrito.
     try {
-      if (window.innerWidth <= 768 && sessionStorage.getItem('auto_fullscreen_transporte') === 'true') {
-        sessionStorage.removeItem('auto_fullscreen_transporte');
-        var cartMapContainer = document.querySelector('#cartMap, .cart-map-container, #cartTrackingMap');
-        if (cartMapContainer) {
-          cartMapContainer.classList.add('map-fullscreen');
-          if (!cartMapContainer.querySelector('.cart-map-exit-fullscreen')) {
-            var btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = 'cart-map-exit-fullscreen';
-            btn.textContent = 'SALIR DEL MAPA';
-            btn.style.cssText = 'position:absolute;top:12px;right:12px;z-index:1000;padding:8px 14px;background:rgba(255,255,255,0.95);color:#0b3d66;border:none;border-radius:999px;cursor:pointer;font-size:12px;font-weight:700;letter-spacing:.06em;box-shadow:0 4px 12px rgba(0,0,0,0.25);';
-            btn.addEventListener('click', function () {
-              cartMapContainer.classList.remove('map-fullscreen');
-              // Limpiar estilos inline del fullscreen: si queda position:relative
-              // el contenedor pierde el alto y el mapa se ve en blanco.
-              cartMapContainer.style.position = '';
-              cartMapContainer.style.top = '';
-              cartMapContainer.style.left = '';
-              cartMapContainer.style.width = '';
-              cartMapContainer.style.height = '';
-              cartMapContainer.style.zIndex = '';
-              try { if (document.fullscreenElement) document.exitFullscreen().catch(function(){}); } catch(e){}
-              ["no-scroll","modal-open","fullscreen-active","is-fullscreen","map-fullscreen","map-fullscreen-open"].forEach(function (cls) {
-                document.body.classList.remove(cls);
-                document.documentElement.classList.remove(cls);
-              });
-              document.body.style.overflow = "";
-              document.documentElement.style.overflow = "";
-              try { setCartMapFocus(cartMapContainer.closest("#hotel-carrito"), false); } catch(e){}
-              var refreshMap = function (full) {
-                try { if (cg._map) cg._map.invalidateSize({pan:false, animate:false}); } catch(e){}
-                if (typeof cg._cartMapInvalidate === 'function') cg._cartMapInvalidate(true);
-                if (full && typeof cg.refreshMapLayout === 'function') cg.refreshMapLayout();
-              };
-              refreshMap(true);
-              [50,150,250,400,650,900].forEach(function (d) {
-                setTimeout(function () { refreshMap(d > 400); }, d);
-              });
-              if (btn && btn.parentNode) btn.parentNode.removeChild(btn);
-            });
-            cartMapContainer.appendChild(btn);
-          }
-        }
+      if (sessionStorage.getItem("auto_fullscreen_transporte") === "true") {
+        sessionStorage.removeItem("auto_fullscreen_transporte");
+        setCartMapFocus(section, true);
         setTimeout(function () {
-          try { if (cg._map) cg._map.invalidateSize({pan:false, animate:false}); } catch (e) {}
-          if (typeof cg._cartMapInvalidate==='function') cg._cartMapInvalidate(true);
+          try { if (cg._map) cg._map.invalidateSize({ pan: false, animate: false }); } catch (e) {}
+          if (typeof cg._cartMapInvalidate === "function") cg._cartMapInvalidate(true);
         }, 50);
       }
     } catch (e) {}
