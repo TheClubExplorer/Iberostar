@@ -5,6 +5,11 @@
     es: {
       siteTitle: "Iberostar | Destinos y hoteles",
       brandDestinations: "Destinos",
+      continue: "Continuar",
+      gateNote: "Después podrá cambiarlo desde el menú.",
+      openMenu: "Abrir menú",
+      closeMenu: "Cerrar menú",
+      closeSearch: "Cerrar búsqueda",
       navDestinos: "Destinos",
       navMexico: "México",
       navJamaica: "Jamaica",
