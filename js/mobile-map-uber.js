@@ -108,7 +108,7 @@
       handle.className = "uber-sheet-handle";
       handle.innerHTML =
         '<span class="uber-sheet-pill" aria-hidden="true"></span>' +
-        '<div class="uber-sheet-collapsed-bar">¿A dónde vas en el complejo?</div>';
+        '<div class="uber-sheet-collapsed-bar">¿A dónde desea ir en el complejo?</div>';
       panel.insertBefore(handle, panel.firstChild);
 
       handle.addEventListener("click", function () {

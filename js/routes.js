@@ -876,7 +876,7 @@
               <p class="cart-hero-sub">Solicita un carrito y síguelo en tiempo real hasta tu destino.</p>
             </div>
             <div class="cart-hero-actions">
-              <span class="cart-location-pill" data-cart-location-status>Activa tu ubicación para pedirlo con mayor precisión</span>
+              <span class="cart-location-pill" data-cart-location-status>Active su ubicación para solicitarlo con mayor precisión</span>
               <button type="button" class="cart-locate-pill" data-cart-locate>Usar mi ubicación</button>
             </div>
           </div>
@@ -901,13 +901,13 @@
               <header class="hotel-cart-form-header">
                 <div>
                   <p class="hotel-cart-form-kicker">Solicitud</p>
-                  <h2 class="hotel-cart-form-title">Pide tu carrito</h2>
+                  <h2 class="hotel-cart-form-title">Solicitar carrito</h2>
                 </div>
-                <p class="hotel-cart-form-note">Te recoge en tu ubicación y te lleva al destino que elijas.</p>
+                <p class="hotel-cart-form-note">Se recoge en su ubicación y le lleva al destino que elija.</p>
               </header>
               <div class="hotel-cart-row">
                 <label class="hotel-cart-field"><span>Nombre</span>
-                  <input type="text" name="nombre" autocomplete="name" placeholder="Tu nombre" />
+                  <input type="text" name="nombre" autocomplete="name" placeholder="Nombre" />
                 </label>
                 <label class="hotel-cart-field"><span>Habitación</span>
                   <input type="text" name="habitacion" inputmode="numeric" placeholder="Ej. 1204" />

@@ -12,7 +12,13 @@
       if (new URLSearchParams(window.location.search).get("tour-preview") === "1") {
         document.documentElement.dataset.tourPreview = "true";
       } else {
-        document.documentElement.dataset.languageGate = "pending";
+        try {
+          if (!localStorage.getItem("revista_lang")) {
+            document.documentElement.dataset.languageGate = "pending";
+          }
+        } catch (e) {
+          document.documentElement.dataset.languageGate = "pending";
+        }
       }
       const routeEntry = new URLSearchParams(window.location.search).get("route-entry");
       if (routeEntry) {
@@ -28,7 +34,7 @@
         window.history.replaceState(null, "", targetUrl.href);
       }
     </script>
-    <link rel="stylesheet" href="style.css?v=51" />
+    <link rel="stylesheet" href="style.css?v=53" />
     <link rel="stylesheet" href="responsive.css" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -168,7 +174,7 @@
 <script src="js/hoteles.js?v=2" defer></script>
 <script src="js/restaurantes.js?v=4" defer></script>
 <script src="js/mapas.js?v=19" defer></script>
-<script src="js/media360.js?v=4" defer></script>
+<script src="js/media360.js?v=5" defer></script>
 <script src="js/videos.js?v=2" defer></script>
 <script src="js/hotel-gallery-data.js?v=2" defer></script>
 <script src="js/hotel-content-data.js?v=2" defer></script>

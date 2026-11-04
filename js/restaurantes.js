@@ -12,6 +12,11 @@
       ["El Cuate Pancho", "Mexicana"], ["Pacific Express · Bistró", "Francesa"],
       ["Tsuba", "Asiática"], ["El Nopal", "Buffet"], ["La Bahía Steak House", "Carnes"]
     ],
+    "Iberostar Selection Paraíso Maya": [
+      ["Olivetti", "Italiana"],
+      ["Under the Sea", "Mariscos"],
+      ["Lemon & Spices", "Griega"]
+    ],
     "Iberostar Selection Cancún": [
       ["American Bistro", "Americana"], ["Antiguo Laguito Buffet", "Buffet"],
       ["Trattoria La Horma", "Italiana"], ["Teppanyaki Naga Hibachi", "Japonesa"],
@@ -204,10 +209,14 @@
     const catalogRestaurants = restaurantes.getHotelRestaurants(hotel.name);
     const paraiso = paraisoRestaurants(hotel.name);
     const pannellum = window.RevistaDigital?.pannellum360;
-    const hasParaisoCards = Boolean(
+    
+
+
+const hasParaisoCards = Boolean(
       pannellum &&
       typeof pannellum.renderRestaurantCards === "function" &&
       typeof pannellum.isPlayaParaiso === "function" &&
+      // Normalizar el nombre del hotel para comparar con PLAYA_PARISO_HOTELS
       pannellum.isPlayaParaiso(hotel.name) &&
       pannellum.getRestaurantes(hotel.name).length
     );
