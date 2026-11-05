@@ -547,7 +547,7 @@
         '</div>'
       : "";
     var cartButton = (isRestaurant || isGolf)
-      ? '<button type="button" class="gp-map-cart guide-cart" data-id="' + popupEscape(poi.id) + '" data-cat="' + popupEscape(poi.category) + '">' + t("Solicitar carrito", "Request a golf cart") + '</button>'
+      ? '<button type="button" class="gp-map-cart guide-cart" data-id="' + popupEscape(poi.id) + '" data-cat="' + popupEscape(poi.category) + '">Solicitar carrito</button>'
       : "";
     return '<div class="gp-map-poi-popup"><strong class="gp-map-poi-title">' + name + '</strong>' +
       (description ? '<small class="gp-map-poi-description">' + description + '</small>' : '') +
@@ -648,33 +648,11 @@
     // Las etiquetas de área (p. ej. "Mar Caribe") no se agrupan: deben verse
     // siempre como rótulo del mapa.
     var labels = L.featureGroup ? L.featureGroup() : L.layerGroup();
-    // Función para asignar coordenadas dentro del polígono del complejo a
-    // POIs que no las tienen, de modo que aparezcan en el mapa Leaflet.
-    var _poiIndex = 0;
-    function resolvePoiLatLng(p) {
-      if (Number.isFinite(p.lat) && Number.isFinite(p.lng)) return [p.lat, p.lng];
-      // Bounding box del polígono del complejo (COMPLEX_RING)
-      var minLat = 20.7531065, maxLat = 20.7648525;
-      var minLng = -86.9697573, maxLng = -86.9573717;
-      // Distribuir puntos dentro del bbox usando índice secuencial para no solaparlos
-      var t = (_poiIndex % 1000) / 1000;
-      _poiIndex += 1;
-      var lat = minLat + (maxLat - minLat) * t;
-      var lng = minLng + (maxLng - minLng) * ((_poiIndex * 7) % 1000 / 1000);
-      return [lat, lng];
-    }
-
-    var poiCount = 0;
     (gp.POIS || []).forEach(function (p) {
       if (p.category === "hotel") return;
       if (p.external === true) return;
       if (filterHotelId && p.hotelId && p.hotelId !== filterHotelId) return;
-      // Asignar coordenadas dentro del complejo a POIs que no las tengan
-      if (p.lat == null || p.lng == null || !Number.isFinite(p.lat) || !Number.isFinite(p.lng)) {
-        var ll = resolvePoiLatLng(p);
-        p.lat = ll[0];
-        p.lng = ll[1];
-      }
+      if (p.lat == null || p.lng == null) return;
       if (p.kind === "area") {
         var labelHtml = '<span style="display:inline-block;transform:translate(-50%,-50%);white-space:nowrap;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#0b3d66;background:rgba(255,255,255,.72);border:1px solid rgba(11,61,102,.35);border-radius:999px;padding:2px 10px;">' + (p.name || "") + "</span>";
         var areaIcon = window.L.divIcon ? window.L.divIcon({ className: "gp-area-label", html: labelHtml, iconSize: [0, 0], iconAnchor: [0, 0] }) : null;
@@ -1367,7 +1345,7 @@
         } else {
           html = '<p class="guide-route-status is-error">' + escapeHtml(route.info || "Intente calcular la ruta de nuevo.") + "</p>";
         }
-        html += '<button type="button" class="guide-route-cancel">' + t("cancelRoute", "Cancel route") + '</button>';
+        html += '<button type="button" class="guide-route-cancel">Cancelar ruta</button>';
         box.innerHTML = notice + html;
         if (!skipReveal) revealFeedback(box);
         // El estado de ruta cambia la altura del menú flotante: lo recolocamos.
@@ -1503,10 +1481,10 @@
       btns += '<button type="button" class="guide-route" data-id="' + escapeHtml(poi.id) + '">Cómo llegar</button>';
       btns += '<button type="button" class="guide-focus" data-id="' + escapeHtml(poi.id) + '">Ver en el mapa</button>';
       if (cat === "restaurante" || cat === "spa" || cat === "golf") {
-        var label = cat === "restaurante" ? t("Reservar", "Book") : (cat === "spa" ? t("Reservar cita", "Book appointment") : t("Reservar tee time", "Book tee time"));
+        var label = cat === "restaurante" ? "Reservar" : (cat === "spa" ? "Reservar cita" : "Reservar tee time");
         btns += '<button type="button" class="guide-book" data-id="' + escapeHtml(poi.id) + '" data-cat="' + cat + '">' + label + "</button>";
         if (cat === "golf" || cat === "restaurante") {
-          btns += '<button type="button" class="guide-cart" data-id="' + escapeHtml(poi.id) + '" data-cat="' + cat + '">' + t("Solicitar carrito", "Request a golf cart") + '</button>';
+          btns += '<button type="button" class="guide-cart" data-id="' + escapeHtml(poi.id) + '" data-cat="' + cat + '">Solicitar carrito</button>';
         }
       }
     } else {
@@ -1597,7 +1575,7 @@
     } else {
       html = '<p class="guide-route-status is-error">' + escapeHtml(route.info || "Intente calcular la ruta de nuevo.") + "</p>";
     }
-    html += '<button type="button" class="guide-route-cancel">' + t("cancelRoute", "Cancel route") + '</button>';
+    html += '<button type="button" class="guide-route-cancel">Cancelar ruta</button>';
     box.innerHTML = notice + html;
     // El estado de ruta cambia la altura del menú: lo recolocamos sobre el panel.
     if (isMobileGuide()) {
@@ -1770,25 +1748,25 @@
     }
     var isCart = kind === "cart";
     var title = isCart
-      ? t("Solicitud de carrito de golf", "Golf cart request")
-      : (poi.category === "restaurante" ? t("bookTable", "Book a table") : (poi.category === "spa" ? t("Reservar cita", "Book appointment") : t("Reservar tee time", "Book tee time")));
+      ? "Solicitud de carrito de golf"
+      : (poi.category === "restaurante" ? "Reservar mesa" : (poi.category === "spa" ? "Reservar cita" : "Reservar tee time"));
     var fields = isCart
-      ? '<p class="guide-book-note">' + t("El carrito le recogerá en su ubicación actual. Active la ubicación del dispositivo para compartir el punto exacto.", "The cart will pick you up at your current location. Enable device location to share the exact point.") + '</p>'
-      :       '<label class="guide-book-field"><span>' + t("Fecha", "Date") + '</span><input type="date" name="fecha" id="guideBookDate" required /></label>' +
-        '<label class="guide-book-field"><span>' + t("Hora", "Time") + '</span><input type="time" name="hora" id="guideBookTime" required /></label>' +
-        '<label class="guide-book-field"><span>' + t("Personas", "Guests") + '</span><input type="number" name="personas" id="guideBookGuests" min="1" max="20" value="2" required /></label>';
+      ? '<p class="guide-book-note">El carrito le recogerá en su ubicación actual. Active la ubicación del dispositivo para compartir el punto exacto.</p>'
+      : '<label class="guide-book-field"><span>Fecha</span><input type="date" name="fecha" id="guideBookDate" required /></label>' +
+        '<label class="guide-book-field"><span>Hora</span><input type="time" name="hora" id="guideBookTime" required /></label>' +
+        '<label class="guide-book-field"><span>Personas</span><input type="number" name="personas" id="guideBookGuests" min="1" max="20" value="2" required /></label>';
     box.innerHTML = '<form class="guide-book-form" id="guideBookForm">' +
       '<h4 class="guide-book-title">' + escapeHtml(title) + "</h4>" +
       '<p class="guide-book-place">' + escapeHtml(poi.name) + "</p>" +
       fields +
-      '<label class="guide-book-field"><span>' + t("Nombre", "Name") + '</span><input type="text" name="nombre" id="guideBookName" required /></label>' +
-      '<label class="guide-book-field"><span>' + t("Habitación", "Room") + '</span><input type="text" name="habitacion" id="guideBookRoom" placeholder="Ej. 1204" /></label>' +
-      '<label class="guide-book-field"><span>' + t("Notas", "Notes") + '</span><textarea name="notas" id="guideBookNotes" rows="2"></textarea></label>' +
+      '<label class="guide-book-field"><span>Nombre</span><input type="text" name="nombre" id="guideBookName" required /></label>' +
+      '<label class="guide-book-field"><span>Habitación</span><input type="text" name="habitacion" id="guideBookRoom" placeholder="Ej. 1204" /></label>' +
+      '<label class="guide-book-field"><span>Notas</span><textarea name="notas" id="guideBookNotes" rows="2"></textarea></label>' +
       '<div class="guide-book-actions">' +
-        '<button type="submit" class="guide-book-submit">' + t("Enviar solicitud", "Send request") + '</button>' +
-        '<button type="button" class="guide-book-cancel" data-guide-book-cancel="1">' + t("Cancelar", "Cancel") + '</button>' +
+        '<button type="submit" class="guide-book-submit">Enviar solicitud</button>' +
+        '<button type="button" class="guide-book-cancel" data-guide-book-cancel="1">Cancelar</button>' +
       "</div>" +
-          '<p class="guide-book-note">' + t("Su solicitud se registra en el sistema. La confirmación se realiza en recepción del hotel.", "Your request is registered in the system. Confirmation is made at hotel reception.") + '</p>' +
+          '<p class="guide-book-note">Su solicitud se registra en el sistema. La confirmación se realiza en recepción del hotel.</p>' +
     "</form>";
     var form = box.querySelector("#guideBookForm");
     if (form) {
