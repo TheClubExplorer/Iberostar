@@ -650,21 +650,21 @@
     var labels = L.featureGroup ? L.featureGroup() : L.layerGroup();
     // Función para asignar coordenadas dentro del polígono del complejo a
     // POIs que no las tienen, de modo que aparezcan en el mapa Leaflet.
-    var _poiCounter = 0;
+    var _poiIndex = 0;
     function resolvePoiLatLng(p) {
       if (Number.isFinite(p.lat) && Number.isFinite(p.lng)) return [p.lat, p.lng];
       // Bounding box del polígono del complejo (COMPLEX_RING)
       var minLat = 20.7531065, maxLat = 20.7648525;
       var minLng = -86.9697573, maxLng = -86.9573717;
-      // Distribuir puntos dentro del bbox usando un hash simple del id
-      var hash = 0;
-      for (var k = 0; k < String(p.id).length; k++) hash = ((hash << 5) - hash + String(p.id).charCodeAt(k)) | 0;
-      var t = Math.abs(hash) % 1000 / 1000;
+      // Distribuir puntos dentro del bbox usando índice secuencial para no solaparlos
+      var t = (_poiIndex % 1000) / 1000;
+      _poiIndex += 1;
       var lat = minLat + (maxLat - minLat) * t;
-      var lng = minLng + (maxLng - minLng) * ((hash * 7) % 1000 / 1000);
+      var lng = minLng + (maxLng - minLng) * ((_poiIndex * 7) % 1000 / 1000);
       return [lat, lng];
     }
 
+    var poiCount = 0;
     (gp.POIS || []).forEach(function (p) {
       if (p.category === "hotel") return;
       if (p.external === true) return;
