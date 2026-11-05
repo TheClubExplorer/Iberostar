@@ -30,6 +30,14 @@
     return new URL(baseHref, window.location.href).pathname.replace(/\/+$/, "");
   }
 
+  function getAppLang() {
+    try {
+      return window.RevistaDigital?.i18n?.getLang?.() || "es";
+    } catch (e) {
+      return "es";
+    }
+  }
+
   function href(path = "/") {
     const routePath = `/${String(path || "/").replace(/^\/+|\/+$/g, "")}`.replace(/^\/$/, "/");
     const projectBasePath = getProjectBasePath();
@@ -131,7 +139,7 @@
     document.body.dataset.hotelSlug = routeContext.hotel || target.hotelSlug || "";
     document.body.dataset.routeKind = routeContext.kind || target.kind || "default";
 
-    const en = window.RevistaDigital.i18n.getLang() === "en";
+    const en = getAppLang() === "en";
     const routeLabels = {
       "/": en ? "Home" : "Inicio",
       "/workspace": "Workspace",
@@ -149,7 +157,7 @@
   }
 
   function getBreadcrumbs(pathname = window.location.pathname) {
-    const en = window.RevistaDigital.i18n.getLang() === "en";
+    const en = getAppLang() === "en";
     const target = resolveRouteTarget(pathname);
     const context = target.context || getRouteContext(pathname);
     const breadcrumbs = [];
@@ -202,7 +210,7 @@
      destino de regreso (explícito, nunca history.back). portalNav pinta un único
      botón de regreso; las migas de pan duplicadas se retiraron a propósito. */
   function getPortalNavModel(route = getAppRoute()) {
-    const en = window.RevistaDigital.i18n.getLang() === "en";
+    const en = getAppLang() === "en";
     const home = { label: en ? "Home" : "Inicio", route: "/" };
 
     if (!route || route === "/") return { back: null, trail: [] };
@@ -405,7 +413,7 @@
   }
 
   function renderCards(records, getPath, type) {
-    const en = window.RevistaDigital.i18n.getLang() === "en";
+    const en = getAppLang() === "en";
     var eyebrow = type === "hotel" ? (en ? "HOTEL" : "HOTEL") : type === "country" ? (en ? "COUNTRY" : "PAÍS") : (en ? "DESTINATION" : "DESTINO");
     var cta = type === "hotel" ? (en ? "Explore →" : "Explorar →") : type === "country" ? (en ? "View destinations →" : "Ver destinos →") : (en ? "Explore →" : "Explorar →");
     var defaultDesc = en ? "Discover the hotel and its experiences." : "Descubra el hotel y sus experiencias.";
@@ -1045,7 +1053,7 @@
     if (isHome || (countryData && parts.length === 1)) {
       document.body.dataset.appMode = "portal";
       document.body.dataset.routeManaged = "true";
-      const en = window.RevistaDigital.i18n.getLang() === "en";
+      const en = getAppLang() === "en";
       const countryCards = Object.entries(catalog).map(([key, item]) => ({ name: item.name, image: item.image, description: `${item.destinations.length} ${en ? "destinations" : "destinos"} · ${(item.destinations || []).reduce((sum, destination) => sum + (destination.hotels ? destination.hotels.length : 0), 0)} ${en ? "hotels to explore" : "hoteles para explorar."}`, route: `/${key}`, destinations: item.destinations.length, hotels: (item.destinations || []).reduce((sum, destination) => sum + (destination.hotels ? destination.hotels.length : 0), 0) }));
       const totalDestinations = countryCards.reduce((sum, item) => sum + item.destinations, 0);
       const totalHotels = countryCards.reduce((sum, item) => sum + item.hotels, 0);
@@ -1097,7 +1105,7 @@
       if (!hotels.length) return false;
       const hasDestinationMap = hotels.some((hotel) => Array.isArray(state()?.hotelCoordinates?.[hotel.name]))
         || Array.isArray(destination.mapCenter);
-      const en = window.RevistaDigital.i18n.getLang() === "en";
+      const en = getAppLang() === "en";
       document.body.dataset.appMode = "portal";
       document.body.dataset.routeManaged = "true";
       const mapDescription = destination.mapNotice || en ? "Select a marker to open the hotel card." : "Seleccione un marcador para abrir la ficha del hotel.";
