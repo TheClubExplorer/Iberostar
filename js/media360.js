@@ -234,8 +234,16 @@
       });
     }
 
+    // Check if current route is /360
+    // Handle case where route might have different format due to project base path
     const currentRoute = window.RevistaDigital.appContext?.route || document.body.dataset.currentRoute;
-    if (currentRoute !== "/360") return;
+    
+    // Normalize route for comparison: strip leading slashes and compare
+    const normalizedRoute = currentRoute ? currentRoute.replace(/^\/+/, "") : "";
+    const is360Route = normalizedRoute === "360" || 
+                       normalizedRoute === "" && window.location.pathname.includes("360");
+    
+    if (!is360Route) return;
     let pendingSelection = null;
     try {
       const storedSelection = window.sessionStorage.getItem("club360RestaurantSelection");

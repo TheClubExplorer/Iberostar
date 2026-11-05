@@ -44,7 +44,7 @@
     { key: "starprestige", label: "Star Prestige" },
     { key: "club", label: "The Club" },
     { key: "spa", label: "Spa" },
-    { key: "restaurante", label: "Restaurantes" },
+    { key: "restaurante", label: t("Restaurantes", "Restaurants") },
     { key: "bar", label: "Bares" },
     { key: "golf", label: "Golf" },
     { key: "concierge", label: "Lobbies y concierge" },
@@ -1337,24 +1337,24 @@
           routeMeta(request) + "</span>";
       }
     } else if (request.status === "pickup") {
-    el.innerHTML = "<strong>Carrito en su ubicación</strong><span>Le lleva a " +
-      escapeHtml(request.destination ? request.destination.name : "su destino") + "</span>";
+    el.innerHTML = "<strong>" + t("Carrito en su ubicación", "Cart at your location") + "</strong><span>" + t("Le lleva a ", "It will take you to ") +
+      escapeHtml(request.destination ? request.destination.name : t("su destino", "your destination")) + "</span>";
     } else if (request.status === "riding") {
       if (request.routeStatus === "loading") {
-        el.innerHTML = "<strong>En camino a " +
-          escapeHtml(request.destination ? request.destination.name : "su destino") +
-          "</strong><span>Trazando la ruta por las calles…</span>";
+        el.innerHTML = "<strong>" + t("En camino a ", "On the way to ") +
+          escapeHtml(request.destination ? request.destination.name : t("su destino", "your destination")) +
+          "</strong><span>" + t("Trazando la ruta por las calles…", "Mapping a route through the resort…") + "</span>";
       } else {
-        el.innerHTML = "<strong>En camino a " +
-          escapeHtml(request.destination ? request.destination.name : "su destino") + "</strong><span>" +
+        el.innerHTML = "<strong>" + t("En camino a ", "On the way to ") +
+          escapeHtml(request.destination ? request.destination.name : t("su destino", "your destination")) + "</strong><span>" +
           escapeHtml(etaPhrase(request.remainingSeconds)) +
           routeMeta(request) + "</span>";
       }
     } else if (request.status === "completed") {
-      el.innerHTML = "<strong>Llegó a " +
-        escapeHtml(request.destination ? request.destination.name : "su destino") + "</strong><span>Disfrute su visita</span>";
+      el.innerHTML = "<strong>" + t("Llegó a ", "Arrived at ") +
+        escapeHtml(request.destination ? request.destination.name : t("su destino", "your destination")) + "</strong><span>" + t("Disfrute su visita", "Enjoy your visit") + "</span>";
     } else if (request.status === "arrived") {
-      el.innerHTML = "<strong>Carrito en su ubicación</strong><span>" + escapeHtml(request.pickup.label) + "</span>";
+      el.innerHTML = "<strong>" + t("Carrito en su ubicación", "Cart at your location") + "</strong><span>" + escapeHtml(request.pickup.label) + "</span>";
     }
   }
 
