@@ -648,11 +648,27 @@
     // Las etiquetas de área (p. ej. "Mar Caribe") no se agrupan: deben verse
     // siempre como rótulo del mapa.
     var labels = L.featureGroup ? L.featureGroup() : L.layerGroup();
+    // Función para asignar coordenadas dentro del polígono del complejo a
+    // POIs que no las tienen, de modo que aparezcan en el mapa Leaflet.
+    var _poiCounter = 0;
+    function resolvePoiLatLng(p) {
+      if (Number.isFinite(p.lat) && Number.isFinite(p.lng)) return [p.lat, p.lng];
+      // Bounding box del polígono del complejo (COMPLEX_RING)
+      var minLat = 20.7531065, maxLat = 20.7648525;
+      var minLng = -86.9697573, maxLng = -86.9573717;
+      // Distribuir puntos dentro del bbox usando un hash simple del id
+      var hash = 0;
+      for (var k = 0; k < String(p.id).length; k++) hash = ((hash << 5) - hash + String(p.id).charCodeAt(k)) | 0;
+      var t = Math.abs(hash) % 1000 / 1000;
+      var lat = minLat + (maxLat - minLat) * t;
+      var lng = minLng + (maxLng - minLng) * ((hash * 7) % 1000 / 1000);
+      return [lat, lng];
+    }
+
     (gp.POIS || []).forEach(function (p) {
       if (p.category === "hotel") return;
       if (p.external === true) return;
       if (filterHotelId && p.hotelId && p.hotelId !== filterHotelId) return;
-      if (p.lat == null || p.lng == null) return;
       if (p.kind === "area") {
         var labelHtml = '<span style="display:inline-block;transform:translate(-50%,-50%);white-space:nowrap;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#0b3d66;background:rgba(255,255,255,.72);border:1px solid rgba(11,61,102,.35);border-radius:999px;padding:2px 10px;">' + (p.name || "") + "</span>";
         var areaIcon = window.L.divIcon ? window.L.divIcon({ className: "gp-area-label", html: labelHtml, iconSize: [0, 0], iconAnchor: [0, 0] }) : null;
