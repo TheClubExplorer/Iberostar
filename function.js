@@ -2469,10 +2469,6 @@ function leafletLibraryUrl(relativePath) {
 }
 
 function loadLeafletRotate() {
-  if (typeof window.loadLeafletRotate === "function") {
-    return window.loadLeafletRotate();
-  }
-
   if (window.L && typeof window.L.Map.prototype.setBearing === "function") {
     return Promise.resolve(window.L);
   }
@@ -6489,7 +6485,7 @@ streetLayer.addTo(
 function movePage(direction) {
   if (activeHotelDetail) return;
 
-  // Las flechas y el swipe solo navegan la revista en la ruta principal "/"
+  // Las flechas y el swipe solo navegan la revista en la ruta raíz "/"
   let currentRoute = "";
   try {
     currentRoute =
@@ -6499,7 +6495,7 @@ function movePage(direction) {
   } catch (e) {
     currentRoute = document.body.dataset.currentRoute || "";
   }
-  if (currentRoute && currentRoute.replace(/^\/+/, "") !== "") return;
+  if (currentRoute.replace(/^\/+/, "") !== "") return;
 
   activeRestaurantMenuIndex = null;
 
