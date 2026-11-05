@@ -188,6 +188,10 @@
   function getTransportDestinations() {
     if (cg._destinations) return cg._destinations;
     var pois = (window.RevistaDigital.guiapa && window.RevistaDigital.guiapa.POIS) || [];
+    // If no POIS data from the guide, use fallback destinations
+    if (!pois || pois.length === 0) {
+      pois = FALLBACK_DESTINATIONS;
+    }
     var list = [];
     var seen = {};
     // Primero agregar los POIs de la guía
@@ -243,8 +247,9 @@
   }
 
   function currentDestination() {
-    var select = document.querySelector("[data-cart-destination]");
-    return (select && findDestination(select.value)) || getTransportDestinations()[0] || null;
+    var trigger = document.querySelector("[data-cart-destination]");
+    var value = trigger ? (trigger.dataset.selectedId || trigger.value) : "";
+    return (value && findDestination(value)) || getTransportDestinations()[0] || null;
   }
 
   cg.getDestinations = function () {
@@ -1497,31 +1502,42 @@
   }
 
   function syncDestinationOptions(section) {
-    var select = section.querySelector("[data-cart-destination]");
-    if (!select) return;
+    var trigger = section.querySelector("[data-cart-destination]");
+    if (!trigger) return;
+    var wrap = trigger.closest("[data-cart-destination-wrap]") || trigger.parentElement;
+    var menu = wrap ? wrap.querySelector(".cart-custom-menu") : null;
+    if (!menu) return;
+    var valueLabel = trigger.querySelector("[data-cart-destination-value]");
     var destinations = getTransportDestinations();
-    var current = select.value;
+    var current = trigger.dataset.selectedId || "";
     var groups = DESTINATION_CATEGORIES.map(function (group) {
       return {
         label: group.label,
         items: destinations.filter(function (item) { return item.category === group.key; })
       };
     });
-    select.innerHTML = groups.filter(function (group) {
+    menu.innerHTML = groups.filter(function (group) {
       return group.items.length > 0;
     }).map(function (group) {
-      return '<optgroup label="' + group.label + '">' +
+      return '<div class="cart-custom-group">' + escapeHtml(group.label) + "</div>" +
         group.items.map(function (destination) {
-          return '<option value="' + escapeHtml(destination.id) + '">' +
-            escapeHtml(destination.name) + "</option>";
-        }).join("") +
-        "</optgroup>";
+          return '<button type="button" role="option" class="cart-custom-option' + (destination.id === current ? " is-selected" : "") + '" data-cart-destination-option value="' + escapeHtml(destination.id) + '" aria-selected="' + (destination.id === current) + '">' +
+            escapeHtml(destination.name) + "</button>";
+        }).join("");
     }).join("");
+    var selected = null;
     if (current && findDestination(current)) {
-      select.value = current;
+      selected = findDestination(current);
     } else if (destinations[0]) {
-      select.value = destinations[0].id;
+      selected = destinations[0];
+      trigger.dataset.selectedId = selected.id;
     }
+    if (selected && valueLabel) valueLabel.textContent = selected.name;
+    menu.querySelectorAll("[data-cart-destination-option]").forEach(function (option) {
+      var active = option.value === (selected && selected.id);
+      option.classList.toggle("is-selected", active);
+      option.setAttribute("aria-selected", String(active));
+    });
   }
 
   function render() {
@@ -1560,7 +1576,7 @@
       guest: guest ? guest.value : "",
       room: room ? room.value : "",
       notes: notes ? notes.value : "",
-      destinationId: destination ? destination.value : "",
+      destinationId: destination ? (destination.dataset.selectedId || destination.value) : "",
       source: "section",
       tourDemo: document.documentElement.dataset.tourPreview === "true"
     });
@@ -1707,6 +1723,69 @@
 
   cg.setMapFocus = setCartMapFocus;
 
+  function positionCartMenu(menu, trigger) {
+    if (!menu || !trigger) return;
+    var rect = trigger.getBoundingClientRect();
+    var isMobile = window.matchMedia("(max-width: 850px)").matches;
+    var width = Math.min(Math.max(220, rect.width), window.innerWidth - 16);
+    menu.style.position = "fixed";
+    menu.style.zIndex = "3200";
+    menu.style.width = isMobile ? "auto" : width + "px";
+    menu.style.left = isMobile ? "0" : Math.max(8, Math.min(rect.left, window.innerWidth - width - 8)) + "px";
+    menu.style.right = isMobile ? "0" : "auto";
+    menu.style.top = isMobile ? "auto" : (rect.bottom + 8) + "px";
+    menu.style.bottom = isMobile ? "0" : "auto";
+  }
+
+  function openSheetMenu(menu, trigger) {
+    if (!menu || menu.hidden === false) return;
+    if (menu.parentNode !== document.body) {
+      var placeholder = document.createElement("span");
+      placeholder.style.display = "none";
+      placeholder.dataset.cartMenuPlaceholder = "1";
+      if (menu.parentNode) menu.parentNode.insertBefore(placeholder, menu);
+      menu.__cartMenuPlaceholder = placeholder;
+    }
+    document.body.appendChild(menu);
+    menu.hidden = false;
+    positionCartMenu(menu, trigger);
+    document.body.classList.add("cart-custom-sheet-open");
+    if (!document.querySelector(".cart-custom-menu-backdrop")) {
+      var backdrop = document.createElement("div");
+      backdrop.className = "cart-custom-menu-backdrop";
+      backdrop.addEventListener("click", function () {
+        if (typeof window.__cartCloseMenus === "function") window.__cartCloseMenus();
+        else restoreSheetMenu(menu);
+      });
+      document.body.appendChild(backdrop);
+    }
+  }
+
+  function restoreSheetMenu(menu) {
+    if (!menu) return;
+    var placeholder = menu.__cartMenuPlaceholder;
+    if (menu.parentNode === document.body && placeholder && placeholder.parentNode) {
+      placeholder.parentNode.insertBefore(menu, placeholder);
+    }
+    if (placeholder) placeholder.remove();
+    delete menu.__cartMenuPlaceholder;
+    menu.hidden = true;
+    menu.style.position = "";
+    menu.style.zIndex = "";
+    menu.style.left = "";
+    menu.style.right = "";
+    menu.style.top = "";
+    menu.style.bottom = "";
+    menu.style.width = "";
+    document.body.classList.remove("cart-custom-sheet-open");
+    document.querySelectorAll(".cart-custom-menu-backdrop").forEach(function (item) { item.remove(); });
+  }
+
+  function closeDestinationMenu(menu, trigger) {
+    restoreSheetMenu(menu);
+    if (trigger) trigger.setAttribute("aria-expanded", "false");
+  }
+
   cg.init = function (root, context) {
     var section = root && typeof root.querySelector === "function"
       ? root.querySelector("#hotel-carrito")
@@ -1726,11 +1805,42 @@
       section.setAttribute("data-cart-bound", "1");
       section.addEventListener("submit", onFormSubmit);
       section.addEventListener("click", onSectionClick);
-      section.addEventListener("change", function (event) {
-        if (event.target.closest("[data-cart-destination]")) {
-          syncMap();
-          if (isMobileCartViewport()) setCartMapFocus(section, true);
+    }
+    if (!window._cartDestinationBound) {
+      window._cartDestinationBound = true;
+      document.addEventListener("click", function (event) {
+        var trigger = event.target.closest("[data-cart-destination]");
+        if (!trigger) return;
+        event.preventDefault();
+        event.stopPropagation();
+        var wrap = trigger.closest("[data-cart-destination-wrap]");
+        var menu = wrap ? wrap.querySelector(".cart-custom-menu") : trigger.parentElement.querySelector(".cart-custom-menu");
+        if (!menu) return;
+        var open = menu.hidden;
+        document.querySelectorAll(".cart-custom-menu").forEach(function (item) { if (item !== menu) restoreSheetMenu(item); });
+        if (open) {
+          openSheetMenu(menu, trigger);
+          trigger.setAttribute("aria-expanded", "true");
+        } else {
+          closeDestinationMenu(menu, trigger);
         }
+      });
+      document.addEventListener("click", function (event) {
+        var option = event.target.closest("[data-cart-destination-option]");
+        if (!option) return;
+        event.stopPropagation();
+        var menuEl = option.closest(".cart-custom-menu");
+        var triggerEl = document.querySelector("[data-cart-destination]");
+        if (triggerEl) {
+          triggerEl.dataset.selectedId = option.value;
+          var labelEl = triggerEl.querySelector("[data-cart-destination-value]");
+          if (labelEl) labelEl.textContent = option.textContent.trim();
+        }
+        if (menuEl) {
+          menuEl.querySelectorAll("[data-cart-destination-option]").forEach(function (item) { var active = item === option; item.classList.toggle("is-selected", active); item.setAttribute("aria-selected", String(active)); });
+          closeDestinationMenu(menuEl, triggerEl);
+        }
+        try { syncMap(); } catch (e) {}
       });
     }
     startLocationTracking();

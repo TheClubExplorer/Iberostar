@@ -876,9 +876,30 @@
     if (!hotels.length) return false;
     const selected = getPreferredCartHotel(hotels);
     try { sessionStorage.setItem("clubCartHotel", selected.slug); } catch (error) { /* ignore */ }
-    const options = hotels.map((hotel) => `<option value="${escapeHtml(hotel.slug)}"${hotel.slug === selected.slug ? " selected" : ""}>${escapeHtml(hotel.name)}</option>`).join("");
     document.body.dataset.appMode = "portal";
     document.body.dataset.routeManaged = "true";
+    const closeCartMenus = () => {
+      document.querySelectorAll(".cart-custom-menu").forEach((menu) => {
+        const placeholder = menu.__cartMenuPlaceholder;
+        if (menu.parentNode === document.body && placeholder && placeholder.parentNode) {
+          placeholder.parentNode.insertBefore(menu, placeholder);
+        }
+        if (placeholder) placeholder.remove();
+        delete menu.__cartMenuPlaceholder;
+        menu.hidden = true;
+        menu.style.position = "";
+        menu.style.left = "";
+        menu.style.right = "";
+        menu.style.top = "";
+        menu.style.bottom = "";
+        menu.style.width = "";
+        menu.style.zIndex = "";
+      });
+      document.querySelectorAll("[data-cart-hotel-select], [data-cart-destination]").forEach((trigger) => trigger.setAttribute("aria-expanded", "false"));
+      document.body.classList.remove("cart-custom-sheet-open");
+      document.querySelectorAll(".cart-custom-menu-backdrop").forEach((item) => item.remove());
+    };
+    window.__cartCloseMenus = closeCartMenus;
     view.innerHTML = `<main class="portal-page cart-page">
       ${portalNav(getPortalNavModel(route))}
       <section class="portal-destination-hero cart-page-hero cart-page-hero--compact">
@@ -895,10 +916,14 @@
             </div>
           </div>
           <div class="cart-quick-bar">
-            <label class="cart-quick-select">
+            <div class="cart-quick-select cart-custom-select" data-cart-hotel-select-wrap>
               <span>Hotel</span>
-              <select data-cart-hotel-select>${options}</select>
-            </label>
+              <button type="button" class="cart-custom-trigger" data-cart-hotel-select aria-haspopup="listbox" aria-expanded="false">
+                <span class="cart-custom-value" data-cart-hotel-value>${escapeHtml(selected.name)}</span>
+                <span class="cart-custom-arrow" aria-hidden="true"><svg viewBox="0 0 20 20" width="18" height="18"><path d="M5 8l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              </button>
+              <div class="cart-custom-menu" role="listbox" aria-label="Hotel" hidden>${hotels.map((hotel) => `<button type="button" role="option" aria-selected="${hotel.slug === selected.slug}" data-cart-hotel-option value="${escapeHtml(hotel.slug)}" class="${hotel.slug === selected.slug ? "is-selected" : ""}">${escapeHtml(hotel.name)}</button>`).join("")}</div>
+            </div>
             <button type="button" class="cart-back-to-trip" data-cart-back-to-trip>Ampliar mapa</button>
           </div>
         </div>
@@ -927,9 +952,16 @@
                   <input type="text" name="habitacion" inputmode="numeric" placeholder="Ej. 1204" />
                 </label>
               </div>
-              <label class="hotel-cart-field"><span>Destino</span>
-                <select name="destino" data-cart-destination></select>
-              </label>
+              <div class="hotel-cart-field cart-custom-field">
+                <span>Destino</span>
+                <div class="cart-custom-select" data-cart-destination-wrap>
+                  <button type="button" class="cart-custom-trigger" data-cart-destination aria-haspopup="listbox" aria-expanded="false">
+                    <span class="cart-custom-value" data-cart-destination-value>…</span>
+                    <span class="cart-custom-arrow" aria-hidden="true"><svg viewBox="0 0 20 20" width="18" height="18"><path d="M5 8l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                  </button>
+                  <div class="cart-custom-menu" role="listbox" aria-label="Destino" hidden></div>
+                </div>
+              </div>
               <details class="hotel-cart-notes">
                 <summary>Agregar indicaciones (opcional)</summary>
                 <label class="hotel-cart-field"><span>Personas, equipaje o punto de encuentro</span>
@@ -955,6 +987,8 @@
     </main>`;
 
     const select = view.querySelector("[data-cart-hotel-select]");
+    const hotelValue = view.querySelector("[data-cart-hotel-value]");
+    const hotelMenu = view.querySelector("[data-cart-hotel-select-wrap] .cart-custom-menu");
     const cart = window.RevistaDigital.carritoGolf;
     const initCart = (hotel) => {
       if (cart && typeof cart.init === "function") {
@@ -966,11 +1000,64 @@
       }
     };
     initCart(selected);
-    if (select) {
-      select.addEventListener("change", () => {
-        const hotel = hotels.find((item) => item.slug === select.value) || hotels[0];
+    if (select && hotelMenu) {
+      const isMobile = () => window.matchMedia("(max-width: 850px)").matches;
+      const positionMenu = () => {
+        const r = select.getBoundingClientRect();
+        const mobile = isMobile();
+        const width = Math.min(Math.max(220, r.width), window.innerWidth - 16);
+        hotelMenu.style.position = "fixed";
+        hotelMenu.style.zIndex = "3200";
+        hotelMenu.style.left = mobile ? "0" : Math.max(8, Math.min(r.left, window.innerWidth - width - 8)) + "px";
+        hotelMenu.style.right = mobile ? "0" : "auto";
+        hotelMenu.style.top = mobile ? "auto" : (r.bottom + 8) + "px";
+        hotelMenu.style.bottom = mobile ? "0" : "auto";
+        hotelMenu.style.width = mobile ? "auto" : width + "px";
+      };
+      const backdrop = document.createElement("div");
+      backdrop.className = "cart-custom-menu-backdrop";
+      backdrop.addEventListener("click", closeCartMenus);
+      const openHotelMenu = () => {
+        if (hotelMenu.hidden === false) return;
+        if (hotelMenu.parentNode !== document.body) {
+          const placeholder = document.createElement("span");
+          placeholder.style.display = "none";
+          placeholder.dataset.cartMenuPlaceholder = "1";
+          hotelMenu.parentNode.insertBefore(placeholder, hotelMenu);
+          hotelMenu.__cartMenuPlaceholder = placeholder;
+          document.body.appendChild(hotelMenu);
+        }
+        hotelMenu.hidden = false;
+        positionMenu(hotelMenu);
+        select.setAttribute("aria-expanded", "true");
+        document.body.classList.add("cart-custom-sheet-open");
+        if (!document.body.contains(backdrop)) document.body.appendChild(backdrop);
+      };
+      const closeHotelMenu = () => closeCartMenus();
+      select.addEventListener("click", (event) => {
+        event.stopPropagation();
+        if (hotelMenu.hidden === false) { closeHotelMenu(); return; }
+        closeCartMenus();
+        openHotelMenu();
+      });
+      hotelMenu.addEventListener("click", (event) => {
+        const option = event.target.closest("[data-cart-hotel-option]");
+        if (!option) return;
+        const hotel = hotels.find((item) => item.slug === option.value) || hotels[0];
         try { sessionStorage.setItem("clubCartHotel", hotel.slug); } catch (error) { /* ignore */ }
+        hotelMenu.querySelectorAll("[data-cart-hotel-option]").forEach((item) => { const active = item === option; item.classList.toggle("is-selected", active); item.setAttribute("aria-selected", String(active)); });
+        if (hotelValue) hotelValue.textContent = hotel.name;
+        closeCartMenus();
         initCart(hotel);
+      });
+      document.addEventListener("keydown", (event) => { if (event.key === "Escape") closeCartMenus(); });
+      window.addEventListener("resize", () => { if (hotelMenu.hidden === false) positionMenu(); });
+    }
+    if (!window.__cartGlobalCloseBound) {
+      window.__cartGlobalCloseBound = true;
+      document.addEventListener("click", (event) => {
+        if (event.target.closest(".cart-custom-select") || event.target.closest(".cart-custom-menu")) return;
+        closeCartMenus();
       });
     }
     return true;
