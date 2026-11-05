@@ -6489,12 +6489,17 @@ streetLayer.addTo(
 function movePage(direction) {
   if (activeHotelDetail) return;
 
-  // No cambiar de página cuando estamos en la vista 360°
-  const currentRoute =
-    window.RevistaDigital.appContext?.route ||
-    document.body.dataset.currentRoute ||
-    "";
-  if (currentRoute && currentRoute.replace(/^\/+/, "") === "360") return;
+  // Las flechas y el swipe solo navegan la revista en la ruta principal "/"
+  let currentRoute = "";
+  try {
+    currentRoute =
+      window.RevistaDigital?.appContext?.route ||
+      document.body.dataset.currentRoute ||
+      "";
+  } catch (e) {
+    currentRoute = document.body.dataset.currentRoute || "";
+  }
+  if (currentRoute && currentRoute.replace(/^\/+/, "") !== "") return;
 
   activeRestaurantMenuIndex = null;
 
@@ -6546,11 +6551,6 @@ window.addEventListener(
       event.key ===
       "ArrowLeft"
     ) {
-      const currentRoute =
-        window.RevistaDigital.appContext?.route ||
-        document.body.dataset.currentRoute ||
-        "";
-      if (currentRoute && currentRoute.replace(/^\/+/, "") === "360") return;
       movePage(-1);
     }
 
@@ -6558,11 +6558,6 @@ window.addEventListener(
       event.key ===
       "ArrowRight"
     ) {
-      const currentRoute =
-        window.RevistaDigital.appContext?.route ||
-        document.body.dataset.currentRoute ||
-        "";
-      if (currentRoute && currentRoute.replace(/^\/+/, "") === "360") return;
       movePage(1);
     }
   }
@@ -6633,11 +6628,6 @@ magazineStage.addEventListener(
       Math.abs(distanceX) > 60 &&
       Math.abs(distanceX) > Math.abs(distanceY)
     ) {
-      const currentRoute =
-        window.RevistaDigital.appContext?.route ||
-        document.body.dataset.currentRoute ||
-        "";
-      if (currentRoute && currentRoute.replace(/^\/+/, "") === "360") return;
       if (distanceX > 0) {
         movePage(1);
       } else {
