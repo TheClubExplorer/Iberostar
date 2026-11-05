@@ -6483,31 +6483,9 @@ streetLayer.addTo(
    ========================================================= */
 
 function movePage(direction) {
-  if (activeHotelDetail) return;
-
-  // Las flechas y el swipe solo navegan la revista en la ruta raíz "/"
-  let currentRoute = "";
-  try {
-    currentRoute =
-      window.RevistaDigital?.appContext?.route ||
-      document.body.dataset.currentRoute ||
-      "";
-  } catch (e) {
-    currentRoute = document.body.dataset.currentRoute || "";
-  }
-  if (currentRoute.replace(/^\/+/, "") !== "") return;
-
-  activeRestaurantMenuIndex = null;
-
-  currentIndex =
-    (
-      currentIndex +
-      direction +
-      pages.length
-    ) %
-    pages.length;
-
-  renderPage();
+  // Navegación de revista digital desactivada: ya no debe cambiar de página
+  // con flechas ni swipe en ninguna ruta.
+  return;
 }
 
 leftButton.addEventListener(
