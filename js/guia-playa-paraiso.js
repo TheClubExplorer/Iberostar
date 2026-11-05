@@ -669,6 +669,12 @@
       if (p.category === "hotel") return;
       if (p.external === true) return;
       if (filterHotelId && p.hotelId && p.hotelId !== filterHotelId) return;
+      // Asignar coordenadas dentro del complejo a POIs que no las tengan
+      if (p.lat == null || p.lng == null || !Number.isFinite(p.lat) || !Number.isFinite(p.lng)) {
+        var ll = resolvePoiLatLng(p);
+        p.lat = ll[0];
+        p.lng = ll[1];
+      }
       if (p.kind === "area") {
         var labelHtml = '<span style="display:inline-block;transform:translate(-50%,-50%);white-space:nowrap;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#0b3d66;background:rgba(255,255,255,.72);border:1px solid rgba(11,61,102,.35);border-radius:999px;padding:2px 10px;">' + (p.name || "") + "</span>";
         var areaIcon = window.L.divIcon ? window.L.divIcon({ className: "gp-area-label", html: labelHtml, iconSize: [0, 0], iconAnchor: [0, 0] }) : null;
