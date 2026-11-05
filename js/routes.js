@@ -211,6 +211,7 @@
      botón de regreso; las migas de pan duplicadas se retiraron a propósito. */
   function getPortalNavModel(route = getAppRoute()) {
     const en = getAppLang() === "en";
+    const t = window.RevistaDigital?.i18n?.t || ((k, d) => d);
     const home = { label: en ? "Home" : "Inicio", route: "/" };
 
     if (!route || route === "/") return { back: null, trail: [] };
@@ -282,10 +283,10 @@
     const countryData = catalog[parts[0]];
     if (!countryData) {
       const sectionLabels = {
-        "/360": en ? "360° Content" : "Contenido 360°",
-        "/videos": "Videos",
-        "/workspace": "Workspace",
-        "/mapa-hoteles": en ? "General hotel map" : "Mapa general de hoteles"
+        "/360": t("sectionContenido360", "360° Content"),
+        "/videos": t("menuVideos", "Videos"),
+        "/workspace": t("menuWorkspace", "Workspace"),
+        "/mapa-hoteles": t("sectionMapaHoteles", "General hotel map")
       };
       if (sectionLabels[route]) {
         return {
@@ -300,7 +301,7 @@
 
     if (parts.length === 1) {
       return {
-        back: { label: en ? "Back to destinations" : "Volver a destinos", route: "/" },
+        back: { label: t("navBackToDestinations", "Back to destinations"), route: "/" },
         trail: [home, { label: countryData.name }]
       };
     }

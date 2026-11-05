@@ -1327,10 +1327,10 @@
     }
     el.hidden = false;
     if (request.status === "searching") {
-      el.innerHTML = "<strong>Buscando carrito…</strong><span>Calculando el más cercano</span>";
+      el.innerHTML = "<strong>" + t("carritoBuscando", "Looking for cart…") + "</strong><span>" + t("carritoCalculando", "Calculating the nearest one") + "</span>";
     } else if (request.status === "assigned") {
       if (request.routeStatus === "loading") {
-        el.innerHTML = "<strong>" + escapeHtml(request.cartName) + "</strong><span>Trazando la ruta por las calles…</span>";
+        el.innerHTML = "<strong>" + escapeHtml(request.cartName) + "</strong><span>" + t("carritoTrazando", "Mapping route through streets…") + "</span>";
       } else {
         el.innerHTML = "<strong>" + escapeHtml(request.cartName) + "</strong><span>" +
           escapeHtml(etaPhrase(request.remainingSeconds)) +
