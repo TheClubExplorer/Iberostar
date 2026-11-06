@@ -16,7 +16,7 @@ Esta ampliación se contrasta con `js/guia-playa-paraiso.js`, que refleja los ca
 ### Ubicaciones ya implementadas en la guía
 - **Coco Bar (`cocobar`):** coordenadas actuales `20.756290,-86.959046`, `source:"Google Maps"`, `verified:true`. Esto reemplaza los registros históricos de `inventory_final.json` (`20.7631,-86.9618`) y de la actualización previa de esta auditoría (`20.756434560304122,-86.9589709211595`).
 - **THE CLUB (`theclub`):** la guía asigna `20.7598333,-86.9652778` desde `OSM_COORDS` y lo marca `verified:true`, con feature `THE CLUB`. El registro antiguo sin coordenadas ya no representa la implementación actual.
-- **Restaurantes añadidos/verificados por Google Maps:** Beach Grill (`20.7578219,-86.9582285`), El Fogón Steak House (`20.756879,-86.959677`), El Fogón Italiano (`20.757161,-86.959936`), Coco Buffet (`20.756466,-86.958965`), El Colonial (`20.7609943,-86.963447`) y Trattoria by El Faro (`20.7589509,-86.9583723`). Todos se registran con `verified:true`.
+- **Restaurantes añadidos/verificados por Google Maps:** Beach Grill (`20.7578219,-86.9582285`), El Fogón Steak House (`20.756879,-86.959677`), El Fogón Italiano (`20.757161,-86.959936`), Coco Buffet (`20.756466,-86.958965`) y El Colonial (`20.7609943,-86.963447`). El Faro / Trattoria ahora usa el punto confirmado por el usuario (`20.7562,-86.9592`) para sus servicios de buffet diurno y trattoria nocturna.
 - **Head Concierge (`head-concierge`):** `20.759753,-86.965457`, `source:"Google Maps"`, `verified:true`.
 - **Star Prestige Beach Club (`star-prestige-beach-club`):** asociado a Iberostar Paraíso JOIA, `20.756829,-86.958688`, `source:"Google Maps"`, `verified:true`.
 - **Fit & Fun Playa Paraíso (`fit-fun-playa-paraiso`):** `20.7603125,-86.9645625`, `source:"Google Maps"`, `verified:true`.
@@ -32,7 +32,7 @@ Esta ampliación se contrasta con `js/guia-playa-paraiso.js`, que refleja los ca
 - **Consolidación Kukulkán / Star Café Maya (2026-10-22):** el usuario confirmó que el punto registrado como `starcafe-maya` (`20.7575018,-86.9645296`) en realidad es el **Lobby Bar "Kukulkán"**. Se eliminó `starcafe-maya` y `lobby-bar-kukulkan` quedó con esas coordenadas, `hotelId:"Iberostar Paraíso Maya"`, `source:"Google Maps"`, `verified:true`.
 - **Music Bar Rhapsody (`music-bar-rhapsody`):** `20.756312,-86.962411`, `source:"Google Maps"`, `verified:true`. Coordenada confirmada por el usuario el 2026-10-22; sustituye la entrada de plano sin coordenadas (`verified:false`) que tenía. Hotel pendiente de confirmar (zona JOIA, junto al lobby-bar-el-mirador).
 - **Aqua Bar La Sirenita (`aqua-bar-la-sirenita`):** `20.754775,-86.960108`, `source:"Google Maps"`, `verified:true`. Coordenada confirmada por el usuario el 2026-10-22; sustituye la entrada de plano sin coordenadas (`verified:false`) que tenía. Hotel pendiente de confirmar (zona Grand Paraíso/JOIA).
-- **PENDIENTE — La Cúpula Bar / Star Rock Café (2026-10-22):** el usuario identificó que el punto de `star-rock-cafe` (asignado por `OSM_COORDS` como `20.7618856,-86.9627721`) en realidad es el **"La Cupula Bar"** (`20.7621251,-86.9630263`, place `0x8f4e610050ca7fa5:0x369f138ff1252b80`). **No se aplicó ningún cambio** a petición del usuario; queda registrado para cuando ordene el ajuste.
+- **Star Rock Café central (2026-10-22):** el usuario confirmó el punto correcto (`20.7583,-86.9644`) y que es una sola cafetería compartida por Paraíso del Mar y Paraíso Lindo. Se consolidó en `starcafe`; la coordenada OSM antigua (`20.7618856,-86.9627721`), que se había asociado erróneamente al café y se identificó como cercana a La Cúpula, se retiró de `OSM_COORDS`.
 - **Cascada y jacuzzi (`waterfall-jacuzzi`):** `20.759539,-86.960991`, `source:"Google Maps"`, `verified:true`. Coordenada confirmada por el usuario el 2026-10-22; sustituye la entrada de plano sin coordenadas (`verified:false`) que tenía.
 - **Piscina tranquila (`quiet-pool`):** `20.759600,-86.960224`, `source:"Google Maps"`, `verified:true`. Coordenada confirmada por el usuario el 2026-10-22; sustituye la entrada de plano sin coordenadas (`verified:false`) que tenía.
 - **Piscina de actividades (`activities-pool`):** `20.759267,-86.959714`, `source:"Google Maps"`, `verified:true`. Coordenada confirmada por el usuario el 2026-10-22; sustituye la entrada de plano sin coordenadas (`verified:false`) que tenía.
@@ -127,11 +127,10 @@ El siguiente listado conserva el detalle histórico del corte del 2026-10-15. No
 - En plano PDF: No | Certidumbre: media
 - Evaluación: Coincidencia OSM cercana (nombre similar). Posible ubicación aproximada, pero no suficiente para marcar como Verificado sin confirmar con plano detallado.
 
-### star-rock-cafe [Pendiente de coordenadas]
-- Cat: bar | Nombre: Star Rock CafÃ©
-- OSM hits: Iberostar Paraiso Lindo(20.75956,-86.96382); Star Hamburgers(20.75982,-86.96630); Iberostar Playa Paraiso Resort(20.75789,-86.96134); Star Market(20.75746,-86.96137); Star Camp(20.76071,-86.96471)
-- En plano PDF: No | Certidumbre: media
-- Evaluación: Coincidencia OSM cercana (nombre similar). Posible ubicación aproximada, pero no suficiente para marcar como Verificado sin confirmar con plano detallado.
+### starcafe [Coordenadas confirmadas]
+- Cat: bar | Nombre: Star Rock Café
+- Coordenadas: `20.7583,-86.9644` | Compartido por Paraíso del Mar y Paraíso Lindo
+- Evaluación: Punto confirmado por el usuario; la ficha errónea duplicada de Lindo fue consolidada.
 
 ### pool-bar-las-olas [Pendiente de coordenadas]
 - Cat: bar | Nombre: Pool Bar Las Olas
