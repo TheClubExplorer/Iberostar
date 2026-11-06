@@ -12,6 +12,11 @@
       ["El Cuate Pancho", "Mexicana"], ["Pacific Express · Bistró", "Francesa"],
       ["Tsuba", "Asiática"], ["El Nopal", "Buffet"], ["La Bahía Steak House", "Carnes"]
     ],
+    "Iberostar Selection Paraíso Maya": [
+      ["Olivetti", "Italiana"],
+      ["Under the Sea", "Mariscos"],
+      ["Lemon & Spices", "Griega"]
+    ],
     "Iberostar Selection Cancún": [
       ["American Bistro", "Americana"], ["Antiguo Laguito Buffet", "Buffet"],
       ["Trattoria La Horma", "Italiana"], ["Teppanyaki Naga Hibachi", "Japonesa"],
@@ -109,11 +114,11 @@
   restaurantes.renderHotelRestaurants = function (hotelName, fallbackName = "") {
     const restaurants = restaurantes.getHotelRestaurants(hotelName, fallbackName);
     if (!restaurants.length) return "";
-
+    const en = window.RevistaDigital.i18n.getLang() === "en";
     return `<section class="hotel-restaurant-list" aria-labelledby="hotelRestaurantHeading">
-      <div class="hotel-restaurant-heading"><div><small>GASTRONOMÍA · SELECCIÓN DE RESTAURANTES</small><h2 id="hotelRestaurantHeading">Restaurantes de ${escapeHtml(hotelName)}</h2></div><span>${restaurants.length} opciones</span></div>
+      <div class="hotel-restaurant-heading"><div><small>${en ? "DINING · RESTAURANT SELECTION" : "GASTRONOMÍA · SELECCIÓN DE RESTAURANTES"}</small><h2 id="hotelRestaurantHeading">${en ? "Restaurants at" : "Restaurantes de"} ${escapeHtml(hotelName)}</h2></div><span>${restaurants.length} ${en ? "options" : "opciones"}</span></div>
       <div class="hotel-restaurant-grid">${restaurants.map(([name, cuisine]) => `<article class="hotel-restaurant-card"><h3>${escapeHtml(name)}</h3><span>${escapeHtml(cuisine)}</span></article>`).join("")}</div>
-      <p>La oferta y los horarios pueden variar según la estancia. Consulte la carta completa en la app de Iberostar.</p>
+      <p>${en ? "Offerings and hours may vary by stay. Check the full menu in the Iberostar app." : "La oferta y los horarios pueden variar según la estancia. Consulte la carta completa en la app de Iberostar."}</p>
     </section>`;
   };
 
@@ -133,7 +138,7 @@
     if (!entries.length) {
       entries = restaurantes.getHotelRestaurants(hotelName).map(([name, cuisine]) => ({
         name,
-        cuisine: cuisine || "Cocina de autor",
+        cuisine: cuisine || (window.RevistaDigital.i18n.getLang() === "en" ? "Signature cuisine" : "Cocina de autor"),
         image: "",
         has360: false
       }));
@@ -159,6 +164,7 @@
   restaurantes.renderRestaurantFiches = function (hotelName, options = {}) {
     const entries = restaurantFicheEntries(hotelName, options);
     if (!entries.length) return "";
+    const en = window.RevistaDigital.i18n.getLang() === "en";
     const place = options.hotelLabel && options.countryLabel
       ? `${escapeHtml(options.hotelLabel)} · ${escapeHtml(options.countryLabel)}`
       : "";
@@ -166,8 +172,8 @@
       const badge = entry.has360 ? "<b>360°</b>" : "";
       const initial = escapeHtml(String(entry.name || "").trim().charAt(0).toUpperCase());
       const alt = entry.has360
-        ? `Vista 360° de ${escapeHtml(entry.name)} en ${escapeHtml(hotelName)}`
-        : `Restaurante ${escapeHtml(entry.name)} en ${escapeHtml(hotelName)}`;
+        ? `${en ? "360° view of" : "Vista 360° de"} ${escapeHtml(entry.name)} ${en ? "at" : "en"} ${escapeHtml(hotelName)}`
+        : `${en ? "Restaurant" : "Restaurante"} ${escapeHtml(entry.name)} ${en ? "at" : "en"} ${escapeHtml(hotelName)}`;
       const media = entry.image
         ? `<span class="pano-360-ficha-media">${RI.img(entry.image, {
             alt,
@@ -175,12 +181,12 @@
           })}${badge}</span>`
         : `<span class="pano-360-ficha-media pano-360-ficha-media-empty" aria-hidden="true"><span class="pano-360-ficha-monogram">${initial}</span>${badge}</span>`;
       const cta = entry.has360
-        ? `<span class="pano-360-ficha-cta">Abrir recorrido 360° →</span>`
-        : `<span class="pano-360-ficha-cta pano-360-ficha-cta-muted">Consultar en el hotel</span>`;
+        ? `<span class="pano-360-ficha-cta">${en ? "Open 360° tour →" : "Abrir recorrido 360° →"}</span>`
+        : `<span class="pano-360-ficha-cta pano-360-ficha-cta-muted">${en ? "Check at the hotel" : "Consultar en el hotel"}</span>`;
       const placeMarkup = place ? `<small class="pano-360-ficha-place">${place}</small>` : "";
       const copy = `<span class="pano-360-ficha-copy"><strong>${escapeHtml(entry.name)}</strong><small>${escapeHtml(entry.cuisine)}</small>${placeMarkup}${cta}</span>`;
       if (entry.has360) {
-        return `<button type="button" class="pano-360-ficha pano-360-ficha-restaurante" data-hotel="${escapeHtml(hotelName)}" data-zone="restaurantes" data-label="${escapeHtml(entry.name)}" aria-label="Abrir recorrido 360° de ${escapeHtml(entry.name)}">${media}${copy}</button>`;
+        return `<button type="button" class="pano-360-ficha pano-360-ficha-restaurante" data-hotel="${escapeHtml(hotelName)}" data-zone="restaurantes" data-label="${escapeHtml(entry.name)}" aria-label="${en ? "Open 360° tour of" : "Abrir recorrido 360° de"} ${escapeHtml(entry.name)}">${media}${copy}</button>`;
       }
       return `<article class="pano-360-ficha pano-360-ficha-restaurante pano-360-ficha-static">${media}${copy}</article>`;
     }).join("");
@@ -198,16 +204,21 @@
       }
       return "";
     }
+    const en = window.RevistaDigital.i18n.getLang() === "en";
     const hotelMedia = window.getHotelMedia ? window.getHotelMedia(hotel.name) : {};
     const heroImage = hotelMedia.banner?.[0] || hotel.image;
 
     const catalogRestaurants = restaurantes.getHotelRestaurants(hotel.name);
     const paraiso = paraisoRestaurants(hotel.name);
     const pannellum = window.RevistaDigital?.pannellum360;
-    const hasParaisoCards = Boolean(
+    
+
+
+const hasParaisoCards = Boolean(
       pannellum &&
       typeof pannellum.renderRestaurantCards === "function" &&
       typeof pannellum.isPlayaParaiso === "function" &&
+      // Normalizar el nombre del hotel para comparar con PLAYA_PARISO_HOTELS
       pannellum.isPlayaParaiso(hotel.name) &&
       pannellum.getRestaurantes(hotel.name).length
     );
@@ -231,12 +242,12 @@
               <span class="restaurant-menu-number">${String(index + 1).padStart(2, "0")}</span>
               <div>
                 <h3>${escapeHtml(restaurant.name)}</h3>
-                <small>${escapeHtml(restaurant.cuisine || "Cocina de autor")}</small>
+                <small>${escapeHtml(restaurant.cuisine || (en ? "Signature cuisine" : "Cocina de autor"))}</small>
               </div>
               ${restaurant.hours ? `<span class="restaurant-menu-hours">${escapeHtml(restaurant.hours)}</span>` : ""}
             </article>`).join("")}
         </div>`
-          : `<p class="restaurant-menu-empty">Consulte la carta y los horarios de este hotel en la app de Iberostar.</p>`);
+          : `<p class="restaurant-menu-empty">${en ? "Check the menu and hours for this hotel in the Iberostar app." : "Consulte la carta y los horarios de este hotel en la app de Iberostar."}</p>`);
 
     return `
       <div class="spread restaurant-menu-spread">
@@ -253,7 +264,7 @@
 
             <div>
               <small>
-                EXPERIENCIAS CULINARIAS
+                ${en ? "CULINARY EXPERIENCES" : "EXPERIENCIAS CULINARIAS"}
               </small>
 
               <h1>
@@ -266,15 +277,15 @@
           <div class="restaurant-menu-summary">
 
             <small>
-              LA MESA DEL HOTEL
+              ${en ? "THE HOTEL'S TABLE" : "LA MESA DEL HOTEL"}
             </small>
 
             <h2>
-              Sabores para descubrir
+              ${en ? "Flavors to discover" : "Sabores para descubrir"}
             </h2>
 
             <p>
-              Una selección para disfrutar durante su estancia en
+              ${en ? "A selection to enjoy during your stay at" : "Una selección para disfrutar durante su estancia en"}
               ${hotel.name}.
             </p>
 
@@ -286,7 +297,7 @@
                 </strong>
 
                 <small>
-                  Restaurantes
+                  ${en ? "Restaurants" : "Restaurantes"}
                 </small>
               </div>
 
@@ -294,15 +305,14 @@
                 <strong>AI</strong>
 
                 <small>
-                  Todo incluido
+                  ${en ? "All-inclusive" : "Todo incluido"}
                 </small>
               </div>
 
             </div>
 
             <p class="restaurant-menu-note">
-              Los horarios pueden variar según la temporada.
-              Consulte disponibilidad al llegar.
+              ${en ? "Hours may vary by season. Check availability on arrival." : "Los horarios pueden variar según la temporada. Consulte disponibilidad al llegar."}
             </p>
 
           </div>
@@ -323,7 +333,7 @@
               class="restaurant-menu-back"
               type="button"
             >
-              ← Volver al mapa del hotel
+              ← ${en ? "Back to hotel map" : "Volver al mapa del hotel"}
             </button>
 
           </header>
@@ -333,17 +343,17 @@
             <div>
 
               <small>
-                SELECCIÓN DEL HOTEL · TODO INCLUIDO
+                ${en ? "HOTEL SELECTION · ALL-INCLUSIVE" : "SELECCIÓN DEL HOTEL · TODO INCLUIDO"}
               </small>
 
               <h2>
-                Menú de restaurantes
+                ${en ? "Restaurant menu" : "Menú de restaurantes"}
               </h2>
 
             </div>
 
             <span>
-              ${restaurantCount} ${restaurantCount === 1 ? "opción" : "opciones"}
+              ${restaurantCount} ${restaurantCount === 1 ? (en ? "option" : "opción") : (en ? "options" : "opciones")}
             </span>
 
           </div>

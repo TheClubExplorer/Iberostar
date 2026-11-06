@@ -242,10 +242,24 @@
       carta: "Crepa de Nutella · Crepa de fresa · Crepa de jamón y queso · Waffles · Helados",
       menu: "Nutella crepe · Strawberry crepe · Ham and cheese crepe · Waffles · Ice cream"
     },
+    "heladeria-el-puente": {
+      tipo: "cafeteria",
+      cocina: "Heladería y snacks",
+      cuisine: "Ice cream parlor and snacks",
+      dressCode: "Informal",
+      reservation: "No requerida",
+      hours: "11:00 - 18:00",
+      horarioTexto: "11:00 - 18:00 h",
+      hotel: "Iberostar Paraíso del Mar",
+      carta: "Helados artesanales variados, paletas, crepas dulces y café.",
+      menu: "Assorted artisan ice cream, popsicles, sweet crepes and coffee.",
+      especialidades: "Helados artesanales variados, paletas, crepas dulces y café.",
+      specialties: "Assorted artisan ice cream, popsicles, sweet crepes and coffee."
+    },
     "el-museo": {
       tipo: "especialidad",
-      cocina: "Cocina Gourmet",
-      cuisine: "Gourmet cuisine",
+      cocina: "Cocina italiana",
+      cuisine: "Italian cuisine",
       carta: "Carpaccio de res con parmesano y rúcula · Filete mignon a las tres pimientas · Lomo de salmón confitado · Fondente de chocolate con helado de vainilla",
       menu: "Beef carpaccio with parmesan and arugula · Peppercorn filet mignon · Confit salmon loin · Chocolate fondant with vanilla ice cream",
       horario: "18:30 - 22:00 h",
@@ -322,52 +336,123 @@
     },
     "el-rancho": {
       tipo: "especialidad",
-      cocina: "Cocina mexicana",
-      cuisine: "Mexican cuisine",
+      cocina: "Steakhouse & Carnes",
+      cuisine: "Steakhouse & Meats",
       dressCode: "Informal elegante",
       reservation: "Recomendada",
       hours: "18:30 - 22:00",
       horarioTexto: "18:30 - 22:00 h",
       hotel: "Iberostar Paraíso Maya",
-      carta: "Tacos al pastor · Mole · Cochinita pibil · Quesadillas · Flan",
-      menu: "Al pastor tacos · Mole · Cochinita pibil · Quesadillas · Flan"
+      carta: "Selección de cortes a la parrilla de leña (rib eye, new york strip, solomillo y costillas glaseadas), con guarniciones clásicas de papas al horno rellenas de crema agria y tocino, vegetales a la parrilla con mantequilla de ajo y tarta tibia de manzana con helado de vainilla.",
+      menu: "Wood-grilled cuts selection (rib eye, new york strip, tenderloin and glazed ribs), with classic sides of baked potatoes stuffed with sour cream and bacon, grilled vegetables with garlic butter and warm apple tart with vanilla ice cream.",
+      especialidades: "Selección de cortes a la parrilla de leña (rib eye, new york strip, solomillo y costillas glaseadas), con guarniciones clásicas de papas al horno rellenas de crema agria y tocino, vegetales a la parrilla con mantequilla de ajo y tarta tibia de manzana con helado de vainilla.",
+      specialties: "Wood-grilled cuts selection (rib eye, new york strip, tenderloin and glazed ribs), with classic sides of baked potatoes stuffed with sour cream and bacon, grilled vegetables with garlic butter and warm apple tart with vanilla ice cream.",
+      signatureDishes: [
+        "Rib eye",
+        "New york strip",
+        "Solomillo",
+        "Costillas glaseadas",
+        "Tarta tibia de manzana con helado de vainilla"
+      ]
+    },
+    "palapa-marina": {
+      tipo: "cafeteria",
+      cocina: "Snack & Almuerzo Grill",
+      cuisine: "Snack and Lunch Grill",
+      dressCode: "Informal",
+      reservation: "No requerida",
+      hours: "11:30 - 17:00",
+      horarioTexto: "11:30 - 17:00 h",
+      hotel: "Iberostar Paraíso Maya",
+      carta: "Servicio informal bajo palapa junto a la alberca central: hamburguesas al carbón, cortes ligeros, tacos de pescado estilo Baja, nachos con queso y guacamole fresco, ensaladas mixtas y fruta tropical recién cortada.",
+      menu: "Informal poolside palapa service: charcoal burgers, light cuts, Baja-style fish tacos, cheese nachos and fresh guacamole, mixed salads and freshly cut tropical fruit.",
+      especialidades: "Hamburguesas al carbón, cortes ligeros, tacos de pescado estilo Baja, nachos con queso y guacamole fresco, ensaladas mixtas y fruta tropical recién cortada.",
+      specialties: "Charcoal burgers, light cuts, Baja-style fish tacos, cheese nachos and fresh guacamole, mixed salads and freshly cut tropical fruit.",
+      signatureDishes: [
+        "Hamburguesas al carbón",
+        "Tacos de pescado estilo Baja",
+        "Nachos con queso y guacamole fresco",
+        "Fruta tropical recién cortada"
+      ]
+    },
+    "tlaqpaque": {
+      tipo: "especialidad",
+      cocina: "Mexicano de Especialidad Tradicional",
+      cuisine: "Traditional Mexican Specialty",
+      dressCode: "Informal elegante",
+      reservation: "Recomendada",
+      hours: "18:00 - 21:30",
+      horarioTexto: "18:00 - 21:30 h",
+      hotel: "Iberostar Paraíso Maya",
+      carta: "Sopa azteca con tiras crujientes de tortilla, chile pasilla y aguacate; pipián verde; cazuelas de mole poblano con pollo de granja; arrachera al carbón acompañada de chiles toreados y cebollitas; y de postre, buñuelos bañados en piloncillo y tamal dulce de chocolate.",
+      menu: "Aztec soup with crispy tortilla strips, pasilla chile and avocado; green pipián; mole poblano casseroles with farm chicken; charcoal-grilled arrachera with roasted chiles and spring onions; and for dessert, piloncillo-glazed buñuelos and sweet chocolate tamale.",
+      especialidades: "Sopa azteca con tiras crujientes de tortilla, chile pasilla y aguacate; pipián verde; cazuelas de mole poblano con pollo de granja; arrachera al carbón acompañada de chiles toreados y cebollitas; y de postre, buñuelos bañados en piloncillo y tamal dulce de chocolate.",
+      specialties: "Aztec soup with crispy tortilla strips, pasilla chile and avocado; green pipián; mole poblano casseroles with farm chicken; charcoal-grilled arrachera with roasted chiles and spring onions; and for dessert, piloncillo-glazed buñuelos and sweet chocolate tamale.",
+      signatureDishes: [
+        "Sopa azteca",
+        "Pipián verde",
+        "Mole poblano con pollo de granja",
+        "Arrachera al carbón",
+        "Buñuelos bañados en piloncillo",
+        "Tamal dulce de chocolate"
+      ]
     },
     "la-geisha": {
       tipo: "especialidad",
-      cocina: "Cocina japonesa",
-      cuisine: "Japanese cuisine",
+      cocina: "Japonés Tradicional y Teppanyaki",
+      cuisine: "Traditional Japanese and Teppanyaki",
       dressCode: "Informal elegante",
       reservation: "Recomendada",
-      hours: "18:30 - 22:00",
-      horarioTexto: "18:30 - 22:00 h",
+      hours: "18:30 - 21:30",
+      horarioTexto: "18:30 - 21:30 h",
       hotel: "Iberostar Paraíso Maya",
-      carta: "Sushi · Sashimi · Teppanyaki · Ramen · Tempura",
-      menu: "Sushi · Sashimi · Teppanyaki · Ramen · Tempura"
+      carta: "Rollos de sushi contemporáneos, sashimi de pesca sustentable y sopa miso, seguidos del espectáculo frente a la plancha teppan con arroz frito yakimeshi, verduras salteadas y mezcla de mar y tierra (camarones, res o salmón en salsa teriyaki casera).",
+      menu: "Contemporary sushi rolls, sustainable fishing sashimi and miso soup, followed by the teppan plancha show cooking with yakimeshi fried rice, sautéed vegetables and surf and turf mix (shrimp, beef or salmon in homemade teriyaki sauce).",
+      especialidades: "Rollos de sushi contemporáneos, sashimi de pesca sustentable y sopa miso, seguidos del espectáculo frente a la plancha teppan con arroz frito yakimeshi, verduras salteadas y mezcla de mar y tierra (camarones, res o salmón en salsa teriyaki casera).",
+      specialties: "Contemporary sushi rolls, sustainable fishing sashimi and miso soup, followed by the teppan plancha show cooking with yakimeshi fried rice, sautéed vegetables and surf and turf mix (shrimp, beef or salmon in homemade teriyaki sauce).",
+      signatureDishes: [
+        "Rollos de sushi contemporáneos",
+        "Sashimi de pesca sustentable",
+        "Sopa miso",
+        "Arroz frito yakimeshi",
+        "Mezcla de mar y tierra en salsa teriyaki"
+      ]
     },
     letoile: {
       tipo: "especialidad",
-      cocina: "Cocina francesa",
-      cuisine: "French cuisine",
+      cocina: "Gourmet Francés",
+      cuisine: "French Gourmet",
       dressCode: "Formal",
       reservation: "Recomendada",
       hours: "18:30 - 22:00",
       horarioTexto: "18:30 - 22:00 h",
       hotel: "Iberostar Paraíso Maya",
-      carta: "Foie gras · Magret de pato · Bouillabaisse · Crème brûlée · Vinos franceses",
-      menu: "Foie gras · Duck magret · Bouillabaisse · Crème brûlée · French wines"
+      carta: "Propuesta clásica de alta cocina gala. Destacan la sopa de cebolla gratinada con queso emmental, terrinas de ave, magret de pato con reducción de frutos rojos, filete mignon en salsa bordelesa y postres de autor como suflé caliente o milhojas de vainilla de Papantla.",
+      menu: "Classic French haute cuisine proposal. Highlights include gratinated onion soup with emmental cheese, poultry terrines, duck magret with red fruit sauce, filet mignon in bordelaise sauce and signature desserts such as hot soufflé or Papantla vanilla mille-feuille.",
+      especialidades: "Sopa de cebolla gratinada con queso emmental, terrinas de ave, magret de pato con reducción de frutos rojos, filete mignon en salsa bordelesa y postres de autor como suflé caliente o milhojas de vainilla de Papantla.",
+      specialties: "Gratinated onion soup with emmental cheese, poultry terrines, duck magret with red fruit sauce, filet mignon in bordelaise sauce and signature desserts such as hot soufflé or Papantla vanilla mille-feuille.",
+      signatureDishes: [
+        "Sopa de cebolla gratinada con queso emmental",
+        "Terrinas de ave",
+        "Magret de pato con reducción de frutos rojos",
+        "Filete mignon en salsa bordelesa",
+        "Suflé caliente",
+        "Milhojas de vainilla de Papantla"
+      ]
     },
     "la-marina": {
-      tipo: "especialidad",
-      cocina: "Mariscos y pescados",
-      cuisine: "Seafood and fish",
-      carta: "Mariscos frescos · Pescados a la plancha · Ostras · Paella de mariscos · Selección de vinos blancos",
-      menu: "Fresh seafood · Grilled fish · Oysters · Seafood paella · White wine selection",
-      horario: "18:30 - 22:00 h",
-      vestimenta: "Elegante casual",
-      dressCode: "Elegant casual",
-      reservas: true,
-      especialidades: "Mariscos frescos, pescados a la plancha, ostras y paella de mariscos",
-      specialties: "Fresh seafood, grilled fish, oysters and seafood paella",
+      tipo: "buffet",
+      cocina: "Buffet Principal",
+      cuisine: "Main Buffet",
+      carta: "Estaciones de cocina en vivo (show cooking), mesa fría de quesos internacionales y charcutería, barras de mariscos y ceviches al mediodía, cortes a la plancha al momento, pastas artesanales y área especial con opciones infantiles y vegetarianas.",
+      menu: "Live cooking stations, international cheese and charcuterie table, seafood and ceviche bars at midday, grilled cuts to order, artisan pastas and special area with children's and vegetarian options.",
+      horario: "Desayuno 07:00 - 10:30 h · Almuerzo 12:30 - 15:30 h · Cena 18:30 - 22:00 h",
+      horarioTexto: "Desayuno 07:00 - 10:30 h · Almuerzo 12:30 - 15:30 h · Cena 18:30 - 22:00 h",
+      vestimenta: "Informal",
+      dressCode: "Casual",
+      reservas: false,
+      especialidades: "Estaciones de cocina en vivo (show cooking), mesa fría de quesos internacionales y charcutería, barras de mariscos y ceviches, cortes a la plancha al momento, pastas artesanales y opciones infantiles y vegetarianas.",
+      specialties: "Live cooking stations, international cheese and charcuterie table, seafood and ceviche bars, grilled cuts to order, artisan pastas and children's and vegetarian options.",
       hotel: "Iberostar Paraíso Maya"
     },
     "el-tapatio": {
@@ -559,6 +644,20 @@
       ],
       hotel: "Playa Paraíso (Área de Playa y Albercas)"
     },
+    "el-kiosko": {
+      tipo: "cafeteria",
+      cocina: "Beach Snack & Grill",
+      cuisine: "Beach Snack and Grill",
+      dressCode: "Informal",
+      reservation: "No requerida",
+      hours: "10:00 - 18:00",
+      horarioTexto: "10:00 - 18:00 h",
+      hotel: "Iberostar Paraíso del Mar",
+      carta: "Nachos con queso fundido y jalapeños · Guacamole fresco · Hot dogs · Tacos al pastor · Fruta cortada.",
+      menu: "Nachos with melted cheese and jalapeños · Fresh guacamole · Hot dogs · Al pastor tacos · Cut fruit.",
+      especialidades: "Nachos con queso fundido y jalapeños, guacamole fresco, hot dogs, tacos al pastor y fruta cortada.",
+      specialties: "Nachos with melted cheese and jalapeños, fresh guacamole, hot dogs, al pastor tacos and cut fruit."
+    }
   };
 
   // --- Bares ---------------------------------------------------------------
@@ -567,20 +666,96 @@
     // "heladeria-el-puente" consolidado: es el mismo lugar que "bar-el-puente"
     // "heladeria-el-mirador" consolidado: es el mismo lugar que "lobby-bar-el-mirador" (JOIA)
     "star-rock-cafe": { tipo: "bar_cierre_temprano", cocina: "Café y repostería", cuisine: "Coffee and pastry", carta: "Café de especialidad · Repostería · Bagels · Smoothies", menu: "Specialty coffee · Pastry · Bagels · Smoothies" },
-    "pool-bar-las-olas": { tipo: "bar", cocina: "Bar de piscina", cuisine: "Pool bar", carta: "Cócteles · Bucket de cerveza · Botella de agua · Snacks", menu: "Cocktails · Beer bucket · Water bottle · Snacks" },
+    "pool-bar-las-olas": { tipo: "bar", cocina: "Bar de piscina (Swim-up)", cuisine: "Pool bar (Swim-up)", carta: "Margaritas frozen · Piñas coladas · Mojitos caribeños · Daiquirís · Cervezas frías", menu: "Frozen margaritas · Piña coladas · Caribbean mojitos · Daiquiris · Cold beers", hours: "10:00 - 19:00", horarioTexto: "10:00 - 19:00 h", hotel: "Iberostar Paraíso del Mar" },
     "lobby-bar-kukulkan": { tipo: "bar", cocina: "Lobby bar", cuisine: "Lobby bar", carta: "Coctelería de autor · Whisky · Aperitivos", menu: "Signature cocktails · Whisky · Appetizers" },
     "music-bar-rhapsody": { tipo: "bar", cocina: "Music bar", cuisine: "Music bar", carta: "Coctelería · Cervezas de autor · Snacks · Música en vivo", menu: "Cocktails · Craft beers · Snacks · Live music" },
     "lobby-bar-el-mirador": { tipo: "bar", cocina: "Lobby bar", cuisine: "Lobby bar", carta: "Coctelería · Vinos tintos · Tabla de quesos", menu: "Cocktails · Red wines · Cheese board" },
     "aqua-bar-la-sirenita": { tipo: "bar", cocina: "Aqua bar", cuisine: "Aqua bar", carta: "Smoothies y jugos · Coctelería sin alcohol · Snacks", menu: "Smoothies and juices · Non-alcoholic cocktails · Snacks" },
     "health-bar-spa": { tipo: "bar_cierre_temprano", cocina: "Health bar", cuisine: "Health bar", carta: "Bowls · Zumos prensados · Ensaladas · Infusiones", menu: "Bowls · Cold-pressed juices · Salads · Infusions" },
-    "aqua-bar-la-perla": { tipo: "bar", cocina: "Aqua bar", cuisine: "Aqua bar", carta: "Smoothies y jugos · Coctelería sin alcohol · Snacks", menu: "Smoothies and juices · Non-alcoholic cocktails · Snacks" },
-    "bar-teatro": { tipo: "bar", cocina: "Bar de teatro", cuisine: "Theater bar", carta: "Aperitivos · Coctelería · Cervezas · Antes de la función", menu: "Appetizers · Cocktails · Beers · Before the show" },
+    "aqua-bar-la-perla": { tipo: "bar", cocina: "Bar de piscina", cuisine: "Pool bar", carta: "Refrescos · Cervezas de barril · Cócteles tropicales con servicio a camastros", menu: "Soft drinks · Draft beers · Tropical cocktails with lounge service", hours: "10:00 - 18:00", horarioTexto: "10:00 - 18:00 h", hotel: "Iberostar Paraíso del Mar" },
+    "bar-teatro": { tipo: "bar", cocina: "Bar de teatro", cuisine: "Theater bar", carta: "Tragos rápidos · Combinados con ron / vodka / whisky · Refrescos", menu: "Quick drinks · Mixed drinks with rum / vodka / whisky · Soft drinks", hours: "17:00 - 00:00", horarioTexto: "17:00 - 00:00 h", hotel: "Iberostar Paraíso del Mar" },
     "lobby-bar-la-fuente": { tipo: "bar", cocina: "Lobby bar", cuisine: "Lobby bar", carta: "Coctelería de temporada · Aperitivos", menu: "Seasonal cocktails · Appetizers" },
     "aqua-bar-las-olas": { tipo: "bar", cocina: "Aqua bar", cuisine: "Aqua bar", carta: "Smoothies y jugos · Coctelería sin alcohol · Snacks", menu: "Smoothies and juices · Non-alcoholic cocktails · Snacks" },
     "lobby-bar-la-cula": { tipo: "bar", cocina: "Lobby bar", cuisine: "Lobby bar", carta: "Coctelería de autor · Highballs", menu: "Signature cocktails · Highballs" },
     "aqua-bar-las-rocas": { tipo: "bar", cocina: "Aqua bar", cuisine: "Aqua bar", carta: "Smoothies y jugos · Coctelería sin alcohol · Snacks", menu: "Smoothies and juices · Non-alcoholic cocktails · Snacks" },
     "lobby-bar-acuario": { tipo: "bar", cocina: "Lobby bar", cuisine: "Lobby bar", carta: "Coctelería · Vinos · Aperitivos", menu: "Cocktails · Wines · Appetizers" },
-    "cigar-bar": { tipo: "bar_cierre_temprano", cocina: "Cigar bar", cuisine: "Cigar bar", carta: "Cigarros premium · Whisky y ron añejo · Quesos · Café", menu: "Premium cigars · Aged whisky and rum · Cheeses · Coffee" }
+    "cigar-bar": { tipo: "bar_cierre_temprano", cocina: "Cigar bar", cuisine: "Cigar bar", carta: "Cigarros premium · Whisky y ron añejo · Quesos · Café", menu: "Premium cigars · Aged whisky and rum · Cheeses · Coffee" },
+    "bar-la-fuente": {
+      tipo: "bar",
+      cocina: "Lobby bar",
+      cuisine: "Lobby bar",
+      carta: "Cafés matutinos de especialidad · Martinis · Cócteles clásicos (Negroni, Old Fashioned) · Digestivos y licores",
+      menu: "Specialty morning coffee · Martinis · Classic cocktails (Negroni, Old Fashioned) · Digestifs and liquors",
+      hours: "08:00 - 01:00",
+      horarioTexto: "08:00 - 01:00 h",
+      hotel: "Iberostar Paraíso del Mar"
+    },
+    "bar-el-kiosko": {
+      tipo: "bar",
+      cocina: "Bar de playa",
+      cuisine: "Beach bar",
+      carta: "Cervezas de playa con limón · Cócteles de ron · Tequila sunrise · Aguas frescas de sabores",
+      menu: "Beach beers with lime · Rum cocktails · Tequila sunrise · Flavored fresh waters",
+      hours: "10:00 - 18:00",
+      horarioTexto: "10:00 - 18:00 h",
+      hotel: "Iberostar Paraíso del Mar"
+    },
+    "bar-galaxy-nightclub": {
+      tipo: "bar_cierre_temprano",
+      cocina: "Nightclub",
+      cuisine: "Nightclub",
+      carta: "Shots · Cócteles energéticos · Cerveza · Licores importados con DJ en directo",
+      menu: "Shots · Energy cocktails · Beer · Imported liquors with live DJ",
+      hours: "23:00 - 03:00",
+      horarioTexto: "23:00 - 03:00 h",
+      hotel: "Iberostar Paraíso del Mar"
+    },
+    "bar-el-puente": {
+      tipo: "bar",
+      cocina: "Bar",
+      cuisine: "Bar",
+      hotel: "Iberostar Paraíso Maya"
+    },
+    "bar-lobby-chichen-itza": {
+      tipo: "bar",
+      cocina: "Lobby bar",
+      cuisine: "Lobby bar",
+      carta: "Coctelería de autor mexicana (mezcales, tequilas reposados), martinis, whiskies de etiqueta y café expreso recién molido.",
+      menu: "Mexican author cocktails (mezcals, rested tequilas), martinis, label whiskies and freshly ground espresso coffee.",
+      hours: "09:00 - 01:00",
+      horarioTexto: "09:00 - 01:00 h",
+      hotel: "Iberostar Paraíso Maya"
+    },
+    "bar-tequila-arrecife": {
+      tipo: "bar",
+      cocina: "Bar de piscina (Swim-up)",
+      cuisine: "Pool bar (Swim-up)",
+      carta: "Barra húmeda dentro del agua; piñas coladas, mojitos de sabores, margaritas frappé y cervezas frías servidas directo en alberca.",
+      menu: "Wet bar inside the water; piña coladas, flavor mojitos, frappé margaritas and cold beers served directly in the pool.",
+      hours: "10:00 - 18:30",
+      horarioTexto: "10:00 - 18:30 h",
+      hotel: "Iberostar Paraíso Maya"
+    },
+    "bar-palapa": {
+      tipo: "bar",
+      cocina: "Bar de playa",
+      cuisine: "Beach bar",
+      carta: "Cócteles de playa, sangrías refrescantes, agua de coco y bebidas sin alcohol para niños.",
+      menu: "Beach cocktails, refreshing sangrias, coconut water and non-alcoholic drinks for children.",
+      hours: "10:00 - 17:00",
+      horarioTexto: "10:00 - 17:00 h",
+      hotel: "Iberostar Paraíso Maya"
+    },
+    "bar-del-teatro": {
+      tipo: "bar",
+      cocina: "Bar de teatro",
+      cuisine: "Theater bar",
+      carta: "Tragos largos, licores combinados y refrescos durante las representaciones nocturnas.",
+      menu: "Long drinks, mixed liquors and soft drinks during the nightly performances.",
+      hours: "18:00 - 23:30",
+      horarioTexto: "18:00 - 23:30 h",
+      hotel: "Iberostar Paraíso Maya"
+    }
   };
 
   // --- Spa, golf y otros servicios ----------------------------------------

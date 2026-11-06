@@ -90,7 +90,7 @@
     {"id":"convention","name":"Centro de Convenciones","category":"conv","lat":20.76143,"lng":-86.96538,"description":"Centro de convenciones del complejo"},
     {"id":"spa","name":"Spa Sensations","category":"spa","lat":20.76032,"lng":-86.96629,"description":"Spa del complejo"},
     {"id":"starcamp","name":"Star Camp","category":"kids","lat":20.76071,"lng":-86.96471,"description":"Star Camp"},
-    {"id":"galaxy","name":"Discoteca Galaxy","category":"discoteca","lat":20.75955,"lng":-86.966,"description":"Discoteca del complejo (+18)"},
+    {"id":"galaxy","name":"Discoteca Galaxy","category":"discoteca","lat":20.75955,"lng":-86.966,"description":"Discoteca del complejo (+18)","hours":"22:00 / 23:00 - 03:00 h","horarioTexto":"22:00 / 23:00 - 03:00 h","carta":"Shots · Cócteles energéticos · Cerveza · Licores importados con DJ en directo"},
     // Coco Bar: coordenada verificada manualmente (Google Maps).
     {"id":"cocobar","name":"Coco Bar","category":"bar","lat":20.756290,"lng":-86.959046,"description":"Coco Bar"},
     {"id":"starcafe","name":"Star Café","category":"bar","lat":20.7585,"lng":-86.963,"description":"Star Café"});
@@ -124,15 +124,15 @@
     {"id":"latelier","name":"L'Atelier","category":"restaurante","description":"Restaurante gourmet"},
 
     {"id":"haiku","name":"Haiku","category":"restaurante","description":"Restaurante japonés"},
+    {"id":"olivetti","name":"The Olivetti","category":"restaurante","lat":20.7567218,"lng":-86.9604135,"description":"Restaurante italiano – Spaghetti Factory","source":"Google Maps","verified":true},
+    {"id":"lemon-spices","name":"Lemon & Spices","category":"restaurante","lat":20.7589139,"lng":-86.96355,"description":"Restaurante asiático","source":"Google Maps","verified":true},
+    {"id":"under-the-sea","name":"America Seafood Grill Under the Sea","category":"restaurante","lat":20.75687,"lng":-86.95974,"description":"Restaurante de mariscos","source":"Google Maps","verified":true},
     {"id":"la-brisa","name":"La Brisa Beach Bar","category":"bar","hotelId":"Iberostar Paraíso JOIA","description":"Bar de playa"},
     {"id":"baby-kitchen","name":"Baby Kitchen","category":"servicio","lat":20.758029,"lng":-86.963437,"description":"Cocina para bebés"});
   POIS.push(
     {"id":"sports-bar-corner","name":"Sports Bar Corner","category":"bar","hotelId":"Iberostar Paraíso Lindo","lat":20.7596764,"lng":-86.9634133,"description":"Sports bar"},
-    // "Heladería El Puente" y "Bar El Puente" son el mismo lugar; quedó un único
-    // POI ("bar-el-puente", en 20.757172,-86.960979). El punto de la playa que
-    // antes se etiquetó como "Bar El Puente" en realidad es Aqua Bar Las Olas.
-    // "Heladería El Mirador" y "Lobby Bar El Mirador" también son el mismo
-    // lugar; quedó un único POI ("lobby-bar-el-mirador") con las coords de Google Maps.
+    // "Heladería El Puente" (20.758672,-86.959008, Paraíso del Mar) y "Bar El Puente"
+    // (20.757158,-86.960980, Paraíso Maya) son POIs separados.
     {"id":"star-rock-cafe","name":"Star Rock Café","category":"bar","description":"Star Rock Café"},
     {"id":"pool-bar-las-olas","name":"Pool Bar Las Olas","category":"bar","lat":20.757897,"lng":-86.961767,"description":"Bar de piscina"},
     {"id":"lobby-bar-kukulkan","name":"Lobby Bar Kukulkán","category":"bar","hotelId":"Iberostar Paraíso Maya","lat":20.7575018,"lng":-86.9645296,"description":"Lobby bar"},
@@ -147,16 +147,18 @@
     {"id":"lobby-bar-la-cula","name":"Lobby Bar La Cúpula","category":"bar","description":"Lobby bar"},
     {"id":"aqua-bar-las-rocas","name":"Aqua Bar Las Rocas","category":"bar","description":"Aqua bar"},
     {"id":"lobby-bar-acuario","name":"Lobby Bar Acuario","category":"bar","hotelId":"Iberostar Paraíso Lindo","lat":20.7595512,"lng":-86.963491,"description":"Lobby bar"},
-    {"id":"cigar-bar","name":"Cigar Bar","category":"bar","description":"Cigar bar"});
+    {"id":"cigar-bar","name":"Cigar Bar","category":"bar","description":"Cigar bar"},
+    {"id":"heladeria-el-puente","name":"Heladería El Puente","category":"restaurante","hotelId":"Iberostar Paraíso del Mar","lat":20.758672,"lng":-86.959008,"description":"Heladería El Puente"},
+    {"id":"bar-el-kiosko","name":"El Kiosko Bar","category":"bar","hotelId":"Iberostar Paraíso del Mar","lat":20.757810,"lng":-86.958304,"description":"Bar de playa frente al mar"});
   POIS.push(
     {"id":"waterfall-jacuzzi","name":"Cascada y jacuzzi","category":"piscina","lat":20.759539,"lng":-86.960991,"description":"Water fall & jacuzzi"},
     {"id":"quiet-pool","name":"Piscina tranquila","category":"piscina","lat":20.759600,"lng":-86.960224,"description":"Quiet pool"},
     {"id":"activities-pool","name":"Piscina de actividades","category":"piscina","lat":20.759267,"lng":-86.959714,"description":"Activities pool"},
-    {"id":"lazy-river","name":"Río lento","category":"piscina","description":"Lazy river"},
+    {"id":"lazy-river","name":"Río lento","nameEn":"Lazy river","category":"piscina","description":"Río lento","descriptionEn":"Lazy river"},
     {"id":"sports-pool","name":"Piscina deportiva","category":"piscina","description":"Sports pool"},
     {"id":"wave-pool","name":"Piscina de olas","category":"piscina","description":"Wave pool"},
     {"id":"jacuzzi","name":"Jacuzzi","category":"piscina","lat":20.757415,"lng":-86.960793,"description":"Jacuzzi"},
-    {"id":"private-pool","name":"Piscina privada","category":"piscina","lat":20.756499,"lng":-86.960229,"description":"Private pool"},
+    {"id":"private-pool","name":"Piscina privada","nameEn":"Private pool","category":"piscina","lat":20.756499,"lng":-86.960229,"description":"Piscina privada","descriptionEn":"Private pool"},
     {"id":"indoor-pool","name":"Piscina cubierta","category":"piscina","lat":20.756076,"lng":-86.961331,"description":"Indoor pool"},
     {"id":"main-pool","name":"Piscina principal","category":"piscina","lat":20.754701,"lng":-86.960497,"description":"Main pool"},
     {"id":"mini-water-playground","name":"Mini parque acuático","category":"piscina","description":"Mini water playground"},
@@ -188,10 +190,9 @@
     {"id":"star-friends-desk","name":"Star Friends Desk","category":"kids","lat":20.755117,"lng":-86.961373,"description":"Star Friends Desk"},
     // --- Nuevos POIs del plano oficial no existentes en catálogo previo ---
     {"id":"beach-bar","name":"Beach Bar / Bar de playa","category":"bar","lat":20.757856,"lng":-86.958359,"description":"Bar de playa"},
-    {"id":"bar-el-puente","name":"Bar El Puente","category":"bar","lat":20.757172,"lng":-86.960979,"description":"Bar El Puente (incluye la heladería)"},
     {"id":"buffet-la-marina","name":"Buffet La Marina","category":"restaurante","lat":20.757842,"lng":-86.963819,"description":"Buffet restaurante La Marina"},
     {"id":"buffet-el-tapatio","name":"Buffet El Tapatío","category":"restaurante","hotelId":"Iberostar Paraíso Maya","lat":20.756848,"lng":-86.960399,"description":"Buffet restaurante El Tapatío"});
-    // Eliminados a petición del usuario (2026-10-22): "surprise-gf", "surprise-2f" y "shushi"
+  // Eliminados a petición del usuario (2026-10-22): "surprise-gf", "surprise-2f" y "shushi"
     // (Restaurant Surprise, planta baja y 2º nivel, y Restaurant Shushi, sin coordenadas verificadas).
 
   // Instalaciones por hotel con coordenadas confirmadas manualmente
@@ -258,7 +259,10 @@
     ["diving-center", 20.7588638, -86.9575332, "Dressel Divers"],
     ["latelier", 20.7551676, -86.9609817, "L'Atelier"],
     ["star-rock-cafe", 20.7618856, -86.9627721, "Star Rock Café"],
-    ["theclub", 20.7598333, -86.9652778, "THE CLUB"]
+    ["theclub", 20.7598333, -86.9652778, "THE CLUB"],
+    ["olivetti", 20.7567218, -86.9604135, "The Olivetti"],
+    ["lemon-spices", 20.7589139, -86.96355, "Lemon & Spices"],
+    ["under-the-sea", 20.75687, -86.95974, "America Seafood Grill Under the Sea"]
   ];
   OSM_COORDS.forEach(function (row) {
     for (var i = 0; i < POIS.length; i += 1) {
