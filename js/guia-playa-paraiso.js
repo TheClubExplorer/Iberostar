@@ -132,9 +132,8 @@
     {"id":"sports-bar-corner","name":"Sports Bar Corner","category":"bar","hotelId":"Iberostar Paraíso Lindo","lat":20.7596764,"lng":-86.9634133,"description":"Sports bar"},
     // "Heladería El Puente" (20.758672,-86.959008, Paraíso del Mar) y "Bar El Puente"
     // (20.757158,-86.960980, Paraíso Maya) son POIs separados.
-    {"id":"bar-el-puente","name":"Bar El Puente","category":"bar","hotelId":"Iberostar Paraíso Maya","lat":20.757158,"lng":-86.960980,"description":"Bar El Puente"},
-    {"id":"starcafe","name":"Star Rock Café","category":"bar","hotelId":"Iberostar Paraíso del Mar","lat":20.7583,"lng":-86.9644,"description":"Cafetería central compartida por Paraíso del Mar y Paraíso Lindo","source":"user-confirmed","verified":true},
-    {"id":"tlaquepaque","name":"Tlaquepaque","category":"restaurante","hotelId":"Iberostar Paraíso Maya","lat":20.7606,"lng":-86.9632,"description":"Restaurante mexicano","source":"user-confirmed","verified":true},
+    {"id":"star-rock-cafe-lindo","name":"Star Rock Café","category":"bar","hotelId":"Iberostar Paraíso Lindo","lat":20.760050,"lng":-86.965207,"description":"Star Rock Café"},
+    {"id":"starcafe","name":"Star Rock Café","category":"bar","hotelId":"Iberostar Paraíso del Mar","lat":20.7618856,"lng":-86.9627721,"description":"Star Rock Café","verified":true},
     {"id":"pool-bar-las-olas","name":"Pool Bar Las Olas","category":"bar","lat":20.757897,"lng":-86.961767,"description":"Bar de piscina"},
     {"id":"lobby-bar-kukulkan","name":"Lobby Bar Kukulkán","category":"bar","hotelId":"Iberostar Paraíso Maya","lat":20.7575018,"lng":-86.9645296,"description":"Lobby bar"},
     {"id":"music-bar-rhapsody","name":"Music Bar Rhapsody","category":"bar","lat":20.756312,"lng":-86.962411,"description":"Music bar"},
@@ -143,10 +142,6 @@
     {"id":"health-bar-spa","name":"Health Bar SPA","category":"bar","lat":20.756025,"lng":-86.961423,"description":"Health bar"},
     {"id":"aqua-bar-la-perla","name":"Aqua Bar La Perla","category":"bar","description":"Aqua bar"},
     {"id":"bar-teatro","name":"Bar Teatro","category":"bar","hotelId":"Iberostar Paraíso Lindo","lat":20.759376,"lng":-86.962659,"description":"Bar de teatro"},
-    {"id":"bar-lobby-chichen-itza","name":"Lobby Bar Chichén Itzá","category":"bar","hotelId":"Iberostar Paraíso Maya","lat":20.7601,"lng":-86.9636,"description":"Lobby bar","source":"user-confirmed","verified":true},
-    {"id":"bar-tequila-arrecife","name":"Bar Tequila / Arrecife","category":"bar","hotelId":"Iberostar Paraíso Maya","lat":20.7588,"lng":-86.9622,"description":"Bar de piscina","source":"user-confirmed","verified":true},
-    {"id":"bar-palapa","name":"Bar Palapa","category":"bar","hotelId":"Iberostar Paraíso Maya","lat":20.7593,"lng":-86.9619,"description":"Bar de playa","source":"user-confirmed","verified":true},
-    {"id":"bar-del-teatro","name":"Bar del Teatro","category":"bar","hotelId":"Iberostar Paraíso Maya","lat":20.7608,"lng":-86.9639,"description":"Bar de teatro","source":"user-confirmed","verified":true},
     {"id":"lobby-bar-la-fuente","name":"Lobby Bar La Fuente","category":"bar","description":"Lobby bar"},
     {"id":"aqua-bar-las-olas","name":"Aqua Bar Las Olas","category":"bar","lat":20.7586198,"lng":-86.9590972,"description":"Aqua bar (zona de playa)"},
     {"id":"lobby-bar-la-cula","name":"Lobby Bar La Cúpula","category":"bar","description":"Lobby bar"},
@@ -212,14 +207,13 @@
     {"id":"fit-fun-joia","name":"Fit & Fun JOIA","category":"deportes","hotelId":"Iberostar Paraíso JOIA","lat":20.7560274,"lng":-86.9611985,"description":"Gimnasio Fit & Fun"},
     {"id":"concierge-joia","name":"Concierge JOIA","category":"concierge","hotelId":"Iberostar Paraíso JOIA","lat":20.756125,"lng":-86.962989,"description":"Concierge del hotel JOIA"},
     {"id":"legado","name":"Legado","category":"restaurante","hotelId":"Iberostar Paraíso JOIA","lat":20.754923,"lng":-86.961316,"description":"Restaurante mexicano"},
-    {"id":"tonis","name":"Toni's","category":"restaurante","hotelId":"Iberostar Paraíso JOIA","lat":20.7605,"lng":-86.9587,"description":"Restaurante Toni's","source":"user-confirmed","verified":true},
     {"id":"star-prestige-joia","name":"Star Prestige JOIA","category":"starprestige","hotelId":"Iberostar Paraíso JOIA","lat":20.756156,"lng":-86.962287,"description":"Área exclusiva Star Prestige en JOIA donde usted disfruta de lujo, servicio atento y experiencias preferentes en un entorno cálido y distinguido.","hours":"09:00 - 21:00","amenities":"Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks","services":"Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas"},
     {"id":"concierge-grand-paraiso","name":"Concierge Grand Paraíso (Edificio 71)","category":"concierge","hotelId":"Iberostar Paraíso JOIA","lat":20.753724,"lng":-86.960434,"description":"Concierge de Grand Paraíso"},
     {"id":"spa-grand-paraiso","name":"Spa Grand Paraíso","category":"spa","hotelId":"Iberostar Paraíso JOIA","lat":20.753233,"lng":-86.960193,"description":"Spa de Grand Paraíso"},
     {"id":"fit-fun-grand-paraiso","name":"Fit & Fun Grand Paraíso","category":"deportes","hotelId":"Iberostar Paraíso JOIA","lat":20.757618,"lng":-86.958517,"description":"Gimnasio Fit & Fun de Grand Paraíso"},
     {"id":"fit-fun-playa-paraiso","name":"Fit & Fun Playa Paraíso","category":"deportes","lat":20.7603125,"lng":-86.9645625,"description":"Gimnasio Fit & Fun en la zona de playa"},
     {"id":"el-colonial","name":"El Colonial","category":"restaurante","lat":20.7609943,"lng":-86.963447,"description":"Restaurant"},
-    {"id":"el-faro","name":"El Faro / Trattoria","category":"restaurante","hotelId":"Iberostar Paraíso del Mar","lat":20.7562,"lng":-86.9592,"description":"Restaurante con buffet diurno y servicio de trattoria nocturno","source":"user-confirmed","verified":true}
+    {"id":"trattoria","name":"Trattoria","category":"restaurante","lat":20.7589509,"lng":-86.9583723,"description":"Trattoria by El Faro"}
   );
 
   // Coordenadas confirmadas con OpenStreetMap. Cada fila es
@@ -244,6 +238,7 @@
     ["el-tapatio", 20.7567139, -86.960329, "El Tapatío"],
     ["venecia", 20.755841, -86.9626532, "Venecia"],
     ["bellavista", 20.7549173, -86.9612041, "Bella Vista"],
+    ["tonis", 20.7549562, -86.9611689, "Tony’s"],
     ["haiku", 20.755212, -86.9610284, "Haiku"],
     ["la-brisa", 20.7546463, -86.9597269, "La Brisa"],
     ["burgers", 20.7598217, -86.9663036, "Star Hamburgers"],
@@ -264,6 +259,7 @@
     ["golf-club-house", 20.7586073, -86.9658668, "Golf Clubhouse"],
     ["diving-center", 20.7588638, -86.9575332, "Dressel Divers"],
     ["latelier", 20.7551676, -86.9609817, "L'Atelier"],
+    ["star-rock-cafe", 20.7618856, -86.9627721, "Star Rock Café"],
     ["theclub", 20.7598333, -86.9652778, "THE CLUB"],
     ["olivetti", 20.7567218, -86.9604135, "The Olivetti"],
     ["lemon-spices", 20.7589139, -86.96355, "Lemon & Spices"],

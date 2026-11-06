@@ -24,13 +24,13 @@ const RESTAURANTES_PARAISO = {
       ["El Mercado", "Buffet"],
       ["El Puerto", "Buffet / Brasería"],
       ["Hashiru", "Teppanyaki / Sushi"],
-      ["Trattoria by El Faro", "Trattoria nocturna en El Faro"],
+      ["Trattoria by El Faro", "Cocina italiana"],
       ["La Hacienda", "Cocina mexicana"],
       ["El Rodizio", "Brasileño"],
       ["La Dorada", "Mediterránea"],
       ["El Colonial", "Cocina francesa"],
-      ["El Faro", "Buffet diurno / Trattoria nocturna"],
-      ["Star Rock Café", "Cafetería central compartida"],
+      ["El Faro", "Buffet internacional"],
+      ["Star Rock Café", "Americana"],
       ["Beach Grill", "Internacional / playa"],
       ["El Kiosko", "Snack bar / Grill"],
       ["Heladería El Puente", "Heladería / Snacks"],
@@ -45,7 +45,7 @@ const RESTAURANTES_PARAISO = {
       ["La Marina", "Buffet Principal"],
       ["Palapa Marina / El Tapatío", "Snack & Almuerzo Grill"],
       ["El Rancho", "Steakhouse & Carnes"],
-      ["Tlaquepaque", "Mexicano de Especialidad Tradicional"],
+      ["Tlaqpaque", "Mexicano de Especialidad Tradicional"],
       ["La Geisha Japanese Restaurant", "Japonés Tradicional y Teppanyaki"],
       ["Bistró L'Etoile", "Gourmet Francés"],
       ["Olivetti", "Cocina italiana"],
@@ -74,7 +74,7 @@ const RESTAURANTES_PARAISO = {
       ["Antojitos / Tacos", "Antojitos mexicanos"],
       ["Crepes & Ice Cream", "Crepas y helados"],
       ["Lobby Bar Acuario", "Lobby bar"],
-      ["Star Rock Café", "Cafetería central compartida"]
+      ["Star Rock Café", "Bar deportivo / Pub Americano"]
     ],
     "Iberostar Paraíso Beach": [
       ["La Plaza", "Buffet principal"],
@@ -85,13 +85,14 @@ const RESTAURANTES_PARAISO = {
       ["El Rodizio", "Brasileño"],
       ["La Dorada", "Mediterránea"],
       ["El Colonial", "Cocina francesa"],
-      ["El Faro", "Buffet diurno / Trattoria nocturna"],
+      ["El Faro", "Buffet internacional"],
+      ["Star Rock Cafe", "Americana"],
       ["Beach Grill", "Internacional / playa"],
       ["El Fogón (Steak House)", "Steak House"],
       ["El Fogón (Italiano)", "Italiana"]
     ],
     "Iberostar Paraíso JOIA": [
-      ["Legado", "Cocina mexicana de fusión"],
+      ["Legado", "Cocina mexicana/brasserie"],
       ["L'Atelier", "Alta cocina"],
       ["Venecia", "Cocina italiana"],
       ["Haiku", "Cocina asiática"],
@@ -99,89 +100,6 @@ const RESTAURANTES_PARAISO = {
       ["Bella Vista", "Buffet"],
       ["La Brisa", "Raw bar y grill"]
     ]
-  };
-
-  const RESTAURANT_POI_IDS = {
-    "Iberostar Paraíso del Mar": {
-      "la plaza": "la-plaza",
-      "el mercado": "el-mercado",
-      "el puerto": "el-puerto",
-      "hashiru": "hashiru",
-      "trattoria by el faro": "el-faro",
-      "el faro": "el-faro",
-      "la hacienda": "la-hacienda",
-      "el rodizio": "rodizio",
-      "la dorada": "la-dorada",
-      "el colonial": "el-colonial",
-      "star rock cafe": "starcafe",
-      "beach grill": "beach-grill",
-      "el kiosko": "bar-el-kiosko",
-      "heladeria el puente": "heladeria-el-puente",
-      "lobby bar la fuente": "lobby-bar-la-fuente",
-      "pool bar las olas": "pool-bar-las-olas",
-      "aqua bar la perla": "aqua-bar-la-perla",
-      "bar del teatro": "bar-teatro",
-      "el kiosko bar": "bar-el-kiosko",
-      "galaxy nightclub": "galaxy"
-    },
-    "Iberostar Paraíso Maya": {
-      "la marina": "la-marina",
-      "palapa marina el tapatio": "buffet-el-tapatio",
-      "el rancho": "el-rancho",
-      "tlaquepaque": "tlaquepaque",
-      "la geisha japanese restaurant": "la-geisha",
-      "bistro l etoile": "letoile",
-      "olivetti": "olivetti",
-      "lemon spices": "lemon-spices",
-      "under the sea": "under-the-sea",
-      "coco snack bar": "coco-buffet",
-      "burger box": "burgers",
-      "buffet la marina": "buffet-la-marina",
-      "buffet el tapatio": "buffet-el-tapatio",
-      "bar el puente": "bar-el-puente",
-      "beach bar": "beach-bar",
-      "lobby bar chichen itza": "bar-lobby-chichen-itza",
-      "bar tequila arrecife": "bar-tequila-arrecife",
-      "bar palapa": "bar-palapa",
-      "bar del teatro": "bar-del-teatro"
-    },
-    "Iberostar Paraíso Lindo": {
-      "la pagoda buffet": "la-pagoda",
-      "el rancho": "el-rancho",
-      "el tapatio": "el-tapatio",
-      "el museo gourmet": "el-museo",
-      "hashiru": "hashiru",
-      "el colonial": "el-colonial",
-      "la geisha japanese restaurant": "la-geisha",
-      "jambalaya": "jambalaya",
-      "antojitos tacos": "antojitos-tacos",
-      "crepes ice cream": "crepes",
-      "lobby bar acuario": "lobby-bar-acuario",
-      "star rock cafe": "starcafe"
-    },
-    "Iberostar Paraíso Beach": {
-      "la plaza": "la-plaza",
-      "el mercado": "el-mercado",
-      "el puerto": "el-puerto",
-      "hashiru": "hashiru",
-      "la hacienda": "la-hacienda",
-      "el rodizio": "rodizio",
-      "la dorada": "la-dorada",
-      "el colonial": "el-colonial",
-      "beach grill": "beach-grill",
-      "el fogon steak house": "el-fogon-steak",
-      "el fogon italiano": "el-fogon-italiano",
-      "el faro": "el-faro"
-    },
-    "Iberostar Paraíso JOIA": {
-      "legado": "legado",
-      "l atelier": "latelier",
-      "venecia": "venecia",
-      "haiku": "haiku",
-      "toni s": "tonis",
-      "bella vista": "bellavista",
-      "la brisa": "la-brisa"
-    }
   };
 
   const VIEW = {
@@ -547,38 +465,34 @@ const RESTAURANTES_PARAISO = {
     return fallbackId;
   }
 
-  function findRestaurantPoi(hotelName, label) {
-    const hotelPoiIds = RESTAURANT_POI_IDS[hotelName] || {};
-    const poiId = hotelPoiIds[normalizeText(label)];
-    if (!poiId) return null;
+  function findRestaurantPoi(label) {
+    const target = normalizeText(label);
     const pois = window.RevistaDigital?.guiapa?.POIS || [];
-    return pois.find((poi) => poi.id === poiId) || null;
+    const restaurants = pois.filter((poi) => normalizeText(poi.category) === "restaurante" || normalizeText(poi.category) === "bar");
+    const exact = restaurants.find((poi) => normalizeText(poi.name) === target);
+    if (exact) return exact;
+    return restaurants
+      .filter((poi) => {
+        const name = normalizeText(poi.name);
+        return name && (target.includes(name) || name.includes(target));
+      })
+      .sort((first, second) =>
+        Math.abs(normalizeText(first.name).length - target.length) -
+        Math.abs(normalizeText(second.name).length - target.length)
+      )[0] || null;
   }
-
-  pannellum360.getRestaurantPoi = findRestaurantPoi;
 
   function getRestaurantDetails(hotelName, label) {
     const hotelRestaurant = (pannellum360.getRestaurantes?.(hotelName) || [])
       .find(([name]) => normalizeText(name) === normalizeText(label));
-    const poi = findRestaurantPoi(hotelName, label);
-    const datos = window.RevistaDigital?.datosComplejo || {};
-    const poiId = (RESTAURANT_POI_IDS[hotelName] || {})[normalizeText(label)];
-    const restaurantData = poiId &&
-      ((datos.RESTAURANTES || {})[poiId] || (datos.BARES || {})[poiId]) || {};
-    const isEnglish = window.RevistaDigital?.i18n?.getLang?.() === "en";
+    const poi = findRestaurantPoi(label);
     return {
-      poi,
-      name: poi?.name || hotelRestaurant?.[0] || label || "Restaurante",
-      cuisine: poi?.cuisine || restaurantData.cocina || restaurantData.cuisine || hotelRestaurant?.[1] || "",
-      hours: poi?.hours || poi?.horarioTexto || restaurantData.hours || restaurantData.horario || "",
-      menu: isEnglish
-        ? restaurantData.menu || poi?.menu || restaurantData.carta || poi?.carta || ""
-        : restaurantData.carta || poi?.carta || poi?.menu || restaurantData.menu || "",
-      isEnglish
+      name: hotelRestaurant?.[0] || label || "Restaurante",
+      cuisine: poi?.cuisine || hotelRestaurant?.[1] || "",
+      hours: poi?.hours || "",
+      menu: poi?.menu || ""
     };
   }
-
-  pannellum360.getRestaurantDetails = getRestaurantDetails;
 
   function openRestaurantMenuOverlay(hotelName, label) {
     const details = getRestaurantDetails(hotelName, label);
@@ -589,9 +503,7 @@ const RESTAURANTES_PARAISO = {
     overlay.setAttribute("aria-label", `Menú de ${details.name}`);
     const menuMarkup = details.menu
       ? `<ul class="pano-360-action-list pano-360-menu-list">${details.menu.split(/\s*[·•]\s*/).filter(Boolean).map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`
-      : `<p class="pano-360-action-note">${details.hours
-        ? (details.isEnglish ? "Menu not registered for this POI." : "Menú aún no registrado para este POI.")
-        : (details.isEnglish ? "Menu and hours not registered for this POI." : "Menú y horario aún no registrados para este POI.")}</p>`;
+      : '<p class="pano-360-action-note">Consulte la carta digital en el hotel.</p>';
     overlay.innerHTML = `
       <div class="pano-360-action-panel pano-360-menu-panel">
         <div class="pano-360-action-header pano-360-menu-header">
@@ -619,17 +531,18 @@ const RESTAURANTES_PARAISO = {
     const guide = window.RevistaDigital?.guiapa;
     const routes = window.RevistaDigital?.routes;
     const hotelRoute = routes?.findHotelPortalRoute?.(hotelName);
-    const restaurantPoi = findRestaurantPoi(hotelName, label);
-    const hasRestaurantCoordinates = restaurantPoi?.lat != null && restaurantPoi?.lng != null &&
-      Number.isFinite(Number(restaurantPoi.lat)) && Number.isFinite(Number(restaurantPoi.lng));
-    if (!hasRestaurantCoordinates) {
-      window.alert(`No hay un POI con coordenadas registradas para ${label}.`);
-      return;
-    }
+    const restaurantPoi = findRestaurantPoi(label);
+    const hasRestaurantCoordinates = restaurantPoi?.verified === true &&
+      Number.isFinite(restaurantPoi.lat) && Number.isFinite(restaurantPoi.lng);
+    const hotelPoi = guide?.poiForHotel?.(hotelName);
+    const destination = hasRestaurantCoordinates ? restaurantPoi : hotelPoi;
+    const notice = hasRestaurantCoordinates
+      ? ""
+      : `No hay ubicación interior verificada para ${label}; la ruta se traza hasta ${hotelName}.`;
 
-    if (!hotelRoute || typeof routes.navigate !== "function" ||
+    if (!hotelRoute || typeof routes.navigate !== "function" || !destination ||
         typeof guide?.queueRouteToPoi !== "function" ||
-        !guide.queueRouteToPoi(restaurantPoi.id)) {
+        !guide.queueRouteToPoi(destination.id, notice)) {
       console.warn(`No se pudo preparar el mapa o la ruta para ${label} en ${hotelName}.`);
       window.alert("No fue posible preparar el mapa y la ruta para este restaurante.");
       return;
