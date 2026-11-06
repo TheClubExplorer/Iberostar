@@ -165,6 +165,7 @@
     {"id":"massage-palapa","name":"Palapas de masajes","category":"spa","lat":20.758252,"lng":-86.957775,"description":"Massage palapa"});
   POIS.push(
     {"id":"tennis","name":"Tenis","category":"deportes","lat":20.760289,"lng":-86.964375,"description":"Tennis"},
+    {"id":"tenis-paraiso-lindo","name":"Tenis Paraíso Lindo","category":"deportes","hotelId":"Iberostar Paraíso Lindo","lat":20.758833,"lng":-86.964598,"description":"Cancha de tenis Paraíso Lindo"},
     {"id":"shooting-area","name":"Campo de tiro","category":"deportes","lat":20.761933,"lng":-86.962473,"description":"Shooting area"},
     {"id":"diving-center","name":"Centro de buceo","category":"deportes","description":"Diving center"},
     {"id":"golf-club-house","name":"Golf Club House","category":"golf","description":"Golf club house"},

@@ -93,7 +93,7 @@
     {"id":"galaxy","name":"Discoteca Galaxy","category":"discoteca","lat":20.75955,"lng":-86.966,"description":"Discoteca del complejo (+18)","hours":"22:00 / 23:00 - 03:00 h","horarioTexto":"22:00 / 23:00 - 03:00 h","carta":"Shots · Cócteles energéticos · Cerveza · Licores importados con DJ en directo"},
     // Coco Bar: coordenada verificada manualmente (Google Maps).
     {"id":"cocobar","name":"Coco Bar","category":"bar","lat":20.756290,"lng":-86.959046,"description":"Coco Bar"},
-    {"id":"starcafe","name":"Star Café","category":"bar","lat":20.7585,"lng":-86.963,"description":"Star Café"});
+    {"id":"starcafe","name":"Star Café","category":"bar","hotelId":"Iberostar Paraíso del Mar","lat":20.760005,"lng":-86.965134,"description":"Star Café"});
   POIS.push({"id":"theclub","name":"THE CLUB","category":"club","description":"Espacio exclusivo para socios donde usted disfruta de atención personalizada, ambientes cálidos y experiencias preferentes en el corazón del complejo.","hours":"08:00 - 22:00","amenities":"Wi-Fi de alta velocidad, áreas de descanso, terraza, prensa digital, bebidas y snacks","services":"Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas"},
     {"id":"playa-mar-caribe","name":"Mar Caribe","category":"playa","description":"Mar Caribe / Caribbean Sea"});
   POIS.push(
