@@ -30,10 +30,15 @@ const RESTAURANTES_PARAISO = {
       ["La Dorada", "Mediterránea"],
       ["El Colonial", "Cocina francesa"],
       ["El Faro", "Buffet internacional"],
-      ["Star Rock Cafe", "Americana"],
       ["Beach Grill", "Internacional / playa"],
       ["El Kiosko", "Snack bar / Grill"],
-      ["Heladería El Puente", "Heladería / Snacks"]
+      ["Heladería El Puente", "Heladería / Snacks"],
+      ["Lobby Bar La Fuente", "Lobby bar"],
+      ["Pool Bar Las Olas", "Bar de piscina (Swim-up)"],
+      ["Aqua Bar La Perla", "Bar de piscina"],
+      ["Bar del Teatro", "Bar de teatro"],
+      ["El Kiosko Bar", "Bar de playa"],
+      ["Galaxy Nightclub", "Nightclub"]
     ],
     "Iberostar Paraíso Maya": [
       ["La Marina", "Buffet Principal"],
@@ -46,7 +51,15 @@ const RESTAURANTES_PARAISO = {
       ["Lemon & Spices", "Cocina asiática"],
       ["Under the Sea", "Mariscos y pescados"],
       ["Coco Snack Bar", "Snack bar"],
-      ["Burger Box", "Hamburguesas"]
+      ["Burger Box", "Hamburguesas"],
+      ["Buffet La Marina", "Buffet Principal"],
+      ["Buffet El Tapatío", "Buffet / Grill de Alberca"],
+      ["Bar El Puente", "Bar"],
+      ["Beach Bar", "Bar de Playa"],
+      ["Lobby Bar Chichén Itzá", "Lobby bar"],
+      ["Bar Tequila / Arrecife", "Bar de piscina (Swim-up)"],
+      ["Bar Palapa", "Bar de playa"],
+      ["Bar del Teatro", "Bar de teatro"]
     ],
     "Iberostar Paraíso Lindo": [
       ["La Pagoda Buffet", "Buffet internacional"],
@@ -58,7 +71,9 @@ const RESTAURANTES_PARAISO = {
       ["La Geisha Japanese Restaurant", "Japonesa"],
       ["Jambalaya", "Cajún"],
       ["Antojitos / Tacos", "Antojitos mexicanos"],
-      ["Crepes & Ice Cream", "Crepas y helados"]
+      ["Crepes & Ice Cream", "Crepas y helados"],
+      ["Lobby Bar Acuario", "Lobby bar"],
+      ["Star Rock Café", "Bar deportivo / Pub Americano"]
     ],
     "Iberostar Paraíso Beach": [
       ["La Plaza", "Buffet principal"],
@@ -452,7 +467,7 @@ const RESTAURANTES_PARAISO = {
   function findRestaurantPoi(label) {
     const target = normalizeText(label);
     const pois = window.RevistaDigital?.guiapa?.POIS || [];
-    const restaurants = pois.filter((poi) => normalizeText(poi.category) === "restaurante");
+    const restaurants = pois.filter((poi) => normalizeText(poi.category) === "restaurante" || normalizeText(poi.category) === "bar");
     const exact = restaurants.find((poi) => normalizeText(poi.name) === target);
     if (exact) return exact;
     return restaurants

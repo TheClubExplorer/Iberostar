@@ -92,8 +92,7 @@
     {"id":"starcamp","name":"Star Camp","category":"kids","lat":20.76071,"lng":-86.96471,"description":"Star Camp"},
     {"id":"galaxy","name":"Discoteca Galaxy","category":"discoteca","lat":20.75955,"lng":-86.966,"description":"Discoteca del complejo (+18)","hours":"22:00 / 23:00 - 03:00 h","horarioTexto":"22:00 / 23:00 - 03:00 h","carta":"Shots · Cócteles energéticos · Cerveza · Licores importados con DJ en directo"},
     // Coco Bar: coordenada verificada manualmente (Google Maps).
-    {"id":"cocobar","name":"Coco Bar","category":"bar","lat":20.756290,"lng":-86.959046,"description":"Coco Bar"},
-    {"id":"starcafe","name":"Star Café","category":"bar","hotelId":"Iberostar Paraíso del Mar","lat":20.760005,"lng":-86.965134,"description":"Star Café"});
+    {"id":"cocobar","name":"Coco Bar","category":"bar","lat":20.756290,"lng":-86.959046,"description":"Coco Bar"});
   POIS.push({"id":"theclub","name":"THE CLUB","category":"club","description":"Espacio exclusivo para socios donde usted disfruta de atención personalizada, ambientes cálidos y experiencias preferentes en el corazón del complejo.","hours":"08:00 - 22:00","amenities":"Wi-Fi de alta velocidad, áreas de descanso, terraza, prensa digital, bebidas y snacks","services":"Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas"},
     {"id":"playa-mar-caribe","name":"Mar Caribe","category":"playa","description":"Mar Caribe / Caribbean Sea"});
   POIS.push(
@@ -108,7 +107,7 @@
     {"id":"burgers","name":"Burgers","category":"restaurante","description":"Hamburguesas"},
     {"id":"antojitos-tacos","name":"Antojitos / Tacos","category":"restaurante","description":"Antojitos / Tacos"},
     {"id":"crepes","name":"Crepes & Ice Cream","category":"restaurante","description":"Crepas y helados"},
-    {"id":"el-museo","name":"El Museo","category":"restaurante","description":"Restaurante gourmet"},
+    {"id":"el-museo","name":"El Museo","category":"restaurante","hotelId":"Iberostar Paraíso Lindo","description":"Restaurante italiano"},
     {"id":"jambalaya","name":"Jambalaya","category":"restaurante","description":"Restaurante cajún"},
     {"id":"la-pagoda","name":"La Pagoda","category":"restaurante","description":"Restaurante buffet"},
     {"id":"el-fogon-steak","name":"El Fogón (Steak House)","category":"restaurante","lat":20.756879,"lng":-86.959677,"description":"Steak house"},
@@ -117,23 +116,24 @@
     {"id":"el-rancho","name":"El Rancho","category":"restaurante","description":"Steak house"},
     {"id":"la-geisha","name":"La Geisha","category":"restaurante","description":"Restaurante japonés"},
     {"id":"letoile","name":"L'Etoile","category":"restaurante","description":"Cocina francesa"},
-    {"id":"la-marina","name":"La Marina","category":"restaurante","lat":20.7577902,"lng":-86.9640737,"description":"Restaurante mediterráneo"},
+    {"id":"la-marina","name":"La Marina","category":"restaurante","hotelId":"Iberostar Paraíso Maya","lat":20.7577902,"lng":-86.9640737,"description":"Buffet restaurante La Marina"},
     {"id":"el-tapatio","name":"El Tapatío","category":"restaurante","description":"Restaurante mexicano / buffet"},
     {"id":"venecia","name":"Venecia","category":"restaurante","description":"Restaurante italiano"},
     {"id":"bellavista","name":"Bellavista","category":"restaurante","description":"Restaurante buffet"},
     {"id":"latelier","name":"L'Atelier","category":"restaurante","description":"Restaurante gourmet"},
 
     {"id":"haiku","name":"Haiku","category":"restaurante","description":"Restaurante japonés"},
-    {"id":"olivetti","name":"The Olivetti","category":"restaurante","lat":20.7567218,"lng":-86.9604135,"description":"Restaurante italiano – Spaghetti Factory","source":"Google Maps","verified":true},
-    {"id":"lemon-spices","name":"Lemon & Spices","category":"restaurante","lat":20.7589139,"lng":-86.96355,"description":"Restaurante asiático","source":"Google Maps","verified":true},
-    {"id":"under-the-sea","name":"America Seafood Grill Under the Sea","category":"restaurante","lat":20.75687,"lng":-86.95974,"description":"Restaurante de mariscos","source":"Google Maps","verified":true},
+    {"id":"olivetti","name":"The Olivetti","category":"restaurante","hotelId":"Iberostar Paraíso Maya","lat":20.7567218,"lng":-86.9604135,"description":"Restaurante italiano – Spaghetti Factory","source":"Google Maps","verified":true},
+    {"id":"lemon-spices","name":"Lemon & Spices","category":"restaurante","hotelId":"Iberostar Paraíso Maya","lat":20.7589139,"lng":-86.96355,"description":"Restaurante asiático","source":"Google Maps","verified":true},
+    {"id":"under-the-sea","name":"America Seafood Grill Under the Sea","category":"restaurante","hotelId":"Iberostar Paraíso Maya","lat":20.75687,"lng":-86.95974,"description":"Restaurante de mariscos","source":"Google Maps","verified":true},
     {"id":"la-brisa","name":"La Brisa Beach Bar","category":"bar","hotelId":"Iberostar Paraíso JOIA","description":"Bar de playa"},
     {"id":"baby-kitchen","name":"Baby Kitchen","category":"servicio","lat":20.758029,"lng":-86.963437,"description":"Cocina para bebés"});
   POIS.push(
     {"id":"sports-bar-corner","name":"Sports Bar Corner","category":"bar","hotelId":"Iberostar Paraíso Lindo","lat":20.7596764,"lng":-86.9634133,"description":"Sports bar"},
     // "Heladería El Puente" (20.758672,-86.959008, Paraíso del Mar) y "Bar El Puente"
     // (20.757158,-86.960980, Paraíso Maya) son POIs separados.
-    {"id":"star-rock-cafe","name":"Star Rock Café","category":"bar","description":"Star Rock Café"},
+    {"id":"star-rock-cafe-lindo","name":"Star Rock Café","category":"bar","hotelId":"Iberostar Paraíso Lindo","lat":20.760050,"lng":-86.965207,"description":"Star Rock Café"},
+    {"id":"starcafe","name":"Star Rock Café","category":"bar","hotelId":"Iberostar Paraíso del Mar","lat":20.7618856,"lng":-86.9627721,"description":"Star Rock Café","verified":true},
     {"id":"pool-bar-las-olas","name":"Pool Bar Las Olas","category":"bar","lat":20.757897,"lng":-86.961767,"description":"Bar de piscina"},
     {"id":"lobby-bar-kukulkan","name":"Lobby Bar Kukulkán","category":"bar","hotelId":"Iberostar Paraíso Maya","lat":20.7575018,"lng":-86.9645296,"description":"Lobby bar"},
     {"id":"music-bar-rhapsody","name":"Music Bar Rhapsody","category":"bar","lat":20.756312,"lng":-86.962411,"description":"Music bar"},
@@ -190,8 +190,8 @@
     {"id":"wedding-chapel","name":"Capilla de bodas","category":"servicio","description":"Wedding chapel"},
     {"id":"star-friends-desk","name":"Star Friends Desk","category":"kids","lat":20.755117,"lng":-86.961373,"description":"Star Friends Desk"},
     // --- Nuevos POIs del plano oficial no existentes en catálogo previo ---
-    {"id":"beach-bar","name":"Beach Bar / Bar de playa","category":"bar","lat":20.757856,"lng":-86.958359,"description":"Bar de playa"},
-    {"id":"buffet-la-marina","name":"Buffet La Marina","category":"restaurante","lat":20.757842,"lng":-86.963819,"description":"Buffet restaurante La Marina"},
+    {"id":"beach-bar","name":"Beach Bar / Bar de playa","category":"bar","hotelId":"Iberostar Paraíso del Mar","lat":20.757856,"lng":-86.958359,"description":"Bar de playa"},
+    {"id":"buffet-la-marina","name":"Buffet La Marina","category":"restaurante","hotelId":"Iberostar Paraíso Maya","lat":20.757842,"lng":-86.963819,"description":"Buffet restaurante La Marina"},
     {"id":"buffet-el-tapatio","name":"Buffet El Tapatío","category":"restaurante","hotelId":"Iberostar Paraíso Maya","lat":20.756848,"lng":-86.960399,"description":"Buffet restaurante El Tapatío"});
   // Eliminados a petición del usuario (2026-10-22): "surprise-gf", "surprise-2f" y "shushi"
     // (Restaurant Surprise, planta baja y 2º nivel, y Restaurant Shushi, sin coordenadas verificadas).
