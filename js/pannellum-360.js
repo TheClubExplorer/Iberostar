@@ -581,6 +581,17 @@ const RESTAURANTES_PARAISO = {
   }
 
   pannellum360.open = function (hotelName, zoneKey, label) {
+    // Store the last viewed 360° for "Volver al 360°" functionality
+    try {
+      window.sessionStorage.setItem("club360LastViewed", JSON.stringify({
+        hotelName: hotelName,
+        zoneKey: zoneKey,
+        label: label,
+        timestamp: Date.now()
+      }));
+    } catch (error) {
+      console.warn("No se pudo guardar la última visita 360°.", error);
+    }
     ensurePannellum().then(() => {
       const view = VIEW[zoneKey] || VIEW.exteriores;
       const url = buildPanorama(hotelName, zoneKey, label, 2048, 1024).toDataURL("image/jpeg", 0.85);
