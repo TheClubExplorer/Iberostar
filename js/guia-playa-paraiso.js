@@ -213,7 +213,7 @@
     {"id":"fit-fun-grand-paraiso","name":"Fit & Fun Grand Paraíso","category":"deportes","hotelId":"Iberostar Paraíso JOIA","lat":20.757618,"lng":-86.958517,"description":"Gimnasio Fit & Fun de Grand Paraíso"},
     {"id":"fit-fun-playa-paraiso","name":"Fit & Fun Playa Paraíso","category":"deportes","lat":20.7603125,"lng":-86.9645625,"description":"Gimnasio Fit & Fun en la zona de playa"},
     {"id":"el-colonial","name":"El Colonial","category":"restaurante","lat":20.7609943,"lng":-86.963447,"description":"Restaurant"},
-    {"id":"trattoria","name":"Trattoria","category":"restaurante","lat":20.7589509,"lng":-86.9583723,"description":"Trattoria by El Faro"}
+    {"id":"trattoria","name":"Trattoria by El Faro","category":"restaurante","lat":20.7589509,"lng":-86.9583723,"description":"Trattoria by El Faro"}
   );
 
   // Coordenadas confirmadas con OpenStreetMap. Cada fila es

@@ -42,7 +42,7 @@ const RESTAURANTES_PARAISO = {
       ["Galaxy Nightclub", "Nightclub"]
     ],
     "Iberostar Paraíso Maya": [
-      ["La Marina", "Buffet Principal"],
+      ["La Marina", "Mariscos y pescados"],
       ["Palapa Marina / El Tapatío", "Snack & Almuerzo Grill"],
       ["El Rancho", "Steakhouse & Carnes"],
       ["Tlaqpaque", "Mexicano de Especialidad Tradicional"],
@@ -66,7 +66,7 @@ const RESTAURANTES_PARAISO = {
       ["La Pagoda Buffet", "Buffet internacional"],
       ["El Rancho", "Steak House"],
       ["El Tapatío", "Cocina mexicana"],
-      ["El Museo Gourmet", "Cocina italiana"],
+      ["El Museo", "Cocina italiana"],
       ["Hashiru", "Teppanyaki"],
       ["El Colonial", "Cocina francesa"],
       ["La Geisha Japanese Restaurant", "Japonesa"],
@@ -76,29 +76,14 @@ const RESTAURANTES_PARAISO = {
       ["Lobby Bar Acuario", "Lobby bar"],
       ["Star Rock Café", "Bar deportivo / Pub Americano"]
     ],
-    "Iberostar Paraíso Beach": [
-      ["La Plaza", "Buffet principal"],
-      ["El Mercado", "Buffet"],
-      ["El Puerto", "Buffet / Brasería"],
-      ["Hashiru", "Teppanyaki / Sushi"],
-      ["La Hacienda", "Cocina mexicana"],
-      ["El Rodizio", "Brasileño"],
-      ["La Dorada", "Mediterránea"],
-      ["El Colonial", "Cocina francesa"],
-      ["El Faro", "Buffet internacional"],
-      ["Star Rock Cafe", "Americana"],
-      ["Beach Grill", "Internacional / playa"],
-      ["El Fogón (Steak House)", "Steak House"],
-      ["El Fogón (Italiano)", "Italiana"]
-    ],
-    "Iberostar Paraíso JOIA": [
-      ["Legado", "Cocina mexicana/brasserie"],
-      ["L'Atelier", "Alta cocina"],
-      ["Venecia", "Cocina italiana"],
-      ["Haiku", "Cocina asiática"],
-      ["Toni's", "Surf & turf"],
-      ["Bella Vista", "Buffet"],
-      ["La Brisa", "Raw bar y grill"]
+    "JOIA Paraíso by Iberostar": [
+      ["La Terraza", "Buffet internacional"],
+      ["Sushi Bar", "Sushi y japonesa"],
+      ["El Grill", "Carnes a la parrilla"],
+      ["Pizzería", "Pizza italiana"],
+      ["Bar de la Piscina", "Bar de piscina"],
+      ["Lobby Bar", "Lobby bar"],
+      ["Café By The Beach", "Café y snacks"]
     ]
   };
 
