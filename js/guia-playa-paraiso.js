@@ -253,7 +253,6 @@
     ["wave-pool", 20.7578053, -86.9615154, "Wave Pool"],
     ["lazy-river", 20.7582757, -86.9622815, "Lazy River"],
     ["mini-water-playground", 20.758176, -86.9631163, "Kids Waterpark"],
-    ["wedding-chapel", 20.7605645, -86.9618901, "Wedding Chapel"],
     ["starmarket", 20.7574499, -86.9613521, "Star Market"],
     ["games-room", 20.759771, -86.9662607, "Video Games Room"],
     ["golf-club-house", 20.7586073, -86.9658668, "Golf Clubhouse"],
