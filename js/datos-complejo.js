@@ -65,14 +65,14 @@
       tipo: "especialidad",
       cocina: "Gourmet / Francesa",
       cuisine: "Gourmet / French",
-      carta: "Bisque de bogavante al coñac · Magret de pato con reducción de frutos rojos · Solomillo de res al vino tinto · Crème brûlée tradicional",
-      menu: "Lobster bisque with cognac · Duck magret with red fruit sauce · Beef tenderloin in red wine · Traditional crème brûlée",
+      carta: "Bisque de bogavante al coñac · Magret de pato con reducción de frutos rojos · Solomillo de res al vino tinto · Créme brûlée tradicional",
+      menu: "Lobster bisque with cognac · Duck magret with red fruit sauce · Beef tenderloin in red wine · Traditional créme brûlée",
       horario: "18:30 - 22:00 h",
       vestimenta: "Formal elegante",
       dressCode: "Formal elegant",
       reservas: true,
-      especialidades: "Bisque de bogavante al coñac, magret de pato con reducción de frutos rojos, solomillo de res al vino tinto y crème brûlée tradicional",
-      specialties: "Lobster bisque with cognac, duck magret with red fruit sauce, beef tenderloin in red wine and traditional crème brûlée",
+      especialidades: "Bisque de bogavante al coñac, magret de pato con reducción de frutos rojos, solomillo de res al vino tinto y créme brûlée tradicional",
+      specialties: "Lobster bisque with cognac, duck magret with red fruit sauce, beef tenderloin in red wine and traditional créme brûlée",
       hotel: "Iberostar Paraíso del Mar"
     },
     hashiru: {
@@ -180,7 +180,7 @@
         "Linguini ai frutti di mare",
         "Panna cotta de frutos rojos"
       ],
-      hotel: "Iberostar Waves Paraíso Beach"
+      hotel: "Iberostar Paraíso Beach"
     },
     "el-puerto": {
       tipo: "especialidad",
@@ -375,28 +375,6 @@
         "Fruta tropical recién cortada"
       ]
     },
-    "tlaqpaque": {
-      tipo: "especialidad",
-      cocina: "Mexicano de Especialidad Tradicional",
-      cuisine: "Traditional Mexican Specialty",
-      dressCode: "Informal elegante",
-      reservation: "Recomendada",
-      hours: "18:00 - 21:30",
-      horarioTexto: "18:00 - 21:30 h",
-      hotel: "Iberostar Paraíso Maya",
-      carta: "Sopa azteca con tiras crujientes de tortilla, chile pasilla y aguacate; pipián verde; cazuelas de mole poblano con pollo de granja; arrachera al carbón acompañada de chiles toreados y cebollitas; y de postre, buñuelos bañados en piloncillo y tamal dulce de chocolate.",
-      menu: "Aztec soup with crispy tortilla strips, pasilla chile and avocado; green pipián; mole poblano casseroles with farm chicken; charcoal-grilled arrachera with roasted chiles and spring onions; and for dessert, piloncillo-glazed buñuelos and sweet chocolate tamale.",
-      especialidades: "Sopa azteca con tiras crujientes de tortilla, chile pasilla y aguacate; pipián verde; cazuelas de mole poblano con pollo de granja; arrachera al carbón acompañada de chiles toreados y cebollitas; y de postre, buñuelos bañados en piloncillo y tamal dulce de chocolate.",
-      specialties: "Aztec soup with crispy tortilla strips, pasilla chile and avocado; green pipián; mole poblano casseroles with farm chicken; charcoal-grilled arrachera with roasted chiles and spring onions; and for dessert, piloncillo-glazed buñuelos and sweet chocolate tamale.",
-      signatureDishes: [
-        "Sopa azteca",
-        "Pipián verde",
-        "Mole poblano con pollo de granja",
-        "Arrachera al carbón",
-        "Buñuelos bañados en piloncillo",
-        "Tamal dulce de chocolate"
-      ]
-    },
     "la-geisha": {
       tipo: "especialidad",
       cocina: "Japonés Tradicional y Teppanyaki",
@@ -478,7 +456,7 @@
         "Enchiladas potosinas artesanales",
         "Buñuelos con miel de piloncillo"
       ],
-      hotel: "Iberostar Selection Paraíso Maya"
+      hotel: "Iberostar Paraíso Maya"
     },
     venecia: {
       tipo: "especialidad",
@@ -514,8 +492,8 @@
       tipo: "especialidad",
       cocina: "Alta Cocina Francesa de Autor",
       cuisine: "Signature French Haute Cuisine",
-      carta: "Foie gras mi-cuit con reducción de oporto · Lenguado Meunière tradicional · Filete Chateaubriand con papas fondant · Soufflé clásico de Grand Marnier",
-      menu: "Mi-cuit foie gras with port reduction · Traditional Meunière sole · Chateaubriand fillet with fondant potatoes · Classic Grand Marnier soufflé",
+      carta: "Foie gras mi-cuit con reducción de oporto · Lenguado Meuniére tradicional · Filete Chateaubriand con papas fondant · Soufflé clásico de Grand Marnier",
+      menu: "Mi-cuit foie gras with port reduction · Traditional Meuniére sole · Chateaubriand fillet with fondant potatoes · Classic Grand Marnier soufflé",
       horario: "18:30 - 22:00 h",
       hours: "18:30 - 22:00 h",
       horarioTexto: "18:30 - 22:00 h",
@@ -523,11 +501,11 @@
       dressCode: "Formal elegante",
       reservas: true,
       reservation: true,
-      especialidades: "Foie gras mi-cuit con reducción de oporto, Lenguado Meunière tradicional, Filete Chateaubriand con papas fondant y Soufflé clásico de Grand Marnier",
-      specialties: "Mi-cuit foie gras with port reduction, traditional Meunière sole, Chateaubriand fillet with fondant potatoes and classic Grand Marnier soufflé",
+      especialidades: "Foie gras mi-cuit con reducción de oporto, Lenguado Meuniére tradicional, Filete Chateaubriand con papas fondant y Soufflé clásico de Grand Marnier",
+      specialties: "Mi-cuit foie gras with port reduction, traditional Meuniére sole, Chateaubriand fillet with fondant potatoes and classic Grand Marnier soufflé",
       signatureDishes: [
         "Foie gras mi-cuit con reducción de oporto",
-        "Lenguado Meunière tradicional",
+        "Lenguado Meuniére tradicional",
         "Filete Chateaubriand con papas fondant",
         "Soufflé clásico de Grand Marnier"
       ],
@@ -558,22 +536,20 @@
       menu: "Sushi · Sashimi · Teppanyaki · Ramen · Tempura"
     },
     "la-brisa": {
-      tipo: "especialidad",
-      cocina: "Cocina mediterránea",
-      cuisine: "Mediterranean cuisine",
-      dressCode: "Informal elegante",
-      reservation: "Recomendada",
-      hours: "18:30 - 22:00",
-      horarioTexto: "18:30 - 22:00 h",
-      hotel: "JOIA Paraíso by Iberostar",
-      carta: "Salmón · Camarones · Pasta · Ensaladas · Postres",
-      menu: "Salmon · Shrimp · Pasta · Salads · Desserts"
+      tipo: "bar",
+      cocina: "Bar de Playa",
+      cuisine: "Beach Bar",
+      hours: "10:00 - 18:00",
+      horarioTexto: "10:00 - 18:00 h",
+      hotel: "Iberostar Paraíso JOIA",
+      carta: "Cervezas frías y refrescos junto a la arena; snacks de playa: hamburguesas, hot dogs, nachos con queso, papas a la francesa, tacos del día o ceviches ligeros.",
+      menu: "Cold beers and soft drinks by the sand; beach snacks: burgers, hot dogs, cheese nachos, french fries, tacos of the day or light ceviches."
     },
     "baby-kitchen": {
       id: "baby-kitchen",
       name: "Baby Kitchen",
       tipo: "cafeteria",
-      cocina: "Área de Preparación Infantil 24h",
+      cocina: "ürea de Preparación Infantil 24h",
       cuisine: "24h Infant Food Prep Area",
       carta: "Purés y papillas orgánicas para bebés · Leche entera, deslactosada y vegetal · Fruta fresca seleccionada para triturar · Esterilizadores y microondas de libre uso",
       menu: "Organic purees and porridges for babies · Whole, lactose-free and plant-based milk · Fresh selected fruit for crushing · Sterilizers and microwaves for free use",
@@ -642,7 +618,7 @@
         "Ceviche fresco de pescado al cilantro",
         "Crepas dulces y helados artesanales"
       ],
-      hotel: "Playa Paraíso (Área de Playa y Albercas)"
+      hotel: "Playa Paraíso (ürea de Playa y Albercas)"
     },
     "el-kiosko": {
       tipo: "cafeteria",
@@ -805,13 +781,16 @@
   // --- Bares ---------------------------------------------------------------
   const BARES = {
     "sports-bar-corner": { tipo: "bar", cocina: "Sports bar", cuisine: "Sports bar", carta: "Antojitos · Hamburguesas · Wings · Cerveza · Snacks", menu: "Mexican snacks · Burgers · Wings · Beer · Snacks", hours: "17:00 - 01:00", horarioTexto: "17:00 - 01:00 h", hotel: "Iberostar Paraíso Lindo" },
-    // "heladeria-el-puente" consolidado: es el mismo lugar que "bar-el-puente"
     // "heladeria-el-mirador" consolidado: es el mismo lugar que "lobby-bar-el-mirador" (JOIA)
-    "star-rock-cafe-lindo": {
+    "starcafe": {
       tipo: "bar",
       cocina: "Bar",
       cuisine: "Bar",
-      hotel: "Iberostar Paraíso Lindo"
+      carta: "Bebidas de alta gama, licores añejos y coctelería especializada; cerveza y snacks tipo bar (alitas, nachos).",
+      menu: "Premium drinks, aged spirits and specialty cocktails; beer and bar snacks (wings, nachos).",
+      hours: "16:00 - 00:00",
+      horarioTexto: "16:00 - 00:00 h",
+      hotel: "Iberostar Paraíso del Mar"
     },
     "pool-bar-las-olas": { tipo: "bar", cocina: "Bar de piscina (Swim-up)", cuisine: "Pool bar (Swim-up)", carta: "Margaritas frozen · Piñas coladas · Mojitos caribeños · Daiquirís · Cervezas frías", menu: "Frozen margaritas · Piña coladas · Caribbean mojitos · Daiquiris · Cold beers", hours: "10:00 - 19:00", horarioTexto: "10:00 - 19:00 h", hotel: "Iberostar Paraíso del Mar" },
     "lobby-bar-kukulkan": { tipo: "bar", cocina: "Lobby bar", cuisine: "Lobby bar", carta: "Coctelería de autor · Whisky · Aperitivos", menu: "Signature cocktails · Whisky · Appetizers", hours: "09:00 - 01:00", horarioTexto: "09:00 - 01:00 h", hotel: "Iberostar Paraíso Maya" },
@@ -820,8 +799,8 @@
     "aqua-bar-la-sirenita": { tipo: "bar", cocina: "Aqua bar", cuisine: "Aqua bar", carta: "Smoothies y jugos · Coctelería sin alcohol · Snacks", menu: "Smoothies and juices · Non-alcoholic cocktails · Snacks", hours: "10:00 - 18:00", horarioTexto: "10:00 - 18:00 h" },
     "health-bar-spa": { tipo: "bar_cierre_temprano", cocina: "Health bar", cuisine: "Health bar", carta: "Bowls · Zumos prensados · Ensaladas · Infusiones", menu: "Bowls · Cold-pressed juices · Salads · Infusions", hours: "08:00 - 20:00", horarioTexto: "08:00 - 20:00 h" },
     "aqua-bar-la-perla": { tipo: "bar", cocina: "Bar de piscina", cuisine: "Pool bar", carta: "Refrescos · Cervezas de barril · Cócteles tropicales con servicio a camastros", menu: "Soft drinks · Draft beers · Tropical cocktails with lounge service", hours: "10:00 - 18:00", horarioTexto: "10:00 - 18:00 h", hotel: "Iberostar Paraíso del Mar" },
-    "bar-teatro": { tipo: "bar", cocina: "Bar de teatro", cuisine: "Theater bar", carta: "Tragos rápidos · Combinados con ron / vodka / whisky · Refrescos", menu: "Quick drinks · Mixed drinks with rum / vodka / whisky · Soft drinks", hours: "17:00 - 00:00", horarioTexto: "17:00 - 00:00 h", hotel: "Iberostar Paraíso del Mar" },
-    "lobby-bar-la-fuente": { tipo: "bar", cocina: "Lobby bar", cuisine: "Lobby bar", carta: "Coctelería de temporada · Aperitivos", menu: "Seasonal cocktails · Appetizers" },
+    "bar-teatro": { tipo: "bar", cocina: "Bar de teatro", cuisine: "Theater bar", carta: "Tragos rápidos · Combinados con ron / vodka / whisky · Refrescos", menu: "Quick drinks · Mixed drinks with rum / vodka / whisky · Soft drinks", hours: "17:00 - 00:00", horarioTexto: "17:00 - 00:00 h", hotel: "Iberostar Paraíso Lindo" },
+    "lobby-bar-la-fuente": { tipo: "bar", cocina: "Lobby bar", cuisine: "Lobby bar", carta: "Coctelería de temporada · Aperitivos", menu: "Seasonal cocktails · Appetizers", hours: "09:00 - 01:00", horarioTexto: "09:00 - 01:00 h" },
     "aqua-bar-las-olas": { tipo: "bar", cocina: "Aqua bar", cuisine: "Aqua bar", carta: "Smoothies y jugos · Coctelería sin alcohol · Snacks", menu: "Smoothies and juices · Non-alcoholic cocktails · Snacks", hours: "10:00 - 18:00", horarioTexto: "10:00 - 18:00 h" },
     "lobby-bar-la-cula": { tipo: "bar", cocina: "Lobby bar", cuisine: "Lobby bar", carta: "Coctelería de autor · Highballs", menu: "Signature cocktails · Highballs", hours: "08:00 - 01:00", horarioTexto: "08:00 - 01:00 h" },
     "aqua-bar-las-rocas": { tipo: "bar", cocina: "Aqua bar", cuisine: "Aqua bar", carta: "Smoothies y jugos · Coctelería sin alcohol · Snacks", menu: "Smoothies and juices · Non-alcoholic cocktails · Snacks", hours: "10:00 - 18:00", horarioTexto: "10:00 - 18:00 h" },
@@ -857,16 +836,6 @@
       horarioTexto: "23:00 - 03:00 h",
       hotel: "Iberostar Paraíso del Mar"
     },
-    "bar-el-puente": {
-      tipo: "bar",
-      cocina: "Bar",
-      cuisine: "Bar",
-      carta: "Barra de servicio rápido integrada con la zona de helados/crepas: cervezas frías, aguas embotelladas, refrescos, granizados, cafés expreso y bebidas sin alcohol para niños y adultos en tránsito.",
-      menu: "Quick service bar integrated with the ice cream/crepe zone: ice-cold beers, bottled waters, sodas, slushies, espresso coffees and non-alcoholic drinks for children and adults in transit.",
-      hours: "11:00 - 18:00",
-      horarioTexto: "11:00 - 18:00 h",
-      hotel: "Iberostar Paraíso Maya"
-    },
     "beach-bar": {
       tipo: "bar",
       cocina: "Bar de Playa",
@@ -897,36 +866,16 @@
       horarioTexto: "09:00 - 01:00 h",
       hotel: "Iberostar Paraíso Maya"
     },
-    "bar-tequila-arrecife": {
+    "star-rock-cafe-lindo": {
       tipo: "bar",
-      cocina: "Bar de piscina (Swim-up)",
-      cuisine: "Pool bar (Swim-up)",
-      carta: "Barra húmeda dentro del agua; piñas coladas, mojitos de sabores, margaritas frappé y cervezas frías servidas directo en alberca.",
-      menu: "Wet bar inside the water; piña coladas, flavor mojitos, frappé margaritas and cold beers served directly in the pool.",
-      hours: "10:00 - 18:30",
-      horarioTexto: "10:00 - 18:30 h",
-      hotel: "Iberostar Paraíso Maya"
+      cocina: "Bar temático",
+      cuisine: "Rock bar",
+      carta: "Bebidas de alta gama, licores añejos y coctelería especializada; cerveza y snacks tipo bar (alitas, nachos).",
+      menu: "Premium drinks, aged spirits and specialty cocktails; beer and bar snacks (wings, nachos).",
+      hours: "16:00 - 00:00",
+      horarioTexto: "16:00 - 00:00 h",
+      hotel: "Iberostar Paraíso Lindo"
     },
-    "bar-palapa": {
-      tipo: "bar",
-      cocina: "Bar de playa",
-      cuisine: "Beach bar",
-      carta: "Cócteles de playa, sangrías refrescantes, agua de coco y bebidas sin alcohol para niños.",
-      menu: "Beach cocktails, refreshing sangrias, coconut water and non-alcoholic drinks for children.",
-      hours: "10:00 - 17:00",
-      horarioTexto: "10:00 - 17:00 h",
-      hotel: "Iberostar Paraíso Maya"
-    },
-    "bar-del-teatro": {
-      tipo: "bar",
-      cocina: "Bar de teatro",
-      cuisine: "Theater bar",
-      carta: "Tragos largos, licores combinados y refrescos durante las representaciones nocturnas.",
-      menu: "Long drinks, mixed liquors and soft drinks during the nightly performances.",
-      hours: "18:00 - 23:30",
-      horarioTexto: "18:00 - 23:30 h",
-      hotel: "Iberostar Paraíso Maya"
-    }
   };
 
   // --- Spa, golf y otros servicios ----------------------------------------
@@ -1006,8 +955,8 @@
     "star-prestige-lounge": {
       hours: "09:00 - 21:00",
       horarioTexto: "09:00 - 21:00",
-      amenities: "Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
-      amenidades: "Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
+      amenities: "üreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
+      amenidades: "üreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
       amenitiesEn: "Rest areas, terrace, Wi-Fi, digital press, drinks and snacks",
       services: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas",
       servicios: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas",
@@ -1019,40 +968,40 @@
     "star-prestige-beach-club": {
       hours: "09:00 - 21:00",
       horarioTexto: "09:00 - 21:00",
-      amenities: "Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
-      amenidades: "Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
+      amenities: "üreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
+      amenidades: "üreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
       amenitiesEn: "Rest areas, terrace, Wi-Fi, digital press, drinks and snacks",
       services: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas",
       servicios: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas",
       servicesEn: "Personalized concierge, premium drinks, priority reservations, access to exclusive areas",
-      description: "Área exclusiva frente al mar donde usted disfruta de confort, servicio atento y experiencias preferentes en un entorno cálido y distinguido.",
-      descripcion: "Área exclusiva frente al mar donde usted disfruta de confort, servicio atento y experiencias preferentes en un entorno cálido y distinguido.",
+      description: "ürea exclusiva frente al mar donde usted disfruta de confort, servicio atento y experiencias preferentes en un entorno cálido y distinguido.",
+      descripcion: "ürea exclusiva frente al mar donde usted disfruta de confort, servicio atento y experiencias preferentes en un entorno cálido y distinguido.",
       descriptionEn: "Exclusive oceanfront area where you enjoy comfort, attentive service and preferred experiences in a warm and distinguished environment."
     },
     "star-prestige-maya": {
       hours: "09:00 - 21:00",
       horarioTexto: "09:00 - 21:00",
-      amenities: "Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
-      amenidades: "Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
+      amenities: "üreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
+      amenidades: "üreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
       amenitiesEn: "Rest areas, terrace, Wi-Fi, digital press, drinks and snacks",
       services: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas",
       servicios: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas",
       servicesEn: "Personalized concierge, premium drinks, priority reservations, access to exclusive areas",
-      description: "Área exclusiva Star Prestige en Paraíso Maya donde usted accede a servicios preferentes, ambientes cálidos y atención personalizada durante su estancia.",
-      descripcion: "Área exclusiva Star Prestige en Paraíso Maya donde usted accede a servicios preferentes, ambientes cálidos y atención personalizada durante su estancia.",
+      description: "ürea exclusiva Star Prestige en Paraíso Maya donde usted accede a servicios preferentes, ambientes cálidos y atención personalizada durante su estancia.",
+      descripcion: "ürea exclusiva Star Prestige en Paraíso Maya donde usted accede a servicios preferentes, ambientes cálidos y atención personalizada durante su estancia.",
       descriptionEn: "Exclusive Star Prestige area in Paraíso Maya where you access preferred services, warm environments and personalized attention during your stay."
     },
     "star-prestige-joia": {
       hours: "09:00 - 21:00",
       horarioTexto: "09:00 - 21:00",
-      amenities: "Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
-      amenidades: "Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
+      amenities: "üreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
+      amenidades: "üreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
       amenitiesEn: "Rest areas, terrace, Wi-Fi, digital press, drinks and snacks",
       services: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas",
       servicios: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas",
       servicesEn: "Personalized concierge, premium drinks, priority reservations, access to exclusive areas",
-      description: "Área exclusiva Star Prestige en JOIA donde usted disfruta de lujo, servicio atento y experiencias preferentes en un entorno cálido y distinguido.",
-      descripcion: "Área exclusiva Star Prestige en JOIA donde usted disfruta de lujo, servicio atento y experiencias preferentes en un entorno cálido y distinguido.",
+      description: "ürea exclusiva Star Prestige en JOIA donde usted disfruta de lujo, servicio atento y experiencias preferentes en un entorno cálido y distinguido.",
+      descripcion: "ürea exclusiva Star Prestige en JOIA donde usted disfruta de lujo, servicio atento y experiencias preferentes en un entorno cálido y distinguido.",
       descriptionEn: "Exclusive Star Prestige area in JOIA where you enjoy luxury, attentive service and preferred experiences in a warm and distinguished environment."
     }
   };
@@ -1064,7 +1013,7 @@
     { hora: "10:30", nombre: "Star Camp: Taller Mini Chef y Huerto", nombreEn: "Star Camp: Mini Chef Workshop and Garden", lugar: "Star Camp", poiId: "starcamp", grupo: "Star Camp · Dolphin (8 a 12 años)" },
     { hora: "11:30", nombre: "Aqua Gym y Ritmos Caribeños", nombreEn: "Aqua Gym and Caribbean Rhythms", lugar: "Piscina Principal", poiId: "activities-pool", grupo: "Fit & Fun" },
     { hora: "15:00", nombre: "Torneo de Vóley de Playa", nombreEn: "Beach Volleyball Tournament", lugar: "Playa Paraíso", poiId: "playa-mar-caribe", grupo: "Fit & Fun" },
-    { hora: "16:30", nombre: "Clínica de Tiro con Arco y Tenis", nombreEn: "Archery and Tennis Clinic", lugar: "Área Deportiva", poiId: "tennis", grupo: "Fit & Fun" },
+    { hora: "16:30", nombre: "Clínica de Tiro con Arco y Tenis", nombreEn: "Archery and Tennis Clinic", lugar: "ürea Deportiva", poiId: "tennis", grupo: "Fit & Fun" },
     { hora: "20:00", nombre: "Música en Vivo y Coctelería", nombreEn: "Live Music and Cocktails", lugar: "Lobby Bar Acuario", poiId: "lobby-bar-acuario", grupo: "Entretenimiento" },
     { hora: "21:30", nombre: "Espectáculo Nocturno Circense", nombreEn: "Night Circus Show", lugar: "Teatro Coliseo", poiId: "teatro-coliseo", grupo: "Espectáculos Nocturnos" }
   ];

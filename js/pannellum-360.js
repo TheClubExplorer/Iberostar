@@ -13,6 +13,7 @@
 
   const ZONES = [
     { key: "restaurantes", label: "Restaurantes", blurb: "Ambientes gastronómicos del hotel." },
+    { key: "bares", label: "Bares", blurb: "Bares y coctelería del complejo." },
     { key: "exteriores", label: "Exteriores", blurb: "Jardines y áreas al aire libre." },
     { key: "playa", label: "Playas", blurb: "La franja de arena y el mar Caribe." },
     { key: "piscinas", label: "Piscinas", blurb: "Piscinas y zonas de sol." }
@@ -30,60 +31,54 @@ const RESTAURANTES_PARAISO = {
       ["La Dorada", "Mediterránea"],
       ["El Colonial", "Cocina francesa"],
       ["El Faro", "Buffet internacional"],
-      ["Star Rock Café", "Americana"],
-      ["Beach Grill", "Internacional / playa"],
-      ["El Kiosko", "Snack bar / Grill"],
-      ["Heladería El Puente", "Heladería / Snacks"],
-      ["Lobby Bar La Fuente", "Lobby bar"],
-      ["Pool Bar Las Olas", "Bar de piscina (Swim-up)"],
-      ["Aqua Bar La Perla", "Bar de piscina"],
-      ["Bar del Teatro", "Bar de teatro"],
-      ["El Kiosko Bar", "Bar de playa"],
-      ["Galaxy Nightclub", "Nightclub"]
+      ["Star Rock Cafe", "Americana"],
+      ["Beach Grill", "Internacional / playa"]
     ],
     "Iberostar Paraíso Maya": [
-      ["La Marina", "Mariscos y pescados"],
-      ["Palapa Marina / El Tapatío", "Snack & Almuerzo Grill"],
-      ["El Rancho", "Steakhouse & Carnes"],
-      ["Tlaqpaque", "Mexicano de Especialidad Tradicional"],
-      ["La Geisha Japanese Restaurant", "Japonés Tradicional y Teppanyaki"],
-      ["Bistró L'Etoile", "Gourmet Francés"],
-      ["Olivetti", "Cocina italiana"],
-      ["Lemon & Spices", "Cocina asiática"],
-      ["Under the Sea", "Mariscos y pescados"],
-      ["Coco Snack Bar", "Snack bar"],
-      ["Burger Box", "Hamburguesas"],
-      ["Buffet La Marina", "Buffet Principal"],
-      ["Buffet El Tapatío", "Buffet / Grill de Alberca"],
-      ["Bar El Puente", "Bar"],
-      ["Beach Bar", "Bar de Playa"],
-      ["Lobby Bar Chichén Itzá", "Lobby bar"],
-      ["Bar Tequila / Arrecife", "Bar de piscina (Swim-up)"],
-      ["Bar Palapa", "Bar de playa"],
-      ["Bar del Teatro", "Bar de teatro"]
-    ],
-    "Iberostar Paraíso Lindo": [
-      ["La Pagoda Buffet", "Buffet internacional"],
+      ["La Pagoda", "Buffet internacional"],
       ["El Rancho", "Steak House"],
       ["El Tapatío", "Cocina mexicana"],
-      ["El Museo", "Cocina italiana"],
+      ["El Museo", "Restaurante Gourmet"],
+      ["La Geisha", "Japonesa"],
+      ["Bistró L'Etoile", "Cocina francesa"],
+      ["La Marina", "Buffet Mediterráneo"],
+      ["Coco Snack Bar", "Snack bar"]
+    ],
+    "Iberostar Paraíso Lindo": [
+      ["La Pagoda", "Buffet internacional"],
+      ["El Rancho", "Steak House"],
+      ["El Tapatío", "Cocina mexicana"],
+      ["El Museo", "Restaurante Gourmet"],
       ["Hashiru", "Teppanyaki"],
       ["El Colonial", "Cocina francesa"],
-      ["La Geisha Japanese Restaurant", "Japonesa"],
+      ["La Geisha", "Japonesa"],
       ["Jambalaya", "Cajún"],
       ["Antojitos / Tacos", "Antojitos mexicanos"],
       ["Crepes & Ice Cream", "Crepas y helados"],
-      ["Lobby Bar Acuario", "Lobby bar"],
-      ["Star Rock Café", "Bar deportivo / Pub Americano"]
+      ["Burgers", "Hamburguesas"]
     ],
-    "JOIA Paraíso by Iberostar": [
-      ["La Terraza", "Buffet internacional"],
-      ["Sushi Bar", "Sushi y japonesa"],
-      ["El Grill", "Carnes a la parrilla"],
-      ["Pizzería", "Pizza italiana"],
-      ["Bar de la Piscina", "Bar de piscina"],
-      ["Lobby Bar", "Lobby bar"],
-      ["Café By The Beach", "Café y snacks"]
+    "Iberostar Paraíso Beach": [
+      ["La Plaza", "Buffet principal"],
+      ["El Mercado", "Buffet"],
+      ["El Puerto", "Buffet / Brasería"],
+      ["Hashiru", "Teppanyaki / Sushi"],
+      ["La Hacienda", "Cocina mexicana"],
+      ["El Rodizio", "Brasileño"],
+      ["La Dorada", "Mediterránea"],
+      ["El Colonial", "Cocina francesa"],
+      ["El Faro", "Buffet internacional"],
+      ["Star Rock Cafe", "Americana"],
+      ["Beach Grill", "Internacional / playa"],
+      ["El Fogón (Steak House)", "Steak House"],
+      ["El Fogón (Italiano)", "Italiana"]
+    ],
+    "Iberostar Paraíso JOIA": [
+      ["Legado", "Cocina mexicana/brasserie"],
+      ["L'Atelier", "Alta cocina"],
+      ["Venecia", "Cocina italiana"],
+      ["Haiku", "Cocina asiática"],
+      ["Bellavista", "Buffet"],
+      ["La Brisa", "Raw bar y grill"]
     ]
   };
 
@@ -453,7 +448,10 @@ const RESTAURANTES_PARAISO = {
   function findRestaurantPoi(label) {
     const target = normalizeText(label);
     const pois = window.RevistaDigital?.guiapa?.POIS || [];
-    const restaurants = pois.filter((poi) => normalizeText(poi.category) === "restaurante" || normalizeText(poi.category) === "bar");
+    const restaurants = pois.filter((poi) => {
+      const cat = normalizeText(poi.category);
+      return cat === "restaurante" || cat === "bar";
+    });
     const exact = restaurants.find((poi) => normalizeText(poi.name) === target);
     if (exact) return exact;
     return restaurants
@@ -581,17 +579,6 @@ const RESTAURANTES_PARAISO = {
   }
 
   pannellum360.open = function (hotelName, zoneKey, label) {
-    // Store the last viewed 360° for "Volver al 360°" functionality
-    try {
-      window.sessionStorage.setItem("club360LastViewed", JSON.stringify({
-        hotelName: hotelName,
-        zoneKey: zoneKey,
-        label: label,
-        timestamp: Date.now()
-      }));
-    } catch (error) {
-      console.warn("No se pudo guardar la última visita 360°.", error);
-    }
     ensurePannellum().then(() => {
       const view = VIEW[zoneKey] || VIEW.exteriores;
       const url = buildPanorama(hotelName, zoneKey, label, 2048, 1024).toDataURL("image/jpeg", 0.85);
