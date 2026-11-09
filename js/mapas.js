@@ -1498,14 +1498,21 @@
     const mapElement = document.querySelector("#generalMap");
     if (!mapElement) return;
 
-    mapas.loadLeaflet().then((L) => {
-      const generalMap = L.map(mapElement, {
-        zoomControl: true,
-        attributionControl: true,
+mapas.loadLeaflet().then((L) => {
+      const complexBounds = state().complexBounds;
+      const complexBoundsFallback = [[20.7525065, -86.9710573], [20.7654525, -86.9560717]];
+      const boundsForZoom = Array.isArray(complexBounds) && complexBounds.length === 2 ? complexBounds : complexBoundsFallback;
+      const isMobile = window.matchMedia("(max-width: 768px)").matches;
+      const minZoomLevel = isMobile ? 17 : 14;
+
+      const map = L.map(element, {
+        scrollWheelZoom: true,
+        preferCanvas: true,
         rotate: true,
         bearing: 0,
         touchRotate: true,
-        rotateControl: { closeOnZeroBearing: false, position: "bottomright" }
+        rotateControl: { closeOnZeroBearing: false, position: "bottomright" },
+        minZoom: minZoomLevel
       });
       mapas.attachTouchScrollGuard(generalMap, mapElement);
 
@@ -1568,12 +1575,16 @@
     if (!Array.isArray(destinationCoordinates) || destinationCoordinates.length < 2) return;
 
     const complexBounds = state().complexBounds;
+    const complexBoundsFallback = [[20.7525065, -86.9710573], [20.7654525, -86.9560717]];
+    const boundsForZoom = Array.isArray(complexBounds) && complexBounds.length === 2 ? complexBounds : complexBoundsFallback;
+    const isMobile = window.matchMedia("(max-width: 768px)").matches;
+    const minZoomLevel = isMobile ? 17 : 14; // Móvil muy restrictivo (17), Desktop (14)
     const isPlayaParaisoHotel = Array.isArray(complexBounds) &&
       complexBounds.length === 2 &&
-      destinationCoordinates[0] >= complexBounds[0][0] &&
-      destinationCoordinates[0] <= complexBounds[1][0] &&
-      destinationCoordinates[1] >= complexBounds[0][1] &&
-      destinationCoordinates[1] <= complexBounds[1][1];
+      destinationCoordinates[0] >= boundsForZoom[0][0] &&
+      destinationCoordinates[0] <= boundsForZoom[1][0] &&
+      destinationCoordinates[1] >= boundsForZoom[0][1] &&
+      destinationCoordinates[1] <= boundsForZoom[1][1];
 
     state().activeMap = null;
     state().userMarker = null;
@@ -1586,10 +1597,11 @@
         rotate: true,
         bearing: 0,
         touchRotate: true,
-        rotateControl: { closeOnZeroBearing: false, position: "bottomright" }
+        rotateControl: { closeOnZeroBearing: false, position: "bottomright" },
+        minZoom: minZoomLevel
       };
       if (isPlayaParaisoHotel) {
-        mapOptions.maxBounds = complexBounds;
+        mapOptions.maxBounds = boundsForZoom;
         mapOptions.maxBoundsViscosity = 1.0;
       }
       state().activeMap = L.map(mapElement, mapOptions)
@@ -1597,7 +1609,13 @@
       mapas.attachTouchScrollGuard(state().activeMap, mapElement);
 
       if (isPlayaParaisoHotel) {
-        state().activeMap.setMinZoom(state().activeMap.getBoundsZoom(complexBounds));
+        // Forzar zoom mínimo estricto (móvil: 15, desktop: 14)
+        state().activeMap.setMinZoom(minZoomLevel);
+        // Ajustar vista inicial al complejo (90-100% viewport)
+        const bounds = L.latLngBounds(boundsForZoom);
+        state().activeMap.fitBounds(bounds, { padding: [20, 20], maxZoom: 17 });
+        // Reforzar minZoom después de fitBounds
+        state().activeMap.setMinZoom(minZoomLevel);
       }
 
       const streetLayer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -1694,7 +1712,7 @@
       else if (points.length > 1) map.fitBounds(L.latLngBounds(points).pad(0.16), { maxZoom: 14 });
       else map.setView(destination.mapCenter, 13);
 
-      if (regionBounds) map.setMinZoom(map.getBoundsZoom(regionBounds));
+      if (regionBounds) map.setMinZoom(minZoomLevel);
       setTimeout(() => { try { map.invalidateSize(); } catch (e) { /* ignore */ } }, 0);
     }).catch((error) => console.warn("No se pudo cargar el mapa del destino.", error));
   };
