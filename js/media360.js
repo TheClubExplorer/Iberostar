@@ -12,19 +12,22 @@
     piscinas: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5c1.8 0 1.8 1.3 3.6 1.3s1.8-1.3 3.6-1.3 1.8 1.3 3.6 1.3 1.8-1.3 3.6-1.3 1.8 1.3 3.6 1.3"/><path d="M3 13.5c1.8 0 1.8 1.3 3.6 1.3s1.8-1.3 3.6-1.3 1.8 1.3 3.6 1.3 1.8-1.3 3.6-1.3 1.8 1.3 3.6 1.3"/><path d="M3 18.5c1.8 0 1.8 1.3 3.6 1.3s1.8-1.3 3.6-1.3 1.8 1.3 3.6 1.3 1.8-1.3 3.6-1.3 1.8 1.3 3.6 1.3"/></svg>',
     exteriores: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21v-7"/><path d="M12 14c-3.4 0-5.5-2.1-5.5-5.5C10 8.5 12 10.6 12 14Z"/><path d="M12 14c3.4 0 5.5-2.1 5.5-5.5C14 8.5 12 10.6 12 14Z"/><path d="M8 21h8"/></svg>',
     playa: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18"/><path d="M4 10a8 8 0 0 1 16 0Z"/><path d="M4 10h16"/></svg>',
-    restaurantes: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3v7"/><path d="M5 3v4a2 2 0 0 0 4 0V3"/><path d="M7 10v11"/><path d="M17 3v18"/><path d="M17 3c-2 0-3 1.8-3 4v4h3"/></svg>'
+    restaurantes: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3v7"/><path d="M5 3v4a2 2 0 0 0 4 0V3"/><path d="M7 10v11"/><path d="M17 3v18"/><path d="M17 3c-2 0-3 1.8-3 4v4h3"/></svg>',
+    bares: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11v8"/><path d="M14 5v16"/><path d="M21 11v8"/><path d="M17 5h-1a2 2 0 0 0-2 2v9.5"/><path d="M7 5h1a2 2 0 0 1 2 2v9.5"/></svg>'
   };
   const ZONES_ES = [
     { key: "piscinas", label: "Piscinas", description: "Albercas y zonas de descanso", icon: ZONE_ICONS.piscinas },
     { key: "exteriores", label: "Exteriores", description: "Jardines y arquitectura", icon: ZONE_ICONS.exteriores },
     { key: "playa", label: "Playa", description: "Arena y mar Caribe", icon: ZONE_ICONS.playa },
-    { key: "restaurantes", label: "Restaurantes", description: "Gastronomía y ambientes", icon: ZONE_ICONS.restaurantes }
+    { key: "restaurantes", label: "Restaurantes", description: "Gastronomía y ambientes", icon: ZONE_ICONS.restaurantes },
+    { key: "bares", label: "Bares", description: "Coctelería y ambiente nocturno", icon: ZONE_ICONS.bares }
   ];
   const ZONES_EN = [
     { key: "piscinas", label: "Pools", description: "Pools and relaxation areas", icon: ZONE_ICONS.piscinas },
     { key: "exteriores", label: "Exteriors", description: "Gardens and architecture", icon: ZONE_ICONS.exteriores },
     { key: "playa", label: "Beach", description: "Sand and Caribbean sea", icon: ZONE_ICONS.playa },
-    { key: "restaurantes", label: "Restaurants", description: "Gastronomy and ambience", icon: ZONE_ICONS.restaurantes }
+    { key: "restaurantes", label: "Restaurants", description: "Gastronomy and ambience", icon: ZONE_ICONS.restaurantes },
+    { key: "bares", label: "Bars", description: "Cocktails and nightlife", icon: ZONE_ICONS.bares }
   ];
   const CHEVRON_ICON = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>';
   const OPEN_ICON = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>';
