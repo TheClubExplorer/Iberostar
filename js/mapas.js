@@ -1274,6 +1274,18 @@
       return;
     }
 
+    // Cancelar petición anterior si existe
+    if (mapas._currentRouteAbort) {
+      mapas._currentRouteAbort.abort();
+    }
+    const controller = typeof AbortController === "function" ? new AbortController() : null;
+    mapas._currentRouteAbort = controller;
+
+    // Mostrar spinner de carga
+    if (status) {
+      status.innerHTML = '<span class="route-spinner"></span> Calculando ruta...';
+    }
+
     if (state().activeMap && window.L) {
       let destinationCoordinates = null;
       if (Array.isArray(coordinatesArg) && coordinatesArg.length === 2) {
@@ -1293,13 +1305,12 @@
       const originCoordinates = [state().currentPosition.latitude, state().currentPosition.longitude];
       const prefer = mapas.getPreferredRouteProfile(originCoordinates, destinationCoordinates);
 
-      if (status) status.textContent = prefer === "pedestrian" ? "Calculando ruta a pie..." : "Calculando ruta...";
-
       mapas
         .computeRoute({
           origin: originCoordinates,
           destination: destinationCoordinates,
-          prefer
+          prefer,
+          signal: controller?.signal
         })
         .then((result) => {
           const routeCoordinates = [
@@ -1348,15 +1359,19 @@
           mapas._directionsRoute = {
             destination: destinationCoordinates,
             prefer,
-            recalcAt: 0,
+            recalcAt: 50,
             recalcToken: 0,
             recalcAbort: null
           };
 
-          // Centra en el destino con un zoom cercano en lugar de alejar el mapa
-          // para encuadrar toda la ruta (el usuario puede alejar si lo desea).
-          const focusZoom = Math.max(state().activeMap.getZoom() || 15, 15);
-          state().activeMap.setView(destinationCoordinates, focusZoom);
+          // Encuadra toda la ruta en la vista (móvil y desktop)
+          const routeLine = state().routeLine;
+          if (routeLine && typeof routeLine.getBounds === "function") {
+            const routeBounds = routeLine.getBounds();
+            if (routeBounds && typeof routeBounds.isValid === "function" && routeBounds.isValid()) {
+              state().activeMap.fitBounds(routeBounds, { padding: [60, 20] });
+            }
+          }
 
           const distance = result.distance ? `${(result.distance / 1000).toFixed(1)} km` : "";
           const minutes = result.duration ? Math.round(result.duration / 60) : null;

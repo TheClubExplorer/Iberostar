@@ -740,6 +740,8 @@ const RESTAURANTES_PARAISO = {
         '<div class="pano-360-stage"><div id="pano360Stage"></div></div>';
 
       document.body.appendChild(modal);
+      // Forzar reflow para que la animación de entrada se dispare correctamente
+      modal.offsetHeight;
       document.body.classList.add("pano-360-open");
 
       let viewer = null;
