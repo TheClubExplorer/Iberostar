@@ -13,9 +13,9 @@
       ["Tsuba", "Asiática"], ["El Nopal", "Buffet"], ["La Bahía Steak House", "Carnes"]
     ],
     "Iberostar Selection Paraíso Maya": [
-      ["Olivetti", "Italiana"],
+      ["Olivetti", "Cocina italiana"],
       ["Under the Sea", "Mariscos"],
-      ["Lemon & Spices", "Griega"]
+      ["Lemon & Spices", "Internacional / Mediterráneo"]
     ],
     "Iberostar Selection Cancún": [
       ["American Bistro", "Americana"], ["Antiguo Laguito Buffet", "Buffet"],
