@@ -592,11 +592,17 @@ const RESTAURANTES_PARAISO = {
       .find(([name]) => normalizeText(name) === normalizeText(label));
     const hotelEntry = hotelRestaurant || hotelBar;
     const poi = findRestaurantPoi(label);
+    // Usar menús resumidos definidos en datos-complejo.js
+    const menuSummarized = {
+      "El Museo": "Entrantes: Antipasto, crema pomodoro y ensalada arúgula-pera. Pastas: Risotto negro, gnocchis gorgonzola, penne arrabbiata y ravioles trufados. Fuertes: Ossobuco con polenta, filete al Chianti y robalo a la plancha. Postres: Cannoli, tiramisú y torta de chocolate con gelato.",
+      "Lemon & Spices": "Entrantes: Mezze con hummus/pita, ensalada griega y crema de espárragos. Fuertes: Pescado al limón, cordero al romero, pollo confitado y cuscús vegetal. Postres: Mousse de limón flameado, tarta de higos y tartaleta de manzana."
+    };
+    const menu = menuSummarized[label] || (poi?.menu || hotelEntry?.[2] || "");
     return {
       name: hotelEntry?.[0] || label || "Restaurante",
       cuisine: poi?.cuisine || hotelEntry?.[1] || "",
       hours: poi?.hours || "",
-      menu: poi?.menu || ""
+      menu: menu
     };
   }
 
