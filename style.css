@@ -4422,7 +4422,7 @@ body.pano-360-open { overflow: hidden; }
   .hotel-guide-panel { top:auto; right:14px; bottom:14px; left:14px; width:auto; max-height:42%; }
   .hotel-complex-map-wrap.is-guide-collapsed .hotel-guide-panel { transform:translateY(calc(100% + 20px)); }
   .hotel-guide-open { top:auto; bottom:14px; left:12px; }
-  .hotel-complex-map-wrap.is-guide-expanded .hotel-guide-panel { top:8vh; right:8px; bottom:8vh; left:8px; width:auto; max-height:none; height:auto; border-radius:16px; z-index:1196; }
+  .hotel-complex-map-wrap.is-guide-expanded .hotel-guide-panel { top:8vh; right:8px; bottom:8vh; left:8px; width:auto; max-height:none; height:auto; border-radius:16px; z-index:1250; }
 }
 
 /* En móvil, panel de la guía más bajo y compacto para dejar ver más mapa,
@@ -4437,15 +4437,16 @@ body.pano-360-open { overflow: hidden; }
     border-radius:12px;
   }
   .hotel-complex-map-wrap.is-guide-expanded .hotel-guide-panel {
-    top:6vh;
-    right:6px;
-    bottom:6vh;
-    left:6px;
-    max-height:none;
-    height:auto;
-    padding:12px;
-    border-radius:14px;
-    z-index:1196;
+    top: 0;
+    margin-top: 88px;
+    right: 6px;
+    bottom: 15vh;
+    left: 6px;
+    max-height: none;
+    height: auto;
+    padding: 12px;
+    border-radius: 14px;
+    z-index: 1250;
   }
   .hotel-guide-panel-head { flex:0 0 auto; gap:8px; }
   .hotel-guide-panel-head .portal-kicker { font-size:9px; letter-spacing:.14em; }
