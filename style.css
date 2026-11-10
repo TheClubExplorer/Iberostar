@@ -3559,6 +3559,9 @@ html[data-language-gate="pending"] .language-gate { display:grid; }
   border: 1px solid var(--gold);
   transition: background .2s ease, color .2s ease, border-color .2s ease;
   white-space: nowrap;
+  flex: 1 1 auto;
+  min-width: 120px;
+  text-align: center;
 }
 
 .guide-pano360:hover,
