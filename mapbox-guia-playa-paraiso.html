@@ -77,38 +77,10 @@
 
     /* Control de Iluminación / Horarios */
     .time-preset-bar {
-      position: fixed;
-      top: 18px;
-      right: 60px;
-      z-index: 200000;
-      display: flex;
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 999px;
-      padding: 4px;
-      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
-      gap: 4px;
-      align-items: center;
+      display: none;
     }
     .time-preset-btn {
-      border: none;
-      background: transparent;
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-size: 13px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s ease;
-      line-height: 1;
-    }
-    .time-preset-btn:hover {
-      background: rgba(202, 168, 103, 0.2);
-    }
-    .time-preset-btn.is-active {
-      background: #caa867;
-      color: #ffffff;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      display: none;
     }
 
     .mapboxgl-marker { z-index: 99999 !important; }
@@ -239,7 +211,6 @@
       .demo-info-card { top: 10px; left: 10px; max-width: calc(100vw - 150px); padding: 10px 12px; }
       .demo-info-card h2 { font-size: 13px; }
       .demo-info-card p { font-size: 10px; }
-      .time-preset-bar { top: auto; bottom: 84px; left: 18px; right: auto; }
       .location-control { top: 108px; left: 10px; }
       .location-control button { padding: 8px 10px; font-size: 11px; }
       .route-info { left: 12px; right: 12px; bottom: 72px; min-width: 0; padding: 12px 14px; }
@@ -398,15 +369,7 @@
     <p id="lblStatus" style="margin-top: 4px; font-weight: 600; color: #8c734b;">Cargando...</p>
   </div>
 
-  <!-- Barra de control horario/luz -->
-  <div class="time-preset-bar" id="timePresetBar" role="group" aria-label="Momento del día">
-    <button class="time-preset-btn" data-preset="dawn" title="Amanecer">🌅</button>
-    <button class="time-preset-btn" data-preset="day" title="Día">☀️</button>
-    <button class="time-preset-btn" data-preset="dusk" title="Tarde">🌇</button>
-    <button class="time-preset-btn" data-preset="night" title="Noche">🌙</button>
-  </div>
-
-  <div id="map"></div>
+<div id="map"></div>
   <button class="mapbox-touch-activate" id="mapTouchActivate" type="button" hidden><span>Toque para mover el mapa</span></button>
   <div class="mapbox-touch-controls" id="mapTouchControls" hidden>
     <button id="mapTouchGuide" type="button" aria-expanded="false">Guía</button>
@@ -488,46 +451,19 @@
       pitch: 65,
       bearing: -45,
       maxBounds: BOUNDS,
-      antialias: true
+      antialias: true,
+      lightPreset: 'day'
     });
     var mapReady = false;
 
     map.addControl(new mapboxgl.NavigationControl({ visualizePitch: true }), 'top-right');
 
-    /* Funciones para iluminación dinámica y cambio por hora */
-    function getLightPresetByHour() {
-      var hour = new Date().getHours();
-      if (hour >= 6 && hour < 11) return 'dawn';   // 06:00 a 10:59 (Amanecer / Mañana)
-      if (hour >= 11 && hour < 18) return 'day';   // 11:00 a 17:59 (Día)
-      if (hour >= 18 && hour < 21) return 'dusk';  // 18:00 a 20:59 (Tarde / Atardecer)
-      return 'night';                              // 21:00 a 05:59 (Noche)
-    }
-
-    var currentLightPreset = getLightPresetByHour();
-    var manualLightOverride = false;
-
-    function updateTimeButtons(preset) {
-      var btns = document.querySelectorAll('.time-preset-btn');
-      btns.forEach(function(b) {
-        b.classList.toggle('is-active', b.getAttribute('data-preset') === preset);
-      });
-    }
-
-    function setMapLighting(preset) {
-      currentLightPreset = preset;
-      try {
-        map.setConfigProperty('basemap', 'lightPreset', preset);
-      } catch(e){}
-      updateTimeButtons(preset);
-    }
-
+    /* Funciones para limpiar capas innecesarias */
     function applyNightAndClean(){
       try { map.setTerrain(null); } catch(e){}
       try { map.setFog(null); } catch(e){}
       try { if(map.getLayer('background')) map.setPaintProperty('background', 'background-color', '#000000'); } catch(e){}
-      
-      // Aplicación del preset calculado según la hora actual
-      setMapLighting(currentLightPreset);
+      try { map.setConfigProperty('basemap', 'lightPreset', 'day'); } catch(e){}
 
       var style = map.getStyle();
       if(style && Array.isArray(style.layers)){
@@ -1070,25 +1006,6 @@
     });
     document.getElementById('btn-recalcular').addEventListener('click', window.recalcularRuta);
     document.getElementById('btn-limpiar-ruta').addEventListener('click', limpiarRuta);
-
-    // Eventos para los botones de cambio de hora
-    document.querySelectorAll('.time-preset-btn').forEach(function(button) {
-      button.addEventListener('click', function() {
-        var preset = button.getAttribute('data-preset');
-        manualLightOverride = true; // El usuario tomó el control manual
-        setMapLighting(preset);
-      });
-    });
-
-    // Verificación automática periódica cada 15 min (si no hay selección manual)
-    setInterval(function() {
-      if (!manualLightOverride) {
-        var calculated = getLightPresetByHour();
-        if (calculated !== currentLightPreset) {
-          setMapLighting(calculated);
-        }
-      }
-    }, 15 * 60 * 1000);
 
     window.addEventListener('beforeunload', function(){
       if(watchId != null) navigator.geolocation.clearWatch(watchId);
