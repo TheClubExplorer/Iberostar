@@ -1513,73 +1513,73 @@
     const mapElement = document.querySelector("#generalMap");
     if (!mapElement) return;
 
-mapas.loadLeaflet().then((L) => {
-      const complexBounds = state().complexBounds;
-      const complexBoundsFallback = [[20.7525065, -86.9710573], [20.7654525, -86.9560717]];
-      const boundsForZoom = Array.isArray(complexBounds) && complexBounds.length === 2 ? complexBounds : complexBoundsFallback;
-      const isMobile = window.matchMedia("(max-width: 768px)").matches;
-      const minZoomLevel = isMobile ? 17 : 14;
+  mapas.loadLeaflet().then((L) => {
+    const complexBounds = state().complexBounds;
+    const complexBoundsFallback = [[20.7525065, -86.9710573], [20.7654525, -86.9560717]];
+    const boundsForZoom = Array.isArray(complexBounds) && complexBounds.length === 2 ? complexBounds : complexBoundsFallback;
+    const isMobile = window.matchMedia("(max-width: 768px)").matches;
+    const minZoomLevel = isMobile ? 17 : 14;
 
-      const map = L.map(element, {
-        scrollWheelZoom: true,
-        preferCanvas: true,
-        rotate: true,
-        bearing: 0,
-        touchRotate: true,
-        rotateControl: { closeOnZeroBearing: false, position: "bottomright" },
-        minZoom: minZoomLevel
-      });
-      mapas.attachTouchScrollGuard(generalMap, mapElement);
-
-      state().activeMap = generalMap;
-
-      const streetLayer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        maxZoom: 19,
-        attribution: "© OpenStreetMap contributors"
-      });
-
-      streetLayer.addTo(generalMap);
-
-      Object.entries(state().hotelCoordinates || {}).forEach(([name, coordinates]) => {
-        L.marker(coordinates)
-          .addTo(generalMap)
-          .bindTooltip(name.replace("Iberostar ", ""), {
-            permanent: true,
-            direction: "top",
-            className: "complex-label"
-          });
-      });
-
-      const places = [
-        ["Centro de convenciones", 20.7610, -86.9650],
-        ["Bella Italia", 20.7618, -86.9631],
-        ["La Palapa", 20.7604, -86.9619],
-        ["El Gaucho", 20.7594, -86.9628],
-        ["Snack & Grill", 20.7626, -86.9642],
-        ["Spa y bienestar", 20.7601287, -86.9661145]
-      ];
-
-      places.forEach(([name, latitude, longitude]) => {
-        L.circleMarker([latitude, longitude], {
-          radius: 7,
-          color: "#fff",
-          weight: 2,
-          fillColor: "#e5b85f",
-          fillOpacity: 1
-        })
-          .addTo(generalMap)
-          .bindTooltip(name, {
-            permanent: true,
-            direction: "right",
-            className: "place-label"
-          });
-      });
-
-      if (window.RevistaDigital && typeof window.RevistaDigital.setupComplexMapFraming === "function") {
-        window.RevistaDigital.setupComplexMapFraming(generalMap, L);
-      }
+    const map = L.map(mapElement, {
+      scrollWheelZoom: true,
+      preferCanvas: true,
+      rotate: true,
+      bearing: 0,
+      touchRotate: true,
+      rotateControl: { closeOnZeroBearing: false, position: "bottomright" },
+      minZoom: minZoomLevel
     });
-  };
+    mapas.attachTouchScrollGuard(map, mapElement);
+
+    state().activeMap = map;
+
+    const streetLayer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution: "© OpenStreetMap contributors"
+    });
+
+    streetLayer.addTo(map);
+
+    Object.entries(state().hotelCoordinates || {}).forEach(([name, coordinates]) => {
+      L.marker(coordinates)
+        .addTo(map)
+        .bindTooltip(name.replace("Iberostar ", ""), {
+          permanent: true,
+          direction: "top",
+          className: "complex-label"
+        });
+    });
+
+    const places = [
+      ["Centro de convenciones", 20.7610, -86.9650],
+      ["Bella Italia", 20.7618, -86.9631],
+      ["La Palapa", 20.7604, -86.9619],
+      ["El Gaucho", 20.7594, -86.9628],
+      ["Snack & Grill", 20.7626, -86.9642],
+      ["Spa y bienestar", 20.7601287, -86.9661145]
+    ];
+
+    places.forEach(([name, latitude, longitude]) => {
+      L.circleMarker([latitude, longitude], {
+        radius: 7,
+        color: "#fff",
+        weight: 2,
+        fillColor: "#e5b85f",
+        fillOpacity: 1
+      })
+        .addTo(map)
+        .bindTooltip(name, {
+          permanent: true,
+          direction: "right",
+          className: "place-label"
+        });
+    });
+
+    if (window.RevistaDigital && typeof window.RevistaDigital.setupComplexMapFraming === "function") {
+      window.RevistaDigital.setupComplexMapFraming(map, L);
+    }
+  });
+};
 
   mapas.initializeHotelMap = function () {
     const mapElement = document.querySelector("#hotelMap");
