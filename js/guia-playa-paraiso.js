@@ -85,7 +85,7 @@
       hotelId: "JOIA Paraíso by Iberostar",
       lat: 20.7563073,
       lng: -86.9629786,
-      description: "Solo adultos (5*)",
+      description: "Solo adultos",
       source: "official",
       verified: true,
       brand: "joia"
@@ -1154,9 +1154,19 @@
     list.innerHTML = pois.map(function (p) {
       var active = p.id === state.selectedId ? " is-active" : "";
       var meta = escapeHtml(categoryLabel(p.category)) + (p.hotelId ? " · " + escapeHtml(p.hotelId) : "");
-      return '<li class="guide-item' + active + '" data-id="' + escapeHtml(p.id) + '" tabindex="0" role="button">' +
+      var brandHtml = "";
+      if (p.category === "hotel" && p.brand) {
+        var brandLogo = p.brand === "waves" ? "src/LOGOS-IBEROSTAR/LOGO_IB_WAVES_BR_POS_REDUCED_RGB.svg" :
+                        p.brand === "selection" ? "src/LOGOS-IBEROSTAR/LOGO_IB_SELECTION_BR_POS_REDUCED_RGB.svg" :
+                        p.brand === "joia" ? "src/LOGOS-IBEROSTAR/JOIA_by_IB_POS_RGB.svg" : "";
+        if (brandLogo) {
+          brandHtml = '<img class="guide-item-brand" src="' + brandLogo + '" alt="' + escapeHtml(p.brand) + '" loading="lazy" />';
+        }
+      }
+      return '<li class="guide-item' + active + (p.category === "hotel" ? " guide-item--hotel" : "") + '" data-id="' + escapeHtml(p.id) + '" tabindex="0" role="button">' +
         '<span class="guide-dot" style="background:' + categoryColor(p.category) + '"></span>' +
         '<span class="guide-item-body"><span class="guide-item-name">' + escapeHtml(p.name) + '</span><span class="guide-item-meta">' + meta + "</span></span>" +
+        brandHtml +
         "</li>";
     }).join("");
   }

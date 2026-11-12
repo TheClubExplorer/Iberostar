@@ -3383,6 +3383,27 @@ body.guide-expanded-open { overflow:hidden !important; overscroll-behavior:none;
 .guide-dot { flex: 0 0 auto; width: 14px; height: 14px; border-radius: 50%; box-shadow: 0 0 0 2px rgba(255, 255, 255, .8); }
 .guide-dot--lg { width: 18px; height: 18px; }
 .guide-dot--pending { background: transparent; border: 2px dashed var(--muted); box-shadow: none; }
+
+/* Hotel brand indicators in guide list */
+.guide-item--hotel { position: relative; }
+.guide-item-brand {
+  flex: 0 0 auto;
+  width: 48px;
+  height: 32px;
+  object-fit: contain;
+  opacity: 0.85;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.15));
+}
+.guide-item--hotel:hover .guide-item-brand,
+.guide-item--hotel.is-active .guide-item-brand {
+  opacity: 1;
+  transform: scale(1.08);
+}
+@media(max-width: 600px) {
+  .guide-item-brand { width: 40px; height: 26px; }
+}
+
 .guide-badge { flex: 0 0 auto; padding: 3px 9px; border-radius: 999px; font: 600 10px var(--font-body); letter-spacing: .06em; text-transform: uppercase; }
 .guide-badge--ok { background: rgba(46, 139, 87, .14); color: #22694a; }
 .guide-badge--pending { background: rgba(143, 115, 50, .14); color: var(--gold-deep); }
@@ -3391,6 +3412,23 @@ body.guide-expanded-open { overflow:hidden !important; overscroll-behavior:none;
 .guide-detail-empty { margin: 0; color: var(--muted); font: 14px/1.6 var(--font-body); }
 .guide-detail-title { margin: 10px 0 4px; color: var(--green-deep); font: 600 20px Georgia, serif; }
 .guide-detail-cat { margin: 0 0 10px; color: var(--gold-deep); font: 600 11px var(--font-body); letter-spacing: .1em; text-transform: uppercase; }
+.guide-detail-brand {
+  display: inline-block;
+  width: 56px;
+  height: 38px;
+  object-fit: contain;
+  opacity: 0.85;
+  margin-bottom: 6px;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.12));
+}
+.guide-detail-brand:hover {
+  opacity: 1;
+  transform: scale(1.06);
+}
+@media(max-width: 600px) {
+  .guide-detail-brand { width: 48px; height: 32px; }
+}
 .guide-detail-desc { margin: 0 0 10px; color: var(--green-deep); font: 14px/1.6 var(--font-body); }
 .guide-detail-row { margin: 4px 0; color: var(--muted); font: 13px var(--font-body); }
 .guide-detail-row strong { color: var(--green-deep); font-weight: 600; margin-right: 4px; }
@@ -4412,8 +4450,19 @@ body.pano-360-open { overflow: hidden; }
   }
 }
 @keyframes guideMobileActionsIn {
-  from { opacity:0; transform:translateY(6px); }
-  to { opacity:1; transform:translateY(0); }
+  from { opacity:0; transform:translateY(8px) scale(0.98); }
+  to { opacity:1; transform:translateY(0) scale(1); }
+}
+@keyframes guideMobileActionsOut {
+  from { opacity:1; transform:translateY(0) scale(1); }
+  to { opacity:0; transform:translateY(6px) scale(0.98); }
+}
+.hotel-complex-map-wrap .guide-mobile-actions {
+  animation: guideMobileActionsIn 0.22s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.hotel-complex-map-wrap .guide-mobile-actions[hidden] {
+  display: block !important;
+  animation: guideMobileActionsOut 0.18s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards;
 }
 
 @media (max-width:1099px){
@@ -4900,6 +4949,33 @@ body.mobile-nav-open .location-status { display: none !important; }
         color: #f2d494;
         font-weight: 700;
       }
+      .complex-label .hotel-tooltip {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .hotel-tooltip-logo {
+        width: 28px;
+        height: 18px;
+        object-fit: contain;
+        filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
+      }
+
+      /* Smooth animation for Leaflet tooltips */
+      .leaflet-tooltip {
+        animation: tooltipFadeIn 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      @keyframes tooltipFadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-6px) scale(0.98);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
       .place-label {
         color: #fff;
         font-size: 10px;
