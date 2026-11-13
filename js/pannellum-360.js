@@ -21,59 +21,38 @@
 
 const RESTAURANTES_PARAISO = {
     "Iberostar Selection Paraíso del Mar": [
-      ["La Plaza", "Buffet principal"],
-      ["El Mercado", "Buffet"],
-      ["Trattoria by El Faro", "Cocina italiana"],
-      ["El Rodizio", "Brasileño"],
       ["La Dorada", "Mediterránea"],
-      ["Star Rock Cafe", "Americana"],
-      ["Beach Grill", "Internacional / playa"]
+      ["El Mercado", "Buffet"],
+      ["La Hacienda", "Cocina mexicana"],
+      ["El Colonial", "Cocina francesa"]
     ],
     "Iberostar Selection Paraíso Maya": [
-      ["La Pagoda", "Buffet internacional"],
       ["El Rancho", "Steak House"],
-      ["El Tapatío", "Cocina mexicana"],
       ["El Museo", "Cocina italiana"],
       ["La Geisha", "Japonesa"],
-      ["Bistró L'Etoile", "Cocina francesa"],
-      ["La Marina", "Buffet Mediterráneo"],
-      ["Coco Snack Bar", "Snack bar"],
+      ["L'Etoile", "Cocina francesa"],
       ["The Olivetti", "Cocina italiana"],
-      ["Under the Sea", "Cocina de mariscos"]
+      ["Under the Sea", "Cocina de mariscos"],
+      ["Buffet La Marina", "Buffet Mediterráneo"]
     ],
     "Iberostar Waves Paraíso Lindo": [
+      ["El Puerto", "Buffet / Brasería"],
       ["La Pagoda", "Buffet internacional"],
-      ["El Rancho", "Steak House"],
       ["El Tapatío", "Cocina mexicana"],
-      ["El Museo", "Restaurante Gourmet"],
-      ["La Geisha", "Japonesa"],
-      ["Jambalaya", "Cajún"],
-      ["Antojitos / Tacos", "Antojitos mexicanos"],
-      ["Crepes & Ice Cream", "Crepas y helados"],
-      ["Burgers", "Hamburguesas"],
       ["Lemon & Spices", "Internacional / Mediterráneo"]
     ],
     "Iberostar Waves Paraíso Beach": [
-      ["La Plaza", "Buffet principal"],
-      ["El Mercado", "Buffet"],
-      ["El Puerto", "Buffet / Brasería"],
       ["Hashiru", "Teppanyaki / Sushi"],
-      ["La Hacienda", "Cocina mexicana"],
-      ["El Rodizio", "Brasileño"],
-      ["La Dorada", "Mediterránea"],
-      ["El Colonial", "Cocina francesa"],
-      ["Star Rock Cafe", "Americana"],
-      ["Beach Grill", "Internacional / playa"],
-      ["El Fogón (Steak House)", "Steak House"],
-      ["El Fogón (Italiano)", "Italiana"]
+      ["Rodizio", "Brasileño"],
+      ["La Plaza", "Buffet principal"],
+      ["Trattoria by El Faro", "Cocina italiana"]
     ],
     "JOIA Paraíso by Iberostar": [
       ["Legado", "Cocina mexicana/brasserie"],
       ["L'Atelier", "Alta cocina"],
       ["Venecia", "Cocina italiana"],
       ["Haiku", "Cocina asiática"],
-      ["Bellavista", "Buffet"],
-      ["La Brisa", "Raw bar y grill"]
+      ["Bellavista", "Buffet"]
     ]
   };
 
