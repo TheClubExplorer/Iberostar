@@ -495,6 +495,8 @@
     "Carta": "Menu",
     "Menú": "Menu",
     "Cocina": "Cuisine",
+    "Imagen anterior": "Previous image",
+    "Imagen siguiente": "Next image",
     "Área geográfica": "Geographic area",
     "Verificado": "Verified",
     "Pendiente de verificación": "Pending verification",
