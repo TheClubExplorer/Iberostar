@@ -42,7 +42,7 @@ const RESTAURANTES_PARAISO = {
       ["Lemon & Spices", "Internacional / Mediterráneo"]
     ],
     "Iberostar Waves Paraíso Beach": [
-      ["Hashiru", "Teppanyaki / Sushi"],
+      ["Hashiro", "Teppanyaki / Sushi"],
       ["Rodizio", "Brasileño"],
       ["La Plaza", "Buffet principal"],
       ["Trattoria by El Faro", "Cocina italiana"]
