@@ -909,7 +909,41 @@
   };
 
   gp.registerMarker = function (id, marker) {
-    if (id && marker) gp._markers[id] = marker;
+    if (id && marker) {
+      gp._markers[id] = marker;
+      try {
+        var el = marker.getElement ? marker.getElement() : null;
+        if (el && !el.classList.contains("gp-map-marker")) {
+          el.classList.add("gp-map-marker");
+        }
+      } catch (e) { /* ignore */ }
+    }
+  };
+
+  gp.filterMapMarkers = function (category) {
+    if (!gp._map || !gp._markers) return;
+    var pois = gp.POIS || [];
+    var poisById = {};
+    pois.forEach(function (p) { poisById[p.id] = p; });
+    Object.keys(gp._markers).forEach(function (id) {
+      var marker = gp._markers[id];
+      var poi = poisById[id];
+      var show = (category === "all") || (poi && poi.category === category);
+      var el = marker.getElement ? marker.getElement() : null;
+      if (show) {
+        if (el) {
+          el.classList.remove("fading-out");
+          el.classList.add("fading-in");
+        }
+        try { if (!marker._map) marker.addTo(gp._map); } catch (e) { /* ignore */ }
+      } else {
+        if (el) {
+          el.classList.remove("fading-in");
+          el.classList.add("fading-out");
+        }
+        try { if (marker._map) marker._map.removeLayer(marker); } catch (e) { /* ignore */ }
+      }
+    });
   };
 
   gp.bindMap = function (map) {
@@ -2236,6 +2270,12 @@ function poiCommonInfoHtml(poi) {
           el.setAttribute("aria-pressed", isActive ? "true" : "false");
         });
         renderList();
+        // Filtrar marcadores del mapa con animación
+        try {
+          if (window.RevistaDigital && window.RevistaDigital.guiapa) {
+            window.RevistaDigital.guiapa.filterMapMarkers(state.filter);
+          }
+        } catch (e) { /* ignore */ }
         return;
       }
       var cancel = event.target.closest(".guide-route-cancel");

@@ -9148,3 +9148,27 @@ body.cart-map-focus-open .hotel-portal-nav { display: none !important; }
   border-color: var(--gold-deep);
   box-shadow: inset 0 0 0 1px var(--gold-deep);
 }
+
+/* --- Animaciones de filtrado de marcadores del mapa --- */
+.gp-map-marker.fading-out {
+  opacity: 0.18 !important;
+  transform: scale(0.85) !important;
+  filter: grayscale(60%) !important;
+  -webkit-filter: grayscale(60%) !important;
+  transition: opacity 0.35s ease, transform 0.35s ease, filter 0.35s ease !important;
+}
+
+.gp-map-marker.fading-in {
+  opacity: 1 !important;
+  transform: scale(1) !important;
+  filter: none !important;
+  -webkit-filter: none !important;
+  transition: opacity 0.45s ease, transform 0.45s ease, filter 0.45s ease !important;
+}
+
+/* Transición base para todos los marcadores del mapa */
+.leaflet-marker-icon,
+.leaflet-marker-icon img,
+div[class*="leaflet-marker-icon"] {
+  transition: opacity 0.35s ease, transform 0.35s ease, filter 0.35s ease !important;
+}
