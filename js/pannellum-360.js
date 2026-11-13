@@ -727,8 +727,32 @@ const RESTAURANTES_PARAISO = {
     }
 
     closePanorama();
-    guide?.renderMobileActions?.(null);
     routes.navigate(hotelRoute);
+    // Limpieza agresiva DESPUÉS de navegar al mapa: en móvil puede quedar el
+    // backdrop del 360, la clase body.pano-360-open (overflow: hidden) o la
+    // tarjeta flotante de la guía sobre el mapa, bloqueando gestos táctiles.
+    setTimeout(function () {
+      // Remover clase de modo abierto del 360
+      document.body.classList.remove("pano-360-open");
+      // Restaurar scroll del body si quedó bloqueado
+      document.body.style.removeProperty("overflow");
+      // Eliminar cualquier elemento del 360 que quede en el DOM
+      document.querySelectorAll(
+        ".pano-360-modal, .pano-360-action-overlay, .pano-360-floating-menu, " +
+        ".pano-360-floating-panel"
+      ).forEach(function (el) {
+        if (el.parentNode) el.parentNode.removeChild(el);
+      });
+      // Colapsar la tarjeta flotante de la guía móvil
+      guide?.renderMobileActions?.(null);
+      // Forzar ocultar el panel directamente en el DOM
+      var panel = document.getElementById("guideMobileActions");
+      if (panel) {
+        panel.setAttribute("hidden", "");
+        panel.style.display = "none";
+        panel.innerHTML = "";
+      }
+    }, 0);
   }
 
   function openReservationOverlay(hotelName, label) {
@@ -834,7 +858,14 @@ const RESTAURANTES_PARAISO = {
         try {
           if (viewer && typeof viewer.destroy === "function") viewer.destroy();
         } catch (error) { /* noop */ }
-        if (modal.parentNode) modal.parentNode.removeChild(modal);
+        viewer = null;
+        // Eliminar cualquier modal o overlay del 360 que quede en el DOM
+        document.querySelectorAll(".pano-360-modal, .pano-360-action-overlay").forEach(function (el) {
+          if (el.parentNode) el.parentNode.removeChild(el);
+        });
+        // Limpiar contenedor del viewer si queda
+        var stage = document.getElementById("pano360Stage");
+        if (stage && stage.parentNode) stage.parentNode.removeChild(stage);
         document.body.classList.remove("pano-360-open");
         document.removeEventListener("keydown", onKey);
       }
