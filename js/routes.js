@@ -1465,7 +1465,7 @@
     const fiches = api.renderRestaurantFiches(hotel.name, { photos });
     const has360 = typeof api.hasRestaurant360 === "function" && api.hasRestaurant360(hotel.name);
     const ficheIntro = has360
-      ? `Abra las fichas con el sello <strong>360°</strong> para recorrer el restaurante.`
+      ? `Abra las fichas con el sello 360° para recorrer el restaurante.`
       : `Consulte la propuesta gastronómica de cada restaurante. Los horarios y la carta pueden variar según la temporada.`;
     const heroImage = hotel.image || "src/paraiso-del-mar/banner/ParaisoDelMar.jpg";
     return `<main class="portal-page">
