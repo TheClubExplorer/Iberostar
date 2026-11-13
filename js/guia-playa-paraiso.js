@@ -1498,13 +1498,15 @@
   function routeToPoi(id) {
     var poi = findPoi(id);
     if (!poi) return;
-    // En móvil, al trazar una ruta salimos de la vista ampliada de la guía
-    // para que el mapa y la ruta trazada queden visibles.
+    // En móvil, al trazar una ruta aseguramos que la guía NO esté expandida
+    // (se muestra en su tamaño pequeño original) para que el mapa y la ruta
+    // trazada queden visibles. No la colapsamos: se queda como al inicio.
     if (isMobileGuide()) {
       try {
         var r = window.RevistaDigital && window.RevistaDigital.routes;
-        if (r && typeof r.setGuidePanelOpen === "function") { r.setGuidePanelOpen(false); }
-        else if (r && typeof r.setGuidePanelExpanded === "function") { r.setGuidePanelExpanded(false); }
+        if (r && typeof r.setGuidePanelExpanded === "function") {
+          r.setGuidePanelExpanded(false);
+        }
       } catch (e) { /* ignore */ }
       if (state.mobilePoi && typeof positionMobileActions === "function") {
         try { positionMobileActions(state.mobilePoi); } catch (e) { /* ignore */ }
