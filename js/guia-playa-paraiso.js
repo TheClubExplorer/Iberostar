@@ -6,25 +6,25 @@
   window.RevistaDigital.guiapa = window.RevistaDigital.guiapa || {};
 
   const CATEGORIES = {
-    hotel: { icon: "building", color: "#0057b8" },
-    club: { icon: "star", color: "#b8860b" },
-    starprestige: { icon: "star", color: "#0057b8" },
-    concierge: { icon: "concierge-bell", color: "#0b3d66" },
-    restaurante: { icon: "utensils", color: "#d4af37" },
-    snacks: { icon: "cookie-bite", color: "#e67e22" },
-    bar: { icon: "cocktail", color: "#5f9ea0" },
-    piscina: { icon: "swimming", color: "#1e90ff" },
-    spa: { icon: "spa", color: "#8a2be2" },
-    golf: { icon: "golf-ball", color: "#2e8b57" },
-    playa: { icon: "umbrella-beach", color: "#f0e68c" },
-    comer: { icon: "shopping-bag", color: "#cd853f" },
-    deportes: { icon: "dumbbell", color: "#708090" },
-    entretenimiento: { icon: "music", color: "#ff69b4" },
-    servicio: { icon: "info", color: "#808080" },
-    wellness: { icon: "spa", color: "#8a2be2" },
-    kids: { icon: "child", color: "#ffb6c1" },
-    conv: { icon: "building", color: "#a9a9a9" },
-    discoteca: { icon: "music", color: "#ff1493" }
+    hotel: { icon: "building", color: "#000000" },
+    club: { icon: "star", color: "#B9A385" },
+    starprestige: { icon: "star", color: "#002855" },
+    concierge: { icon: "concierge-bell", color: "#002855" },
+    restaurante: { icon: "utensils", color: "#B9A385" },
+    snacks: { icon: "cookie-bite", color: "#4E545A" },
+    bar: { icon: "cocktail", color: "#4E545A" },
+    piscina: { icon: "swimming", color: "#02678D" },
+    spa: { icon: "spa", color: "#B0857C" },
+    golf: { icon: "golf-ball", color: "#00331D" },
+    playa: { icon: "umbrella-beach", color: "#709EB1" },
+    comer: { icon: "shopping-bag", color: "#B0857C" },
+    deportes: { icon: "dumbbell", color: "#ACAFB0" },
+    entretenimiento: { icon: "music", color: "#4E545A" },
+    servicio: { icon: "info", color: "#ACAFB0" },
+    wellness: { icon: "spa", color: "#B0857C" },
+    kids: { icon: "child", color: "#ACAFB0" },
+    conv: { icon: "building", color: "#ACAFB0" },
+    discoteca: { icon: "music", color: "#6B0123" }
   };
 
   // Catálogo base alineado con lo verificado (se expandirá con coordenadas OSM)
