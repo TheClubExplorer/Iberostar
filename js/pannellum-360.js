@@ -23,13 +23,9 @@ const RESTAURANTES_PARAISO = {
     "Iberostar Selection Paraíso del Mar": [
       ["La Plaza", "Buffet principal"],
       ["El Mercado", "Buffet"],
-      ["El Puerto", "Buffet / Brasería"],
-      ["Hashiru", "Teppanyaki / Sushi"],
       ["Trattoria by El Faro", "Cocina italiana"],
-      ["La Hacienda", "Cocina mexicana"],
       ["El Rodizio", "Brasileño"],
       ["La Dorada", "Mediterránea"],
-      ["El Colonial", "Cocina francesa"],
       ["Star Rock Cafe", "Americana"],
       ["Beach Grill", "Internacional / playa"]
     ],
@@ -38,24 +34,24 @@ const RESTAURANTES_PARAISO = {
       ["El Rancho", "Steak House"],
       ["El Tapatío", "Cocina mexicana"],
       ["El Museo", "Cocina italiana"],
-      ["Lemon & Spices", "Internacional / Mediterráneo"],
       ["La Geisha", "Japonesa"],
       ["Bistró L'Etoile", "Cocina francesa"],
       ["La Marina", "Buffet Mediterráneo"],
-      ["Coco Snack Bar", "Snack bar"]
+      ["Coco Snack Bar", "Snack bar"],
+      ["The Olivetti", "Cocina italiana"],
+      ["Under the Sea", "Cocina de mariscos"]
     ],
     "Iberostar Waves Paraíso Lindo": [
       ["La Pagoda", "Buffet internacional"],
       ["El Rancho", "Steak House"],
       ["El Tapatío", "Cocina mexicana"],
       ["El Museo", "Restaurante Gourmet"],
-      ["Hashiru", "Teppanyaki"],
-      ["El Colonial", "Cocina francesa"],
       ["La Geisha", "Japonesa"],
       ["Jambalaya", "Cajún"],
       ["Antojitos / Tacos", "Antojitos mexicanos"],
       ["Crepes & Ice Cream", "Crepas y helados"],
-      ["Burgers", "Hamburguesas"]
+      ["Burgers", "Hamburguesas"],
+      ["Lemon & Spices", "Internacional / Mediterráneo"]
     ],
     "Iberostar Waves Paraíso Beach": [
       ["La Plaza", "Buffet principal"],
