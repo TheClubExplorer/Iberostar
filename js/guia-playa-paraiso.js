@@ -1539,7 +1539,7 @@
     var body = mobileActionsRoot("#guideMobileActionsBody");
     if (!body) return;
     if (!poi) {
-      panel.hidden = true;
+      panel.setAttribute("hidden", "");
       body.innerHTML = "";
       if (titleEl) titleEl.textContent = "";
       return;
@@ -1582,7 +1582,7 @@
       '<div class="guide-mobile-actions-buttons">' + btns + "</div>" +
       '<div class="guide-route-box" id="guideMobileRouteBox" role="status" aria-live="polite"></div>' +
       '<div class="guide-book-box" id="guideMobileBookBox"></div>';
-    panel.hidden = false;
+    panel.removeAttribute("hidden");
     positionMobileActions(poi);
     renderMobileRouteStatus();
   }
@@ -2315,6 +2315,7 @@ function poiCommonInfoHtml(poi) {
   };
   gp.queryPois = queryPois;
   gp.canMapPoi = canMap;
+  gp.renderMobileActions = renderMobileActions;
   gp.renderCategoryLegend = function (mount) {
     if (!mount) return false;
     mount.innerHTML = legendMarkup();

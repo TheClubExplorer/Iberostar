@@ -727,6 +727,7 @@ const RESTAURANTES_PARAISO = {
     }
 
     closePanorama();
+    guide?.renderMobileActions?.(null);
     routes.navigate(hotelRoute);
   }
 
