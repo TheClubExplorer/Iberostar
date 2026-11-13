@@ -4,11 +4,11 @@
 
   /* Prueba de Exploración 360°: solo los hoteles de Playa Paraíso. */
   const PLAYA_PARISO_HOTELS = [
-    "Iberostar Paraíso del Mar",
-    "Iberostar Paraíso Maya",
-    "Iberostar Paraíso Lindo",
-    "Iberostar Paraíso Beach",
-    "Iberostar Paraíso JOIA"
+    "Iberostar Selection Paraíso del Mar",
+    "Iberostar Selection Paraíso Maya",
+    "Iberostar Waves Paraíso Lindo",
+    "Iberostar Waves Paraíso Beach",
+    "JOIA Paraíso by Iberostar"
   ];
 
   const ZONES = [
@@ -20,7 +20,7 @@
   ];
 
 const RESTAURANTES_PARAISO = {
-    "Iberostar Paraíso del Mar": [
+    "Iberostar Selection Paraíso del Mar": [
       ["La Plaza", "Buffet principal"],
       ["El Mercado", "Buffet"],
       ["El Puerto", "Buffet / Brasería"],
@@ -30,11 +30,11 @@ const RESTAURANTES_PARAISO = {
       ["El Rodizio", "Brasileño"],
       ["La Dorada", "Mediterránea"],
       ["El Colonial", "Cocina francesa"],
-
+      ["El Faro", "Buffet internacional"],
       ["Star Rock Cafe", "Americana"],
       ["Beach Grill", "Internacional / playa"]
     ],
-    "Iberostar Paraíso Maya": [
+    "Iberostar Selection Paraíso Maya": [
       ["La Pagoda", "Buffet internacional"],
       ["El Rancho", "Steak House"],
       ["El Tapatío", "Cocina mexicana"],
@@ -45,7 +45,7 @@ const RESTAURANTES_PARAISO = {
       ["La Marina", "Buffet Mediterráneo"],
       ["Coco Snack Bar", "Snack bar"]
     ],
-    "Iberostar Paraíso Lindo": [
+    "Iberostar Waves Paraíso Lindo": [
       ["La Pagoda", "Buffet internacional"],
       ["El Rancho", "Steak House"],
       ["El Tapatío", "Cocina mexicana"],
@@ -58,7 +58,7 @@ const RESTAURANTES_PARAISO = {
       ["Crepes & Ice Cream", "Crepas y helados"],
       ["Burgers", "Hamburguesas"]
     ],
-    "Iberostar Paraíso Beach": [
+    "Iberostar Waves Paraíso Beach": [
       ["La Plaza", "Buffet principal"],
       ["El Mercado", "Buffet"],
       ["El Puerto", "Buffet / Brasería"],
@@ -67,13 +67,13 @@ const RESTAURANTES_PARAISO = {
       ["El Rodizio", "Brasileño"],
       ["La Dorada", "Mediterránea"],
       ["El Colonial", "Cocina francesa"],
-
+      ["El Faro", "Buffet internacional"],
       ["Star Rock Cafe", "Americana"],
       ["Beach Grill", "Internacional / playa"],
       ["El Fogón (Steak House)", "Steak House"],
       ["El Fogón (Italiano)", "Italiana"]
     ],
-    "Iberostar Paraíso JOIA": [
+    "JOIA Paraíso by Iberostar": [
       ["Legado", "Cocina mexicana/brasserie"],
       ["L'Atelier", "Alta cocina"],
       ["Venecia", "Cocina italiana"],
@@ -84,7 +84,7 @@ const RESTAURANTES_PARAISO = {
   };
 
   const BARES_PARAISO = {
-    "Iberostar Paraíso del Mar": [
+    "Iberostar Selection Paraíso del Mar": [
       ["Star Rock Café", "Bar temático"],
       ["Pool Bar Las Olas", "Bar de piscina (Swim-up)"],
       ["Aqua Bar La Perla", "Bar de piscina"],
@@ -94,7 +94,7 @@ const RESTAURANTES_PARAISO = {
       ["Coco Bar", "Bar de alberca y playa"],
       ["Bar Galaxy Nightclub", "Discoteca"]
     ],
-    "Iberostar Paraíso Maya": [
+    "Iberostar Selection Paraíso Maya": [
       ["Lobby Bar Kukulkán", "Lobby bar"],
       ["Coco Bar", "Bar de alberca y playa"],
       ["Aqua Bar La Sirenita", "Aqua bar"],
@@ -103,18 +103,18 @@ const RESTAURANTES_PARAISO = {
       ["Music Bar Rhapsody", "Music bar"],
       ["Bar El Puente", "Pool bar"]
     ],
-    "Iberostar Paraíso Lindo": [
+    "Iberostar Waves Paraíso Lindo": [
       ["Star Rock Café Lindo", "Bar temático"],
       ["Sports Bar Corner", "Sports bar"],
       ["Bar Teatro", "Bar de teatro"],
       ["Lobby Bar Acuario", "Lobby bar"],
       ["Bar El Puente", "Pool bar"]
     ],
-    "Iberostar Paraíso JOIA": [
+    "JOIA Paraíso by Iberostar": [
       ["Lobby Bar El Mirador", "Lobby bar"],
       ["La Brisa Beach Bar", "Raw bar y grill"]
     ],
-    "Iberostar Paraíso Beach": [
+    "Iberostar Waves Paraíso Beach": [
       ["Star Rock Café", "Bar temático"],
       ["Pool Bar Las Olas", "Bar de piscina (Swim-up)"],
       ["Aqua Bar La Perla", "Bar de piscina"],
@@ -399,12 +399,59 @@ const RESTAURANTES_PARAISO = {
       .trim();
   }
 
+  // Normaliza un nombre de hotel para comparar con/sin marca comercial.
+  // Quita prefijos de marca (iberostar, selection, waves, by) y devuelve
+  // tokens ordenados alfabéticamente, sin tildes ni puntuación.
+  function normalizeHotelName(value) {
+    if (!value) return "";
+    var text = normalizeText(value);
+    if (!text) return "";
+    var tokens = text.split(/\s+/).filter(function (token) {
+      return token !== "iberostar" &&
+             token !== "selection" &&
+             token !== "waves" &&
+             token !== "by";
+    });
+    tokens.sort();
+    return tokens.join(" ");
+  }
+
+  /* Devuelve el nombre canónico exacto de uno de los 5 hoteles de Playa Paraíso
+     o "" si no pertenece al complejo. Acepta variantes con/sin marca comercial. */
+  function canonicalHotelNameValue(value) {
+    var target = normalizeHotelName(value);
+    if (!target) return "";
+    var found = PLAYA_PARISO_HOTELS.find(function (name) {
+      return normalizeHotelName(name) === target;
+    });
+    return found || "";
+  }
+
+  /* Mapa de nombre normalizado -> clave real para búsquedas rápidas en
+     RESTAURANTES_PARAISO, BARES_PARAISO y HOTEL_POOL_IDS. Evita fallos
+     cuando hotelName llega con variantes de marca comercial. */
+  var HOTEL_KEY_MAP = {};
+  PLAYA_PARISO_HOTELS.forEach(function (name) {
+    HOTEL_KEY_MAP[normalizeHotelName(name)] = name;
+  });
+
+  function resolveHotelKey(hotelName) {
+    var key = canonicalHotelNameValue(hotelName);
+    return key || hotelName;
+  }
+
+  function findGuidePoiById(id) {
+    var pois = window.RevistaDigital?.guiapa?.POIS;
+    if (!Array.isArray(pois)) return null;
+    return pois.find(function (poi) { return String(poi.id) === String(id); }) || null;
+  }
+
   const HOTEL_POOL_IDS = {
-    "Iberostar Paraíso del Mar": ["activities-pool", "quiet-pool", "waterfall-jacuzzi"],
-    "Iberostar Paraíso Beach": ["activities-pool", "quiet-pool", "waterfall-jacuzzi"],
-    "Iberostar Paraíso Lindo": ["wave-pool", "lazy-river", "mini-water-playground", "sports-pool", "jacuzzi"],
-    "Iberostar Paraíso Maya": ["wave-pool", "lazy-river", "mini-water-playground", "sports-pool", "jacuzzi"],
-    "Iberostar Paraíso JOIA": ["main-pool", "private-pool", "indoor-pool"]
+    "Iberostar Selection Paraíso del Mar": ["activities-pool", "quiet-pool", "waterfall-jacuzzi"],
+    "Iberostar Waves Paraíso Beach": ["activities-pool", "quiet-pool", "waterfall-jacuzzi"],
+    "Iberostar Waves Paraíso Lindo": ["wave-pool", "lazy-river", "mini-water-playground", "sports-pool", "jacuzzi"],
+    "Iberostar Selection Paraíso Maya": ["wave-pool", "lazy-river", "mini-water-playground", "sports-pool", "jacuzzi"],
+    "JOIA Paraíso by Iberostar": ["main-pool", "private-pool", "indoor-pool"]
   };
 
   const POOL_SUBTITLES = {
@@ -450,7 +497,8 @@ const RESTAURANTES_PARAISO = {
     const pools = getPoolPois();
     if (!pools.length) return [];
     const byId = new Map(pools.map((poi) => [poi.id, poi]));
-    const selected = (HOTEL_POOL_IDS[hotelName] || [])
+    const key = resolveHotelKey(hotelName);
+    const selected = (HOTEL_POOL_IDS[key] || HOTEL_POOL_IDS[hotelName] || [])
       .map((id) => byId.get(id))
       .filter(Boolean);
     if (selected.length) return selected;
@@ -469,7 +517,7 @@ const RESTAURANTES_PARAISO = {
   }
 
   const BAR_FALLBACK_COORDS = {
-    "Iberostar Paraíso del Mar": [
+    "Iberostar Selection Paraíso del Mar": [
       { id: "starcafe", name: "Star Rock Café", lat: 20.7618856, lng: -86.9627721, description: "Bar temático" },
       { id: "pool-bar-las-olas", name: "Pool Bar Las Olas", lat: 20.757897, lng: -86.961767, description: "Bar de piscina (Swim-up)" },
       { id: "aqua-bar-la-perla", name: "Aqua Bar La Perla", lat: 20.7589509, lng: -86.9583723, description: "Bar de piscina" },
@@ -479,7 +527,7 @@ const RESTAURANTES_PARAISO = {
       { id: "cocobar", name: "Coco Bar", lat: 20.756290, lng: -86.959046, description: "Bar de alberca y playa" },
       { id: "bar-galaxy-nightclub", name: "Bar Galaxy Nightclub", lat: 20.75955, lng: -86.966, description: "Discoteca" }
     ],
-    "Iberostar Paraíso Maya": [
+    "Iberostar Selection Paraíso Maya": [
       { id: "lobby-bar-kukulkan", name: "Lobby Bar Kukulkán", lat: 20.7575018, lng: -86.9645296, description: "Lobby bar" },
       { id: "cocobar", name: "Coco Bar", lat: 20.756290, lng: -86.959046, description: "Bar de alberca y playa" },
       { id: "aqua-bar-la-sirenita", name: "Aqua Bar La Sirenita", lat: 20.754775, lng: -86.960108, description: "Aqua bar" },
@@ -488,18 +536,18 @@ const RESTAURANTES_PARAISO = {
       { id: "music-bar-rhapsody", name: "Music Bar Rhapsody", lat: 20.756312, lng: -86.962411, description: "Music bar" },
       { id: "bar-el-puente", name: "Bar El Puente", lat: 20.757166, lng: -86.960961, description: "Pool bar" }
     ],
-    "Iberostar Paraíso Lindo": [
+    "Iberostar Waves Paraíso Lindo": [
       { id: "star-rock-cafe-lindo", name: "Star Rock Café Lindo", lat: 20.760072, lng: -86.965257, description: "Bar temático" },
       { id: "sports-bar-corner", name: "Sports Bar Corner", lat: 20.7596764, lng: -86.9634133, description: "Sports bar" },
       { id: "bar-teatro", name: "Bar Teatro", lat: 20.759376, lng: -86.962659, description: "Bar de teatro" },
       { id: "lobby-bar-acuario", name: "Lobby Bar Acuario", lat: 20.7595512, lng: -86.963491, description: "Lobby bar" },
       { id: "bar-el-puente", name: "Bar El Puente", lat: 20.757166, lng: -86.960961, description: "Pool bar" }
     ],
-    "Iberostar Paraíso JOIA": [
+    "JOIA Paraíso by Iberostar": [
       { id: "lobby-bar-el-mirador", name: "Lobby Bar El Mirador", lat: 20.756335, lng: -86.962712, description: "Lobby bar" },
       { id: "la-brisa", name: "La Brisa Beach Bar", lat: 20.7549562, lng: -86.9611689, description: "Raw bar y grill" }
     ],
-    "Iberostar Paraíso Beach": [
+    "Iberostar Waves Paraíso Beach": [
       { id: "starcafe", name: "Star Rock Café", lat: 20.7618856, lng: -86.9627721, description: "Bar temático" },
       { id: "pool-bar-las-olas", name: "Pool Bar Las Olas", lat: 20.757897, lng: -86.961767, description: "Bar de piscina (Swim-up)" },
       { id: "aqua-bar-la-perla", name: "Aqua Bar La Perla", lat: 20.7589509, lng: -86.9583723, description: "Bar de piscina" },
@@ -516,12 +564,14 @@ const RESTAURANTES_PARAISO = {
     const pois = gp && gp.POIS;
     if (!Array.isArray(pois) || !pois.length) {
       // Fallback estático si POIS no está listo
-      return (BAR_FALLBACK_COORDS[hotelName] || []).map((b) => ({ ...b, category: "bar" }));
+      var barKey = resolveHotelKey(hotelName);
+      return (BAR_FALLBACK_COORDS[barKey] || BAR_FALLBACK_COORDS[hotelName] || []).map((b) => ({ ...b, category: "bar" }));
     }
     const bars = pois.filter((poi) => normalizeText(poi.category) === "bar");
     if (!bars.length) return [];
     const byId = new Map(bars.map((poi) => [poi.id, poi]));
-    const hotelBars = (BARES_PARAISO[hotelName] || [])
+    var barKey = resolveHotelKey(hotelName);
+    const hotelBars = (BARES_PARAISO[barKey] || BARES_PARAISO[hotelName] || [])
       .map(([name]) => {
         const target = normalizeText(name);
         return bars.find((poi) => normalizeText(poi.name) === target) || byId.get(target);
@@ -565,13 +615,22 @@ const RESTAURANTES_PARAISO = {
     return fallbackId;
   }
 
-  function findRestaurantPoi(label) {
+  function findRestaurantPoi(label, hotelName) {
     const target = normalizeText(label);
     const pois = window.RevistaDigital?.guiapa?.POIS || [];
     const restaurants = pois.filter((poi) => {
       const cat = normalizeText(poi.category);
       return cat === "restaurante" || cat === "bar";
     });
+    // Primero intenta coincidencia exacta dentro del mismo hotel (si se conoce)
+    if (hotelName) {
+      const exactHotel = restaurants.find((poi) =>
+        normalizeText(poi.name) === target &&
+        (normalizeText(poi.hotelId || poi.hotel || "") === normalizeText(hotelName)
+         || normalizeText(poi.hotelId || poi.hotel || "") === resolveHotelKey(hotelName))
+      );
+      if (exactHotel) return exactHotel;
+    }
     const exact = restaurants.find((poi) => normalizeText(poi.name) === target);
     if (exact) return exact;
     return restaurants
@@ -642,15 +701,22 @@ const RESTAURANTES_PARAISO = {
   function openRestaurantMap(hotelName, label, closePanorama) {
     const guide = window.RevistaDigital?.guiapa;
     const routes = window.RevistaDigital?.routes;
+    // findHotelPortalRoute y poiForHotel buscan en estructuras que pueden
+    // usar nombres sin marca; pasar el hotelName original (no canonical)
     const hotelRoute = routes?.findHotelPortalRoute?.(hotelName);
-    const restaurantPoi = findRestaurantPoi(label);
+    const restaurantPoi = findRestaurantPoi(label, hotelName);
     const hasRestaurantCoordinates = restaurantPoi?.verified === true &&
       Number.isFinite(restaurantPoi.lat) && Number.isFinite(restaurantPoi.lng);
     const hotelPoi = guide?.poiForHotel?.(hotelName);
-    const destination = hasRestaurantCoordinates ? restaurantPoi : hotelPoi;
+    const hotelHasCoordinates = hotelPoi &&
+      Number.isFinite(hotelPoi.lat) && Number.isFinite(hotelPoi.lng);
+    const destination = hasRestaurantCoordinates ? restaurantPoi
+      : (hotelHasCoordinates ? hotelPoi : null);
     const notice = hasRestaurantCoordinates
       ? ""
-      : `No hay ubicación interior verificada para ${label}; la ruta se traza hasta ${hotelName}.`;
+      : hotelHasCoordinates
+        ? `No hay ubicación interior verificada para ${label}; la ruta se traza hasta ${hotelName}.`
+        : `No hay ubicación verificada para ${label} ni para ${hotelName}.`;
 
     if (!hotelRoute || typeof routes.navigate !== "function" || !destination ||
         typeof guide?.queueRouteToPoi !== "function" ||
@@ -707,20 +773,38 @@ const RESTAURANTES_PARAISO = {
     });
   }
 
-  pannellum360.open = function (hotelName, zoneKey, label) {
+  pannellum360.open = function (hotelName, zoneKey, label, requestedPoiId) {
     ensurePannellum().then(() => {
-      const view = VIEW[zoneKey] || VIEW.exteriores;
-      const url = buildPanorama(hotelName, zoneKey, label, 2048, 1024).toDataURL("image/jpeg", 0.85);
+      var canonicalHotel = canonicalHotelNameValue(hotelName) || hotelName;
+
+      var zoneAliases = {
+        restaurante: "restaurantes",
+        bar: "bares",
+        exterior: "exteriores",
+        pool: "piscinas"
+      };
+      var normalizedZoneKey = normalizeText(zoneKey || "");
+      var requestedZone = zoneAliases[normalizedZoneKey] || normalizedZoneKey;
+
+      // Si llega un poiId, derivar la zona de su categoría (antes del zoneKey)
+      var requestedPoi = requestedPoiId ? findGuidePoiById(requestedPoiId) : null;
+      var poiCategory = requestedPoi ? normalizeText(requestedPoi.category) : "";
+      var derivedZone = "";
+      if (poiCategory === "restaurante") derivedZone = "restaurantes";
+      else if (poiCategory === "bar" || poiCategory === "discoteca") derivedZone = "bares";
+
+      var resolvedZone = VIEW[requestedZone] ? requestedZone : (derivedZone || "exteriores");
+      var view = VIEW[resolvedZone];
+      var url = buildPanorama(canonicalHotel, resolvedZone, label, 2048, 1024).toDataURL("image/jpeg", 0.85);
 
       // Botón "Ver en el mapa": solo aparece si existe una guía del hotel y un
-      // punto del mapa que corresponda a esta zona/etiqueta. Conecta el
-      // recorrido 360° con la guía interactiva sin tocar su lógica.
-      const poiTarget = resolvePoiForPano(zoneKey, label);
-      const isRestaurantView = String(zoneKey || "").toLowerCase() === "restaurantes" || String(zoneKey || "").toLowerCase() === "bares" || normalizeText(label).includes("restaurante");
-      const mapButton = !isRestaurantView && poiTarget
+      // punto del mapa que corresponda a esta zona/etiqueta.
+      var poiTarget = requestedPoiId || resolvePoiForPano(resolvedZone, label);
+      var isRestaurantView = resolvedZone === "restaurantes" || resolvedZone === "bares";
+      var mapButton = !isRestaurantView && poiTarget
         ? '<button type="button" class="pano-360-map" data-poi="' + escapeHtml(poiTarget) + '">Ver en el mapa</button>'
         : "";
-      const restaurantActions = isRestaurantView ?
+      var restaurantActions = isRestaurantView ?
         '<button type="button" class="pano-360-menu">Ver menú</button>' +
         '<button type="button" class="pano-360-map">Ver en el mapa</button>' +
         '<button type="button" class="pano-360-book">Reservar</button>' :
@@ -732,7 +816,7 @@ const RESTAURANTES_PARAISO = {
       modal.setAttribute("aria-modal", "true");
       modal.innerHTML =
         '<div class="pano-360-bar">' +
-          "<strong>" + escapeHtml(label) + " · " + escapeHtml(hotelName) + "</strong>" +
+          "<strong>" + escapeHtml(label) + " · " + escapeHtml(canonicalHotel) + "</strong>" +
           '<span class="pano-360-bar-actions">' + mapButton + restaurantActions +
           '<button type="button" class="pano-360-close" aria-label="Cerrar recorrido">×</button>' +
           "</span>" +
@@ -740,7 +824,6 @@ const RESTAURANTES_PARAISO = {
         '<div class="pano-360-stage"><div id="pano360Stage"></div></div>';
 
       document.body.appendChild(modal);
-      // Forzar reflow para que la animación de entrada se dispare correctamente
       modal.offsetHeight;
       document.body.classList.add("pano-360-open");
 
@@ -749,9 +832,7 @@ const RESTAURANTES_PARAISO = {
       function closeModal() {
         try {
           if (viewer && typeof viewer.destroy === "function") viewer.destroy();
-        } catch (error) {
-          /* noop */
-        }
+        } catch (error) { /* noop */ }
         if (modal.parentNode) modal.parentNode.removeChild(modal);
         document.body.classList.remove("pano-360-open");
         document.removeEventListener("keydown", onKey);
@@ -811,13 +892,13 @@ const RESTAURANTES_PARAISO = {
       const menuBtn = modal.querySelector(".pano-360-menu");
       if (menuBtn) {
         menuBtn.addEventListener("click", () => {
-          openRestaurantMenuOverlay(hotelName, label);
+          openRestaurantMenuOverlay(canonicalHotel, label);
         });
       }
       const bookingBtn = modal.querySelector(".pano-360-book");
       if (bookingBtn) {
         bookingBtn.addEventListener("click", () => {
-          openReservationOverlay(hotelName, label);
+          openReservationOverlay(canonicalHotel, label);
         });
       }
       modal.addEventListener("click", (event) => {
@@ -831,15 +912,21 @@ const RESTAURANTES_PARAISO = {
   /* ---------- sección en la ficha del hotel ---------- */
 
   pannellum360.isPlayaParaiso = function (hotelName) {
-    return PLAYA_PARISO_HOTELS.indexOf(hotelName) >= 0;
+    return Boolean(canonicalHotelNameValue(hotelName));
+  };
+
+  pannellum360.canonicalHotelName = function (hotelName) {
+    return canonicalHotelNameValue(hotelName);
   };
 
   pannellum360.getRestaurantes = function (hotelName) {
-    return RESTAURANTES_PARAISO[hotelName] || [];
+    var key = resolveHotelKey(hotelName);
+    return RESTAURANTES_PARAISO[key] || RESTAURANTES_PARAISO[hotelName] || [];
   };
 
   pannellum360.getBares = function (hotelName) {
-    return BARES_PARAISO[hotelName] || [];
+    var key = resolveHotelKey(hotelName);
+    return BARES_PARAISO[key] || BARES_PARAISO[hotelName] || [];
   };
 
   /* Datos por restaurante para construir fichas visuales: nombre, cocina,

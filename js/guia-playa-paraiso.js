@@ -500,6 +500,18 @@
   function poiGalleryHotel(poi) {
     var direct = POI_GALLERY_HOTELS.find(function (hotel) { return hotel.name === poi.hotelId; });
     if (direct) return direct;
+    // Fallback: comparar nombres normalizados usando canonicalHotelName
+    // para manejar variantes de marca (con/sin Selection, Waves, by Iberostar, etc.)
+    var pannellum = window.RevistaDigital && window.RevistaDigital.pannellum360;
+    if (pannellum && typeof pannellum.canonicalHotelName === "function" && poi.hotelId) {
+      var targetCanonical = pannellum.canonicalHotelName(poi.hotelId);
+      if (targetCanonical) {
+        var canonicalMatch = POI_GALLERY_HOTELS.find(function (hotel) {
+          return pannellum.canonicalHotelName(hotel.name) === targetCanonical;
+        });
+        if (canonicalMatch) return canonicalMatch;
+      }
+    }
     var hotelSlug = document.body && document.body.dataset.hotelSlug;
     var pageHotel = POI_GALLERY_HOTELS.find(function (hotel) { return hotel.slug === hotelSlug; });
     if (pageHotel && (!Number.isFinite(poi.lat) || !Number.isFinite(poi.lng))) return pageHotel;
@@ -528,6 +540,9 @@
     var isRestaurant = poi.category === "restaurante";
     var isGolf = poi.category === "golf";
     var hotel = isRestaurant ? poiGalleryHotel(poi) : null;
+    var panoHotel = hotel && window.RevistaDigital.pannellum360 && typeof window.RevistaDigital.pannellum360.canonicalHotelName === "function"
+      ? (window.RevistaDigital.pannellum360.canonicalHotelName(hotel.name) || hotel.name)
+      : (hotel && hotel.name) || "";
     var images = isGolf
       ? GOLF_GALLERY_IMAGES
       : (isRestaurant
@@ -535,19 +550,17 @@
             return "src/" + hotel.folder + "/" + (hotel.restaurantFolder || "restaurante") + "/" + image + "-640.webp";
           })
         : []);
-    var has360 = isRestaurant && hotel && window.RevistaDigital.pannellum360?.isPlayaParaiso?.(hotel.name);
+    var has360 = isRestaurant && hotel && panoHotel && window.RevistaDigital.pannellum360?.isPlayaParaiso?.(panoHotel);
+    var pano360Btn = has360
+      ? '<div class="gp-map-pano360">' +
+        '<button type="button" class="gp-map-carousel-360-link" data-poi-360-hotel="' + popupEscape(panoHotel) + '" data-poi-360-label="' + name + '">Ver exploración 360°</button>' +
+        '</div>'
+      : "";
     var slides = images.map(function (image, index) {
       return '<div class="gp-map-carousel-slide' + (index === 0 ? ' is-active' : '') + '" data-map-slide aria-hidden="' + (index === 0 ? 'false' : 'true') + '">' +
         '<img src="' + popupEscape(image) + '" alt="' + name + ' · imagen ' + (index + 1) + '" loading="' + (index === 0 ? 'eager' : 'lazy') + '" decoding="async" />' +
         '</div>';
     });
-    if (has360) {
-      slides.push('<div class="gp-map-carousel-slide gp-map-carousel-360" data-map-slide aria-hidden="true">' +
-        '<strong>¿Desea ver más de ' + name + '?</strong>' +
-        '<span>Explore este restaurante en 360° en ' + popupEscape(hotel.name) + '.</span>' +
-        '<button type="button" class="gp-map-carousel-360-link" data-poi-360-hotel="' + popupEscape(hotel.name) + '" data-poi-360-label="' + name + '">Ver exploración 360°</button>' +
-        '</div>');
-    }
     var carousel = images.length
       ? '<div class="gp-map-carousel" data-map-carousel>' +
           '<div class="gp-map-carousel-slides">' + slides.join("") + '</div>' +
@@ -578,6 +591,7 @@
       (description ? '<small class="gp-map-poi-description">' + description + '</small>' : '') +
       details +
       carousel +
+      pano360Btn +
       '<button type="button" class="gp-dir" data-lat="' + poi.lat + '" data-lng="' + poi.lng + '" data-name="' + name + '">Cómo llegar</button>' +
       cartButton +
       '</div>';
@@ -2259,7 +2273,8 @@ function poiCommonInfoHtml(poi) {
         if (panoPoi && window.RevistaDigital.pannellum360 && typeof window.RevistaDigital.pannellum360.open === "function") {
           var hotelName = panoPoi.hotelId || panoPoi.hotel;
           if (hotelName) {
-            window.RevistaDigital.pannellum360.open(hotelName, "restaurante", panoPoi.name);
+            var panoZone = (panoPoi.category === "bar" || panoPoi.category === "discoteca") ? "bares" : "restaurantes";
+            window.RevistaDigital.pannellum360.open(hotelName, panoZone, panoPoi.name, panoPoi.id);
           }
         }
         return;
