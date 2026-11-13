@@ -29,10 +29,10 @@ const RESTAURANTES_PARAISO = {
     "Iberostar Selection Paraíso Maya": [
       ["El Rancho", "Steak House"],
       ["El Museo", "Cocina italiana"],
-      ["La Geisha", "Japonesa"],
+      ["La Gueisha", "Japonesa"],
       ["L'Etoile", "Cocina francesa"],
       ["The Olivetti", "Cocina italiana"],
-      ["Under the Sea", "Cocina de mariscos"],
+      ["America Seafood Grill Under the Sea", "Cocina de mariscos"],
       ["Buffet La Marina", "Buffet Mediterráneo"]
     ],
     "Iberostar Waves Paraíso Lindo": [
