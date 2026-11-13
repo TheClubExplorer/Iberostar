@@ -553,7 +553,7 @@
     var has360 = isRestaurant && hotel && panoHotel && window.RevistaDigital.pannellum360?.isPlayaParaiso?.(panoHotel);
     var pano360Btn = has360
       ? '<div class="gp-map-pano360">' +
-        '<button type="button" class="gp-map-carousel-360-link" data-poi-360-hotel="' + popupEscape(panoHotel) + '" data-poi-360-label="' + name + '">Ver exploración 360°</button>' +
+        '<button type="button" class="gp-map-carousel-360-link" data-poi-id="' + popupEscape(poi.id) + '" data-poi-360-hotel="' + popupEscape(panoHotel) + '" data-poi-360-label="' + name + '">Ver exploración 360°</button>' +
         '</div>'
       : "";
     var slides = images.map(function (image, index) {
@@ -641,11 +641,22 @@
     var panoramaButton = popupElement.querySelector("[data-poi-360-hotel]");
     if (panoramaButton && panoramaButton.dataset.bound !== "true") {
       panoramaButton.dataset.bound = "true";
-      panoramaButton.addEventListener("click", function () {
+      panoramaButton.addEventListener("click", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        var pannellum360 = window.RevistaDigital && window.RevistaDigital.pannellum360;
+        var hotelName = panoramaButton.getAttribute("data-poi-360-hotel");
+        var label = panoramaButton.getAttribute("data-poi-360-label");
+        var poiId = panoramaButton.getAttribute("data-poi-id");
+        if (pannellum360 && typeof pannellum360.open === "function" && hotelName) {
+          pannellum360.open(hotelName, "restaurantes", label, poiId);
+          return;
+        }
+        // Fallback: navegar a /360 solo si pannellum360 no está disponible
         try {
           window.sessionStorage.setItem("club360RestaurantSelection", JSON.stringify({
-            hotelName: panoramaButton.getAttribute("data-poi-360-hotel"),
-            label: panoramaButton.getAttribute("data-poi-360-label")
+            hotelName: hotelName,
+            label: label
           }));
         } catch (error) {
           console.warn("No se pudo guardar el restaurante para la exploración 360°.", error);

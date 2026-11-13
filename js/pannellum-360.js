@@ -702,12 +702,18 @@ const RESTAURANTES_PARAISO = {
     const guide = window.RevistaDigital?.guiapa;
     const routes = window.RevistaDigital?.routes;
     // findHotelPortalRoute y poiForHotel buscan en estructuras que pueden
-    // usar nombres sin marca; pasar el hotelName original (no canonical)
-    const hotelRoute = routes?.findHotelPortalRoute?.(hotelName);
+    // usar nombres sin marca comercial; probar primero con el hotelName
+    // original y, si falla, con el nombre canónico resuelto.
+    var canonicalKey = resolveHotelKey(hotelName);
+    var hotelRoute = routes?.findHotelPortalRoute?.(hotelName)
+      || routes?.findHotelPortalRoute?.(canonicalKey);
     const restaurantPoi = findRestaurantPoi(label, hotelName);
     const hasRestaurantCoordinates = restaurantPoi?.verified === true &&
       Number.isFinite(restaurantPoi.lat) && Number.isFinite(restaurantPoi.lng);
-    const hotelPoi = guide?.poiForHotel?.(hotelName);
+    var hotelPoi = guide?.poiForHotel?.(hotelName);
+    if (!hotelPoi && canonicalKey !== hotelName) {
+      hotelPoi = guide?.poiForHotel?.(canonicalKey);
+    }
     const hotelHasCoordinates = hotelPoi &&
       Number.isFinite(hotelPoi.lat) && Number.isFinite(hotelPoi.lng);
     const destination = hasRestaurantCoordinates ? restaurantPoi
@@ -718,7 +724,7 @@ const RESTAURANTES_PARAISO = {
         ? `No hay ubicación interior verificada para ${label}; la ruta se traza hasta ${hotelName}.`
         : `No hay ubicación verificada para ${label} ni para ${hotelName}.`;
 
-    if (!hotelRoute || typeof routes.navigate !== "function" || !destination ||
+    if (!destination || typeof routes.navigate !== "function" ||
         typeof guide?.queueRouteToPoi !== "function" ||
         !guide.queueRouteToPoi(destination.id, notice)) {
       console.warn(`No se pudo preparar el mapa o la ruta para ${label} en ${hotelName}.`);
@@ -727,7 +733,15 @@ const RESTAURANTES_PARAISO = {
     }
 
     closePanorama();
-    routes.navigate(hotelRoute);
+    // Solo navegar si hay una ruta de hotel diferente a la actual; si ya
+    // estamos en el mapa del complejo, quedarse en la misma página y centrar
+    // el mapa en el restaurante.
+    var currentPath = window.location.pathname || "/";
+    if (hotelRoute && hotelRoute !== currentPath) {
+      routes.navigate(hotelRoute);
+    } else {
+      guide.selectPoi(destination.id);
+    }
     // Limpieza agresiva DESPUÉS de navegar al mapa: en móvil puede quedar el
     // backdrop del 360, la clase body.pano-360-open (overflow: hidden) o la
     // tarjeta flotante de la guía sobre el mapa, bloqueando gestos táctiles.
