@@ -30,7 +30,6 @@ const RESTAURANTES_PARAISO = {
       ["El Rodizio", "Brasileño"],
       ["La Dorada", "Mediterránea"],
       ["El Colonial", "Cocina francesa"],
-      ["El Faro", "Buffet internacional"],
       ["Star Rock Cafe", "Americana"],
       ["Beach Grill", "Internacional / playa"]
     ],
@@ -67,7 +66,6 @@ const RESTAURANTES_PARAISO = {
       ["El Rodizio", "Brasileño"],
       ["La Dorada", "Mediterránea"],
       ["El Colonial", "Cocina francesa"],
-      ["El Faro", "Buffet internacional"],
       ["Star Rock Cafe", "Americana"],
       ["Beach Grill", "Internacional / playa"],
       ["El Fogón (Steak House)", "Steak House"],
