@@ -4461,8 +4461,8 @@ body.pano-360-open { overflow: hidden; }
   animation: guideMobileActionsIn 0.22s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 .hotel-complex-map-wrap .guide-mobile-actions[hidden] {
-  display: block !important;
-  animation: guideMobileActionsOut 0.18s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards;
+  display: none !important;
+  animation: none;
 }
 
 @media (max-width:1099px){
