@@ -2243,12 +2243,22 @@
     if (match) return "Restaurants in " + (translationFor(match[1]) || match[1]);
     match = value.match(/^Todos los restaurantes de (.+)$/i);
     if (match) return "All restaurants in " + (translationFor(match[1]) || match[1]);
-    match = value.match(/^(\d+) hoteles y (\d+) restaurantes\. Elija un hotel para ver su carta\.$/i);
-    if (match) return match[1] + " hotels and " + match[2] + " restaurants. Choose a hotel to see its menu.";
+    match = value.match(/^(\d+) hotel(?:es)? y (\d+) restaurante(?:s)?\. Elija un hotel para ver su carta\.$/i);
+    if (match) {
+      const countHotels = Number(match[1]);
+      const countRestaurant = Number(match[2]);
+      return match[1] + " " + (countHotels === 1 ? "hotel" : "hotels") + " and " + match[2] + " " + (countRestaurant === 1 ? "restaurant" : "restaurants") + ". Choose a hotel to see its menu.";
+    }
+    match = value.match(/^(\d+) hotel(?:es)? · (\d+) restaurante(?:s)?$/i);
+    if (match) {
+      const countHotels = Number(match[1]);
+      const countRestaurant = Number(match[2]);
+      return match[1] + " " + (countHotels === 1 ? "hotel" : "hotels") + " · " + match[2] + " " + (countRestaurant === 1 ? "restaurant" : "restaurants");
+    }
     match = value.match(/^(\d+) RESTAURANTES$/);
     if (match) return match[1] + " RESTAURANTS";
-    match = value.match(/^(\d+) restaurantes$/);
-    if (match) return match[1] + " restaurants";
+    match = value.match(/^(\d+) restaurantes?$/i);
+    if (match) return match[1] + (Number(match[1]) === 1 ? " restaurant" : " restaurants");
     match = value.match(/^GASTRONOMÍA · (.+)$/);
     if (match) return "DINING · " + (translationFor(match[1]) || match[1]);
     match = value.match(/^Restaurantes · (.+)$/);

@@ -115,7 +115,12 @@
       tipo: "Tipo",
       cocina: "Cocina",
       cuisine: "Cocina",
-      cartaEn: "Carta"
+      cartaEn: "Carta",
+      footerLead: "Iberostar Hotels & Resorts es una cadena hotelera líder en hoteles de vacaciones presente en los principales destinos turísticos de España, Mediterráneo y Caribe. Con más de 120 hoteles de 4 y 5 estrellas, Iberostar Hotels & Resorts le ofrece hoteles y resorts para disfrutar de unas vacaciones en la playa, con golf, spa & wellness además de bodas y convenciones. Reserve sus vacaciones con Iberostar Hotels & Resorts.",
+      footerNote: "El portfolio de Iberostar Beachfront Resorts excluye los intereses de Iberostar en Cuba.",
+      footerLegal: "Nota legal",
+      footerPrivacy: "Política de privacidad",
+      footerLinksLabel: "Enlaces de interés"
     },
 
     en: {
@@ -255,7 +260,12 @@
       seeMore: "See more",
       closeModal: "Close modal",
       loading: "Loading",
-      error: "Error"
+      error: "Error",
+      footerLead: "Iberostar Hotels & Resorts is a leading vacation hotel chain present in the main tourist destinations of Spain, the Mediterranean and the Caribbean. With more than 120 four- and five-star hotels, Iberostar Hotels & Resorts offers hotels and resorts to enjoy a beach vacation, with golf, spa & wellness as well as weddings and conventions. Book your vacation with Iberostar Hotels & Resorts.",
+      footerNote: "The Iberostar Beachfront Resorts portfolio excludes Iberostar's interests in Cuba.",
+      footerLegal: "Legal notice",
+      footerPrivacy: "Privacy policy",
+      footerLinksLabel: "Links of interest"
     }
   };
 
