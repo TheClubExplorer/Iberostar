@@ -496,7 +496,7 @@
       id: "baby-kitchen",
       name: "Baby Kitchen",
       tipo: "cafeteria",
-      cocina: "Area de Preparación Infantil 24h",
+      cocina: "Área de Preparación Infantil 24h",
       cuisine: "24h Infant Food Prep Area",
       carta: "Purés y papillas orgánicas para bebés · Leche entera, deslactosada y vegetal · Fruta fresca seleccionada para triturar · Esterilizadores y microondas de libre uso",
       menu: "Organic purees and porridges for babies · Whole, lactose-free and plant-based milk · Fresh selected fruit for crushing · Sterilizers and microwaves for free use",
@@ -565,7 +565,7 @@
         "Ceviche fresco de pescado al cilantro",
         "Crepas dulces y helados artesanales"
       ],
-      hotel: "Playa Paraíso (Area de Playa y Albercas)"
+      hotel: "Playa Paraíso (Área de Playa y Albercas)"
     },
     "el-kiosko": {
       tipo: "cafeteria",
@@ -855,8 +855,8 @@
     "star-prestige-lounge": {
       hours: "09:00 - 21:00",
       horarioTexto: "09:00 - 21:00",
-      amenities: "Areas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
-      amenidades: "Areas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
+      amenities: "Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
+      amenidades: "Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
       amenitiesEn: "Rest areas, terrace, Wi-Fi, digital press, drinks and snacks",
       services: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas",
       servicios: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas",
@@ -868,40 +868,40 @@
     "star-prestige-beach-club": {
       hours: "09:00 - 21:00",
       horarioTexto: "09:00 - 21:00",
-      amenities: "Areas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
-      amenidades: "Areas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
+      amenities: "Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
+      amenidades: "Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
       amenitiesEn: "Rest areas, terrace, Wi-Fi, digital press, drinks and snacks",
       services: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas",
       servicios: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas",
       servicesEn: "Personalized concierge, premium drinks, priority reservations, access to exclusive areas",
-      description: "Area exclusiva frente al mar donde usted disfruta de confort, servicio atento y experiencias preferentes en un entorno cálido y distinguido.",
-      descripcion: "Area exclusiva frente al mar donde usted disfruta de confort, servicio atento y experiencias preferentes en un entorno cálido y distinguido.",
+      description: "Área exclusiva frente al mar donde usted disfruta de confort, servicio atento y experiencias preferentes en un entorno cálido y distinguido.",
+      descripcion: "Área exclusiva frente al mar donde usted disfruta de confort, servicio atento y experiencias preferentes en un entorno cálido y distinguido.",
       descriptionEn: "Exclusive oceanfront area where you enjoy comfort, attentive service and preferred experiences in a warm and distinguished environment."
     },
     "star-prestige-maya": {
       hours: "09:00 - 21:00",
       horarioTexto: "09:00 - 21:00",
-      amenities: "Areas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
-      amenidades: "Areas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
+      amenities: "Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
+      amenidades: "Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
       amenitiesEn: "Rest areas, terrace, Wi-Fi, digital press, drinks and snacks",
       services: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas",
       servicios: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas",
       servicesEn: "Personalized concierge, premium drinks, priority reservations, access to exclusive areas",
-      description: "Area exclusiva Star Prestige en Paraíso Maya donde usted accede a servicios preferentes, ambientes cálidos y atención personalizada durante su estancia.",
-      descripcion: "Area exclusiva Star Prestige en Paraíso Maya donde usted accede a servicios preferentes, ambientes cálidos y atención personalizada durante su estancia.",
+      description: "Área exclusiva Star Prestige en Paraíso Maya donde usted accede a servicios preferentes, ambientes cálidos y atención personalizada durante su estancia.",
+      descripcion: "Área exclusiva Star Prestige en Paraíso Maya donde usted accede a servicios preferentes, ambientes cálidos y atención personalizada durante su estancia.",
       descriptionEn: "Exclusive Star Prestige area in Paraíso Maya where you access preferred services, warm environments and personalized attention during your stay."
     },
     "star-prestige-joia": {
       hours: "09:00 - 21:00",
       horarioTexto: "09:00 - 21:00",
-      amenities: "Areas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
-      amenidades: "Areas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
+      amenities: "Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
+      amenidades: "Áreas de descanso, terraza, Wi-Fi, prensa digital, bebidas y snacks",
       amenitiesEn: "Rest areas, terrace, Wi-Fi, digital press, drinks and snacks",
       services: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas",
       servicios: "Concierge personalizado, bebidas premium, reservas prioritarias, acceso a áreas exclusivas",
       servicesEn: "Personalized concierge, premium drinks, priority reservations, access to exclusive areas",
-      description: "Area exclusiva Star Prestige en JOIA donde usted disfruta de lujo, servicio atento y experiencias preferentes en un entorno cálido y distinguido.",
-      descripcion: "Area exclusiva Star Prestige en JOIA donde usted disfruta de lujo, servicio atento y experiencias preferentes en un entorno cálido y distinguido.",
+      description: "Área exclusiva Star Prestige en JOIA donde usted disfruta de lujo, servicio atento y experiencias preferentes en un entorno cálido y distinguido.",
+      descripcion: "Área exclusiva Star Prestige en JOIA donde usted disfruta de lujo, servicio atento y experiencias preferentes en un entorno cálido y distinguido.",
       descriptionEn: "Exclusive Star Prestige area in JOIA where you enjoy luxury, attentive service and preferred experiences in a warm and distinguished environment."
     }
   };
@@ -913,7 +913,7 @@
     { hora: "10:30", nombre: "Star Camp: Taller Mini Chef y Huerto", nombreEn: "Star Camp: Mini Chef Workshop and Garden", lugar: "Star Camp", poiId: "starcamp", grupo: "Star Camp · Dolphin (8 a 12 años)" },
     { hora: "11:30", nombre: "Aqua Gym y Ritmos Caribeños", nombreEn: "Aqua Gym and Caribbean Rhythms", lugar: "Piscina Principal", poiId: "activities-pool", grupo: "Fit & Fun" },
     { hora: "15:00", nombre: "Torneo de Vóley de Playa", nombreEn: "Beach Volleyball Tournament", lugar: "Playa Paraíso", poiId: "playa-mar-caribe", grupo: "Fit & Fun" },
-    { hora: "16:30", nombre: "Clínica de Tiro con Arco y Tenis", nombreEn: "Archery and Tennis Clinic", lugar: "Area Deportiva", poiId: "tennis", grupo: "Fit & Fun" },
+    { hora: "16:30", nombre: "Clínica de Tiro con Arco y Tenis", nombreEn: "Archery and Tennis Clinic", lugar: "Área Deportiva", poiId: "tennis", grupo: "Fit & Fun" },
     { hora: "20:00", nombre: "Música en Vivo y Coctelería", nombreEn: "Live Music and Cocktails", lugar: "Lobby Bar Acuario", poiId: "lobby-bar-acuario", grupo: "Entretenimiento" },
     { hora: "21:30", nombre: "Espectáculo Nocturno Circense", nombreEn: "Night Circus Show", lugar: "Teatro Coliseo", poiId: "teatro-coliseo", grupo: "Espectáculos Nocturnos" }
   ];

@@ -1527,8 +1527,12 @@
       bearing: 0,
       touchRotate: true,
       rotateControl: { closeOnZeroBearing: false, position: "bottomright" },
-      minZoom: minZoomLevel
+      minZoom: minZoomLevel,
+      maxBounds: L.latLngBounds(boundsForZoom),
+      maxBoundsViscosity: 1.0,
+      maxZoom: 18
     });
+    map.setView(L.latLngBounds(boundsForZoom).getCenter(), 15);
     mapas.attachTouchScrollGuard(map, mapElement);
 
     state().activeMap = map;

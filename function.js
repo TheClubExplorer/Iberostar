@@ -273,7 +273,7 @@ function frameComplexMap(map, L, options = {}) {
   if (!map || !L) return null;
   const opts = options || {};
   const container = typeof map.getContainer === "function" ? map.getContainer() : null;
-  if (container && (!container.clientWidth || !container.clientHeight)) return null;
+  const hasSize = container ? Boolean(container.clientWidth && container.clientHeight) : true;
 
   const perimeter = opts.perimeter ? L.latLngBounds(opts.perimeter) : L.latLngBounds(complexPerimeter);
   const navBounds = opts.navBounds ? L.latLngBounds(opts.navBounds) : L.latLngBounds(complexBounds);
@@ -289,45 +289,48 @@ function frameComplexMap(map, L, options = {}) {
   const maxZoom = typeof opts.maxZoom === "number" ? opts.maxZoom : 18;
   const zoomOffset = typeof opts.zoomOffset === "number" ? opts.zoomOffset : 0;
   const minZoomOffset = typeof opts.minZoomOffset === "number" ? opts.minZoomOffset : 0;
+  const skipView = opts.skipView === true || !hasSize;
 
   map.options.maxBoundsViscosity = 1.0;
   map.setMaxBounds(navBounds);
   map.setMaxZoom(maxZoom);
 
+  const size = map.getSize();
+  const frameWidth = hasSize ? Math.max(size.x - paddingTopLeft.x - paddingBottomRight.x, 32) : 320;
+  const frameHeight = hasSize ? Math.max(size.y - paddingTopLeft.y - paddingBottomRight.y, 32) : 320;
+
   // El encuadre se calcula a medida (no con fitBounds) para que el relleno
   // asimétrico desplace el contenido de forma exacta y el zoom sea siempre el
   // correcto, incluso si el mapa aún no tenía ninguna vista.
-  const size = map.getSize();
-  const availableWidth = Math.max(size.x - paddingTopLeft.x - paddingBottomRight.x, 32);
-  const availableHeight = Math.max(size.y - paddingTopLeft.y - paddingBottomRight.y, 32);
-  const rawZoom = boundsZoomFor(focusBounds, L, availableWidth, availableHeight);
-  // Mismo redondeo que Leaflet: se trunca al nivel entero inferior.
-  const zoom = Math.max(1, Math.min(maxZoom, Math.floor(rawZoom) + zoomOffset));
+  let zoom = Math.max(1, Math.min(maxZoom, Math.floor(boundsZoomFor(focusBounds, L, frameWidth, frameHeight)) + zoomOffset));
+  if (!skipView) {
+    // El centro se desplaza la mitad de la diferencia de los rellenos para
+    // que el contenido quede centrado en la zona libre del mapa.
+    const center = L.latLngBounds(focusBounds).getCenter();
+    const projected = map.project(center, zoom);
+    const offsetX = (paddingBottomRight.x - paddingTopLeft.x) / 2;
+    const offsetY = (paddingBottomRight.y - paddingTopLeft.y) / 2;
+    const shifted = map.unproject(projected.add(L.point(offsetX, offsetY)), zoom);
 
-  // El centro se desplaza la mitad de la diferencia de los rellenos para
-  // que el contenido quede centrado en la zona libre del mapa.
-  const center = L.latLngBounds(focusBounds).getCenter();
-  const projected = map.project(center, zoom);
-  const offsetX = (paddingBottomRight.x - paddingTopLeft.x) / 2;
-  const offsetY = (paddingBottomRight.y - paddingTopLeft.y) / 2;
-  const shifted = map.unproject(projected.add(L.point(offsetX, offsetY)), zoom);
-
-  map.__programmaticFit = true;
-  try {
-    map.setView(shifted, zoom, { animate: false });
-  } finally {
-    map.__programmaticFit = false;
+    map.__programmaticFit = true;
+    try {
+      map.setView(shifted, zoom, { animate: false });
+    } finally {
+      map.__programmaticFit = false;
+    }
   }
 
   // El zoom mínimo permite ver el complejo entero: si se indica, se calcula
   // con esos límites; si no, es el propio zoom del encuadre.
+  const minSizeWidth = hasSize ? Math.max(size.x - padding * 2, 32) : 320;
+  const minSizeHeight = hasSize ? Math.max(size.y - padding * 2, 32) : 320;
   if (opts.minZoomBounds) {
     const minBounds = L.latLngBounds(opts.minZoomBounds);
     const minZoom = Math.floor(boundsZoomFor(
       minBounds,
       L,
-      Math.max(size.x - padding * 2, 32),
-      Math.max(size.y - padding * 2, 32)
+      minSizeWidth,
+      minSizeHeight
     )) + minZoomOffset;
     map.setMinZoom(Math.max(1, Math.min(minZoom, zoom)));
   } else {
@@ -351,10 +354,14 @@ function setupComplexMapFraming(map, L, options = {}) {
 
   const element = typeof map.getContainer === "function" ? map.getContainer() : null;
   const refit = () => {
-    if (!map || map.__userAdjusted) return;
+    if (!map) return;
     if (element && (!element.clientWidth || !element.clientHeight)) return;
     try { map.invalidateSize(); } catch (error) { /* ignore */ }
-    frameComplexMap(map, L, options);
+    if (map.__userAdjusted) {
+      frameComplexMap(map, L, { ...options, skipView: true });
+    } else {
+      frameComplexMap(map, L, options);
+    }
   };
 
   if (typeof requestAnimationFrame === "function") requestAnimationFrame(refit);
@@ -722,7 +729,7 @@ const pages = [
       "+52 984 877 2800",
       "reservas@iberostar.com",
       "iberostar.com",
-      "Playa del Carmen, Q.R00"
+      "Playa del Carmen, Q.ROO"
     ]
   }
 ];
@@ -6251,6 +6258,7 @@ function initializeGeneralMap() {
 
   loadLeaflet()
     .then((L) => {
+      const generalNavBounds = L.latLngBounds(complexBounds);
       const generalMap =
         L.map(
           mapElement,
@@ -6260,9 +6268,12 @@ function initializeGeneralMap() {
             rotate: true,
             bearing: 0,
             touchRotate: true,
-            rotateControl: { closeOnZeroBearing: false, position: "bottomright" }
+            rotateControl: { closeOnZeroBearing: false, position: "bottomright" },
+            maxBounds: generalNavBounds,
+            maxBoundsViscosity: 1.0,
+            maxZoom: 18
           }
-        );
+        ).setView(L.latLngBounds(complexPerimeter).getCenter(), 15);
 
       activeMap =
         generalMap;
@@ -6668,6 +6679,12 @@ const siteNav = document.getElementById("siteNav");
 const navOverlay = document.getElementById("navOverlay");
 const mobileNavMedia = window.matchMedia("(max-width: 850px)");
 let mobileNavSavedScrollY = 0;
+
+if (siteNav) {
+  siteNav.querySelectorAll("details.site-tools").forEach((details) => {
+    details.open = false;
+  });
+}
 
 function lockBodyScrollForMobileNav() {
   mobileNavSavedScrollY = window.scrollY || document.documentElement.scrollTop || 0;

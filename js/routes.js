@@ -1793,6 +1793,7 @@
 
     const build = typeof mapas.loadMarkerCluster === "function" ? mapas.loadMarkerCluster() : mapas.loadLeaflet();
     build.then((L) => {
+      const createSafeBounds = L.latLng(coordinates).toBounds(4000);
       const map = L.map(element, {
         scrollWheelZoom: true,
         preferCanvas: true,
@@ -1800,8 +1801,12 @@
         rotate: true,
         bearing: 0,
         touchRotate: true,
-        rotateControl: { closeOnZeroBearing: false, position: "bottomright" }
+        rotateControl: { closeOnZeroBearing: false, position: "bottomright" },
+        maxBounds: createSafeBounds,
+        maxBoundsViscosity: 1.0,
+        maxZoom: 19
       });
+      map.setView(coordinates, 16);
       if (typeof mapas.attachTouchScrollGuard === "function") mapas.attachTouchScrollGuard(map, element);
       activeHotelPortalMap = map;
       window.RevistaDigital.state.activeMap = map;
@@ -1829,7 +1834,6 @@
           const marker = L.marker(item.coordinates)
             .addTo(map)
             .bindPopup(`<strong>${escapeHtml(item.name)}</strong><br><small>${escapeHtml(destination.name)}, ${escapeHtml(countryData.name)}</small><br><a href="${href(hotelRoute)}" data-app-route="${hotelRoute}">Ver ficha →</a>`);
-          if (item.name === hotel.name) marker.openPopup();
           const guideHotel = window.RevistaDigital.guiapa?.poiForHotel?.(item.name);
           if (guideHotel) window.RevistaDigital.guiapa.registerMarker(guideHotel.id, marker);
           window.RevistaDigital.guiapa?.registerMarker?.(item.name, marker);
@@ -1940,6 +1944,11 @@
 
     const build = typeof mapas.loadMarkerCluster === "function" ? mapas.loadMarkerCluster() : mapas.loadLeaflet();
     build.then((L) => {
+      const rdState = window.RevistaDigital && window.RevistaDigital.state;
+      const hotelPointsBounds = L.latLngBounds(hotels.map((item) => item.coordinates));
+      const createNavBounds = (rdState && rdState.complexBounds)
+        ? L.latLngBounds(rdState.complexBounds)
+        : hotelPointsBounds.pad(0.05);
       const map = L.map(element, {
         scrollWheelZoom: true,
         preferCanvas: true,
@@ -1947,8 +1956,12 @@
         rotate: true,
         bearing: 0,
         touchRotate: true,
-        rotateControl: { closeOnZeroBearing: false, position: "bottomright" }
+        rotateControl: { closeOnZeroBearing: false, position: "bottomright" },
+        maxBounds: createNavBounds,
+        maxBoundsViscosity: 1.0,
+        maxZoom: 19
       });
+      map.setView(hotelPointsBounds.getCenter(), 15);
       if (typeof mapas.attachTouchScrollGuard === "function") mapas.attachTouchScrollGuard(map, element);
       window.RevistaDigital.state.activeMap = map;
       window.RevistaDigital.state.userMarker = null;
@@ -1991,7 +2004,6 @@
     }
     // Encuadre y límites de navegación del complejo Playa Paraíso
     const regionBounds = portalComplexViewBounds(L, hotels, guide?._poiLayer);
-    const rdState = window.RevistaDigital && window.RevistaDigital.state;
     const perimeter = (rdState && rdState.complexPerimeter) ? L.latLngBounds(rdState.complexPerimeter) : regionBounds;
     const navBounds = (rdState && rdState.complexBounds) ? L.latLngBounds(rdState.complexBounds) : (regionBounds ? regionBounds.pad(0.05) : null);
     if (perimeter && window.RevistaDigital && typeof window.RevistaDigital.setupComplexMapFraming === "function") {
@@ -2300,6 +2312,7 @@
         history.replaceState(history.state, "", href(canonicalRoute));
         return handleRouteChange(canonicalRoute);
       }
+      if (!window.location.hash) window.scrollTo(0, 0);
       if (activeMapboxFullscreen) setMapboxFullscreen(activeMapboxFullscreen.frame, false);
       window.RevistaDigital.mapas?.closeMapFullscreenAndRestoreScroll?.();
       if (document.body.classList.contains("guide-expanded-open")) setGuidePanelExpanded(false);
