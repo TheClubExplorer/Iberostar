@@ -3212,6 +3212,8 @@ function renderHotel(page) {
 
           ${carouselSlides}
 
+          <span class="hotel-carousel-weather weather-chip-dark weather-chip-overlay weather-live" data-weather-city="Cancún">Clima</span>
+
           <div class="reference-photo-content">
             <small>
               Todo lo incluido · La esencia
@@ -5136,6 +5138,13 @@ function wireVideos() {
    RENDER HOTEL
    ========================================================= */
 
+const WEATHER_CITY_BY_COUNTRY = {
+  mexico: "Cancún",
+  jamaica: "Montego Bay",
+  "republica-dominicana": "Punta Cana",
+  brasil: "Salvador"
+};
+
 function renderCountryMenu(page) {
   const countryKey = page.country || "mexico";
   const country = hotelCountryMenus[countryKey] || hotelCountryMenus.mexico;
@@ -5179,6 +5188,7 @@ function renderCountryMenu(page) {
       <div class="country-header">
         <div class="country-header-line"></div>
         <div class="country-header-meta">${page.kicker || country.name.toUpperCase()}</div>
+        <span class="country-header-weather weather-chip-light weather-live" data-weather-city="${WEATHER_CITY_BY_COUNTRY[countryKey] || "Cancún"}">Clima</span>
       </div>
 
       <div class="country-intro">
@@ -5252,6 +5262,7 @@ function renderComplexPage(page) {
             alt: "Vista del complejo Iberostar Playa Paraíso",
             sizes: "(max-width:620px) 92vw, 34vw"
           })}
+          <span class="complex-hero-weather weather-chip-dark weather-chip-overlay weather-live" data-weather-city="Cancún">Clima</span>
           <figcaption>Playa Paraíso · Riviera Maya</figcaption>
         </figure>
       </header>
@@ -5507,6 +5518,7 @@ function renderHotelDetail() {
             cls: "hotel-hero-image",
             sizes: "(max-width:860px) 100vw, 55vw"
           })}
+          <span class="hotel-hero-weather weather-chip-dark weather-chip-overlay weather-live" data-weather-city="${WEATHER_CITY_BY_COUNTRY[detail.countryKey] || "Cancún"}">Clima</span>
         </div>
 
         <div class="hotel-hero-info">

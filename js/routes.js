@@ -14,6 +14,12 @@
     "iberostar-paraiso-lindo",
     "iberostar-paraiso-joia"
   ]);
+  const PORTAL_WEATHER_CITY_BY_COUNTRY = {
+    mexico: "Cancún",
+    jamaica: "Montego Bay",
+    "republica-dominicana": "Punta Cana",
+    brasil: "Salvador"
+  };
 
   function slugify(value = "") {
     return String(value || "")
@@ -1086,6 +1092,7 @@
               destination.image || "src/paraiso-del-mar/banner/ParaisoDelMar.jpg",
               ...complexHotels.map((hotel) => hotel.image)
             ], destination.name)}
+            <span class="portal-hero-weather weather-chip-dark weather-chip-overlay weather-live" data-weather-city="${PORTAL_WEATHER_CITY_BY_COUNTRY[countrySlug] || "Cancún"}">Clima</span>
             <div>
               <p class="portal-kicker">${escapeHtml(complexPage.kicker || `EL COMPLEJO · ${destination.name.toUpperCase()}`)}</p>
               <h1>${escapeHtml(complexPage.title || destination.name)}</h1>
@@ -1178,7 +1185,7 @@
       const quickLinks = isHome
         ? renderPortalQuickLinks(countryCards, (item) => item.route, en ? "Quick access to countries" : "Acceso rápido a países", (item) => item.destinations)
         : renderPortalQuickLinks(countryData.destinations, (item) => `/${country}/${item.slug}`, en ? "Quick access to destinations" : "Acceso rápido a destinos", (item) => item.hotels.length);
-      view.innerHTML = `<main class="portal-page">${!isHome ? portalNav(getPortalNavModel(route)) : ""}<section class="portal-hero portal-hero--fullbleed"><div><p class="portal-kicker">${breadcrumb}</p><h1>${heading}</h1><p>${intro}</p>${!isHome ? "" : `<a class="portal-hero-link" href="${href("/mexico/riviera-maya")}" data-app-route="/mexico/riviera-maya">${en ? "Discover Iberostar Playa Paraíso" : "Conozca Iberostar Playa Paraíso"} <span>→</span></a><div class="portal-hero-stats" aria-label="${en ? "Destination summary" : "Resumen de destinos"}"><span><strong>${Object.keys(catalog).length}</strong> ${en ? "countries" : "países"}</span><span><strong>${totalDestinations}</strong> ${en ? "destinations" : "destinos"}</span><span><strong>${totalHotels}</strong> ${en ? "hotels" : "hoteles"}</span></div>`}</div>${renderPortalHeroCarousel(heroImages, isHome ? (en ? "our destinations" : "nuestros destinos") : countryData.name)}</section>${countryMapMarkup}<section class="portal-section"><div class="portal-section-heading"><div><p class="portal-kicker">${isHome ? (en ? "OUR COUNTRIES" : "NUESTROS PAÍSES") : (en ? "DESTINATIONS" : "DESTINOS")}</p><h2>${isHome ? (en ? "Travel your way" : "Viaje a su manera") : (en ? "Choose where to stay" : "Elija dónde hospedarse")}</h2></div>${!isHome ? `<a href="${href("/")}" data-app-route="/">${en ? "All countries" : "Todos los países"}</a>` : ""}</div>${countryQuickLinks}${quickLinks}<div class="destination-grid portal-card-carousel">${cards}</div></section></main>`;
+      view.innerHTML = `<main class="portal-page">${!isHome ? portalNav(getPortalNavModel(route)) : ""}<section class="portal-hero portal-hero--fullbleed"><span class="portal-hero-weather weather-chip-dark weather-chip-overlay weather-live" data-weather-city="${PORTAL_WEATHER_CITY_BY_COUNTRY[country] || "Cancún"}">Clima</span><div><p class="portal-kicker">${breadcrumb}</p><h1>${heading}</h1><p>${intro}</p>${!isHome ? "" : `<a class="portal-hero-link" href="${href("/mexico/riviera-maya")}" data-app-route="/mexico/riviera-maya">${en ? "Discover Iberostar Playa Paraíso" : "Conozca Iberostar Playa Paraíso"} <span>→</span></a><div class="portal-hero-stats" aria-label="${en ? "Destination summary" : "Resumen de destinos"}"><span><strong>${Object.keys(catalog).length}</strong> ${en ? "countries" : "países"}</span><span><strong>${totalDestinations}</strong> ${en ? "destinations" : "destinos"}</span><span><strong>${totalHotels}</strong> ${en ? "hotels" : "hoteles"}</span></div>`}</div>${renderPortalHeroCarousel(heroImages, isHome ? (en ? "our destinations" : "nuestros destinos") : countryData.name)}</section>${countryMapMarkup}<section class="portal-section"><div class="portal-section-heading"><div><p class="portal-kicker">${isHome ? (en ? "OUR COUNTRIES" : "NUESTROS PAÍSES") : (en ? "DESTINATIONS" : "DESTINOS")}</p><h2>${isHome ? (en ? "Travel your way" : "Viaje a su manera") : (en ? "Choose where to stay" : "Elija dónde hospedarse")}</h2></div>${!isHome ? `<a href="${href("/")}" data-app-route="/">${en ? "All countries" : "Todos los países"}</a>` : ""}</div>${countryQuickLinks}${quickLinks}<div class="destination-grid portal-card-carousel">${cards}</div></section></main>`;
       initPortalHeroCarousels(view);
       const countryMap = view.querySelector("#countryMap");
       if (countryMap) {
@@ -1197,7 +1204,7 @@
       document.body.dataset.appMode = "portal";
       document.body.dataset.routeManaged = "true";
       const mapDescription = destination.mapNotice || en ? "Select a marker to open the hotel card." : "Seleccione un marcador para abrir la ficha del hotel.";
-      view.innerHTML = `<main class="portal-page">${portalNav(getPortalNavModel(route))}<section class="portal-destination-hero portal-hero--fullbleed">${renderPortalHeroCarousel([destination.image, ...hotels.map((hotel) => hotel.image)], destination.name)}<div><p class="portal-kicker">${escapeHtml(countryData.name).toUpperCase()} · ${en ? "DESTINATION" : "DESTINO"}</p><h1>${escapeHtml(destination.name)}</h1><p>${escapeHtml(destination.description)}</p>${destination.complex ? `<a class="portal-hero-link" href="${href("/complejo-playa-paraiso")}" data-app-route="/complejo-playa-paraiso">${en ? "View Playa Paraíso complex →" : "Ver el complejo Playa Paraíso →"}</a>` : ""}</div></section><section class="portal-section"><div class="portal-section-heading"><div><p class="portal-kicker">${en ? "ACCOMMODATIONS" : "ALOJAMIENTOS"}</p><h2>${en ? "Hotels in" : "Hoteles en"} ${escapeHtml(destination.name)}</h2></div></div>${renderCountryQuickLinks(catalog, en ? "Quick access to countries" : "Acceso rápido a países")}${renderPortalQuickLinks(hotels, (hotel) => `/${country}/${destination.slug}/${hotel.slug}`, en ? "Quick access to hotels" : "Acceso rápido a hoteles")}<div class="destination-grid destination-grid--hotels portal-card-carousel">${renderCards(hotels, (hotel) => `/${country}/${destination.slug}/${hotel.slug}`, "hotel")}</div></section></main>`;
+      view.innerHTML = `<main class="portal-page">${portalNav(getPortalNavModel(route))}<section class="portal-destination-hero portal-hero--fullbleed">${renderPortalHeroCarousel([destination.image, ...hotels.map((hotel) => hotel.image)], destination.name)}<span class="portal-hero-weather weather-chip-dark weather-chip-overlay weather-live" data-weather-city="${PORTAL_WEATHER_CITY_BY_COUNTRY[country] || "Cancún"}">Clima</span><div><p class="portal-kicker">${escapeHtml(countryData.name).toUpperCase()} · ${en ? "DESTINATION" : "DESTINO"}</p><h1>${escapeHtml(destination.name)}</h1><p>${escapeHtml(destination.description)}</p>${destination.complex ? `<a class="portal-hero-link" href="${href("/complejo-playa-paraiso")}" data-app-route="/complejo-playa-paraiso">${en ? "View Playa Paraíso complex →" : "Ver el complejo Playa Paraíso →"}</a>` : ""}</div></section><section class="portal-section"><div class="portal-section-heading"><div><p class="portal-kicker">${en ? "ACCOMMODATIONS" : "ALOJAMIENTOS"}</p><h2>${en ? "Hotels in" : "Hoteles en"} ${escapeHtml(destination.name)}</h2></div></div>${renderCountryQuickLinks(catalog, en ? "Quick access to countries" : "Acceso rápido a países")}${renderPortalQuickLinks(hotels, (hotel) => `/${country}/${destination.slug}/${hotel.slug}`, en ? "Quick access to hotels" : "Acceso rápido a hoteles")}<div class="destination-grid destination-grid--hotels portal-card-carousel">${renderCards(hotels, (hotel) => `/${country}/${destination.slug}/${hotel.slug}`, "hotel")}</div></section></main>`;
       initPortalHeroCarousels(view);
       const mapElement = view.querySelector("#destinationMap");
       if (mapElement) window.RevistaDigital.mapas?.initializeDestinationMap(mapElement, { countrySlug: country, destination });
@@ -1423,6 +1430,7 @@
             priority: true,
             sizes: "(max-width:600px) 100vw, 45vw"
           })}
+          <span class="portal-hero-weather weather-chip-light weather-chip-overlay weather-live" data-weather-city="${PORTAL_WEATHER_CITY_BY_COUNTRY[country.slug] || "Cancún"}">Clima</span>
           <div><p class="portal-kicker">GASTRONOMÍA · ${escapeHtml(country.name).toUpperCase()}</p><h1>Restaurantes en ${escapeHtml(country.name)}</h1><p>${country.hotels.length} ${hotelWord} y ${country.restaurantCount} ${restaurantWord}. Elija un hotel para ver su carta.</p></div>
         </section>
         ${restaurantSearchMarkup()}
@@ -1476,6 +1484,7 @@
           priority: true,
           sizes: "(max-width:600px) 100vw, 45vw"
         })}
+        <span class="portal-hero-weather weather-chip-light weather-chip-overlay weather-live" data-weather-city="${PORTAL_WEATHER_CITY_BY_COUNTRY[country.slug] || "Cancún"}">Clima</span>
         <div><p class="portal-kicker">${escapeHtml(country.name).toUpperCase()} · ${escapeHtml(hotel.destinationName).toUpperCase()}</p><h1>${escapeHtml(hotel.name)}</h1><p>${count} ${countWord} para descubrir durante su estancia.</p><a class="portal-hero-link" href="${href(hotel.hotelRoute)}" data-app-route="${hotel.hotelRoute}">Ver la ficha del hotel →</a></div>
       </section>
       <section class="portal-section restaurant-fiche">
@@ -1580,6 +1589,7 @@
           ...Object.values(official || {}).filter(Array.isArray).flat()
         ], displayName, "hotel-portal-hero-carousel", "hotel-portal-hero-bg", "100vw")}
         <div class="hotel-portal-hero-scrim"></div>
+        <span class="hotel-portal-hero-weather weather-chip-dark weather-chip-overlay weather-live" data-weather-city="${PORTAL_WEATHER_CITY_BY_COUNTRY[countrySlug] || "Cancún"}">Clima</span>
           <div class="hotel-portal-hero-content">
             <p class="portal-kicker">${escapeHtml(countryData.name).toUpperCase()} · ${escapeHtml(destination.name).toUpperCase()}</p>
             <h1>${escapeHtml(displayName)}</h1>

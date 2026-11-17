@@ -834,7 +834,7 @@
     if (map._complexMaskApplied) return gp._complexMask || null;
     var L = window.L;
     var opts = options || {};
-    var color = opts.color || "#f5f0e7"; // tono del sitio (--paper)
+    var color = opts.color || "#eceae6"; // tono del sitio (--paper)
     var ring = gp.COMPLEX_RING;
     // Renderizador SVG explícito: el mapa usa preferCanvas, pero necesitamos
     // SVG para poder difuminar el borde con CSS (filter: blur).
@@ -1311,7 +1311,7 @@
     // Renderizador SVG explícito: los mapas de la guía usan preferCanvas y el
     // renderer de canvas es inestable al rotar/hacer zoom con leaflet-rotate.
     var lineOptions = {
-      color: "#0057b8",
+      color: "#002855",
       weight: 6,
       opacity: 0.95,
       pane: "complexRoutePane"

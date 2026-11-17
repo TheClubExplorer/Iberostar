@@ -1232,7 +1232,7 @@
     if (line) {
       if (!cg._routeLine) {
         cg._routeLine = cg._L.polyline(line, {
-          color: dashed ? "#8a7c6e" : "#2e8b57",
+          color: dashed ? "#83786f" : "#2e8b57",
           weight: dashed ? 4 : 5,
           dashArray: dashed ? "6 8" : "",
           opacity: dashed ? 0.75 : 0.95
@@ -1240,7 +1240,7 @@
       } else {
         cg._routeLine.setLatLngs(line);
         cg._routeLine.setStyle({
-          color: dashed ? "#8a7c6e" : "#2e8b57",
+          color: dashed ? "#83786f" : "#2e8b57",
           weight: dashed ? 4 : 5,
           dashArray: dashed ? "6 8" : "",
           opacity: dashed ? 0.75 : 0.95
