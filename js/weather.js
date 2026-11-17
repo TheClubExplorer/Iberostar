@@ -20,6 +20,16 @@ const weatherLabels = {
   default: "Clima no disponible"
 };
 
+const weatherLabelsEn = {
+  clear: "Clear",
+  clouds: "Cloudy",
+  rain: "Rain",
+  thunderstorm: "Storm",
+  snow: "Snow",
+  mist: "Mist",
+  default: "Weather not available"
+};
+
 function weatherConditionKey(value) {
   const text = String(value || "").toLowerCase();
   if (text.includes("thunderstorm")) return "thunderstorm";
@@ -36,17 +46,23 @@ function weatherIconSvg(condition, size = 16) {
   return `<svg class="weather-icon" width="${size}" height="${size}" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">${weatherIconPaths[key] || weatherIconPaths.default}</svg>`;
 }
 
-function weatherLabel(condition, description) {
-  return weatherLabels[weatherConditionKey(condition || description)] || weatherLabels.default;
+function currentWeatherLang() {
+  return window.RevistaDigital?.i18n?.getLang?.() === "en" ? "en" : "es";
 }
 
-function weatherEndpoint(city) {
-  return `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&units=metric&lang=es&appid=${WEATHER_API_KEY}`;
+function weatherLabel(condition, description, lang = currentWeatherLang()) {
+  const labels = lang === "en" ? weatherLabelsEn : weatherLabels;
+  return labels[weatherConditionKey(condition || description)] || labels.default;
+}
+
+function weatherEndpoint(city, lang = currentWeatherLang()) {
+  return `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&units=metric&lang=${lang}&appid=${WEATHER_API_KEY}`;
 }
 
 async function getWeatherForCity(city) {
+  const lang = currentWeatherLang();
   try {
-    const response = await fetch(weatherEndpoint(city));
+    const response = await fetch(weatherEndpoint(city, lang));
     if (!response.ok) return null;
     const data = await response.json();
     const condition = data.weather?.[0]?.main || "";
@@ -55,7 +71,8 @@ async function getWeatherForCity(city) {
       city: data.name,
       condition,
       description,
-      label: weatherLabel(condition, description)
+      label: weatherLabel(condition, description, lang),
+      lang
     };
   } catch (error) {
     console.error("Error clima ciudad:", error);
@@ -71,12 +88,14 @@ window.RevistaDigital.weather = {
 };
 
 function paintWeatherBadge(badge, data) {
+  const lang = data?.lang || currentWeatherLang();
+  const fallback = lang === "en" ? weatherLabelsEn.default : weatherLabels.default;
   const icon = window.RevistaDigital.weather.icon(data?.condition || "clouds", 15);
   badge.innerHTML = icon;
   const text = document.createElement("span");
-  text.textContent = data?.label || "Clima no disponible";
+  text.textContent = data?.label || fallback;
   badge.appendChild(text);
-  badge.title = data ? `${data.description} · ${data.city}` : "Clima no disponible";
+  badge.title = data ? `${data.description} · ${data.city}` : fallback;
 }
 
 async function refreshWeatherCards() {

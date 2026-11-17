@@ -9274,9 +9274,10 @@ div[class*="leaflet-marker-icon"] {
 
 .site-footer-logo {
   display: block;
-  height: 46px;
+  height: 180px;
   width: auto;
-  margin: 0 0 24px;
+  max-width: 100%;
+  margin: 0 auto 24px;
 }
 
 .site-footer-lead {
@@ -9333,8 +9334,8 @@ div[class*="leaflet-marker-icon"] {
   }
 
   .site-footer-logo {
-    height: 34px;
-    margin-bottom: 18px;
+    height: 124px;
+    margin: 0 auto 18px;
   }
 
   .site-footer-lead {
