@@ -2632,7 +2632,7 @@ button {
 .site-nav-destinos .site-tools-menu { left:0; right:auto; }
 .mobile-menu-btn, .mobile-nav-close, .mobile-nav-intro, .nav-overlay { display:none; }
 html[data-route-startup="true"] .magazine-stage,html[data-route-startup="true"] #pager { display:none !important; }
-.app-view { display:none; width:100%; }
+.app-view { display:none; width:100%; padding-bottom:100px; }
 body[data-app-mode="portal"] { min-height:100vh; align-items:stretch; justify-content:flex-start; background:var(--paper); color:var(--green-deep); }
 body[data-app-mode="hotel"] { min-height:100vh; align-items:stretch; justify-content:flex-start; background:var(--paper); color:var(--green-deep); }
 body[data-app-mode="tool"] { min-height:100vh; align-items:stretch; justify-content:flex-start; background:var(--paper); color:var(--green-deep); }
@@ -2666,7 +2666,7 @@ body.cart-map-focus-open .location-status,
 }
 body[data-app-mode="portal"] .app-view { display:block; }
 body[data-app-mode="hotel"] .nav-button,body[data-app-mode="hotel"] #pager { display:none !important; }
-body[data-app-mode="hotel"] .magazine-stage { width:min(1240px,94vw); margin:28px auto 64px; }
+body[data-app-mode="hotel"] .magazine-stage { width:min(1240px,94vw); margin:28px auto 140px; }
 body[data-app-mode="hotel"] .book-shell { min-height:0; perspective:none; }
 body[data-app-mode="hotel"] .book-shell.page-turn,body[data-app-mode="tool"] .book-shell.page-turn { animation:none !important; }
 body[data-app-mode="hotel"] .book-shell > .spread { min-height:0; border-radius:14px; box-shadow:0 16px 42px var(--green-deep)17; }
