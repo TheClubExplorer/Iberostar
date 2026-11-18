@@ -606,7 +606,7 @@ const pages = [
       "Iberostar Paraíso del Mar, Playa Paraíso, Quintana Roo, México",
     image: "src/ParaisoDelMar 1.jpg",
     intro:
-      "Iberostar Waves Paraíso del Mar combina la belleza natural de la Riviera Maya, una experiencia Todo Incluido premium, gastronomía internacional, actividades para toda la familia y acceso a una de las playas más atractivas del Caribe mexicano.",
+      "Todo Incluido premium en Riviera Maya con gastronomía internacional, actividades familiares y playa destacada.",
     stats: [
       ["344", "Habitaciones"],
       ["7", "Restaurantes"],
@@ -628,7 +628,7 @@ const pages = [
       "Iberostar Selection Paraíso Maya Suites, Carretera Chetumal-Puerto Juárez km 309, Playa Paraíso, Quintana Roo, México",
     image: "src/paraisoMaya 1.jpg",
     intro:
-      "Iberostar Selection Paraíso Maya combina la grandeza de la cultura maya con una experiencia todo incluido frente al Caribe. Sus piscinas, parque acuático, río lento, gastronomía internacional y programas familiares convierten al resort en uno de los destinos más completos de Riviera Maya.",
+      "Todo incluido frente al Caribe con cultura maya, piscinas, parque acuático, río lento y programas familiares.",
     stats: [
       ["308", "Habitaciones"],
       ["8", "Restaurantes"],
@@ -650,7 +650,7 @@ const pages = [
       "Iberostar Paraíso Lindo, Playa Paraíso, Quintana Roo, México",
     image: "src/ParaisoLindo1.jpg",
     intro:
-      "Iberostar Selection Paraíso Lindo combina naturaleza, diversión y descanso en un entorno privilegiado frente al Caribe mexicano. Sus piscinas, parque acuático, río lento y experiencias gastronómicas lo convierten en el lugar ideal para familias y viajeros que buscan disfrutar de la esencia de Riviera Maya con el sello de hospitalidad Iberostar.",
+      "Naturaleza, diversión y descanso en entorno caribeño privilegiado; piscinas, parque acuático, río lento, ideal familias.",
     stats: [
       ["388", "Habitaciones"],
       ["9", "Restaurantes"],
@@ -672,7 +672,7 @@ const pages = [
       "Iberostar Paraíso Beach, Playa Paraíso, Quintana Roo, México",
     image: "src/paraisoBeach1.jpg",
     intro:
-      "Iberostar Waves Paraíso Beach combina la esencia del Caribe mexicano con una experiencia Todo Incluido diseñada para toda la familia. Rodeado de exuberantes jardines tropicales y una espectacular playa de arena blanca, ofrece gastronomía internacional, entretenimiento para todas las edades, piscinas de gran tamaño y acceso a las experiencias exclusivas que caracterizan a Iberostar. Un destino donde la relajación, la diversión y la sostenibilidad se unen para crear vacaciones inolvidables.",
+      "Esencia del Caribe en Todo Incluido familiar: jardines tropicales, playa blanca, gastronomía, entretenimiento, sostenibilidad.",
     stats: [
       ["302", "Habitaciones"],
       ["6", "Restaurantes"],
@@ -694,7 +694,7 @@ const pages = [
       "Iberostar JOIA Paraíso, Playa Paraíso, Quintana Roo, México",
     image: "src/JOIA1.jpg",
     intro:
-      "JOIA Paraíso by Iberostar representa la máxima expresión de lujo dentro del complejo Iberostar Playa Paraíso. Diseñado exclusivamente para adultos, ofrece suites elegantes, servicio de mayordomía, experiencias gastronómicas gourmet, spa de clase mundial y acceso privilegiado a una de las playas más hermosas del Caribe mexicano.",
+      "Lujo solo adultos: suites, mayordomía, gastronomía gourmet, spa de clase mundial y acceso privilegiado a playa.",
     stats: [
       ["310", "Habitaciones"],
       ["8", "Restaurantes"],
