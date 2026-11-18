@@ -1,4 +1,4 @@
-const WEATHER_API_KEY = "ddfed6e6d7dac57eea9c70419f39e71e";
+const WEATHER_API_KEY = "7c43033903b5f178db5657dd856c87a0";
 
 const weatherIconPaths = {
   clear: `<circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.4M12 19.6V22M2 12h2.4M19.6 12H22M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none"/>`,

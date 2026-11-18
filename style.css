@@ -2612,7 +2612,7 @@ button {
   box-shadow: 0 8px 30px rgba(64, 54, 46, .04);
 }
 .site-brand { display:flex; align-items:center; gap:12px; color:inherit; text-decoration:none; font:600 16px var(--font-ui); letter-spacing:.08em; text-transform:uppercase; }
-.site-brand img { width:120px; height:94px; object-fit:contain; }
+.site-brand img { width:180px; height:auto; object-fit:contain; }
 .site-nav { display:flex; align-items:center; gap:clamp(12px, 2.2vw, 30px); flex-wrap:wrap; }
 .site-nav a,.site-tools summary { color:var(--green); cursor:pointer; font:600 12px var(--font-ui); letter-spacing:.08em; text-decoration:none; text-transform:uppercase; }
 .site-nav a:hover,.site-tools summary:hover { color:var(--gold-deep); }
@@ -2855,7 +2855,7 @@ body.guide-expanded-open { overflow:hidden !important; overscroll-behavior:none;
   .nav-overlay[hidden] { display:none; }
   .nav-overlay.is-open { opacity:1; }
 }
-@media(max-width:600px) { .portal-page { padding-top:16px; } .portal-hero,.portal-destination-hero { grid-template-columns:1fr; } .portal-hero > div,.portal-destination-hero > div { padding:28px; } .portal-hero > img,.portal-destination-hero > img { grid-column:1; grid-row:auto; min-height:220px; max-height:260px; } .portal-map-section { grid-template-columns:1fr; padding:18px; } .portal-destination-map { height:300px; } .portal-destination-map.portal-complex-map { height:300px; min-height:300px; } .portal-all-hotels-map { height:52vh; min-height:300px; } .destination-grid { grid-template-columns:1fr; } .destination-card,.destination-card-copy { min-height:300px; } .site-brand img { width:90px; height:71px; } .hotel-portal-nav { position:sticky; top:12px; z-index:20; padding:10px 12px; gap:8px; } .hotel-portal-nav a { padding:8px 10px; border-radius:999px; font-size:11px; } .hotel-portal-hero { min-height:420px; } .hotel-portal-hero-content { padding:22px 20px 26px; } .hotel-portal-hero h1 { font-size:clamp(30px,10vw,44px); } .hotel-portal-hero-location { font-size:11px; letter-spacing:.04em; } .hotel-portal-hero-desc { font-size:15px; } .hotel-portal-section { margin-top:38px; } .hotel-portal-about-split { grid-template-columns:1fr; } .hotel-portal-about-copy h2 { font-size:clamp(28px,8vw,38px); } .hotel-portal-stats-panel { grid-template-columns:repeat(2,minmax(0,1fr)); } .hotel-portal-services { grid-template-columns:1fr; } .hotel-portal-card-grid { grid-template-columns:1fr; } .hotel-portal-gallery { grid-template-columns:1fr; } .hotel-portal-gallery figure:first-child { grid-column:auto; grid-row:auto; } .hotel-portal-gallery img, .hotel-portal-gallery figure:first-child img { height:220px; } .hotel-portal-map { height:300px; } .hotel-portal-hero-cta { width:100%; justify-content:center; } }
+@media(max-width:600px) { .portal-page { padding-top:16px; } .portal-hero,.portal-destination-hero { grid-template-columns:1fr; } .portal-hero > div,.portal-destination-hero > div { padding:28px; } .portal-hero > img,.portal-destination-hero > img { grid-column:1; grid-row:auto; min-height:220px; max-height:260px; } .portal-map-section { grid-template-columns:1fr; padding:18px; } .portal-destination-map { height:300px; } .portal-destination-map.portal-complex-map { height:300px; min-height:300px; } .portal-all-hotels-map { height:52vh; min-height:300px; } .destination-grid { grid-template-columns:1fr; } .destination-card,.destination-card-copy { min-height:300px; } .site-brand img { width:130px; height:auto; } .hotel-portal-nav { position:sticky; top:12px; z-index:20; padding:10px 12px; gap:8px; } .hotel-portal-nav a { padding:8px 10px; border-radius:999px; font-size:11px; } .hotel-portal-hero { min-height:420px; } .hotel-portal-hero-content { padding:22px 20px 26px; } .hotel-portal-hero h1 { font-size:clamp(30px,10vw,44px); } .hotel-portal-hero-location { font-size:11px; letter-spacing:.04em; } .hotel-portal-hero-desc { font-size:15px; } .hotel-portal-section { margin-top:38px; } .hotel-portal-about-split { grid-template-columns:1fr; } .hotel-portal-about-copy h2 { font-size:clamp(28px,8vw,38px); } .hotel-portal-stats-panel { grid-template-columns:repeat(2,minmax(0,1fr)); } .hotel-portal-services { grid-template-columns:1fr; } .hotel-portal-card-grid { grid-template-columns:1fr; } .hotel-portal-gallery { grid-template-columns:1fr; } .hotel-portal-gallery figure:first-child { grid-column:auto; grid-row:auto; } .hotel-portal-gallery img, .hotel-portal-gallery figure:first-child img { height:220px; } .hotel-portal-map { height:300px; } .hotel-portal-hero-cta { width:100%; justify-content:center; } }
 .portal-hero > div.portal-hero-carousel,.portal-destination-hero > div.portal-hero-carousel { padding:0; }
 .hotel-portal-hero .portal-hero-carousel { max-height:none; }
 @media(max-width:700px) { .hotel-restaurant-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
@@ -5096,7 +5096,7 @@ body.mobile-nav-open .location-status { display: none !important; }
       @media (max-width: 850px) {
         body {
           justify-content: flex-start;
-          padding: 18px 0 88px;
+          padding: 18px 0 0;
         }
 
         .magazine-stage {
@@ -9260,62 +9260,73 @@ div[class*="leaflet-marker-icon"] {
 .site-footer {
   margin-top: auto;
   width: 100%;
-  background: #002855;
+  background-color: #83786F;
+  background-image: none;
   border-top: 6px solid #B9A385;
-  color: #ECEAE6;
+  color: #090403;
   font-family: var(--font-display);
 }
 
 .site-footer-inner {
   max-width: 1240px;
   margin: 0 auto;
-  padding: 42px 28px 38px;
+  padding: 30px 28px 26px;
 }
 
 .site-footer-logo {
   display: block;
-  height: 180px;
+  height: 110px;
   width: auto;
   max-width: 100%;
-  margin: 0 auto 24px;
+  margin: 0 auto 18px;
 }
 
 .site-footer-lead {
-  margin: 0 0 16px;
+  margin: 0 0 12px;
   max-width: 860px;
-  font-size: 16px;
-  line-height: 1.65;
+  font-size: 15px;
+  line-height: 1.6;
   font-weight: 400;
-  color: #ECEAE6;
+  color: #090403;
+  -webkit-text-fill-color: #090403;
+  opacity: 1;
+  mix-blend-mode: normal;
 }
 
 .site-footer-note {
   margin: 0;
   max-width: 860px;
-  font-size: 14px;
-  line-height: 1.6;
-  color: #ECEAE6;
+  font-size: 13px;
+  line-height: 1.55;
+  color: #090403;
+  -webkit-text-fill-color: #090403;
+  opacity: 1;
+  mix-blend-mode: normal;
 }
 
 .site-footer-links {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px 30px;
-  margin-top: 28px;
-  padding-top: 20px;
-  border-top: 1px solid rgba(236, 234, 230, .25);
+  gap: 10px 24px;
+  margin-top: 20px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(236, 234, 230, .28);
 }
 
 .site-footer-links a {
-  color: #B9A385;
+  color: #090403;
+  -webkit-text-fill-color: #090403;
+  opacity: 1;
+  mix-blend-mode: normal;
   text-decoration: none;
-  font-size: 16px;
+  font-size: 14px;
   letter-spacing: .02em;
 }
 
 .site-footer-links a:hover,
 .site-footer-links a:focus-visible {
-  color: #fff;
+  color: #ECEAE6;
+  -webkit-text-fill-color: #ECEAE6;
   text-decoration: underline;
 }
 
@@ -9330,36 +9341,36 @@ div[class*="leaflet-marker-icon"] {
   }
 
   .site-footer-inner {
-    padding: 30px 18px 26px;
+    padding: 24px 18px calc(20px + env(safe-area-inset-bottom, 0px));
   }
 
   .site-footer-logo {
-    height: 124px;
-    margin: 0 auto 18px;
+    height: 76px;
+    margin: 0 auto 14px;
   }
 
   .site-footer-lead {
-    font-size: 15px;
-    line-height: 1.6;
-    margin-bottom: 12px;
+    font-size: 14px;
+    line-height: 1.55;
+    margin-bottom: 10px;
   }
 
   .site-footer-note {
-    font-size: 13px;
-    line-height: 1.55;
+    font-size: 12px;
+    line-height: 1.5;
   }
 
   .site-footer-links {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10px 16px;
-    margin-top: 22px;
-    padding-top: 16px;
+    gap: 8px 16px;
+    margin-top: 16px;
+    padding-top: 12px;
   }
 
   .site-footer-links a {
-    font-size: 14px;
-    padding: 6px 0;
+    font-size: 13px;
+    padding: 4px 0;
   }
 }
 
@@ -9371,4 +9382,21 @@ div[class*="leaflet-marker-icon"] {
 .weather-badge {
   text-transform: uppercase;
   letter-spacing: .1em;
+}
+
+.portal-page > .portal-hero--fullbleed,
+.portal-page > .hotel-portal-hero {
+  width: auto;
+  max-width: none;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+@media (min-width: 621px) {
+  .portal-page > .portal-nav {
+    margin: -16px 0 20px calc(50% - 50vw + 4px);
+  }
 }

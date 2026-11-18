@@ -15,6 +15,7 @@
     "Iberostar Selection Paraíso Maya": [
       ["Olivetti", "Cocina italiana"],
       ["Under the Sea", "Mariscos"],
+      ["La Marina", "Restaurante de Mariscos · Buffet Mediterráneo"],
       ["Lemon & Spices", "Internacional / Mediterráneo"]
     ],
     "Iberostar Selection Cancún": [

@@ -33,7 +33,7 @@ const RESTAURANTES_PARAISO = {
       ["L'Etoile", "Cocina francesa"],
       ["The Olivetti", "Cocina italiana"],
       ["American Seafood Grill Under the Sea", "Cocina de mariscos"],
-      ["Buffet La Marina", "Buffet Mediterráneo"]
+      ["La Marina", "Restaurante de Mariscos · Buffet Mediterráneo"]
     ],
     "Iberostar Waves Paraíso Lindo": [
       ["El Puerto", "Buffet / Brasería"],

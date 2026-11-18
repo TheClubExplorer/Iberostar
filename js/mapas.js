@@ -965,34 +965,6 @@
     return window.markerClusterPromise;
   };
 
-  mapas.loadGoogleMaps = function () {
-    if (!window.GOOGLE_MAPS_API_KEY) {
-      return Promise.resolve(null);
-    }
-
-    if (window.google?.maps) {
-      return Promise.resolve(window.google.maps);
-    }
-
-    if (window.googleMapsPromise) {
-      return window.googleMapsPromise;
-    }
-
-    window.googleMapsPromise = new Promise((resolve, reject) => {
-      const callbackName = "googleMapsReady";
-      window[callbackName] = () => resolve(window.google.maps);
-
-      const script = document.createElement("script");
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${window.GOOGLE_MAPS_API_KEY}&callback=${callbackName}`;
-      script.async = true;
-      script.defer = true;
-      script.onerror = reject;
-      document.head.appendChild(script);
-    });
-
-    return window.googleMapsPromise;
-  };
-
   mapas.requestCurrentLocation = function () {
     const status = document.getElementById("locationStatus");
 
@@ -1817,10 +1789,6 @@
 
   if (typeof window.loadLeaflet !== "function") {
     window.loadLeaflet = mapas.loadLeaflet;
-  }
-
-  if (typeof window.loadGoogleMaps !== "function") {
-    window.loadGoogleMaps = mapas.loadGoogleMaps;
   }
 
   if (typeof window.requestCurrentLocation !== "function") {

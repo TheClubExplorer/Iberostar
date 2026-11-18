@@ -20,8 +20,7 @@
       dinner: "18:30 - 22:00"
     },
     buffet_marina: {
-      breakfast: "07:00 - 10:30",
-      lunch: "13:00 - 15:00",
+      lunch: "12:00 - 16:00",
       dinner: "18:30 - 22:00"
     },
     especialidad: {
@@ -654,26 +653,25 @@
       ]
     },
     "buffet-la-marina": {
-      tipo: "buffet",
-      cocina: "Buffet Principal",
-      cuisine: "Main Buffet",
-      dressCode: "Informal",
-      reservation: "No requerida",
-      hours: "07:00 - 10:30 · 12:30 - 15:30 · 18:30 - 22:00",
-      horarioTexto: "Desayuno 07:00 - 10:30 h · Almuerzo 12:30 - 15:30 h · Cena 18:30 - 22:00 h",
-      hotel: "Iberostar Paraíso Maya",
-      carta: "Desayuno: Huevos y omelettes preparados al momento al gusto, hot cakes, waffles, estación de chilaquiles, embutidos y quesos variados, fruta tropical cortada, jugos naturales y panadería dulce recién horneada. Almuerzo y Cena: Estaciones de show cooking con carnes de res, aves y pescados a la plancha; barra de ensaladas orgánicas; barra caliente con pastas preparadas al momento, pizzas caseras, guisados mexicanos, pescados en salsa y mesa central de repostería y helados.",
-      menu: "Breakfast: Eggs and omelettes prepared to order, hot cakes, waffles, chilaquiles station, assorted cold cuts and cheeses, cut tropical fruit, natural juices and freshly baked sweet bakery. Lunch and Dinner: Live cooking stations with grilled beef, poultry and fish; organic salad bar; hot bar with freshly made pastas, homemade pizzas, Mexican stews, fish in sauce and central pastry and ice cream table.",
-      especialidades: "Huevos y omelettes al momento, hot cakes, waffles, estación de chilaquiles, embutidos y quesos, fruta tropical, jugos naturales, panadería dulce, estaciones de show cooking, barra de ensaladas orgánicas, pastas preparadas al momento, pizzas caseras, guisados mexicanos, pescados en salsa, repostería y helados.",
-      specialties: "Eggs and omelettes to order, hot cakes, waffles, chilaquiles station, cold cuts and cheeses, tropical fruit, natural juices, sweet bakery, live cooking stations, organic salad bar, freshly made pastas, homemade pizzas, Mexican stews, fish in sauce, pastry and ice cream.",
+      tipo: "especialidad",
+      cocina: "Restaurante de Mariscos · Buffet Mediterráneo",
+      cuisine: "Seafood Restaurant · Mediterranean Buffet",
+      vestimenta: "Casual de playa (almuerzo) / Smart Casual (cena)",
+      dressCode: "Beach casual (lunch) / Smart Casual (dinner)",
+      horario: "Almuerzo 12:00 - 16:00 h · Cena 18:30 - 22:00 h",
+      horarioTexto: "Almuerzo 12:00 - 16:00 h · Cena 18:30 - 22:00 h",
+      hours: "12:00 - 16:00 · 18:30 - 22:00",
+      hotel: "Iberostar Selection Paraíso Maya",
+      description: "Restaurante de mariscos en Iberostar Selection Paraíso Maya, con buffet mediterráneo al mediodía y cena a la carta; acceso compartido desde Paraíso Lindo.",
+      carta: "Almuerzo (12:00 - 16:00 h): Buffet Mediterráneo e Internacional frente a la alberca y playa. Cena (18:30 - 22:00 h): Especialidad a la carta en Pescados y Mariscos.",
+      menu: "Lunch (12:00 - 16:00): Mediterranean and international buffet by the pool and beach. Dinner (18:30 - 22:00): A la carte fish and seafood specialty.",
+      especialidades: "Buffet Mediterráneo e Internacional frente a la alberca y playa; cena a la carta de pescados y mariscos.",
+      specialties: "Mediterranean and international buffet by the pool and beach; a la carte fish and seafood dinner.",
       signatureDishes: [
-        "Huevos y omelettes al momento",
-        "Estación de chilaquiles",
-        "Carnes a la plancha",
-        "Pastas preparadas al momento",
-        "Pizzas caseras",
-        "Guisados mexicanos",
-        "Repostería y helados"
+        "Buffet Mediterráneo e Internacional",
+        "Pescados y Mariscos a la carta",
+        "Vista a la alberca y playa",
+        "Acceso compartido con Paraíso Lindo"
       ]
     },
   };
@@ -688,8 +686,8 @@
       cuisine: "Bar",
       carta: "Bebidas de alta gama, licores añejos y coctelería especializada; cerveza y snacks tipo bar (alitas, nachos).",
       menu: "Premium drinks, aged spirits and specialty cocktails; beer and bar snacks (wings, nachos).",
-      hours: "16:00 - 00:00",
-      horarioTexto: "16:00 - 00:00 h",
+      hours: "18:00 - 01:00",
+      horarioTexto: "18:00 a 01:00 h (servicio de cocina y snacks hasta las 23:30 h, continuando como bar nocturno y ambiente sports bar / música hasta el cierre).",
       hotel: "Iberostar Paraíso del Mar"
     },
     "pool-bar-las-olas": { tipo: "bar", cocina: "Bar de piscina (Swim-up)", cuisine: "Pool bar (Swim-up)", carta: "Margaritas frozen · Piñas coladas · Mojitos caribeños · Daiquirís · Cervezas frías", menu: "Frozen margaritas · Piña coladas · Caribbean mojitos · Daiquiris · Cold beers", hours: "10:00 - 19:00", horarioTexto: "10:00 - 19:00 h", hotel: "Iberostar Paraíso del Mar" },
@@ -772,8 +770,8 @@
       cuisine: "Rock bar",
       carta: "Bebidas de alta gama, licores añejos y coctelería especializada; cerveza y snacks tipo bar (alitas, nachos).",
       menu: "Premium drinks, aged spirits and specialty cocktails; beer and bar snacks (wings, nachos).",
-      hours: "16:00 - 00:00",
-      horarioTexto: "16:00 - 00:00 h",
+      hours: "18:00 - 01:00",
+      horarioTexto: "18:00 a 01:00 h (servicio de cocina y snacks hasta las 23:30 h, continuando como bar nocturno y ambiente sports bar / música hasta el cierre).",
       hotel: "Iberostar Paraíso Lindo"
     },
   };
