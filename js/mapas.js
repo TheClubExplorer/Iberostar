@@ -1321,7 +1321,7 @@
 
           state().routeLine?.remove();
           const routeLineOptions = {
-            color: "#d9b978",
+            color: "#B9A385",
             weight: 6,
             opacity: 0.95,
             dashArray: "12 8"

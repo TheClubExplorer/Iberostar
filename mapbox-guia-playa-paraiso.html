@@ -743,11 +743,11 @@
       map.addLayer({
         id: 'ruta-linea', type: 'line', source: 'ruta-src',
         layout: { 'line-join': 'round', 'line-cap': 'round' },
-        paint: { 'line-color': '#d4af37', 'line-width': 6, 'line-opacity': 1 }
+        paint: { 'line-color': '#B9A385', 'line-width': 6, 'line-opacity': 1 }
       });
       map.addLayer({
         id: 'ruta-puntos', type: 'circle', source: 'ruta-src',
-        paint: { 'circle-radius': 4, 'circle-color': '#d4af37', 'circle-opacity': 0.9, 'circle-stroke-width': 2, 'circle-stroke-color': '#ffffff' }
+        paint: { 'circle-radius': 4, 'circle-color': '#B9A385', 'circle-opacity': 0.9, 'circle-stroke-width': 2, 'circle-stroke-color': '#ffffff' }
       });
       var distanceKm = (result.distance / 1000).toFixed(1);
       var distanceEl = document.getElementById('route-distance');
