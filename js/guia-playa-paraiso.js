@@ -1192,7 +1192,18 @@
     var items = presentCategories().map(function (entry) {
       return '<li><span class="guide-dot" style="background:' + categoryColor(entry.key) + '"></span>' + escapeHtml(categoryLabel(entry.key)) + " <em>" + entry.count + "</em></li>";
     }).join("");
-    return '<h3 class="guide-legend-title">Leyenda de categorías</h3><ul class="guide-legend-list">' + items + '</ul><p class="guide-legend-note"><span class="guide-dot guide-dot--pending"></span>Pendiente de verificación (sin ubicación confirmada)</p>';
+    var pendingCount = 0;
+    var currentPois = queryPois({ filter: state.filter, query: state.query });
+    currentPois.forEach(function (p) {
+      var hasCoords = typeof p.lat === "number" && typeof p.lng === "number";
+      var isVerified = p.verified === true;
+      if (!hasCoords || !isVerified) pendingCount++;
+    });
+    var noteHtml = "";
+    if (pendingCount > 0) {
+      noteHtml = '<p class="guide-legend-note"><span class="guide-dot guide-dot--pending"></span>' + pendingCount + ' lugar' + (pendingCount === 1 ? '' : 'es') + ' pendiente de verificación (sin ubicación confirmada)</p>';
+    }
+    return '<h3 class="guide-legend-title">Leyenda de categorías</h3><ul class="guide-legend-list">' + items + '</ul>' + noteHtml;
   }
 
   function renderLegend() {
