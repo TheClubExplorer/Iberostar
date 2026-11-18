@@ -11,7 +11,7 @@ const SUPABASE_URL =
   "https://bivdwkwwlyisordzjhql.supabase.co";
 
 const SUPABASE_KEY =
-  "sb_publishable_8ji1n1QQR7AFRAUQyGHe6g_CdRZqUho";
+  "sb_publishable_QxdZMBsOeDNoK2T_3ZZYIg_8i_DWgno";
 
 const supabaseClient =
   window.supabase.createClient(
@@ -19,6 +19,16 @@ const supabaseClient =
     SUPABASE_KEY
   );
 window.supabaseClient = supabaseClient;
+
+const MAX_VIDEO_UPLOAD_BYTES = 50 * 1024 * 1024;
+
+function videoSizeLabel(bytes) {
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function videoTooLargeMessage(size) {
+  return `El video es demasiado pesado (${videoSizeLabel(size)}). El límite es de 50 MB. Comprímelo o sube uno más pequeño.`;
+}
 
 async function probarSupabase() {
   const { data, error } = await supabaseClient
@@ -83,6 +93,12 @@ function supabaseErrorMessage(error, fallback) {
       /row-level security|permission denied|not authorized|unauthorized/i.test(error.message || ""))
   ) {
     return "Inicie sesión con una cuenta de administrador.";
+  }
+  if (
+    error &&
+    /exceeded the maximum allowed size|file.*too large|payload too large/i.test(error.message || "")
+  ) {
+    return "El video es demasiado pesado: supera el límite de 50 MB. Comprímelo o sube uno más pequeño.";
   }
   return fallback;
 }
@@ -4723,6 +4739,12 @@ function wireVideos() {
 
       if (!file) return;
 
+      if (file.size > MAX_VIDEO_UPLOAD_BYTES) {
+        alert(videoTooLargeMessage(file.size));
+        fileInput.value = "";
+        return;
+      }
+
       const url =
         URL.createObjectURL(file);
 
@@ -4878,6 +4900,17 @@ function wireVideos() {
       if (!editId && !file) {
         alert(
           "Seleccione un video."
+        );
+
+        return;
+      }
+
+      if (
+        file &&
+        file.size > MAX_VIDEO_UPLOAD_BYTES
+      ) {
+        alert(
+          videoTooLargeMessage(file.size)
         );
 
         return;

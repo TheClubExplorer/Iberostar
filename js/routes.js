@@ -651,7 +651,7 @@
         stage.classList.toggle("is-mapbox", activate);
         frame.hidden = !activate;
         if (activate && !frame.src) {
-          frame.src = `${href("/mapbox-guia-playa-paraiso.html")}?embed=1&mode=complex&v=2`;
+          frame.src = `${href("/mapbox/mapbox-guia-playa-paraiso.html")}?embed=1&mode=complex&v=3`;
           frame.addEventListener("load", () => {
             sendMapboxCommand(frame, { command: "resize" });
             syncMapboxFrameViewport(frame);
@@ -912,8 +912,13 @@
         <div class="cart-hero-inner">
           <div class="cart-hero-top">
             <div class="cart-hero-head">
-              <p class="portal-kicker">MOVILIDAD · THE CLUB</p>
-              <h1>Carrito de golf</h1>
+              <div class="cart-hero-nav-row">
+                <div class="cart-hero-nav-desktop">${portalNav(getPortalNavModel(route))}</div>
+              </div>
+              <div class="cart-hero-title-row">
+                <h1>Carrito de golf</h1>
+                <p class="portal-kicker">MOVILIDAD · THE CLUB</p>
+              </div>
               <p class="cart-hero-sub">Solicita un carrito y síguelo en tiempo real hasta tu destino.</p>
             </div>
             <div class="cart-hero-actions">
@@ -981,7 +986,7 @@
           </div>
           <div class="hotel-cart-map-wrap">
             <div id="cartTrackingMap" class="hotel-cart-map" role="application" aria-label="Mapa de seguimiento del carrito de golf">
-              <iframe class="cart-mapbox-frame" title="Seguimiento 3D del carrito de golf" data-mapbox-src="${escapeHtml(`${href("/mapbox-guia-playa-paraiso.html")}?embed=1&mode=cart&v=2`)}" hidden></iframe>
+              <iframe class="cart-mapbox-frame" title="Seguimiento 3D del carrito de golf" data-mapbox-src="${escapeHtml(`${href("/mapbox/mapbox-guia-playa-paraiso.html")}?embed=1&mode=cart&v=3`)}" hidden></iframe>
             </div>
             <button type="button" class="cart-map-expand" data-cart-back-to-trip>Ampliar mapa</button>
             <button type="button" class="cart-panel-reopen" data-cart-panel-toggle aria-expanded="false">Mostrar solicitud</button>
@@ -1380,7 +1385,7 @@
         <span class="destination-card-copy"><small>RESTAURANTES</small><strong>${escapeHtml(country.name)}</strong><span>${country.hotels.length} ${hotelWord} · ${country.restaurantCount} ${restaurantWord}</span><b>Ver carta →</b></span>
       </a>`;
       }).join("");
-      view.innerHTML = `<main class="portal-page">
+      view.innerHTML = `<main class="portal-page restaurant-portal-page">
         ${portalNav(getPortalNavModel(route))}
         <section class="portal-hero">
           <div><p class="portal-kicker">RESTAURANTES</p><h1>Sabores de nuestros destinos</h1><p>Elija un país para descubrir la carta de restaurantes de cada hotel.</p></div>
@@ -1422,7 +1427,7 @@
       document.body.dataset.returnRoute = "/restaurantes";
       const hotelWord = country.hotels.length === 1 ? "hotel" : "hoteles";
       const restaurantWord = country.restaurantCount === 1 ? "restaurante" : "restaurantes";
-      view.innerHTML = `<main class="portal-page">
+      view.innerHTML = `<main class="portal-page restaurant-portal-page">
         ${portalNav(getPortalNavModel(route))}
         <section class="portal-destination-hero">
           ${RI.img(country.image, {
@@ -1476,7 +1481,7 @@
       ? `Abra las fichas con el sello 360° para recorrer el restaurante.`
       : `Consulte la propuesta gastronómica de cada restaurante. Los horarios y la carta pueden variar según la temporada.`;
     const heroImage = hotel.image || "src/paraiso-del-mar/banner/ParaisoDelMar.jpg";
-    return `<main class="portal-page">
+    return `<main class="portal-page restaurant-portal-page">
       ${portalNav(getPortalNavModel(`/restaurantes/${hotel.slug}`))}
       <section class="portal-destination-hero">
         ${RI.img(heroImage, {

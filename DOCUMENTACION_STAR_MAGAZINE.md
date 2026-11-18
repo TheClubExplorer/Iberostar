@@ -1,6 +1,6 @@
 ﻿# I B E R O S T A R  T H E  C L U B
 
-## Star Magazine: Manual de Usuario y Documentación Técnica de la Aplicación Web
+## The Club Explorer: Manual de Usuario y Documentación Técnica de la Aplicación Web
 
 **Versión 1.2** (manual ampliado y reestructurado)  
 **Enfoque:** Riviera Maya (México) — Complejo Iberostar Playa Paraíso
@@ -92,8 +92,8 @@ Herramienta interna para que el socio/colaborador se ubique, navegue y resuelva 
 | **Leaflet.RotatedMarker** | Rotación de marcadores | `js/mapas.js` (`loadLeafletRotate`) | Librería local en `/libs/Leaflet.RotatedMarker/` |
 | **Valhalla** | Ruteo peatonal (dentro complejo) | `js/mapas.js` (~línea 1100) | `https://valhalla1.openstreetmap.de/route` |
 | **OSRM** | Ruteo vehicular (fuera) | `js/mapas.js` (~línea 1150) | `https://router.project-osrm.org/` |
-| **Mapbox GL JS** | Mapa 3D opcional + Directions | `mapbox-guia-playa-paraiso.html` | Token en el HTML (no commitear) |
-| **Mapbox Directions API** | Rutas en vista Mapbox | `mapbox-guia-playa-paraiso.html` | `api.mapbox.com/directions/v5/...` |
+| **Mapbox GL JS** | Mapa 3D opcional + Directions | `mapbox/mapbox-guia-playa-paraiso.html` | Token en el HTML (no commitear) |
+| **Mapbox Directions API** | Rutas en vista Mapbox | `mapbox/mapbox-guia-playa-paraiso.html` | `api.mapbox.com/directions/v5/...` |
 | **Pannellum** | Visor 360° panorámicas | `js/pannellum-360.js` | Librería local en `/libs/pannellum/` |
 | **Supabase (PostgreSQL + Auth + Storage)** | Backend: Workspace, Videos, media | `function.js` (cliente), `js/workspace.js`, `js/videos.js` | URL/anon key en `function.js` |
 | **OpenStreetMap (tiles)** | Capa base del mapa Leaflet | `js/mapas.js:1540` | `https://{s}.tile.openstreetmap.org/...` |
@@ -297,11 +297,11 @@ Para cambiar el texto: edita `intro` en la página correspondiente, commit y pus
 
 ## 11. Mapa y ruteo “Cómo llegar”
 
-**Archivos:** `js/mapas.js` (Leaflet) + `mapbox-guia-playa-paraiso.html` (Mapbox).
+**Archivos:** `js/mapas.js` (Leaflet) + `mapbox/mapbox-guia-playa-paraiso.html` (Mapbox).
 
 - **Peatonal (dentro del complejo):** Valhalla `https://valhalla1.openstreetmap.de/route` (`costing: pedestrian`).
 - **Vehicular (fuera):** OSRM `https://router.project-osrm.org/route/v1/driving/...`.
-- **Mapbox Directions:** `https://api.mapbox.com/directions/v5/mapbox/{profile}/...` (token en `mapbox-guia-playa-paraiso.html`).
+- **Mapbox Directions:** `https://api.mapbox.com/directions/v5/mapbox/{profile}/...` (token en `mapbox/mapbox-guia-playa-paraiso.html`).
 
 **Si la ruta no sale:**
 - Consola → error de fetch → revisa conectividad / CORS del proveedor.
@@ -367,7 +367,7 @@ git push origin main
 
 Cuando toques rotar:
 1. **Supabase:** Dashboard → Settings → API → Regenerate `anon`/`publishable` key → actualiza `function.js` (`SUPABASE_KEY`) y `index.html` (SDK carga dinámica si usas env).
-2. **Mapbox:** Account → Access tokens → Create/rotate → actualiza `mapbox-guia-playa-paraiso.html` (`mapboxgl.accessToken`).
+2. **Mapbox:** Account → Access tokens → Create/rotate → actualiza `mapbox/mapbox-guia-playa-paraiso.html` (`mapboxgl.accessToken`).
 3. **OpenWeatherMap:** Account → API keys → Regenerate → actualiza `js/weather.js` (`WEATHER_API_KEY`).
 4. Commit sin exponer la key antigua en el diff (usa `git commit --amend` o historia limpia si se filtró).
 

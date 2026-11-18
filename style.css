@@ -7375,6 +7375,43 @@ body.cart-map-focus-open .hotel-portal-nav { display: none !important; }
   margin: 0 0 10px;
 }
 
+.cart-hero-nav-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.cart-hero-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.cart-hero-title-row .portal-kicker {
+  margin: 0;
+}
+
+.cart-hero-nav-desktop {
+  display: none;
+}
+
+.cart-hero-nav-desktop .portal-nav {
+  margin: 0;
+  flex-wrap: nowrap;
+}
+
+@media (min-width: 621px) {
+  .cart-page > .portal-nav {
+    visibility: hidden;
+  }
+
+  .cart-hero-nav-desktop {
+    display: block;
+  }
+}
+
 .cart-page-hero--compact {
   display: block;
   min-height: 0;
@@ -9271,6 +9308,7 @@ div[class*="leaflet-marker-icon"] {
   max-width: 1240px;
   margin: 0 auto;
   padding: 30px 28px 26px;
+  text-align: center;
 }
 
 .site-footer-logo {
@@ -9282,7 +9320,7 @@ div[class*="leaflet-marker-icon"] {
 }
 
 .site-footer-lead {
-  margin: 0 0 12px;
+  margin: 0 auto 12px;
   max-width: 860px;
   font-size: 15px;
   line-height: 1.6;
@@ -9294,7 +9332,7 @@ div[class*="leaflet-marker-icon"] {
 }
 
 .site-footer-note {
-  margin: 0;
+  margin: 0 auto;
   max-width: 860px;
   font-size: 13px;
   line-height: 1.55;
@@ -9307,6 +9345,7 @@ div[class*="leaflet-marker-icon"] {
 .site-footer-links {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 10px 24px;
   margin-top: 20px;
   padding-top: 14px;
@@ -9396,7 +9435,11 @@ div[class*="leaflet-marker-icon"] {
 }
 
 @media (min-width: 621px) {
-  .portal-page > .portal-nav {
-    margin: -16px 0 20px calc(50% - 50vw + 4px);
-  }
+.portal-page > .portal-nav {
+  margin: -16px 0 20px calc(50% - 50vw + 4px);
+}
+
+.restaurant-portal-page > .portal-nav {
+  margin-left: 0;
+}
 }
