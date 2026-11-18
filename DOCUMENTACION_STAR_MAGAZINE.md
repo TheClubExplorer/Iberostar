@@ -82,6 +82,27 @@ Herramienta interna para que el socio/colaborador se ubique, navegue y resuelva 
 
 ---
 
+## 2.1 APIs externas usadas (referencia rápida)
+
+| Servicio | Qué hace | Archivo / Línea | Nota |
+|----------|----------|-----------------|------|
+| **OpenWeatherMap** | Clima actual + badges por ciudad | `js/weather.js:5` | Key rotar periódicamente |
+| **Leaflet** | Mapa 2D base (OSM tiles) | `js/mapas.js` (carga dinámica `loadLeaflet`) | Librería local en `/libs/leaflet/` |
+| **Leaflet.markercluster** | Clusters de marcadores | `js/mapas.js` (`loadMarkerCluster`) | Librería local en `/libs/leaflet.markercluster/` |
+| **Leaflet.RotatedMarker** | Rotación de marcadores | `js/mapas.js` (`loadLeafletRotate`) | Librería local en `/libs/Leaflet.RotatedMarker/` |
+| **Valhalla** | Ruteo peatonal (dentro complejo) | `js/mapas.js` (~línea 1100) | `https://valhalla1.openstreetmap.de/route` |
+| **OSRM** | Ruteo vehicular (fuera) | `js/mapas.js` (~línea 1150) | `https://router.project-osrm.org/` |
+| **Mapbox GL JS** | Mapa 3D opcional + Directions | `mapbox-guia-playa-paraiso.html` | Token en el HTML (no commitear) |
+| **Mapbox Directions API** | Rutas en vista Mapbox | `mapbox-guia-playa-paraiso.html` | `api.mapbox.com/directions/v5/...` |
+| **Pannellum** | Visor 360° panorámicas | `js/pannellum-360.js` | Librería local en `/libs/pannellum/` |
+| **Supabase (PostgreSQL + Auth + Storage)** | Backend: Workspace, Videos, media | `function.js` (cliente), `js/workspace.js`, `js/videos.js` | URL/anon key en `function.js` |
+| **OpenStreetMap (tiles)** | Capa base del mapa Leaflet | `js/mapas.js:1540` | `https://{s}.tile.openstreetmap.org/...` |
+| **Geolocation API (navegador)** | Ubicación usuario (carrito, mapa) | `js/mapas.js:996` (`requestCurrentLocation`) | Requiere HTTPS |
+
+> **Google Maps API:** Código de carga (`loadGoogleMaps`) **eliminado** (key vacía, no se usaba). Mapas usan Leaflet + OSM.
+
+---
+
 ## 3. Estructura de carpetas (relevante)
 
 ```
