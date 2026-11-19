@@ -709,7 +709,7 @@
         var areaIcon = window.L.divIcon ? window.L.divIcon({ className: "gp-area-label", html: labelHtml, iconSize: [0, 0], iconAnchor: [0, 0] }) : null;
         var areaMarker = window.L.marker([p.lat, p.lng], areaIcon ? { icon: areaIcon } : {});
         areaMarker.bindPopup("<strong>" + (p.name || "") + "</strong><br><small>" + (p.description || "") + "</small>");
-        gp.registerMarker(p.id, areaMarker);
+        gp.registerMarker(p.id, areaMarker, labels);
         areaMarker.addTo(labels);
         return;
       }
@@ -778,7 +778,7 @@
         }
         m.bindPopup(popup, popupOptions);
       }
-      gp.registerMarker(p.id, m);
+      gp.registerMarker(p.id, m, layer);
       m.addTo(layer);
     });
     layer.addTo(map);
@@ -786,6 +786,7 @@
       if (labels.getLayers().length) labels.addTo(map);
     } catch (e) { /* ignore label layer errors */ }
     gp._poiLayer = layer;
+    gp._poiLabelLayer = labels;
     return layer;
   };
   window.RevistaDigital.guiapa = gp;
@@ -908,9 +909,15 @@
     gp._complexMask = null;
   };
 
-  gp.registerMarker = function (id, marker) {
+  gp.registerMarker = function (id, marker, parentLayer) {
     if (id && marker) {
       gp._markers[id] = marker;
+      gp._markerParents = gp._markerParents || {};
+      if (parentLayer) {
+        gp._markerParents[id] = parentLayer;
+      } else {
+        delete gp._markerParents[id];
+      }
       try {
         var el = marker.getElement ? marker.getElement() : null;
         if (el && !el.classList.contains("gp-map-marker")) {
@@ -929,19 +936,37 @@
       var marker = gp._markers[id];
       var poi = poisById[id];
       var show = (category === "all") || (poi && poi.category === category);
-      var el = marker.getElement ? marker.getElement() : null;
+      var parent = (gp._markerParents && gp._markerParents[id]) || null;
+      if (!parent && gp._poiLayer && gp._poiLayer.hasLayer && gp._poiLayer.hasLayer(marker)) {
+        parent = gp._poiLayer;
+      }
+      var el;
       if (show) {
+        try {
+          if (parent) {
+            if (!parent.hasLayer(marker)) parent.addLayer(marker);
+          } else if (!marker._map) {
+            marker.addTo(gp._map);
+          }
+        } catch (e) { /* ignore */ }
+        el = marker.getElement ? marker.getElement() : null;
         if (el) {
           el.classList.remove("fading-out");
           el.classList.add("fading-in");
         }
-        try { if (!marker._map) marker.addTo(gp._map); } catch (e) { /* ignore */ }
       } else {
+        el = marker.getElement ? marker.getElement() : null;
         if (el) {
           el.classList.remove("fading-in");
           el.classList.add("fading-out");
         }
-        try { if (marker._map) marker._map.removeLayer(marker); } catch (e) { /* ignore */ }
+        try {
+          if (parent) {
+            if (parent.hasLayer(marker)) parent.removeLayer(marker);
+          } else if (marker._map) {
+            marker._map.removeLayer(marker);
+          }
+        } catch (e) { /* ignore */ }
       }
     });
   };
