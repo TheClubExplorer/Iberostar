@@ -518,7 +518,7 @@ const RESTAURANTES_PARAISO = {
     ],
     "JOIA Paraíso by Iberostar": [
       { id: "lobby-bar-el-mirador", name: "Lobby Bar El Mirador", lat: 20.756335, lng: -86.962712, description: "Lobby bar" },
-      { id: "la-brisa", name: "La Brisa Beach Bar", lat: 20.7549562, lng: -86.9611689, description: "Raw bar y grill" },
+      { id: "la-brisa", name: "La Brisa Beach Bar", lat: 20.7546463, lng: -86.9597269, description: "Raw bar y grill" },
       { id: "punta-sal-ceviche", name: "Punta Sal Ceviche & Beach Bar", lat: 20.754750, lng: -86.959584, description: "Ceviche & Beach Bar" }
     ],
     "Iberostar Waves Paraíso Beach": [
