@@ -23,29 +23,29 @@ const RESTAURANTES_PARAISO = {
     "Iberostar Selection Paraíso del Mar": [
       ["La Dorada", "Mediterránea"],
       ["El Mercado", "Buffet"],
-      ["La Hacienda", "Cocina mexicana"],
-      ["El Colonial", "Cocina francesa"]
+      ["Rodizio", "Brasileño"],
+      ["Trattoria by El Faro", "Cocina italiana"]
     ],
     "Iberostar Selection Paraíso Maya": [
       ["El Rancho", "Steak House"],
       ["El Museo", "Cocina italiana"],
-      ["La Geisha", "Japonesa"],
-      ["L'Etoile", "Cocina francesa"],
+      ["La Geisha", "Japonesa", "", "Desayuno cerrado · Comida cerrada · Cena 18:30 - 21:30 h · Lunes a Domingo · Acceso sujeto a disponibilidad de reservación"],
+      ["L'Etoile", "Cocina francesa", "", "Desayuno cerrado · Comida cerrada · Cena 18:30 - 22:00 h · Lunes a Domingo · Acceso sujeto a disponibilidad de reservación"],
       ["The Olivetti", "Cocina italiana"],
       ["American Seafood Grill Under the Sea", "Cocina de mariscos"],
-      ["La Marina", "Restaurante de Mariscos · Buffet Mediterráneo"]
+      ["La Marina", "Restaurante de Mariscos · Buffet Mediterráneo", "", "Desayuno cerrado · Comida (Buffet) 12:00 - 16:00 h · Cena (Mariscos a la carta) 18:30 - 22:00 h · Lunes a Domingo"]
     ],
     "Iberostar Waves Paraíso Lindo": [
-      ["El Puerto", "Buffet / Brasería"],
       ["La Pagoda", "Buffet internacional"],
       ["El Tapatío", "Cocina mexicana"],
       ["Lemon & Spices", "Internacional / Mediterráneo"]
     ],
     "Iberostar Waves Paraíso Beach": [
       ["Hashiro", "Teppanyaki / Sushi"],
-      ["Rodizio", "Brasileño"],
-      ["La Plaza", "Buffet principal"],
-      ["Trattoria by El Faro", "Cocina italiana"]
+      ["El Puerto", "Buffet / Brasería"],
+      ["La Hacienda", "Cocina mexicana"],
+      ["El Colonial", "Cocina francesa"],
+      ["La Plaza", "Buffet principal"]
     ],
     "JOIA Paraíso by Iberostar": [
       ["Legado", "Cocina mexicana/brasserie"],
@@ -58,7 +58,7 @@ const RESTAURANTES_PARAISO = {
 
   const BARES_PARAISO = {
     "Iberostar Selection Paraíso del Mar": [
-      ["Star Rock Café", "Bar temático"],
+      ["Star Café", "Coffee Shop & Snacks", "", "Horario continuo (24 horas) · Lunes a Domingo · Desayuno rápido, comida ligera, cena o antojos de madrugada sin interrupción"],
       ["Pool Bar Las Olas", "Bar de piscina (Swim-up)"],
       ["Aqua Bar La Perla", "Bar de piscina"],
       ["Bar La Fuente", "Lobby bar"],
@@ -77,7 +77,7 @@ const RESTAURANTES_PARAISO = {
       ["Bar El Puente", "Pool bar"]
     ],
     "Iberostar Waves Paraíso Lindo": [
-      ["Star Rock Café Lindo", "Bar temático"],
+      ["Star Café Lindo", "Coffee Shop & Snacks", "", "Horario continuo (24 horas) · Lunes a Domingo · Desayuno rápido, comida ligera, cena o antojos de madrugada sin interrupción"],
       ["Sports Bar Corner", "Sports bar"],
       ["Bar Teatro", "Bar de teatro"],
       ["Lobby Bar Acuario", "Lobby bar"],
@@ -491,7 +491,7 @@ const RESTAURANTES_PARAISO = {
 
   const BAR_FALLBACK_COORDS = {
     "Iberostar Selection Paraíso del Mar": [
-      { id: "starcafe", name: "Star Rock Café", lat: 20.7618856, lng: -86.9627721, description: "Bar temático" },
+      { id: "starcafe", name: "Star Café", lat: 20.7618856, lng: -86.9627721, description: "Coffee Shop & Snacks · Horario continuo (24 horas)" },
       { id: "pool-bar-las-olas", name: "Pool Bar Las Olas", lat: 20.757897, lng: -86.961767, description: "Bar de piscina (Swim-up)" },
       { id: "aqua-bar-la-perla", name: "Aqua Bar La Perla", lat: 20.7589509, lng: -86.9583723, description: "Bar de piscina" },
       { id: "bar-la-fuente", name: "Bar La Fuente", lat: 20.7612389, lng: -86.9640931, description: "Lobby bar" },
@@ -510,7 +510,7 @@ const RESTAURANTES_PARAISO = {
       { id: "bar-el-puente", name: "Bar El Puente", lat: 20.757166, lng: -86.960961, description: "Pool bar" }
     ],
     "Iberostar Waves Paraíso Lindo": [
-      { id: "star-rock-cafe-lindo", name: "Star Rock Café Lindo", lat: 20.760072, lng: -86.965257, description: "Bar temático" },
+      { id: "star-rock-cafe-lindo", name: "Star Café Lindo", lat: 20.760072, lng: -86.965257, description: "Coffee Shop & Snacks · Horario continuo (24 horas)" },
       { id: "sports-bar-corner", name: "Sports Bar Corner", lat: 20.7596764, lng: -86.9634133, description: "Sports bar" },
       { id: "bar-teatro", name: "Bar Teatro", lat: 20.759376, lng: -86.962659, description: "Bar de teatro" },
       { id: "lobby-bar-acuario", name: "Lobby Bar Acuario", lat: 20.7595512, lng: -86.963491, description: "Lobby bar" },
@@ -518,7 +518,8 @@ const RESTAURANTES_PARAISO = {
     ],
     "JOIA Paraíso by Iberostar": [
       { id: "lobby-bar-el-mirador", name: "Lobby Bar El Mirador", lat: 20.756335, lng: -86.962712, description: "Lobby bar" },
-      { id: "la-brisa", name: "La Brisa Beach Bar", lat: 20.7549562, lng: -86.9611689, description: "Raw bar y grill" }
+      { id: "la-brisa", name: "La Brisa Beach Bar", lat: 20.7549562, lng: -86.9611689, description: "Raw bar y grill" },
+      { id: "punta-sal-ceviche", name: "Punta Sal Ceviche & Beach Bar", lat: 20.754750, lng: -86.959584, description: "Ceviche & Beach Bar" }
     ],
     "Iberostar Waves Paraíso Beach": [
       { id: "starcafe", name: "Star Rock Café", lat: 20.7618856, lng: -86.9627721, description: "Bar temático" },
@@ -633,7 +634,7 @@ const RESTAURANTES_PARAISO = {
     return {
       name: hotelEntry?.[0] || label || "Restaurante",
       cuisine: poi?.cuisine || hotelEntry?.[1] || "",
-      hours: poi?.hours || "",
+      hours: poi?.hours || hotelEntry?.[3] || "",
       menu: menu
     };
   }
@@ -953,9 +954,10 @@ const RESTAURANTES_PARAISO = {
      hoteles del complejo Playa Paraíso tienen recorrido 360° hoy. */
   pannellum360.getRestaurantFicheData = function (hotelName) {
     if (!pannellum360.isPlayaParaiso(hotelName)) return [];
-    return pannellum360.getRestaurantes(hotelName).map(([name, cuisine]) => ({
+    return pannellum360.getRestaurantes(hotelName).map(([name, cuisine, , hours]) => ({
       name,
       cuisine: cuisine || "Restaurante",
+      hours: hours || getRestaurantDetails(hotelName, name).hours,
       image: buildPreview(hotelName, "restaurantes", name),
       has360: true
     }));
@@ -1085,8 +1087,9 @@ const RESTAURANTES_PARAISO = {
     if (!pannellum360.isPlayaParaiso(hotelName)) return "";
     const restaurants = pannellum360.getRestaurantes(hotelName);
     if (!restaurants.length) return "";
-    const cards = restaurants.map(([name, cuisine]) => {
+    const cards = restaurants.map(([name, cuisine, , hours]) => {
       const preview = buildPreview(hotelName, "restaurantes", name);
+      const serviceHours = hours || getRestaurantDetails(hotelName, name).hours;
       return `
         <button type="button" class="pano-360-ficha pano-360-ficha-restaurante" data-hotel="${escapeHtml(hotelName)}" data-zone="restaurantes" data-label="${escapeHtml(name)}">
           <span class="pano-360-ficha-media">
@@ -1096,6 +1099,7 @@ const RESTAURANTES_PARAISO = {
           <span class="pano-360-ficha-copy">
             <strong>${escapeHtml(name)}</strong>
             <small>${escapeHtml(cuisine)}</small>
+            ${serviceHours ? `<small class="restaurant-menu-hours">${escapeHtml(serviceHours)}</small>` : ""}
           </span>
         </button>
       `;

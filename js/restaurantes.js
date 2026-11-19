@@ -15,7 +15,9 @@
     "Iberostar Selection Paraíso Maya": [
       ["Olivetti", "Cocina italiana"],
       ["Under the Sea", "Mariscos"],
-      ["La Marina", "Restaurante de Mariscos · Buffet Mediterráneo"],
+      ["La Marina", "Restaurante de Mariscos · Buffet Mediterráneo", "Desayuno cerrado · Comida (Buffet) 12:00 - 16:00 h · Cena (Mariscos a la carta) 18:30 - 22:00 h · Lunes a Domingo"]
+    ],
+    "Iberostar Waves Paraíso Lindo": [
       ["Lemon & Spices", "Internacional / Mediterráneo"]
     ],
     "Iberostar Selection Cancún": [
@@ -118,7 +120,7 @@
     const en = window.RevistaDigital.i18n.getLang() === "en";
     return `<section class="hotel-restaurant-list" aria-labelledby="hotelRestaurantHeading">
       <div class="hotel-restaurant-heading"><div><small>${en ? "DINING · RESTAURANT SELECTION" : "GASTRONOMÍA · SELECCIÓN DE RESTAURANTES"}</small><h2 id="hotelRestaurantHeading">${en ? "Restaurants at" : "Restaurantes de"} ${escapeHtml(hotelName)}</h2></div><span>${restaurants.length} ${en ? "options" : "opciones"}</span></div>
-      <div class="hotel-restaurant-grid">${restaurants.map(([name, cuisine]) => `<article class="hotel-restaurant-card"><h3>${escapeHtml(name)}</h3><span>${escapeHtml(cuisine)}</span></article>`).join("")}</div>
+      <div class="hotel-restaurant-grid">${restaurants.map(([name, cuisine, hours]) => `<article class="hotel-restaurant-card"><h3>${escapeHtml(name)}</h3><span>${escapeHtml(cuisine)}</span>${hours ? `<small class="restaurant-menu-hours">${escapeHtml(hours)}</small>` : ""}</article>`).join("")}</div>
       <p>${en ? "Offerings and hours may vary by stay. Check the full menu in the Iberostar app." : "La oferta y los horarios pueden variar según la estancia. Consulte la carta completa en la app de Iberostar."}</p>
     </section>`;
   };
@@ -137,9 +139,10 @@
       if (Array.isArray(list) && list.length) entries = list;
     }
     if (!entries.length) {
-      entries = restaurantes.getHotelRestaurants(hotelName).map(([name, cuisine]) => ({
+      entries = restaurantes.getHotelRestaurants(hotelName).map(([name, cuisine, hours]) => ({
         name,
         cuisine: cuisine || (window.RevistaDigital.i18n.getLang() === "en" ? "Signature cuisine" : "Cocina de autor"),
+        hours: hours || "",
         image: "",
         has360: false
       }));
@@ -185,7 +188,8 @@
         ? `<span class="pano-360-ficha-cta">${en ? "Open 360° tour →" : "Abrir recorrido 360° →"}</span>`
         : `<span class="pano-360-ficha-cta pano-360-ficha-cta-muted">${en ? "Check at the hotel" : "Consultar en el hotel"}</span>`;
       const placeMarkup = place ? `<small class="pano-360-ficha-place">${place}</small>` : "";
-      const copy = `<span class="pano-360-ficha-copy"><strong>${escapeHtml(entry.name)}</strong><small>${escapeHtml(entry.cuisine)}</small>${placeMarkup}${cta}</span>`;
+      const hoursMarkup = entry.hours ? `<small class="restaurant-menu-hours">${escapeHtml(entry.hours)}</small>` : "";
+      const copy = `<span class="pano-360-ficha-copy"><strong>${escapeHtml(entry.name)}</strong><small>${escapeHtml(entry.cuisine)}</small>${hoursMarkup}${placeMarkup}${cta}</span>`;
       if (entry.has360) {
         return `<button type="button" class="pano-360-ficha pano-360-ficha-restaurante" data-hotel="${escapeHtml(hotelName)}" data-zone="restaurantes" data-label="${escapeHtml(entry.name)}" aria-label="${en ? "Open 360° tour of" : "Abrir recorrido 360° de"} ${escapeHtml(entry.name)}">${media}${copy}</button>`;
       }
@@ -225,9 +229,9 @@ const hasParaisoCards = Boolean(
     );
 
     const menuEntries = catalogRestaurants.length
-      ? catalogRestaurants.map(([name, cuisine]) => ({ name, cuisine }))
+      ? catalogRestaurants.map(([name, cuisine, hours]) => ({ name, cuisine, hours }))
       : (paraiso.length
-          ? paraiso.map(([name, cuisine]) => ({ name, cuisine }))
+          ? paraiso.map(([name, cuisine, hours]) => ({ name, cuisine, hours }))
           : []);
 
     const restaurantCount = menuEntries.length
@@ -415,7 +419,7 @@ const hasParaisoCards = Boolean(
     const pano = window.RevistaDigital?.pannellum360;
     if (pano && typeof pano.getRestaurantes === "function") {
       const list = pano.getRestaurantes(hotelName);
-      if (Array.isArray(list) && list.length) return list.map(([name, cuisine]) => [name, cuisine || "Restaurante"]);
+      if (Array.isArray(list) && list.length) return list.map(([name, cuisine, , hours]) => [name, cuisine || "Restaurante", hours || ""]);
     }
     return [];
   }
