@@ -189,7 +189,7 @@
       reservation: "Recomendada",
       hours: "18:30 - 22:00",
       horarioTexto: "18:30 - 22:00 h",
-      hotel: "Iberostar Paraíso Lindo",
+      hotel: "Iberostar Waves Paraíso Beach",
       carta: "Ceviche · Pulpo a la parrilla · Pescado a la veracruzana · Camarones al ajillo · Paella",
       menu: "Ceviche · Grilled octopus · Veracruz-style fish · Garlic shrimp · Paella"
     },
