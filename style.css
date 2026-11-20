@@ -3409,8 +3409,17 @@ body.guide-expanded-open { overflow:hidden !important; overscroll-behavior:none;
 .guide-badge--pending { background: rgba(143, 115, 50, .14); color: var(--gold-deep); }
 .guide-side { display: flex; flex-direction: column; gap: 18px; padding: 0; border: 0; background: transparent; box-shadow: none; }
 .guide-detail, .guide-legend { border: 1px solid rgba(64, 54, 46, .1); border-radius: 16px; background: var(--paper-alt); box-shadow: 0 12px 28px rgba(64, 54, 46, .05); padding: 18px; }
+.guide-detail { position: relative; }
 .guide-detail-empty { margin: 0; color: var(--muted); font: 14px/1.6 var(--font-body); }
-.guide-detail-title { margin: 10px 0 4px; color: var(--green-deep); font: 600 20px Georgia, serif; }
+.guide-detail-close {
+  position: absolute; top: 10px; right: 10px; z-index: 4;
+  width: 30px; height: 30px; border: 0; border-radius: 50%;
+  background: rgba(64, 54, 46, .1); color: var(--green-deep);
+  font: 400 19px/1 var(--font-body); cursor: pointer;
+}
+.guide-detail-close:hover,
+.guide-detail-close:focus-visible { background: rgba(64, 54, 46, .2); }
+.guide-detail-title { margin: 10px 0 4px; padding-right: 34px; color: var(--green-deep); font: 600 20px Georgia, serif; }
 .guide-detail-cat { margin: 0 0 10px; color: var(--gold-deep); font: 600 11px var(--font-body); letter-spacing: .1em; text-transform: uppercase; }
 .guide-detail-brand {
   display: inline-block;
@@ -4355,7 +4364,8 @@ body.pano-360-open { overflow: hidden; }
 /* Detalle compacto y alineado */
 .guide-explorer--panel .guide-detail { padding:12px; border-radius:12px; }
 .guide-explorer--panel .guide-detail-empty { font-size:12.5px; line-height:1.5; }
-.guide-explorer--panel .guide-detail-title { margin:6px 0 2px; font-size:16px; }
+.guide-explorer--panel .guide-detail-close { top:6px; right:6px; width:24px; height:24px; font-size:16px; }
+.guide-explorer--panel .guide-detail-title { margin:6px 0 2px; padding-right:26px; font-size:16px; }
 .guide-explorer--panel .guide-detail-cat { margin:0 0 7px; font-size:9.5px; letter-spacing:.08em; }
 .guide-explorer--panel .guide-detail-desc { margin:0 0 8px; font-size:12.5px; line-height:1.5; }
 .guide-explorer--panel .guide-detail-row { margin:2px 0; font-size:11.5px; line-height:1.45; }

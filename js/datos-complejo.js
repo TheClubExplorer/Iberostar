@@ -499,6 +499,25 @@
       specialties: "Ember: Premium grilled meat cuts (Ribeye, Filet Mignon), Argentine empanadas, beef carpaccio. · La Brisa: Fresh ceviches and aguachiles, grilled catch of the day, pizzas, relaxed pool dining.",
       signatureDishes: ["Ember: Ribeye", "Ember: Filet Mignon", "Ember: Empanadas argentinas", "Ember: Carpaccio de res", "La Brisa: Ceviches y aguachiles frescos", "La Brisa: Pesca del día a la parrilla", "La Brisa: Pizzas"]
     },
+    "grand-cellar": {
+      tipo: "snacks",
+      categories: ["snacks"],
+      cocina: "The Wine Cellar (Cava de Vinos) — Experiencia de Cata de Vinos y Maridaje",
+      cuisine: "The Wine Cellar (Wine Cellar) — Wine Tasting and Pairing Experience",
+      hours: "Catas 17:00 y 19:00 h · Lunes a Domingo",
+      horarioTexto: "Horarios de Cata: 17:00 y 19:00 h. Operación diaria: Degustaciones programadas de Lunes a Domingo.",
+      hotel: "JOIA Paraíso by Iberostar",
+      description: "The Wine Cellar (Cava de Vinos). Coordenadas: 20.756344, -86.962658. Horarios de Cata: 17:00 y 19:00 h. Operación diaria: Degustaciones programadas de Lunes a Domingo. Costo: $700 MXN por persona lunes a sábado, $1,400 MXN domingos. Catas privadas disponibles contactando a Concierge.",
+      carta: "Menú (Cata y Maridaje por día): Lunes y Miércoles (Tequila/Mezcal y Vinos Mexicanos): queso Oaxaca ahumado, chicharrón, sikil pak, chapulines y mermelada de chile. Martes (Vinos Españoles): queso manchego, Idiazábal, Mahón, jamón serrano y embutido ibérico. Jueves (Vinos Argentinos): tabla de carne con queso, chorizo, camarón y empanadas con chimichurri. Viernes (Vinos Italianos): burrata trufada, Asiago, provolone, coppa y prosciutto. Sábado y Domingo (Vinos del Nuevo Mundo y Burbujas): queso camembert, queso azul, paté de campaña y paté en croûte.",
+      menu: "Menu (Tasting and Pairing by day): Monday and Wednesday (Tequila/Mezcal and Mexican Wines): smoked Oaxaca cheese, chicharrón, sikil pak, chapulines and chili jam. Tuesday (Spanish Wines): manchego, Idiazábal, Mahón, serrano ham and Iberian sausage. Thursday (Argentine Wines): meat board with cheese, chorizo, shrimp and chimichurri empanadas. Friday (Italian Wines): truffled burrata, Asiago, provolone, coppa and prosciutto. Saturday and Sunday (New World Wines and Sparkling): camembert, blue cheese, country pâté and pâté en croûte.",
+      vestimenta: "Casual Elegante (Smart Casual)",
+      dressCode: "Smart Casual",
+      reservas: true,
+      reservation: true,
+      especialidades: "Catas de vino privadas, maridaje guiado por sommelier experto y botellas de colección.",
+      specialties: "Private wine tastings, sommelier-guided pairing, and collection bottles.",
+      signatureDishes: ["Queso Oaxaca ahumado", "Chicharrón", "Sikil pak", "Chapulines", "Queso manchego", "Idiazábal", "Mahón", "Jamón serrano", "Tabla de carne", "Chorizo", "Camarón", "Empanadas con chimichurri", "Burrata trufada", "Asiago", "Provolone", "Coppa", "Prosciutto", "Queso camembert", "Queso azul", "Paté de campaña", "Paté en croûte"]
+    },
     "punta-sal-ceviche": {
       tipo: "bar",
       cocina: "Ceviche & Beach Bar",
