@@ -9,7 +9,7 @@
   <script src="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js"></script>
 
   <script src="../js/datos-complejo.js?v=19"></script>
-  <script src="../js/guia-playa-paraiso.js?v=53"></script>
+  <script src="../js/guia-playa-paraiso.js?v=55"></script>
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script>
     (function () {
@@ -104,7 +104,7 @@
     @keyframes destino-pulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255,59,48,0.7); } 70% { transform: scale(1.5); box-shadow: 0 0 0 12px rgba(255,59,48,0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255,59,48,0); } }
 
     /* Panel de información de ruta */
-    .route-info { position: fixed; bottom: 24px; left: 24px; z-index: 200000; background: rgba(255,255,255,0.95); border-radius: 12px; padding: 14px 18px; box-shadow: 0 6px 24px rgba(0,0,0,0.35); font-family: var(--font-display); min-width: 200px; display: none; }
+    .route-info { position: fixed; top: auto; bottom: calc(var(--gp-route-info-bottom,24px) + env(safe-area-inset-bottom)); left: 24px; z-index: 200000; background: rgba(255,255,255,0.95); border-radius: 12px; padding: 14px 18px; box-shadow: 0 6px 24px rgba(0,0,0,0.35); font-family: var(--font-display); min-width: 200px; display: none; }
     .route-info.is-visible { display: block; }
     .route-info h4 { margin: 0 0 8px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.14em; color: #5a3e1b; font-weight: 700; }
     .route-info .route-stats { display: flex; gap: 16px; margin-bottom: 10px; }
@@ -115,6 +115,11 @@
     .route-info .btn-recalcular { margin-top: 10px; padding: 8px 14px; border: 1px solid #caa867; background: transparent; color: #caa867; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; font-family: var(--font-display); text-transform: uppercase; letter-spacing: 0.1em; }
     .route-info .btn-recalcular:hover { background: #caa867; color: #ffffff; }
     .route-info .btn-limpiar { margin: 10px 0 0 6px; padding: 8px 10px; border: 1px solid #8c734b; background: transparent; color: #5a3e1b; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; font-family: var(--font-display); }
+    .gp-route-bar { position: fixed; bottom: calc(var(--gp-route-bottom,16px) + env(safe-area-inset-bottom)); left: 50%; z-index: 200002; display: flex; align-items: center; gap: 10px; max-width: calc(100vw - 24px); padding: 7px 8px 7px 14px; border-radius: 999px; background: rgba(0,40,85,0.94); color: #ffffff; box-shadow: 0 6px 20px rgba(0,0,0,0.25); font: 600 12px/1.2 var(--font-body); opacity: 0; transform: translate(-50%,16px); pointer-events: none; transition: opacity .18s ease, transform .18s ease; }
+    .gp-route-bar.is-visible { opacity: 1; transform: translate(-50%,0); pointer-events: auto; }
+    .gp-route-bar-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .gp-route-bar-cancel { flex: 0 0 auto; padding: 5px 11px; border: 1px solid rgba(255,255,255,0.6); border-radius: 999px; background: rgba(255,255,255,0.12); color: #ffffff; font: 600 11px/1 var(--font-body); cursor: pointer; }
+    .gp-route-bar-cancel:hover { background: rgba(255,255,255,0.22); }
     .location-control { position: fixed; top: 128px; left: 18px; z-index: 200000; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; max-width: min(280px, calc(100vw - 24px)); font-family: var(--font-body); }
     .location-control button { border: 1px solid #caa867; border-radius: 999px; padding: 9px 14px; background: #fff; color: #5a3e1b; font-size: 12px; font-weight: 700; cursor: pointer; box-shadow: 0 3px 12px rgba(0,0,0,.25); }
     .location-control button:disabled { cursor: wait; opacity: .7; }
@@ -213,7 +218,7 @@
       .demo-info-card p { font-size: 10px; }
       .location-control { top: 108px; left: 10px; }
       .location-control button { padding: 8px 10px; font-size: 11px; }
-      .route-info { left: 12px; right: 12px; bottom: 72px; min-width: 0; padding: 12px 14px; }
+      .route-info { left: 12px; right: 12px; bottom: calc(var(--gp-route-info-bottom,72px) + env(safe-area-inset-bottom)); min-width: 0; padding: 12px 14px; }
       .guide-toggle { right: 12px; bottom: 12px; }
       .guide-panel { width: 100vw; max-width: 100vw; }
     }
@@ -340,11 +345,14 @@
         left: 10px;
         align-items: flex-start;
       }
-      html[data-embed-mode="complex"][data-parent-viewport="desktop"] .route-info { top: 184px; }
+      html[data-embed-mode="complex"][data-parent-viewport="desktop"] .route-info {
+        top: auto;
+        bottom: calc(var(--gp-route-info-bottom,84px) + env(safe-area-inset-bottom));
+      }
       html[data-embed-mode="complex"] .route-info {
-        top: 142px;
+        top: auto;
         right: 10px;
-        bottom: auto;
+        bottom: calc(var(--gp-route-info-bottom,84px) + env(safe-area-inset-bottom));
         left: 10px;
         z-index: 200014;
         min-width: 0;
@@ -353,11 +361,9 @@
       html[data-embed-mode="complex"] .mapboxgl-ctrl-top-right { top: 8px; right: 8px; }
       html[data-embed-mode="complex"] .mapboxgl-ctrl-top-right .mapboxgl-ctrl-group { margin: 0; }
       html[data-embed-mode="complex"] .mapboxgl-ctrl-bottom-right { bottom: 8px; }
-      html[data-embed-mode="complex"] .guide-panel.is-open ~ .route-info { bottom: auto; }
     }
     @media (max-width: 360px) {
       html[data-embed-mode="complex"] .location-control { top: 142px; }
-      html[data-embed-mode="complex"] .route-info { top: 184px; }
     }
   </style>
 </head>
@@ -577,6 +583,10 @@
       setRouteStatus('Seleccione un lugar y pulse «Cómo llegar».', false);
       rutaActiva = null;
       pendingDestination = null;
+      try {
+        var guiaRuta = window.RevistaDigital && window.RevistaDigital.guiapa;
+        if (guiaRuta && typeof guiaRuta.clearRouteFocus === "function") guiaRuta.clearRouteFocus();
+      } catch (e) {}
     }
 
     var rutaActiva = null;
@@ -715,11 +725,53 @@
       return (originComplex && destComplex) ? "pedestrian" : "driving";
     }
 
+    function positionRouteInfo(){
+      var panel = document.getElementById('route-info');
+      if(!panel || !panel.classList.contains('is-visible')) return;
+      var viewportWidth = window.innerWidth || document.documentElement.clientWidth || 0;
+      var viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
+      var panelRect = panel.getBoundingClientRect ? panel.getBoundingClientRect() : null;
+      var panelWidth = panelRect && panelRect.width ? panelRect.width : 280;
+      var panelLeft = panelRect ? panelRect.left : (viewportWidth - panelWidth) / 2;
+      var panelRight = panelLeft + panelWidth;
+      var defaultBottom = document.documentElement.dataset.embedMode === 'complex' ? 84 : (viewportWidth <= 600 ? 72 : 24);
+      var minTop = viewportHeight - defaultBottom;
+      var selectors = ['.guide-panel', '.guide-toggle', '.mapboxgl-ctrl-bottom-left', '.mapboxgl-ctrl-bottom-right'];
+      selectors.forEach(function(selector){
+        var nodes = document.querySelectorAll ? document.querySelectorAll(selector) : [];
+        Array.prototype.forEach.call(nodes, function(node){
+          if(!node || node === panel) return;
+          var style = window.getComputedStyle ? window.getComputedStyle(node) : null;
+          if(style && (style.display === 'none' || style.visibility === 'hidden' || Number(style.opacity || 1) < 0.05)) return;
+          var rect = node.getBoundingClientRect ? node.getBoundingClientRect() : null;
+          if(!rect || !rect.width || !rect.height) return;
+          var expanded = node.classList && node.classList.contains('guide-panel') && node.classList.contains('is-expanded');
+          if(!expanded && (rect.bottom < viewportHeight - 120 || rect.top < viewportHeight * 0.35)) return;
+          if(rect.right <= panelLeft || rect.left >= panelRight) return;
+          minTop = Math.min(minTop, rect.top);
+        });
+      });
+      var bottom = Math.max(16, viewportHeight - minTop + 10);
+      var next = bottom + 'px';
+      if(panel.style && panel.style.getPropertyValue && panel.style.getPropertyValue('--gp-route-info-bottom') !== next){
+        panel.style.setProperty('--gp-route-info-bottom', next);
+      }
+    }
+
+    window.addEventListener('resize', positionRouteInfo);
+    if(window.MutationObserver && document.body){
+      new window.MutationObserver(positionRouteInfo).observe(document.body, { attributes: true, attributeFilter: ['class', 'style', 'hidden'], subtree: true });
+    }
+
     function setRouteStatus(message, visible){
       var statusEl = document.getElementById('route-status');
       if(statusEl) statusEl.textContent = message;
       var panel = document.getElementById('route-info');
-      if(panel && visible) panel.classList.add('is-visible');
+      if(panel && visible){
+        panel.classList.add('is-visible');
+        positionRouteInfo();
+        setTimeout(positionRouteInfo, 260);
+      }
     }
 
     function formatDuration(seconds){
@@ -795,6 +847,12 @@
       limpiarRuta();
       rutaActiva = { userLat: userLat, userLng: userLng, destLat: destLat, destLng: destLng, destName: destName, abortController: null };
       lastRouteOrigin = [userLat, userLng];
+      try {
+        var guiaRutaActiva = window.RevistaDigital && window.RevistaDigital.guiapa;
+        if (guiaRutaActiva && typeof guiaRutaActiva.setRouteFocusByCoordinates === "function") {
+          guiaRutaActiva.setRouteFocusByCoordinates([destLat, destLng], destName);
+        }
+      } catch (e) {}
       var destEl = document.createElement('div');
       destEl.className = 'destino-marker';
       destEl.title = 'Destino';
@@ -1060,6 +1118,7 @@
     });
     document.getElementById('btn-recalcular').addEventListener('click', window.recalcularRuta);
     document.getElementById('btn-limpiar-ruta').addEventListener('click', limpiarRuta);
+    window.cancelarRuta3d = limpiarRuta;
 
     window.addEventListener('beforeunload', function(){
       if(watchId != null) navigator.geolocation.clearWatch(watchId);
@@ -1078,9 +1137,18 @@
       var CATEGORIES = gpApi.CATEGORIES || (window.CATEGORIES || (gpApi && gpApi.CATEGORIAS) || {});
       var markers = {};
       var state = { selectedId: null, category: '', query: '' };
+      var routeFocusId = null;
 
       function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
       function catColor(cat){ var c = CATEGORIES[cat]; return (c && c.color) ? c.color : '#808080'; }
+
+      function applyMapboxRouteFocus(){
+        Object.keys(markers).forEach(function(id){
+          var el = markers[id] && markers[id].getElement && markers[id].getElement();
+          if(el) el.style.display = (!routeFocusId || id === routeFocusId) ? '' : 'none';
+        });
+        renderList();
+      }
 
       function getMarkerHTML(p,color){
         var size = 30;
@@ -1294,8 +1362,19 @@
           window.RevistaDigital.guiapa.markers = markers;
           window.RevistaDigital.guiapa.POIS = POIS;
         } catch(e){}
+        applyMapboxRouteFocus();
       }
       window.renderPPMarkers = function(){ try { renderMarkers(); } catch(e){} };
+
+      try {
+        var gApi = window.RevistaDigital && window.RevistaDigital.guiapa;
+        if (gApi) {
+          gApi._routeFocusHook = function(focus){
+            routeFocusId = focus && focus.active ? focus.id : null;
+            applyMapboxRouteFocus();
+          };
+        }
+      } catch(e){}
 
       function selectPoi(id){
         var p = POIS.find(function(x){ return x.id === id; });
@@ -1328,6 +1407,7 @@
         var list = (sourceList || []).filter(function(p){
           if(!p) return false;
           if(p.lat == null || p.lng == null || p.external === true) return false;
+          if(routeFocusId && p.id !== routeFocusId) return false;
           if(p.kind === 'area' || p.category === 'hotel') return true;
           if(state.category && p.category !== state.category) return false;
           if(q){ var haystack = [p.name, p.description, p.category, p.hotelId].filter(Boolean).join(' ').toLowerCase(); if(haystack.indexOf(q) === -1) return false; }

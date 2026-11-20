@@ -1461,6 +1461,164 @@
   }
 
   gp._route = { status: "idle", targetId: null, targetName: null, info: null, line: null, abort: null, recalcAbort: null, recalcAt: 0, recalcToken: 0 };
+  gp._routeFocus = { active: false, id: null, name: null };
+
+  function applyRouteFocus() {
+    if (!gp._markers || !Object.keys(gp._markers).length) return;
+    var focus = gp._routeFocus || {};
+    var active = !!focus.active && !!focus.id;
+    if (!active) {
+      gp.filterMapMarkers(state.filter);
+      return;
+    }
+    Object.keys(gp._markers).forEach(function (id) {
+      var marker = gp._markers[id];
+      var show = id === focus.id;
+      var parent = (gp._markerParents && gp._markerParents[id]) || null;
+      if (!parent && gp._poiLayer && gp._poiLayer.hasLayer && gp._poiLayer.hasLayer(marker)) parent = gp._poiLayer;
+      var el = marker.getElement ? marker.getElement() : null;
+      if (show) {
+        try {
+          if (parent) {
+            if (!parent.hasLayer(marker)) parent.addLayer(marker);
+          } else if (!marker._map) {
+            marker.addTo(gp._map);
+          }
+        } catch (e) {}
+        if (el) {
+          el.classList.remove("fading-out");
+          el.classList.add("fading-in");
+        }
+      } else {
+        if (el) {
+          el.classList.remove("fading-in");
+          el.classList.add("fading-out");
+        }
+        try {
+          if (parent) {
+            if (parent.hasLayer(marker)) parent.removeLayer(marker);
+          } else if (marker._map) {
+            marker._map.removeLayer(marker);
+          }
+        } catch (e) {}
+      }
+    });
+  }
+
+  function ensureRouteBar() {
+    var bar = document.getElementById("gpRouteBar");
+    if (bar) return bar;
+    bar = document.createElement("div");
+    bar.id = "gpRouteBar";
+    bar.className = "gp-route-bar";
+    bar.setAttribute("role", "status");
+    bar.setAttribute("aria-live", "polite");
+    bar.innerHTML = '<span class="gp-route-bar-label"></span><button type="button" class="gp-route-bar-cancel">Cancelar</button>';
+    document.body.appendChild(bar);
+    var cancel = bar.querySelector(".gp-route-bar-cancel");
+    if (cancel) {
+      cancel.addEventListener("click", function () {
+        if (typeof gp.cancelRoute === "function") gp.cancelRoute();
+        var mapas = window.RevistaDigital && window.RevistaDigital.mapas;
+        if (mapas && typeof mapas.cancelRoute === "function") mapas.cancelRoute();
+        if (typeof window.cancelarRuta3d === "function") window.cancelarRuta3d();
+        gp.clearRouteFocus();
+      });
+    }
+    return bar;
+  }
+
+  var routeBarPositionTimer = null;
+
+  function positionRouteBar() {
+    var bar = document.getElementById("gpRouteBar");
+    if (!bar || !bar.classList.contains("is-visible")) return;
+    var viewportWidth = window.innerWidth || document.documentElement.clientWidth || 0;
+    var viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
+    var barRect = bar.getBoundingClientRect ? bar.getBoundingClientRect() : null;
+    var barWidth = barRect && barRect.width ? barRect.width : 240;
+    var barLeft = viewportWidth / 2 - barWidth / 2;
+    var barRight = barLeft + barWidth;
+    var minTop = viewportHeight - 16;
+    var selectors = [".guide-mobile-actions:not([hidden])", ".hotel-guide-panel", ".hotel-guide-open", ".route-info", ".guide-toggle", ".mapboxgl-ctrl-bottom-left", ".mapboxgl-ctrl-bottom-right"];
+    selectors.forEach(function (selector) {
+      var nodes = document.querySelectorAll ? document.querySelectorAll(selector) : [];
+      Array.prototype.forEach.call(nodes, function (node) {
+        if (!node || node === bar) return;
+        var style = window.getComputedStyle ? window.getComputedStyle(node) : null;
+        if (style && (style.display === "none" || style.visibility === "hidden" || Number(style.opacity || 1) < 0.05)) return;
+        var rect = node.getBoundingClientRect ? node.getBoundingClientRect() : null;
+        if (!rect || !rect.width || !rect.height || rect.bottom < viewportHeight - 120 || rect.top < viewportHeight * 0.35) return;
+        if (rect.right <= barLeft || rect.left >= barRight) return;
+        minTop = Math.min(minTop, rect.top);
+      });
+    });
+    var bottom = Math.max(16, viewportHeight - minTop + 10);
+    var next = bottom + "px";
+    if (bar.style && bar.style.getPropertyValue && bar.style.getPropertyValue("--gp-route-bottom") !== next) {
+      bar.style.setProperty("--gp-route-bottom", next);
+    }
+  }
+
+  function scheduleRouteBarPosition() {
+    if (routeBarPositionTimer) clearTimeout(routeBarPositionTimer);
+    routeBarPositionTimer = setTimeout(function () {
+      routeBarPositionTimer = null;
+      positionRouteBar();
+    }, 0);
+    setTimeout(positionRouteBar, 260);
+  }
+
+  window.addEventListener("resize", scheduleRouteBarPosition);
+  if (window.MutationObserver && document.body) {
+    new window.MutationObserver(scheduleRouteBarPosition).observe(document.body, { attributes: true, attributeFilter: ["class", "style", "hidden"], subtree: true });
+  }
+
+  function renderRouteBar() {
+    var focus = gp._routeFocus || {};
+    var bar = document.getElementById("gpRouteBar");
+    if (!focus.active || !focus.id) {
+      if (bar) bar.classList.remove("is-visible");
+      return;
+    }
+    bar = ensureRouteBar();
+    var label = bar.querySelector(".gp-route-bar-label");
+    if (label) label.textContent = "Dirigiéndote a " + (focus.name || "el destino");
+    bar.classList.add("is-visible");
+    scheduleRouteBarPosition();
+  }
+
+  function notifyRouteFocus() {
+    applyRouteFocus();
+    if (typeof gp._routeFocusHook === "function") gp._routeFocusHook(gp._routeFocus);
+    renderRouteBar();
+  }
+
+  gp.setRouteFocus = function (id, name) {
+    if (!id) return false;
+    var poi = findPoi(id);
+    gp._routeFocus = { active: true, id: id, name: name || (poi && poi.name) || "el destino" };
+    notifyRouteFocus();
+    return true;
+  };
+
+  gp.setRouteFocusByCoordinates = function (coordinates, name) {
+    if (!Array.isArray(coordinates) || coordinates.length < 2) return false;
+    var lat = Number(coordinates[0]);
+    var lng = Number(coordinates[1]);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return false;
+    var poi = (gp.POIS || []).find(function (item) {
+      return item && Number.isFinite(Number(item.lat)) && Number.isFinite(Number(item.lng)) &&
+        Math.abs(Number(item.lat) - lat) < 0.0002 && Math.abs(Number(item.lng) - lng) < 0.0002;
+    });
+    if (!poi) return false;
+    return gp.setRouteFocus(poi.id, name || poi.name);
+  };
+
+  gp.clearRouteFocus = function () {
+    gp._routeFocus = { active: false, id: null, name: null };
+    notifyRouteFocus();
+  };
 
   function removeRouteLine() {
     if (gp._route.line) {
@@ -1491,6 +1649,7 @@
     gp._route.targetName = null;
     gp._route.info = null;
     if (!silent) gp._routeNotice = "";
+    gp.clearRouteFocus();
     if (!silent) renderRouteStatus();
   }
 
@@ -1719,6 +1878,8 @@
     gp._route.targetId = id;
     gp._route.targetName = name;
     gp._route.info = info || null;
+    if (status === "idle") gp.clearRouteFocus();
+    else gp.setRouteFocus(id, name);
     renderRouteStatus();
   }
 

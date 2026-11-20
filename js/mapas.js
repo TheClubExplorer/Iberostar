@@ -1278,6 +1278,10 @@
     state().routeLine?.remove();
     state().routeLine = null;
     mapas._directionsRoute = null;
+    try {
+      const guia = window.RevistaDigital?.guiapa;
+      if (guia && typeof guia.clearRouteFocus === "function") guia.clearRouteFocus();
+    } catch (error) {}
   };
 
   mapas.openDirections = function (destination, coordinatesArg) {
@@ -1319,6 +1323,14 @@
         if (status) status.textContent = "Estamos actualizando la ubicación de ese destino.";
         return;
       }
+
+      try {
+        const guia = window.RevistaDigital?.guiapa;
+        const focusName = typeof destination === "string" ? destination : (destination && destination.name) || "el destino";
+        if (guia && typeof guia.setRouteFocusByCoordinates === "function") {
+          guia.setRouteFocusByCoordinates(destinationCoordinates, focusName);
+        }
+      } catch (error) {}
 
       const originCoordinates = [state().currentPosition.latitude, state().currentPosition.longitude];
       const prefer = mapas.getPreferredRouteProfile(originCoordinates, destinationCoordinates);
@@ -1396,6 +1408,10 @@
           state().routeLine?.remove();
           state().routeLine = null;
           mapas._directionsRoute = null;
+          try {
+            const guia = window.RevistaDigital?.guiapa;
+            if (guia && typeof guia.clearRouteFocus === "function") guia.clearRouteFocus();
+          } catch (error) {}
           if (status) status.textContent = "Seleccione otro destino para calcular la ruta.";
         });
 
