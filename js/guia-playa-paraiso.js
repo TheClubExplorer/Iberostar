@@ -488,6 +488,26 @@
     });
   }
 
+  gp.menuToggleLabel = function () {
+    return window.RevistaDigital.i18n?.getLang?.() === "en" ? "View menu" : "Ver menú";
+  };
+
+  gp.menuCollapseLabel = function () {
+    return window.RevistaDigital.i18n?.getLang?.() === "en" ? "Show less" : "Ver menos";
+  };
+
+  gp.menuHideLabel = function () {
+    return window.RevistaDigital.i18n?.getLang?.() === "en" ? "Hide menu" : "Ocultar menú";
+  };
+
+  gp.isMobilePoiGuide = function () {
+    try {
+      return window.matchMedia("(max-width: 850px)").matches;
+    } catch (e) {
+      return window.innerWidth <= 850;
+    }
+  };
+
   function poiHoursText(poi) {
     return poi && (poi.hours || poi.horarioTexto || poi.horario) || "";
   }
@@ -581,25 +601,43 @@
     var menu = popupEscape(menuText || "");
     var menuLabel = english ? "Menu" : "Menú";
     var missingMenu = english ? "Not available yet." : "No disponible por ahora.";
-    var details = (hours || menu || isRestaurant)
-      ? '<div class="gp-map-poi-details">' +
-          (hours ? '<p><strong>Horario:</strong> ' + hours + '</p>' : '') +
-          (menu ? '<p><strong>' + menuLabel + ':</strong> ' + menu + '</p>' :
-            (isRestaurant ? '<p><strong>' + menuLabel + ':</strong> ' + missingMenu + '</p>' : '')) +
-        '</div>'
-      : "";
+    var hoursHtml = hours ? '<p><strong>Horario:</strong> ' + hours + '</p>' : '';
+    var menuHtml = menu ? '<p><strong>' + menuLabel + ':</strong> ' + menu + '</p>' : (isRestaurant ? '<p><strong>' + menuLabel + ':</strong> ' + missingMenu + '</p>' : '');
+    var descriptionHtml = description ? '<small class="gp-map-poi-description">' + description + '</small>' : '';
+    var details = (hoursHtml || menuHtml) ? '<div class="gp-map-poi-details">' + hoursHtml + menuHtml + '</div>' : '';
+    var dirButton = '<button type="button" class="gp-dir" data-lat="' + poi.lat + '" data-lng="' + poi.lng + '" data-name="' + name + '">Cómo llegar</button>';
+    var compactDining = gp.isMobilePoiGuide() && isRestaurant;
+    var extra = compactDining ? (descriptionHtml + menuHtml + carousel + pano360Btn + cartButton) : (details + carousel + pano360Btn + cartButton);
+    var visibleDetails = compactDining && hoursHtml ? '<div class="gp-map-poi-details">' + hoursHtml + '</div>' : details;
+    var toggle = compactDining && extra
+      ? '<button type="button" class="gp-map-menu-toggle" data-popup-menu-toggle aria-expanded="false">' + gp.menuToggleLabel() + '</button>' +
+        '<div class="gp-map-menu-extra" hidden>' + extra + '</div>'
+      : '';
     return '<div class="gp-map-poi-popup"><strong class="gp-map-poi-title">' + name + '</strong>' +
-      (description ? '<small class="gp-map-poi-description">' + description + '</small>' : '') +
-      details +
-      carousel +
-      pano360Btn +
-      '<button type="button" class="gp-dir" data-lat="' + poi.lat + '" data-lng="' + poi.lng + '" data-name="' + name + '">Cómo llegar</button>' +
-      cartButton +
+      (compactDining ? '' : descriptionHtml) +
+      visibleDetails +
+      (compactDining ? '' : carousel + pano360Btn) +
+      dirButton +
+      (compactDining ? '' : cartButton) +
+      toggle +
       '</div>';
   }
 
   function initializePoiPopup(popupElement) {
     if (!popupElement) return;
+    var menuToggle = popupElement.querySelector("[data-popup-menu-toggle]");
+    if (menuToggle && menuToggle.dataset.bound !== "true") {
+      menuToggle.dataset.bound = "true";
+      menuToggle.addEventListener("click", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        var extra = popupElement.querySelector(".gp-map-menu-extra");
+        if (!extra) return;
+        extra.hidden = !extra.hidden;
+        menuToggle.setAttribute("aria-expanded", extra.hidden ? "false" : "true");
+        menuToggle.textContent = extra.hidden ? gp.menuToggleLabel() : gp.menuHideLabel();
+      });
+    }
     var carousel = popupElement.querySelector("[data-map-carousel]");
     if (carousel) {
       var slides = Array.prototype.slice.call(carousel.querySelectorAll("[data-map-slide]"));
@@ -764,16 +802,27 @@
         } else if (p.category === "bar" || p.category === "discoteca") {
           var english = window.RevistaDigital.i18n?.getLang?.() === "en";
           var barMenu = poiMenuText(p);
-          popup = '<div class="gp-bar-popup">'
-            + '<strong class="gp-bar-popup-name">' + name + '</strong>'
-            + '<p class="gp-bar-popup-hours"><strong>' + (english ? 'Hours:' : 'Horario:') + '</strong> ' + popupEscape(poiHoursText(p) || (english ? 'Please check with the hotel.' : 'Consultar en el hotel.')) + '</p>'
-            + (barMenu
-              ? '<p class="gp-bar-popup-menu"><strong>' + (english ? 'Menu:' : 'Carta:') + '</strong> ' + popupEscape(barMenu) + '</p>'
-              : '<p class="gp-bar-popup-menu"><strong>' + (english ? 'Menu:' : 'Carta:') + '</strong> ' + (english ? 'Not available yet.' : 'No disponible por ahora.') + '</p>')
-            + (p.description ? '<small class="gp-bar-popup-desc">' + popupEscape(p.description) + '</small>' : '')
-            + dirButton
-            + '</div>';
+          var barMenuHtml = barMenu
+            ? '<p class="gp-bar-popup-menu"><strong>' + (english ? 'Menu:' : 'Carta:') + '</strong> ' + popupEscape(barMenu) + '</p>'
+            : '<p class="gp-bar-popup-menu"><strong>' + (english ? 'Menu:' : 'Carta:') + '</strong> ' + (english ? 'Not available yet.' : 'No disponible por ahora.') + '</p>';
+          var barDescHtml = p.description ? '<small class="gp-bar-popup-desc">' + popupEscape(p.description) + '</small>' : '';
+          var barHoursHtml = '<p class="gp-bar-popup-hours"><strong>' + (english ? 'Hours:' : 'Horario:') + '</strong> ' + popupEscape(poiHoursText(p) || (english ? 'Please check with the hotel.' : 'Consultar en el hotel.')) + '</p>';
+          var compactBar = gp.isMobilePoiGuide() && p.category === "bar";
+          popup = '<div class="gp-bar-popup">' +
+            '<strong class="gp-bar-popup-name">' + name + '</strong>' +
+            barHoursHtml +
+            dirButton +
+            (compactBar
+              ? '<button type="button" class="gp-map-menu-toggle" data-popup-menu-toggle aria-expanded="false">' + gp.menuToggleLabel() + '</button>' +
+                '<div class="gp-map-menu-extra" hidden>' + barMenuHtml + barDescHtml + '</div>'
+              : barMenuHtml + barDescHtml) +
+            '</div>';
           popupOptions = { className: 'gp-bar-pop', minWidth: 220, maxWidth: 280 };
+          if (compactBar) {
+            m.on("popupopen", function (event) {
+              initializePoiPopup(event.popup.getElement());
+            });
+          }
         } else {
           popup = '<strong>' + name + '</strong><br><small>' + (p.description||'') + '</small><br>' + dirButton;
         }
@@ -889,7 +938,7 @@
     if (!map._maskInteractionHook) {
       map._maskInteractionHook = true;
       var maskContainer = map.getContainer();
-      map.on("zoomstart rotatestart", function () {
+      map.on("zoomstart movestart rotatestart", function () {
         try { maskContainer.classList.add("map-interacting"); } catch (e) { /* ignore */ }
       });
       map.on("zoomend rotateend moveend", function () {
@@ -1313,11 +1362,8 @@
   function bindRouteRedraw(map) {
     if (gp._redrawMap === map) return;
     if (gp._redrawMap && gp._redrawHandler) {
-      try { gp._redrawMap.off("rotate zoomend", gp._redrawHandler); } catch (e) { /* ignore */ }
+      try { gp._redrawMap.off("rotateend zoomend", gp._redrawHandler); } catch (e) { /* ignore */ }
     }
-    // leaflet-rotate 0.2.8 no dispara 'rotateend': solo 'rotate' por cada
-    // setBearing (cada fotograma del gesto táctil). Se encola un redraw por
-    // fotograma de animación para no recalcar el SVG más de una vez por frame.
     gp._redrawHandler = function () {
       if (gp._redrawQueued) return;
       gp._redrawQueued = true;
@@ -1330,7 +1376,7 @@
       });
     };
     gp._redrawMap = map;
-    map.on("rotate zoomend", gp._redrawHandler);
+    map.on("rotateend zoomend", gp._redrawHandler);
   }
 
   function drawRoute(origin, poi, result, options) {
@@ -1619,6 +1665,8 @@
     state.mobilePoi = poi || null;
     var panel = mobileActionsRoot("#guideMobileActions");
     if (!panel) return;
+    var isDining = !!poi && (poi.category === "restaurante" || poi.category === "bar");
+    panel.classList.toggle("guide-mobile-actions--dining", isDining && isMobileGuide());
     var titleEl = mobileActionsRoot("#guideMobileActionsTitle");
     var body = mobileActionsRoot("#guideMobileActionsBody");
     if (!body) return;
@@ -1666,6 +1714,45 @@
       '<div class="guide-mobile-actions-buttons">' + btns + "</div>" +
       '<div class="guide-route-box" id="guideMobileRouteBox" role="status" aria-live="polite"></div>' +
       '<div class="guide-book-box" id="guideMobileBookBox"></div>';
+    if (isDining && isMobileGuide()) {
+      var info = body.querySelector(".guide-mobile-actions-info");
+      var rows = info ? Array.prototype.slice.call(info.querySelectorAll(".guide-detail-row")) : [];
+      var hiddenRows = rows.filter(function (row) {
+        var label = row.querySelector("strong");
+        return !label || label.textContent !== "Horario";
+      });
+      var buttonsEl = body.querySelector(".guide-mobile-actions-buttons");
+      var buttons = buttonsEl ? Array.prototype.slice.call(buttonsEl.children) : [];
+      var primary = [];
+      if (poi.category === "restaurante") {
+        primary = buttons.filter(function (btn) { return btn.classList.contains("guide-route") || btn.classList.contains("guide-book"); });
+      } else {
+        primary = buttons.filter(function (btn) { return btn.classList.contains("guide-route") || btn.classList.contains("guide-focus"); });
+      }
+      if (!primary.length) primary = buttons.slice(0, 2);
+      var extraButtons = buttons.filter(function (btn) { return primary.indexOf(btn) === -1; });
+      if (hiddenRows.length || extraButtons.length) {
+        var extra = document.createElement("div");
+        extra.className = "guide-mobile-actions-extra";
+        extra.hidden = true;
+        hiddenRows.forEach(function (row) { extra.appendChild(row); });
+        if (extraButtons.length) {
+          var extraWrap = document.createElement("div");
+          extraWrap.className = "guide-mobile-actions-buttons";
+          extraButtons.forEach(function (btn) { extraWrap.appendChild(btn); });
+          extra.appendChild(extraWrap);
+        }
+        var more = document.createElement("button");
+        more.type = "button";
+        more.className = "guide-mobile-actions-more";
+        more.setAttribute("data-mobile-actions-more", "");
+        more.setAttribute("aria-expanded", "false");
+        more.setAttribute("data-label-more", gp.menuToggleLabel());
+        more.textContent = gp.menuToggleLabel();
+        body.insertBefore(extra, buttonsEl ? buttonsEl.nextSibling : null);
+        body.insertBefore(more, extra);
+      }
+    }
     panel.removeAttribute("hidden");
     positionMobileActions(poi);
     renderMobileRouteStatus();
@@ -2278,6 +2365,17 @@ function poiCommonInfoHtml(poi) {
       if (event.target.closest("#guideMobileActionsClose")) {
         var mpanel = mobileActionsRoot("#guideMobileActions");
         if (mpanel) mpanel.hidden = true;
+        return;
+      }
+      var more = event.target.closest("[data-mobile-actions-more]");
+      if (more) {
+        var extra = more.parentNode ? more.parentNode.querySelector(".guide-mobile-actions-extra") : null;
+        if (extra) {
+          extra.hidden = !extra.hidden;
+          more.setAttribute("aria-expanded", extra.hidden ? "false" : "true");
+          more.textContent = extra.hidden ? (more.getAttribute("data-label-more") || gp.menuToggleLabel()) : gp.menuCollapseLabel();
+          try { positionMobileActions(state.mobilePoi); } catch (e) {}
+        }
         return;
       }
       var backTo360 = event.target.closest("[data-back-to-360]");

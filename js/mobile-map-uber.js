@@ -250,6 +250,11 @@
     }
 
     const poi = findPoiByName(name);
+    if (poi && (poi.category === "restaurante" || poi.category === "bar")) {
+      card.hidden = true;
+      card.innerHTML = "";
+      return;
+    }
     const hours = (poi && (poi.hours || poi.horario)) ? (poi.hours || poi.horario) : t("Consultar horario", "Check hours");
     let walk = t("A pie: —", "On foot: —");
     const pos = window.RevistaDigital && window.RevistaDigital.state ? window.RevistaDigital.state.currentPosition : null;

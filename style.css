@@ -4431,6 +4431,12 @@ body.pano-360-open { overflow: hidden; }
   .guide-mobile-actions-cat { margin:0 0 4px; color:var(--gold-deep); font:600 10.5px/1.2 var(--font-body); letter-spacing:.06em; text-transform:uppercase; }
   .guide-mobile-actions-info .guide-detail-row { margin:2px 0; font-size:11px; line-height:1.35; }
   .guide-mobile-actions-info .guide-detail-row strong { color:var(--green-deep); font-weight:600; margin-right:4px; }
+  .hotel-complex-map-wrap .guide-mobile-actions--dining { max-height:50vh !important; max-height:min(50dvh,420px) !important; }
+  .guide-mobile-actions--dining .guide-mobile-actions-more { width:100%; margin-top:6px; padding:5px 8px; border:1px solid #c8c7c2; border-radius:8px; background:#fff; color:var(--green-deep); font:600 12px/1.2 var(--font-ui); cursor:pointer; }
+  .guide-mobile-actions--dining .guide-mobile-actions-extra { margin-top:6px; padding-top:6px; border-top:1px solid rgba(64,54,46,.12); }
+  .guide-mobile-actions--dining .guide-mobile-actions-extra[hidden] { display:none !important; }
+  .guide-mobile-actions--dining .guide-mobile-actions-extra .guide-detail-row { margin:2px 0; font-size:11px; line-height:1.35; }
+  .guide-mobile-actions--dining .guide-mobile-actions-extra .guide-detail-row strong { color:var(--green-deep); font-weight:600; margin-right:4px; }
 }
 
 /* Ajuste para móviles pequeños (≤620px, incl. 375px) */
@@ -6161,6 +6167,11 @@ body.cart-custom-sheet-open { overflow: hidden; }
 
 .gp-map-poi-pop .leaflet-popup-content-wrapper { border-radius: 13px; }
 .gp-map-poi-pop .leaflet-popup-content { width: 238px !important; margin: 10px 12px; }
+@media (max-width: 850px) {
+  .gp-map-menu-toggle { width:100%; margin-top:7px; padding:5px 8px; border:1px solid #c8c7c2; border-radius:8px; background:#fff; color:#002855; font:600 12px/1.2 var(--font-ui); cursor:pointer; }
+  .gp-map-menu-extra { display:grid; gap:7px; margin-top:7px; }
+  .gp-map-menu-extra[hidden] { display:none !important; }
+}
 .gp-map-poi-popup { display: grid; gap: 7px; font-family: var(--font-body); }
 .gp-map-poi-title { color: #002855; font-size: 14px; line-height: 1.25; }
 .gp-map-poi-description { color: #83786f; font-size: 11px; line-height: 1.35; }
@@ -6748,7 +6759,7 @@ body.cart-map-focus-open .hotel-portal-nav { display: none !important; }
     padding: 10px 14px 16px;
     overflow: hidden;
     background: rgba(255,255,255,.98);
-    backdrop-filter: blur(8px);
+    backdrop-filter: none !important;
   }
   .hotel-guide-panel.uber-expanded,
   .hotel-guide-panel.uber-sheet.uber-expanded {
