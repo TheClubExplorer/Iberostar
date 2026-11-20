@@ -877,6 +877,8 @@
     };
 
     var userMarker = null;
+    var userHeading = null;
+    var lastHeadingFix = null;
     var watchId = null;
     var watchStarted = false;
     var centerOnNextLocation = false;
@@ -901,18 +903,67 @@
       return 6371000 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     }
 
-    function updateUserMarker(lat, lng, accuracy){
+    function setUserHeading(degrees){
+      if(!Number.isFinite(degrees)) return;
+      var normalized = ((degrees % 360) + 360) % 360;
+      var current = Number.isFinite(userHeading) ? userHeading : normalized;
+      var delta = ((normalized - current + 540) % 360) - 180;
+      userHeading = ((current + delta * 0.6) % 360 + 360) % 360;
+    }
+
+    function bearingBetween(first, second){
+      var toRadians = Math.PI / 180;
+      var lat1 = first[0] * toRadians;
+      var lat2 = second[0] * toRadians;
+      var deltaLng = (second[1] - first[1]) * toRadians;
+      var y = Math.sin(deltaLng) * Math.cos(lat2);
+      var x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(deltaLng);
+      return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+    }
+
+    function updateHeading(position, lat, lng){
+      var coords = position && position.coords ? position.coords : null;
+      var rawHeading = coords ? coords.heading : null;
+      var rawSpeed = coords ? coords.speed : null;
+      var hasReported = rawHeading !== null && rawHeading !== undefined && rawHeading !== '' && Number.isFinite(Number(rawHeading)) && Number(rawHeading) >= 0 && Number(rawHeading) <= 360;
+      var speed = rawSpeed !== null && rawSpeed !== undefined && rawSpeed !== '' && Number.isFinite(Number(rawSpeed)) ? Number(rawSpeed) : NaN;
+      var current = [lat, lng];
+      if(!lastHeadingFix){
+        lastHeadingFix = { point: current };
+        if(hasReported && (!Number.isFinite(speed) || speed > 0.5)) setUserHeading(Number(rawHeading));
+        return;
+      }
+      if(distanceBetweenMeters(lastHeadingFix.point, current) < 2) return;
+      var heading = hasReported && (!Number.isFinite(speed) || speed > 0.5)
+        ? Number(rawHeading)
+        : bearingBetween(lastHeadingFix.point, current);
+      setUserHeading(heading);
+      lastHeadingFix = { point: current };
+    }
+
+    function applyUserHeading(){
+      if(!userMarker || !userMarker.getElement || userHeading == null) return;
+      var icon = userMarker.getElement().querySelector('.user-marker-icon');
+      if(!icon) return;
+      var bearing = typeof map.getBearing === 'function' ? map.getBearing() : 0;
+      var angle = ((userHeading - bearing) % 360 + 360) % 360;
+      icon.style.transform = 'rotate(' + angle.toFixed(1) + 'deg)';
+    }
+
+    function updateUserMarker(lat, lng, accuracy, position){
+      updateHeading(position, lat, lng);
       window.RevistaDigital = window.RevistaDigital || {};
-      window.RevistaDigital.userLocation = { lat: lat, lng: lng, accuracy: accuracy || 0 };
+      window.RevistaDigital.userLocation = { lat: lat, lng: lng, accuracy: accuracy || 0, heading: Number.isFinite(userHeading) ? userHeading : null };
       window.RevistaDigital.state = window.RevistaDigital.state || {};
       window.RevistaDigital.state.currentPosition = {
         latitude: lat,
         longitude: lng,
-        accuracy: accuracy || null
+        accuracy: accuracy || null,
+        heading: Number.isFinite(userHeading) ? userHeading : null
       };
       if(!mapReady) return;
       var size = 28;
-      var personSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="' + size + '" height="' + size + '"><circle cx="12" cy="8" r="4" fill="#d4af37"/><path d="M12 14c-4.41 0-8 2.59-8 6h16c0-3.41-3.59-6-8-6z" fill="#d4af37"/></svg>';
+      var personSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="' + size + '" height="' + size + '"><path d="M12 0 L16 5.5 L8 5.5 Z" fill="#d4af37"/><circle cx="12" cy="8" r="4" fill="#d4af37"/><path d="M12 14c-4.41 0-8 2.59-8 6h16c0-3.41-3.59-6-8-6z" fill="#d4af37"/></svg>';
       var pulseSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" width="72" height="72"><circle cx="36" cy="36" r="18" fill="none" stroke="#d4af37" stroke-width="2" opacity="0.6"><animate attributeName="r" from="18" to="32" dur="1.5s" repeatCount="indefinite"/><animate attributeName="opacity" from="0.6" to="0" dur="1.5s" repeatCount="indefinite"/></circle></svg>';
       if(!userMarker){
         var el = document.createElement('div');
@@ -925,9 +976,11 @@
         userMarker = new mapboxgl.Marker({ element: el, anchor: 'center' })
           .setLngLat([lng, lat])
           .addTo(map);
+        map.on('rotate', applyUserHeading);
       } else {
         userMarker.setLngLat([lng, lat]);
       }
+      applyUserHeading();
     }
 
     window.initUserLocation = function(options){
@@ -952,7 +1005,7 @@
         var lat = pos.coords.latitude;
         var lng = pos.coords.longitude;
         var acc = pos.coords.accuracy || 0;
-        updateUserMarker(lat, lng, acc);
+        updateUserMarker(lat, lng, acc, pos);
         setLocationStatus('Ubicación actualizada' + (acc ? ' (precisión aprox. ' + Math.round(acc) + ' m).' : '.'));
         var pending = pendingDestination;
         if(pending){
@@ -987,6 +1040,7 @@
       }
 
       setLocationStatus('Solicitando permiso de ubicación...');
+      lastHeadingFix = null;
       try {
         watchId = navigator.geolocation.watchPosition(onSuccess, onError, {
           enableHighAccuracy: true,

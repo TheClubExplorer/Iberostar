@@ -241,6 +241,16 @@
     return 6371000 * 2 * Math.atan2(Math.sqrt(haversine), Math.sqrt(1 - haversine));
   }
 
+  function bearingBetweenCoordinates(first, second) {
+    const radians = (degrees) => (degrees * Math.PI) / 180;
+    const latitude1 = radians(first.latitude);
+    const latitude2 = radians(second.latitude);
+    const longitudeDelta = radians(second.longitude - first.longitude);
+    const y = Math.sin(longitudeDelta) * Math.cos(latitude2);
+    const x = Math.cos(latitude1) * Math.sin(latitude2) - Math.sin(latitude1) * Math.cos(latitude2) * Math.cos(longitudeDelta);
+    return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+  }
+
   function pointToSegmentMeters(point, start, end) {
     const rad = Math.PI / 180;
     const startLat = start.lat != null ? start.lat : start[0];
@@ -514,6 +524,56 @@
     return mapas._smoothedPosition;
   }
 
+  function setUserHeading(heading) {
+    if (!Number.isFinite(heading)) return;
+    const normalized = ((heading % 360) + 360) % 360;
+    const current = Number.isFinite(mapas._userHeading) ? mapas._userHeading : normalized;
+    const delta = ((normalized - current + 540) % 360) - 180;
+    mapas._userHeading = ((current + delta * 0.6) % 360 + 360) % 360;
+  }
+
+  function updateUserHeading(coords, smoothed) {
+    const latitude = smoothed && Number(smoothed.latitude);
+    const longitude = smoothed && Number(smoothed.longitude);
+    if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return;
+
+    const rawHeading = coords && coords.heading;
+    const rawSpeed = coords && coords.speed;
+    const hasReported = rawHeading !== null && rawHeading !== undefined && rawHeading !== "" && Number.isFinite(Number(rawHeading)) && Number(rawHeading) >= 0 && Number(rawHeading) <= 360;
+    const reported = hasReported ? Number(rawHeading) : NaN;
+    const speed = rawSpeed !== null && rawSpeed !== undefined && rawSpeed !== "" && Number.isFinite(Number(rawSpeed)) ? Number(rawSpeed) : NaN;
+    const last = mapas._lastHeadingFix;
+    const now = Date.now();
+
+    if (!last) {
+      mapas._lastHeadingFix = { latitude, longitude, time: now };
+      if (hasReported && (!Number.isFinite(speed) || speed > 0.5)) setUserHeading(reported);
+      return;
+    }
+
+    const distance = distanceBetweenCoordinates(last, { latitude, longitude });
+    if (distance < 2) return;
+
+    const heading = hasReported && (!Number.isFinite(speed) || speed > 0.5)
+      ? reported
+      : bearingBetweenCoordinates(last, { latitude, longitude });
+    setUserHeading(heading);
+    mapas._lastHeadingFix = { latitude, longitude, time: now };
+  }
+
+  mapas.applyUserHeading = function (marker, map) {
+    const target = marker || state()?.userMarker;
+    if (!target || typeof target.getElement !== "function") return;
+    const element = target.getElement();
+    const icon = element && element.querySelector ? element.querySelector(".user-marker-icon") : null;
+    if (!icon) return;
+    const activeMap = map || target._map || state()?.activeMap;
+    const bearing = activeMap && typeof activeMap.getBearing === "function" ? Number(activeMap.getBearing()) || 0 : 0;
+    const heading = Number.isFinite(mapas._userHeading) ? mapas._userHeading : 0;
+    const angle = ((heading + bearing) % 360 + 360) % 360;
+    icon.style.transform = "rotate(" + angle.toFixed(1) + "deg)";
+  };
+
   // Animación breve entre lecturas para que el icono se desplace de forma
   // continua en lugar de saltar de punto en punto.
   function animateUserMarker(marker, target) {
@@ -570,6 +630,7 @@
   mapas.syncUserMarkerPosition = function (coords) {
     const smoothed = smoothUserPosition(coords || state()?.currentPosition);
     if (!smoothed) return;
+    updateUserHeading(coords, smoothed);
 
     const current = state()?.currentPosition;
     if (current) {
@@ -577,13 +638,15 @@
         ...current,
         latitude: smoothed.latitude,
         longitude: smoothed.longitude,
-        accuracy: smoothed.accuracy
+        accuracy: smoothed.accuracy,
+        heading: mapas._userHeading
       };
     }
 
     const marker = state()?.userMarker;
     if (marker) {
       animateUserMarker(marker, [smoothed.latitude, smoothed.longitude]);
+      mapas.applyUserHeading(marker);
     }
 
     if (typeof window.updateGeneralUserMarker === "function") {
@@ -670,6 +733,7 @@
     if (!navigator.geolocation || mapas._nearbyWatchId) return;
 
     mapas._smoothedPosition = null;
+    mapas._lastHeadingFix = null;
 
     mapas._nearbyWatchId = navigator.geolocation.watchPosition(
       (position) => {
@@ -706,6 +770,7 @@
   window.RevistaDigital.location.startNearbyContextWatch = mapas.startNearbyContextWatch;
   window.RevistaDigital.location.startLiveTracking = mapas.startNearbyContextWatch;
   window.RevistaDigital.location.syncUserMarkerPosition = mapas.syncUserMarkerPosition;
+  window.RevistaDigital.location.applyUserHeading = mapas.applyUserHeading;
   window.RevistaDigital.location.autoNavigateNearbyContext = false;
 
   function libraryUrl(relativePath) {
@@ -839,6 +904,8 @@
             });
             const popup = map._popup;
             if (isOpenOverlay(popup) && typeof popup.update === "function") popup.update();
+            const userMarker = state()?.userMarker;
+            if (userMarker && userMarker._map === map) mapas.applyUserHeading(userMarker, map);
           };
           // Gestion de popups durante la rotacion: se cierran al iniciar
           // rotatestart y se reabren suavemente en rotateend.
@@ -977,6 +1044,7 @@
             state().currentPosition.latitude,
             state().currentPosition.longitude
           ]);
+          mapas.applyUserHeading(state().userMarker, state().activeMap);
 
           state().activeMap.panTo([
             state().currentPosition.latitude,
@@ -984,13 +1052,14 @@
           ]);
         } else if (state().activeMap && window.L) {
           const size = 28;
-          const personSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="' + size + '" height="' + size + '"><circle cx="12" cy="8" r="4" fill="#d4af37"/><path d="M12 14c-4.41 0-8 2.59-8 6h16c0-3.41-3.59-6-8-6z" fill="#d4af37"/></svg>';
+          const personSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="' + size + '" height="' + size + '"><path d="M12 0 L16 5.5 L8 5.5 Z" fill="#d4af37"/><circle cx="12" cy="8" r="4" fill="#d4af37"/><path d="M12 14c-4.41 0-8 2.59-8 6h16c0-3.41-3.59-6-8-6z" fill="#d4af37"/></svg>';
           const pulseSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" width="72" height="72"><circle cx="36" cy="36" r="18" fill="none" stroke="#d4af37" stroke-width="2" opacity="0.6"><animate attributeName="r" from="18" to="32" dur="1.5s" repeatCount="indefinite"/><animate attributeName="opacity" from="0.6" to="0" dur="1.5s" repeatCount="indefinite"/></circle></svg>';
           const html = '<div class="user-marker-wrap" style="position:relative;width:' + size + 'px;height:' + size + 'px;display:flex;align-items:center;justify-content:center;"><div class="user-marker-pulse" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:72px;height:72px;pointer-events:none;">' + pulseSvg + '</div><div class="user-marker-icon" style="position:relative;z-index:1;line-height:0;">' + personSvg + '</div></div>';
           state().userMarker = L.marker([state().currentPosition.latitude, state().currentPosition.longitude], {
             icon: L.divIcon({ className: "user-marker-div", html: html, iconSize: [size, size], iconAnchor: [size/2, size/2] })
           }).addTo(state().activeMap).bindTooltip("Su ubicación actual");
         }
+        mapas.applyUserHeading(state().userMarker, state().activeMap);
 
         if (typeof window.updateGeneralUserMarker === "function") {
           window.updateGeneralUserMarker();
@@ -1613,12 +1682,13 @@
     const position = state().currentPosition;
     if (!position) return;
     const size = 28;
-    const personSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="' + size + '" height="' + size + '"><circle cx="12" cy="8" r="4" fill="#d4af37"/><path d="M12 14c-4.41 0-8 2.59-8 6h16c0-3.41-3.59-6-8-6z" fill="#d4af37"/></svg>';
+    const personSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="' + size + '" height="' + size + '"><path d="M12 0 L16 5.5 L8 5.5 Z" fill="#d4af37"/><circle cx="12" cy="8" r="4" fill="#d4af37"/><path d="M12 14c-4.41 0-8 2.59-8 6h16c0-3.41-3.59-6-8-6z" fill="#d4af37"/></svg>';
     const pulseSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" width="72" height="72"><circle cx="36" cy="36" r="18" fill="none" stroke="#d4af37" stroke-width="2" opacity="0.6"><animate attributeName="r" from="18" to="32" dur="1.5s" repeatCount="indefinite"/><animate attributeName="opacity" from="0.6" to="0" dur="1.5s" repeatCount="indefinite"/></circle></svg>';
     const html = '<div class="user-marker-wrap" style="position:relative;width:' + size + 'px;height:' + size + 'px;display:flex;align-items:center;justify-content:center;"><div class="user-marker-pulse" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:72px;height:72px;pointer-events:none;">' + pulseSvg + '</div><div class="user-marker-icon" style="position:relative;z-index:1;line-height:0;">' + personSvg + '</div></div>';
     state().userMarker = L.marker([position.latitude, position.longitude], {
       icon: L.divIcon({ className: "user-marker-div", html: html, iconSize: [size, size], iconAnchor: [size/2, size/2] })
     }).addTo(map).bindTooltip("Su ubicación actual");
+    mapas.applyUserHeading(state().userMarker, map);
   }
 
   mapas.initializeDestinationMap = function (element, routeInfo = {}) {
