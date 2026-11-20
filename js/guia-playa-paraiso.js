@@ -555,6 +555,77 @@
     return closest || pageHotel || null;
   }
 
+  function poiGalleryImages(poi) {
+    if (!poi) return [];
+    if (poi.category === "golf") return GOLF_GALLERY_IMAGES;
+    if (poi.category !== "restaurante") return [];
+    var hotel = poiGalleryHotel(poi);
+    if (!hotel || !hotel.images) return [];
+    return hotel.images.map(function (image) {
+      return "src/" + hotel.folder + "/" + (hotel.restaurantFolder || "restaurante") + "/" + image + "-640.webp";
+    });
+  }
+
+  function poiCarouselMarkup(images, name) {
+    if (!images || !images.length) return "";
+    var slides = images.map(function (image, index) {
+      return '<div class="gp-map-carousel-slide' + (index === 0 ? ' is-active' : '') + '" data-map-slide aria-hidden="' + (index === 0 ? 'false' : 'true') + '">' +
+        '<img src="' + popupEscape(image) + '" alt="' + name + ' · imagen ' + (index + 1) + '" loading="' + (index === 0 ? 'eager' : 'lazy') + '" decoding="async" />' +
+        '</div>';
+    });
+    return '<div class="gp-map-carousel" data-map-carousel>' +
+      '<div class="gp-map-carousel-slides">' + slides.join("") + '</div>' +
+      '<div class="gp-map-carousel-controls">' +
+        '<button type="button" data-map-carousel-step="-1" aria-label="Imagen anterior">«</button>' +
+        '<span data-map-carousel-count>1 / ' + slides.length + '</span>' +
+        '<button type="button" data-map-carousel-step="1" aria-label="Imagen siguiente">»</button>' +
+      '</div>' +
+    '</div>';
+  }
+
+  function initializePoiCarousel(root) {
+    if (!root) return;
+    var carousel = root.querySelector("[data-map-carousel]");
+    if (!carousel) return;
+    var slides = Array.prototype.slice.call(carousel.querySelectorAll("[data-map-slide]"));
+    var count = carousel.querySelector("[data-map-carousel-count]");
+    if (carousel.dataset.initialized !== "true") {
+      carousel.dataset.initialized = "true";
+      carousel.__currentSlide = 0;
+      carousel.__showSlide = function (index) {
+        carousel.__currentSlide = (index + slides.length) % slides.length;
+        slides.forEach(function (slide, slideIndex) {
+          var active = slideIndex === carousel.__currentSlide;
+          slide.classList.toggle("is-active", active);
+          slide.setAttribute("aria-hidden", String(!active));
+        });
+        if (count) count.textContent = (carousel.__currentSlide + 1) + " / " + slides.length;
+      };
+      carousel.querySelectorAll("[data-map-carousel-step]").forEach(function (button) {
+        button.addEventListener("click", function () {
+          carousel.__showSlide(carousel.__currentSlide + Number(button.dataset.mapCarouselStep || 0));
+        });
+      });
+    }
+    var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!reduceMotion && slides.length > 1 && !carousel.__autoPlay) {
+      carousel.__autoPlay = window.setInterval(function () {
+        carousel.__showSlide(carousel.__currentSlide + 1);
+      }, 3500);
+    }
+    carousel.__showSlide(carousel.__currentSlide);
+  }
+
+  function stopPoiCarousel(root) {
+    if (!root) return;
+    root.querySelectorAll("[data-map-carousel]").forEach(function (carousel) {
+      if (carousel.__autoPlay) {
+        window.clearInterval(carousel.__autoPlay);
+        carousel.__autoPlay = null;
+      }
+    });
+  }
+
   function poiPopupMarkup(poi) {
     var name = popupEscape(poi.name);
     var description = popupEscape(poi.description || "");
@@ -564,34 +635,14 @@
     var panoHotel = hotel && window.RevistaDigital.pannellum360 && typeof window.RevistaDigital.pannellum360.canonicalHotelName === "function"
       ? (window.RevistaDigital.pannellum360.canonicalHotelName(hotel.name) || hotel.name)
       : (hotel && hotel.name) || "";
-    var images = isGolf
-      ? GOLF_GALLERY_IMAGES
-      : (isRestaurant
-        ? (hotel?.images || []).map(function (image) {
-            return "src/" + hotel.folder + "/" + (hotel.restaurantFolder || "restaurante") + "/" + image + "-640.webp";
-          })
-        : []);
+    var images = poiGalleryImages(poi);
     var has360 = isRestaurant && hotel && panoHotel && window.RevistaDigital.pannellum360?.isPlayaParaiso?.(panoHotel);
     var pano360Btn = has360
       ? '<div class="gp-map-pano360">' +
         '<button type="button" class="gp-map-carousel-360-link" data-poi-id="' + popupEscape(poi.id) + '" data-poi-360-hotel="' + popupEscape(panoHotel) + '" data-poi-360-label="' + name + '">Ver exploración 360°</button>' +
         '</div>'
       : "";
-    var slides = images.map(function (image, index) {
-      return '<div class="gp-map-carousel-slide' + (index === 0 ? ' is-active' : '') + '" data-map-slide aria-hidden="' + (index === 0 ? 'false' : 'true') + '">' +
-        '<img src="' + popupEscape(image) + '" alt="' + name + ' · imagen ' + (index + 1) + '" loading="' + (index === 0 ? 'eager' : 'lazy') + '" decoding="async" />' +
-        '</div>';
-    });
-    var carousel = images.length
-      ? '<div class="gp-map-carousel" data-map-carousel>' +
-          '<div class="gp-map-carousel-slides">' + slides.join("") + '</div>' +
-          '<div class="gp-map-carousel-controls">' +
-            '<button type="button" data-map-carousel-step="-1" aria-label="Imagen anterior">«</button>' +
-            '<span data-map-carousel-count>1 / ' + slides.length + '</span>' +
-            '<button type="button" data-map-carousel-step="1" aria-label="Imagen siguiente">»</button>' +
-          '</div>' +
-        '</div>'
-      : "";
+    var carousel = poiCarouselMarkup(images, name);
     var cartButton = (isRestaurant || isGolf)
       ? '<button type="button" class="gp-map-cart guide-cart" data-id="' + popupEscape(poi.id) + '" data-cat="' + popupEscape(poi.category) + '">Solicitar carrito</button>'
       : "";
@@ -610,8 +661,7 @@
     var extra = compactDining ? (descriptionHtml + menuHtml + carousel + pano360Btn + cartButton) : (details + carousel + pano360Btn + cartButton);
     var visibleDetails = compactDining && hoursHtml ? '<div class="gp-map-poi-details">' + hoursHtml + '</div>' : details;
     var toggle = compactDining && extra
-      ? '<button type="button" class="gp-map-menu-toggle" data-popup-menu-toggle aria-expanded="false">' + gp.menuToggleLabel() + '</button>' +
-        '<div class="gp-map-menu-extra" hidden>' + extra + '</div>'
+      ? '<button type="button" class="gp-map-menu-toggle" data-popup-menu-toggle data-poi-id="' + popupEscape(poi.id) + '">' + gp.menuToggleLabel() + '</button>'
       : '';
     return '<div class="gp-map-poi-popup"><strong class="gp-map-poi-title">' + name + '</strong>' +
       (compactDining ? '' : descriptionHtml) +
@@ -631,43 +681,11 @@
       menuToggle.addEventListener("click", function (event) {
         event.preventDefault();
         event.stopPropagation();
-        var extra = popupElement.querySelector(".gp-map-menu-extra");
-        if (!extra) return;
-        extra.hidden = !extra.hidden;
-        menuToggle.setAttribute("aria-expanded", extra.hidden ? "false" : "true");
-        menuToggle.textContent = extra.hidden ? gp.menuToggleLabel() : gp.menuHideLabel();
+        var poiId = menuToggle.getAttribute("data-poi-id");
+        if (poiId) gp.openDiningOverlay(poiId);
       });
     }
-    var carousel = popupElement.querySelector("[data-map-carousel]");
-    if (carousel) {
-      var slides = Array.prototype.slice.call(carousel.querySelectorAll("[data-map-slide]"));
-      var count = carousel.querySelector("[data-map-carousel-count]");
-      if (carousel.dataset.initialized !== "true") {
-        carousel.dataset.initialized = "true";
-        carousel.__currentSlide = 0;
-        carousel.__showSlide = function (index) {
-          carousel.__currentSlide = (index + slides.length) % slides.length;
-          slides.forEach(function (slide, slideIndex) {
-            var active = slideIndex === carousel.__currentSlide;
-            slide.classList.toggle("is-active", active);
-            slide.setAttribute("aria-hidden", String(!active));
-          });
-          if (count) count.textContent = (carousel.__currentSlide + 1) + " / " + slides.length;
-        };
-        carousel.querySelectorAll("[data-map-carousel-step]").forEach(function (button) {
-          button.addEventListener("click", function () {
-            carousel.__showSlide(carousel.__currentSlide + Number(button.dataset.mapCarouselStep || 0));
-          });
-        });
-      }
-      var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      if (!reduceMotion && slides.length > 1 && !carousel.__autoPlay) {
-        carousel.__autoPlay = window.setInterval(function () {
-          carousel.__showSlide(carousel.__currentSlide + 1);
-        }, 3500);
-      }
-      carousel.__showSlide(carousel.__currentSlide);
-    }
+    initializePoiCarousel(popupElement);
     var cartButton = popupElement.querySelector(".gp-map-cart");
     if (cartButton && cartButton.dataset.bound !== "true") {
       cartButton.dataset.bound = "true";
@@ -711,6 +729,113 @@
       });
     }
   }
+
+  function closeDiningOverlay() {
+    var overlay = document.querySelector(".gp-dining-overlay");
+    if (!overlay) return;
+    stopPoiCarousel(overlay);
+    if (overlay.__onKeyDown) document.removeEventListener("keydown", overlay.__onKeyDown);
+    if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+    document.body.classList.remove("gp-dining-open");
+  }
+
+  gp.closeDiningOverlay = closeDiningOverlay;
+
+  gp.openDiningOverlay = function (id) {
+    var poi = (gp.POIS || []).find(function (item) { return item && item.id === id; });
+    if (!poi || (poi.category !== "restaurante" && poi.category !== "bar")) return false;
+    closeDiningOverlay();
+
+    var english = window.RevistaDigital.i18n?.getLang?.() === "en";
+    var name = popupEscape(poi.name);
+    var isRestaurant = poi.category === "restaurante";
+    var images = poiGalleryImages(poi);
+    var carousel = poiCarouselMarkup(images, name);
+    var description = popupEscape(poi.description || "");
+    var hours = popupEscape(poiHoursText(poi));
+    var menuText = popupEscape(poiMenuText(poi));
+    var menuLabel = english ? "Menu" : "Menú";
+    var missingMenu = english ? "Not available yet." : "No disponible por ahora.";
+    var hoursText = hours || (english ? "Please check with the hotel." : "Consultar en el hotel.");
+
+    var hotel = poiGalleryHotel(poi);
+    var panoHotel = hotel && window.RevistaDigital.pannellum360 && typeof window.RevistaDigital.pannellum360.canonicalHotelName === "function"
+      ? (window.RevistaDigital.pannellum360.canonicalHotelName(hotel.name) || hotel.name)
+      : (hotel && hotel.name) || poi.hotelId || poi.hotel || "";
+    var pannellum360 = window.RevistaDigital && window.RevistaDigital.pannellum360;
+    var has360 = pannellum360 && typeof pannellum360.isPlayaParaiso === "function" &&
+      pannellum360.isPlayaParaiso(isRestaurant ? panoHotel : (poi.hotelId || poi.hotel || panoHotel));
+
+    var overlay = document.createElement("div");
+    overlay.className = "gp-dining-overlay";
+    overlay.setAttribute("role", "dialog");
+    overlay.setAttribute("aria-modal", "true");
+    overlay.setAttribute("aria-label", name);
+    overlay.innerHTML =
+      '<div class="gp-dining-bar">' +
+        '<div class="gp-dining-heading"><strong>' + name + '</strong><span>' + (english ? "Menu" : "Menú") + '</span></div>' +
+        '<button type="button" class="gp-dining-close" aria-label="' + (english ? "Close" : "Salir") + '">×</button>' +
+      '</div>' +
+      '<div class="gp-dining-content">' +
+        carousel +
+        (description ? '<section class="gp-dining-section"><h3>' + (english ? "About" : "Descripción") + '</h3><p>' + description + '</p></section>' : '') +
+        '<section class="gp-dining-section"><h3>' + (english ? "Hours" : "Horario") + '</h3><p>' + hoursText + '</p></section>' +
+        '<section class="gp-dining-section"><h3>' + menuLabel + '</h3><p>' + (menuText || missingMenu) + '</p></section>' +
+        '<div class="gp-dining-actions">' +
+          '<button type="button" class="gp-dining-route gp-dir" data-lat="' + poi.lat + '" data-lng="' + poi.lng + '" data-name="' + name + '">' + (english ? "Directions" : "Cómo llegar") + '</button>' +
+          '<button type="button" class="gp-dining-map" data-dining-map="1">' + (english ? "View on map" : "Ver en el mapa") + '</button>' +
+          (isRestaurant ? '<button type="button" class="gp-dining-cart" data-dining-cart="1">' + (english ? "Request cart" : "Solicitar carrito") + '</button>' : '') +
+          (has360 ? '<button type="button" class="gp-dining-360" data-dining-360="1">Ver exploración 360°</button>' : '') +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(overlay);
+    document.body.classList.add("gp-dining-open");
+    initializePoiCarousel(overlay);
+
+    overlay.querySelector(".gp-dining-close").addEventListener("click", function () {
+      closeDiningOverlay();
+    });
+    overlay.addEventListener("click", function (event) {
+      if (event.target === overlay) closeDiningOverlay();
+    });
+    overlay.__onKeyDown = function (event) {
+      if (event.key === "Escape") closeDiningOverlay();
+    };
+    document.addEventListener("keydown", overlay.__onKeyDown);
+
+    var routeButton = overlay.querySelector(".gp-dining-route");
+    if (routeButton) {
+      routeButton.addEventListener("click", function () {
+        closeDiningOverlay();
+      });
+    }
+    var mapButton = overlay.querySelector("[data-dining-map]");
+    if (mapButton) {
+      mapButton.addEventListener("click", function () {
+        closeDiningOverlay();
+        if (typeof gp.selectPoi === "function") gp.selectPoi(poi.id, { noScroll: gp.isMobilePoiGuide() });
+      });
+    }
+    var cartButton = overlay.querySelector("[data-dining-cart]");
+    if (cartButton) {
+      cartButton.addEventListener("click", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (typeof gp.selectPoi === "function") gp.selectPoi(poi.id, { noScroll: true });
+        gp.renderDiningCartForm?.(overlay, poi);
+      });
+    }
+    var panoButton = overlay.querySelector("[data-dining-360]");
+    if (panoButton) {
+      panoButton.addEventListener("click", function () {
+        closeDiningOverlay();
+        if (pannellum360 && typeof pannellum360.open === "function") {
+          pannellum360.open(panoHotel || poi.hotelId || poi.hotel, isRestaurant ? "restaurantes" : "bares", poi.name, poi.id);
+        }
+      });
+    }
+    return true;
+  };
 
   gp.addPoiLayer = function (map, filterHotelId, options) {
     if (!map || !window.L) return null;
@@ -813,8 +938,7 @@
             barHoursHtml +
             dirButton +
             (compactBar
-              ? '<button type="button" class="gp-map-menu-toggle" data-popup-menu-toggle aria-expanded="false">' + gp.menuToggleLabel() + '</button>' +
-                '<div class="gp-map-menu-extra" hidden>' + barMenuHtml + barDescHtml + '</div>'
+              ? '<button type="button" class="gp-map-menu-toggle" data-popup-menu-toggle data-poi-id="' + popupEscape(p.id) + '">' + gp.menuToggleLabel() + '</button>'
               : barMenuHtml + barDescHtml) +
             '</div>';
           popupOptions = { className: 'gp-bar-pop', minWidth: 220, maxWidth: 280 };
@@ -2088,6 +2212,98 @@
     if (showInMobileActions) positionMobileActions(state.mobilePoi);
   }
 
+  function scrollDiningCartBox(box) {
+    try { box.scrollIntoView({ block: "nearest", behavior: "smooth" }); } catch (e) {}
+  }
+
+  function renderDiningCartDone(box, poi, request, tracker) {
+    box.innerHTML = '<div class="guide-book-done guide-book-done--cart">' +
+      '<h4 class="guide-book-title">Se solicitó el transporte</h4>' +
+      '<p>Buscando un carrito para recogerte en ' + escapeHtml(request.pickup?.label || "") +
+      ' y llevarte a ' + escapeHtml(request.destination?.name || poi.name) + '.</p>' +
+      '<button type="button" class="guide-cart-track" data-guide-cart-track="1">Ver el transporte →</button>' +
+      '</div>';
+    box.querySelector("[data-guide-cart-track]")?.addEventListener("click", function () {
+      try { sessionStorage.setItem("auto_fullscreen_transporte", "true"); } catch (e) {}
+      gp.closeDiningOverlay?.();
+      tracker.openPage(document.body.dataset.hotelSlug || "");
+    });
+    scrollDiningCartBox(box);
+  }
+
+  function renderDiningCartForm(overlay, poi) {
+    var content = overlay && overlay.querySelector(".gp-dining-content");
+    if (!content || !poi) return;
+    var box = overlay.querySelector("[data-dining-cart-box]");
+    if (!box) {
+      box = document.createElement("section");
+      box.className = "gp-dining-section gp-dining-cart-box";
+      box.setAttribute("data-dining-cart-box", "");
+      var actions = content.querySelector(".gp-dining-actions");
+      if (actions) content.insertBefore(box, actions);
+      else content.appendChild(box);
+    }
+    var tracker = window.RevistaDigital && window.RevistaDigital.carritoGolf;
+    box.innerHTML = '<form class="guide-book-form" data-dining-cart-form>' +
+      '<h4 class="guide-book-title">Solicitud de carrito de golf</h4>' +
+      '<p class="guide-book-place">' + escapeHtml(poi.name) + '</p>' +
+      '<p class="guide-book-note">El carrito le recogerá en su ubicación actual. Active la ubicación del dispositivo para compartir el punto exacto.</p>' +
+      '<label class="guide-book-field"><span>Nombre</span><input type="text" name="nombre" data-dining-cart-name required /></label>' +
+      '<label class="guide-book-field"><span>Habitación</span><input type="text" name="habitacion" data-dining-cart-room placeholder="Ej. 1204" /></label>' +
+      '<label class="guide-book-field"><span>Notas</span><textarea name="notas" data-dining-cart-notes rows="2"></textarea></label>' +
+      '<div class="guide-book-actions">' +
+        '<button type="submit" class="guide-book-submit">Enviar solicitud</button>' +
+        '<button type="button" class="guide-book-cancel" data-dining-cart-cancel="1">Cancelar</button>' +
+      '</div>' +
+      '<p class="guide-book-note">Su solicitud se registra en el sistema. La confirmación se realiza en recepción del hotel.</p>' +
+      '</form>';
+    var form = box.querySelector("[data-dining-cart-form]");
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+      if (!tracker || typeof tracker.request !== "function") {
+        box.innerHTML = '<div class="guide-book-done">' +
+          '<h4 class="guide-book-title">Solicitud enviada</h4>' +
+          '<p>Registramos su solicitud de carrito de golf para ' + escapeHtml(poi.name) + '.</p>' +
+          '<p>Recepción del hotel le confirmará la hora y el punto de encuentro.</p>' +
+          '</div>';
+        scrollDiningCartBox(box);
+        return;
+      }
+      var destination = null;
+      if (Number.isFinite(Number(poi.lat)) && Number.isFinite(Number(poi.lng))) {
+        destination = { id: poi.id, name: poi.name, lat: Number(poi.lat), lng: Number(poi.lng) };
+      } else if (poi.hotelId && typeof gp.poiForHotel === "function") {
+        var hotelPoi = gp.poiForHotel(poi.hotelId);
+        if (hotelPoi && Number.isFinite(Number(hotelPoi.lat)) && Number.isFinite(Number(hotelPoi.lng))) {
+          destination = { id: hotelPoi.id, name: hotelPoi.name, lat: Number(hotelPoi.lat), lng: Number(hotelPoi.lng) };
+        }
+      }
+      var request = tracker.request({
+        guest: form.querySelector("[data-dining-cart-name]")?.value || "",
+        room: form.querySelector("[data-dining-cart-room]")?.value || "",
+        notes: form.querySelector("[data-dining-cart-notes]")?.value || "",
+        destination: destination,
+        source: "guide-map"
+      });
+      if (request) {
+        renderDiningCartDone(box, poi, request, tracker);
+        return;
+      }
+      box.innerHTML = '<div class="guide-book-done">' +
+        '<h4 class="guide-book-title">Solicitud enviada</h4>' +
+        '<p>Registramos su solicitud de carrito de golf para ' + escapeHtml(poi.name) + '.</p>' +
+        '<p>Recepción del hotel le confirmará la hora y el punto de encuentro.</p>' +
+        '</div>';
+      scrollDiningCartBox(box);
+    });
+    box.querySelector("[data-dining-cart-cancel]")?.addEventListener("click", function () {
+      box.innerHTML = "";
+    });
+    scrollDiningCartBox(box);
+  }
+
+  gp.renderDiningCartForm = renderDiningCartForm;
+
   function selectPoi(id, opts) {
     var poi = findPoi(id);
     if (!poi) return;
@@ -2369,6 +2585,12 @@ function poiCommonInfoHtml(poi) {
       }
       var more = event.target.closest("[data-mobile-actions-more]");
       if (more) {
+        var diningPoi = state.mobilePoi;
+        if (diningPoi && (diningPoi.category === "restaurante" || diningPoi.category === "bar")) {
+          event.preventDefault();
+          if (diningPoi.id) gp.openDiningOverlay(diningPoi.id);
+          return;
+        }
         var extra = more.parentNode ? more.parentNode.querySelector(".guide-mobile-actions-extra") : null;
         if (extra) {
           extra.hidden = !extra.hidden;
