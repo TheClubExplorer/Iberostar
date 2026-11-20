@@ -85,7 +85,7 @@ const RESTAURANTES_PARAISO = {
     ],
     "JOIA Paraíso by Iberostar": [
       ["Lobby Bar El Mirador", "Lobby bar"],
-      ["La Brisa Beach Bar", "Raw bar y grill"]
+      ["Ember Steak House / La Brisa", "Ember: Especialidad — Cortes de carne a la parrilla · La Brisa: Restaurante de alberca / Almuerzo frente al mar"]
     ],
     "Iberostar Waves Paraíso Beach": [
       ["Star Rock Café", "Bar temático"],
@@ -518,7 +518,7 @@ const RESTAURANTES_PARAISO = {
     ],
     "JOIA Paraíso by Iberostar": [
       { id: "lobby-bar-el-mirador", name: "Lobby Bar El Mirador", lat: 20.756335, lng: -86.962712, description: "Lobby bar" },
-      { id: "la-brisa", name: "La Brisa Beach Bar", lat: 20.7546463, lng: -86.9597269, description: "Raw bar y grill" },
+      { id: "la-brisa", name: "Ember Steak House / La Brisa", lat: 20.7546463, lng: -86.9597269, description: "Ember: Especialidad — Cortes de carne a la parrilla · La Brisa: Restaurante de alberca / Almuerzo frente al mar" },
       { id: "punta-sal-ceviche", name: "Punta Sal Ceviche & Beach Bar", lat: 20.754750, lng: -86.959584, description: "Ceviche & Beach Bar" }
     ],
     "Iberostar Waves Paraíso Beach": [

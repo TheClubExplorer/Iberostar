@@ -3431,6 +3431,9 @@ body.guide-expanded-open { overflow:hidden !important; overscroll-behavior:none;
 }
 .guide-detail-desc { margin: 0 0 10px; color: var(--green-deep); font: 14px/1.6 var(--font-body); }
 .guide-detail-row { margin: 4px 0; color: var(--muted); font: 13px var(--font-body); }
+.guide-extra-info .guide-detail-row,
+.guide-mobile-actions-info .guide-detail-row,
+.gp-bar-popup-menu { white-space: pre-line; }
 .guide-detail-row strong { color: var(--green-deep); font-weight: 600; margin-right: 4px; }
 .guide-detail-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
 .guide-focus { padding: 8px 14px; border-radius: 8px; border: 1px solid #002855; background: #002855; color: #fff; font: 600 13px var(--font-body); }
