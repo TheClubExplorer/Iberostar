@@ -930,20 +930,13 @@
       try { sessionStorage.setItem('destino_solicitado', JSON.stringify({nombre:nombre, lat:lat, lng:lng})); } catch(e){}
       map.flyTo({ center: [lng, lat], zoom: 17, pitch: 45, bearing: 0, duration: 1200 });
       var guiapa = window.RevistaDigital && window.RevistaDigital.guiapa;
-      if(guiapa && guiapa.POIS && guiapa.markers){
+      if(guiapa && guiapa.POIS && typeof guiapa.openPoiPopup === "function"){
         var poi = guiapa.POIS.find(function(p){
           return p && p.lat != null && p.lng != null &&
                  Math.abs(parseFloat(p.lat) - lat) < 0.0001 &&
                  Math.abs(parseFloat(p.lng) - lng) < 0.0001;
         });
-        if(poi && poi.id){
-          var m = guiapa.markers[poi.id];
-          if(m && m.getPopup){
-            try{
-              if(!m.getPopup().isOpen()) m.togglePopup();
-            }catch(e){}
-          }
-        }
+        if(poi && poi.id) guiapa.openPoiPopup(poi.id, false);
       }
       var routeNameEl = document.getElementById('route-dest-name');
       if(routeNameEl) routeNameEl.textContent = nombre;
@@ -1161,26 +1154,93 @@
       var markers = {};
       var state = { selectedId: null, category: '', query: '' };
       var routeFocusId = null;
+      var guideMarkersVisible = true;
+      var selectedFeatureId = null;
+      var sharedPoiPopup = new mapboxgl.Popup({ offset: 14, closeButton: true, focusAfterOpen: false });
 
       function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
       function catColor(cat){ var c = CATEGORIES[cat]; return (c && c.color) ? c.color : '#808080'; }
 
-      function applyMapboxRouteFocus(){
+      function getSourcePois(){
+        var list = [];
+        try {
+          var g = (window.RevistaDigital && window.RevistaDigital.guiapa) || {};
+          if(Array.isArray(g.POIS) && g.POIS.length) list = g.POIS.slice();
+        } catch(e){}
+        if(!list.length && Array.isArray(POIS) && POIS.length) list = POIS.slice();
+        if(!list.length && Array.isArray(window.POIS)) list = window.POIS.slice();
+        if(!list.length && window.RevistaDigital && Array.isArray(window.RevistaDigital.POIS)) list = window.RevistaDigital.POIS.slice();
+        return (list || []).filter(function(p){
+          return p && p.id != null && p.lat != null && p.lng != null && p.external !== true && Number.isFinite(Number(p.lat)) && Number.isFinite(Number(p.lng));
+        });
+      }
+
+      function isLabelPoi(p){ return p && (p.kind === 'area' || p.category === 'hotel'); }
+
+      function buildPoiFeatures(list){
+        return {
+          type: 'FeatureCollection',
+          features: list.filter(function(p){ return !isLabelPoi(p); }).map(function(p){
+            return {
+              type: 'Feature',
+              id: String(p.id),
+              properties: {
+                id: String(p.id),
+                name: p.name || '',
+                category: p.category || '',
+                color: p.color || catColor(p.category)
+              },
+              geometry: { type: 'Point', coordinates: [Number(p.lng), Number(p.lat)] }
+            };
+          })
+        };
+      }
+
+      function syncLabelVisibility(){
         Object.keys(markers).forEach(function(id){
           var el = markers[id] && markers[id].getElement && markers[id].getElement();
-          if(el) el.style.display = (!routeFocusId || id === routeFocusId) ? '' : 'none';
+          if(!el) return;
+          var focusVisible = !routeFocusId || String(routeFocusId) === String(id);
+          el.style.display = guideMarkersVisible && focusVisible ? '' : 'none';
         });
+      }
+
+      function updatePoiSourceData(){
+        if(!map.getSource('gp-pois')) return;
+        var list = getSourcePois();
+        if(routeFocusId) list = list.filter(function(p){ return String(p.id) === String(routeFocusId); });
+        map.getSource('gp-pois').setData(buildPoiFeatures(list));
+        var lblStatus = document.getElementById('lblStatus');
+        if(lblStatus) lblStatus.textContent = list.length + ' POIs';
+      }
+
+      function applyMapboxRouteFocus(){
+        syncLabelVisibility();
+        updatePoiSourceData();
         renderList();
       }
 
-      function getMarkerHTML(p,color){
-        var size = 30;
-        var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="'+size+'" height="'+size+'" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="'+color+'" stroke="#fff" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="#fff"/></svg>';
-        var coreStyle = 'background-image:url(data:image/svg+xml;base64,'+btoa(svg)+');';
-        if(p.category === 'club') return '<div class="gp-club-wrap"><span class="gp-club-pulse"></span><span class="gp-club-pulse gp-club-pulse--late"></span><div class="gp-club-core" style="'+coreStyle+'"></div></div>';
-        if(p.category === 'starprestige') return '<div class="gp-sp-wrap"><span class="gp-sp-ring"></span><span class="gp-sp-ring gp-sp-ring--wide"></span><div class="gp-sp-core" style="'+coreStyle+'"></div></div>';
-        if(p.category === 'concierge') return '<div class="gp-con-wrap"><div class="gp-con-core" style="'+coreStyle+'"></div></div>';
-        return '<div style="'+coreStyle+' width:'+size+'px; height:'+size+'px; background-size:contain;"></div>';
+      function setSelectedFeature(id){
+        if(!map.getSource('gp-pois')) return;
+        if(selectedFeatureId != null){
+          try { map.setFeatureState({ source: 'gp-pois', id: selectedFeatureId }, { selected: false }); } catch(e){}
+        }
+        selectedFeatureId = id != null ? String(id) : null;
+        if(selectedFeatureId != null){
+          try { map.setFeatureState({ source: 'gp-pois', id: selectedFeatureId }, { selected: true }); } catch(e){}
+        }
+      }
+
+      function guideLayerIds(){
+        return ['gp-poi-clusters', 'gp-poi-cluster-count', 'gp-poi-glow', 'gp-poi-points', 'gp-poi-selected-ring'];
+      }
+
+      function setGuideMarkersVisible(visible){
+        guideMarkersVisible = visible !== false;
+        guideLayerIds().forEach(function(id){
+          if(map.getLayer(id)) map.setLayoutProperty(id, 'visibility', guideMarkersVisible ? 'visible' : 'none');
+        });
+        syncLabelVisibility();
       }
 
       function getPopupHTML(p){
@@ -1328,62 +1388,141 @@
         });
       }
 
+      bindPopupActions(sharedPoiPopup);
+
       var markersRendered = false;
-      function renderMarkers(){
-        var listPOIS = [];
-        try {
-          var g = (window.RevistaDigital && window.RevistaDigital.guiapa) || {};
-          if(Array.isArray(g.POIS) && g.POIS.length) listPOIS = g.POIS.slice();
-        } catch(e){}
-        if(!listPOIS.length && Array.isArray(POIS) && POIS.length) listPOIS = POIS.slice();
-        if(!listPOIS.length && Array.isArray(window.POIS)) listPOIS = window.POIS.slice();
-        if(!listPOIS.length && window.RevistaDigital && Array.isArray(window.RevistaDigital.POIS)) listPOIS = window.RevistaDigital.POIS.slice();
-        var count = 0;
-        (listPOIS || []).forEach(function(p){
-          if(!p) return;
-          if(p.lat == null || p.lng == null || p.external === true) return;
-          if(markers[p.id]) return;
-          if(p.kind === 'area'){
-            var lblEl = document.createElement('div');
-            lblEl.className = 'gp-area-label';
-            lblEl.textContent = p.name || '';
-            var areaPopup = new mapboxgl.Popup({offset: 14, closeButton: true, focusAfterOpen: false}).setHTML(getPopupHTML(p));
-            bindPopupActions(areaPopup);
-            var ma = new mapboxgl.Marker({element: lblEl, anchor: 'center'}).setLngLat([parseFloat(p.lng), parseFloat(p.lat)]).setPopup(areaPopup).addTo(map);
-            markers[p.id] = ma;
-            count++;
-            return;
+
+      function addPoiLayers(data){
+        if(map.getSource('gp-pois')){
+          map.getSource('gp-pois').setData(data);
+          return;
+        }
+        map.addSource('gp-pois', { type: 'geojson', data: data, cluster: true, clusterRadius: 42, clusterMaxZoom: 17 });
+        map.addLayer({
+          id: 'gp-poi-clusters', type: 'circle', source: 'gp-pois',
+          filter: ['has', 'point_count'],
+          paint: {
+            'circle-color': '#0b3d66',
+            'circle-radius': ['step', ['get', 'point_count'], 16, 10, 21, 30, 26],
+            'circle-stroke-width': 2,
+            'circle-stroke-color': '#ffffff'
           }
-          if(p.category === 'hotel'){
-            var hEl = document.createElement('div');
-            hEl.className = 'gp-hotel-label';
-            hEl.textContent = p.name || '';
-            var hotelPopup = new mapboxgl.Popup({offset: 14, closeButton: true, focusAfterOpen: false}).setHTML(getPopupHTML(p));
-            bindPopupActions(hotelPopup);
-            var mh = new mapboxgl.Marker({element: hEl, anchor: 'bottom'}).setLngLat([parseFloat(p.lng), parseFloat(p.lat)]).setPopup(hotelPopup).addTo(map);
-            markers[p.id] = mh;
-            count++;
-            return;
-          }
-          var color = p.color || catColor(p.category);
-          var container = document.createElement('div'); container.className = 'gp-marker-container'; container.innerHTML = getMarkerHTML(p, color);
-          var popupCls = p.category === 'club' ? 'gp-club-pop' : (p.category === 'starprestige' ? 'gp-sp-pop' : '');
-          var popup = new mapboxgl.Popup({offset: 14, closeButton: true, focusAfterOpen: false, className: popupCls}).setHTML(getPopupHTML(p));
-          bindPopupActions(popup);
-          var marker = new mapboxgl.Marker({element: container, anchor: 'center'}).setLngLat([parseFloat(p.lng), parseFloat(p.lat)]).setPopup(popup).addTo(map);
-          markers[p.id] = marker;
-          container.addEventListener('click', function(){ selectPoi(p.id); });
-          count++;
         });
-        if(Object.keys(markers).length > 0) markersRendered = true;
+        map.addLayer({
+          id: 'gp-poi-cluster-count', type: 'symbol', source: 'gp-pois',
+          filter: ['has', 'point_count'],
+          layout: { 'text-field': ['get', 'point_count_abbreviated'], 'text-size': 11 },
+          paint: { 'text-color': '#ffffff' }
+        });
+        map.addLayer({
+          id: 'gp-poi-glow', type: 'circle', source: 'gp-pois',
+          filter: ['all', ['!', ['has', 'point_count']], ['any',
+            ['==', ['get', 'category'], 'club'],
+            ['==', ['get', 'category'], 'starprestige'],
+            ['==', ['get', 'category'], 'concierge']
+          ]],
+          paint: {
+            'circle-radius': 19,
+            'circle-color': 'rgba(255,255,255,0)',
+            'circle-stroke-width': 3,
+            'circle-stroke-color': ['get', 'color'],
+            'circle-stroke-opacity': 0.5
+          }
+        });
+        map.addLayer({
+          id: 'gp-poi-points', type: 'circle', source: 'gp-pois',
+          filter: ['all', ['!', ['has', 'point_count']]],
+          paint: {
+            'circle-radius': ['case', ['boolean', ['feature-state', 'selected'], false], 10, 7],
+            'circle-color': ['get', 'color'],
+            'circle-stroke-width': ['case', ['boolean', ['feature-state', 'selected'], false], 3, 2],
+            'circle-stroke-color': '#ffffff',
+            'circle-opacity': 0.95
+          }
+        });
+        map.addLayer({
+          id: 'gp-poi-selected-ring', type: 'circle', source: 'gp-pois',
+          filter: ['all', ['!', ['has', 'point_count']], ['boolean', ['feature-state', 'selected'], false]],
+          paint: {
+            'circle-radius': 15,
+            'circle-color': 'rgba(255,255,255,0)',
+            'circle-stroke-width': 2,
+            'circle-stroke-color': '#caa867'
+          }
+        });
+        map.on('click', 'gp-poi-clusters', function(event){
+          var feature = event.features && event.features[0];
+          if(!feature || !feature.properties || !feature.geometry) return;
+          var clusterId = feature.properties.cluster_id;
+          var center = feature.geometry.coordinates;
+          map.getSource('gp-pois').getClusterExpansionZoom(clusterId, function(error, zoom){
+            if(error || !center) return;
+            map.easeTo({ center: center, zoom: (zoom || map.getZoom()) + 0.3, duration: 450 });
+          });
+        });
+        ['gp-poi-glow', 'gp-poi-points'].forEach(function(layerId){
+          map.on('click', layerId, function(event){
+            var feature = event.features && event.features[0];
+            if(!feature || !feature.properties || !feature.properties.id) return;
+            openPoiPopup(feature.properties.id, false);
+          });
+        });
+        ['gp-poi-clusters', 'gp-poi-glow', 'gp-poi-points'].forEach(function(layerId){
+          map.on('mouseenter', layerId, function(){ map.getCanvas().style.cursor = 'pointer'; });
+          map.on('mouseleave', layerId, function(){ map.getCanvas().style.cursor = ''; });
+        });
+      }
+
+      function openPoiPopup(id, moveMap){
+        var poi = getSourcePois().find(function(item){ return String(item.id) === String(id); });
+        if(!poi) return;
+        state.selectedId = String(id);
+        setSelectedFeature(id);
+        sharedPoiPopup.setLngLat([Number(poi.lng), Number(poi.lat)]).setHTML(getPopupHTML(poi)).addTo(map);
+        var popupElement = sharedPoiPopup.getElement();
+        if(popupElement){
+          popupElement.classList.remove('gp-club-pop', 'gp-sp-pop');
+          if(poi.category === 'club') popupElement.classList.add('gp-club-pop');
+          if(poi.category === 'starprestige') popupElement.classList.add('gp-sp-pop');
+        }
+        if(moveMap !== false){
+          map.flyTo({
+            center: [Number(poi.lng), Number(poi.lat)],
+            zoom: Math.max(map.getZoom(), 17.2),
+            pitch: isCompactMap ? 45 : 65,
+            bearing: isCompactMap ? 0 : -45,
+            duration: 900
+          });
+        }
+        syncLabelVisibility();
+        renderList();
+      }
+
+      function renderMarkers(){
+        var list = getSourcePois();
+        list.forEach(function(p){
+          if(!isLabelPoi(p) || markers[p.id]) return;
+          var element = document.createElement('div');
+          element.className = p.kind === 'area' ? 'gp-area-label' : 'gp-hotel-label';
+          element.textContent = p.name || '';
+          var marker = new mapboxgl.Marker({ element: element, anchor: p.kind === 'area' ? 'center' : 'bottom' })
+            .setLngLat([Number(p.lng), Number(p.lat)]).addTo(map);
+          element.addEventListener('click', function(event){ event.stopPropagation(); openPoiPopup(p.id, false); });
+          markers[p.id] = marker;
+        });
+        addPoiLayers(buildPoiFeatures(list));
+        markersRendered = true;
+        syncLabelVisibility();
+        setSelectedFeature(state.selectedId);
         var lblStatus = document.getElementById('lblStatus');
-        if(lblStatus) lblStatus.textContent = Object.keys(markers).length + ' POIs';
-        // Exponer para acceso global desde irAlPunto
+        if(lblStatus) lblStatus.textContent = list.length + ' POIs';
         try {
           window.RevistaDigital = window.RevistaDigital || {};
           window.RevistaDigital.guiapa = window.RevistaDigital.guiapa || {};
           window.RevistaDigital.guiapa.markers = markers;
           window.RevistaDigital.guiapa.POIS = POIS;
+          window.RevistaDigital.guiapa.openPoiPopup = openPoiPopup;
+          window.RevistaDigital.guiapa.setGuideMarkersVisible = setGuideMarkersVisible;
         } catch(e){}
         applyMapboxRouteFocus();
       }
@@ -1400,13 +1539,17 @@
       } catch(e){}
 
       function selectPoi(id){
-        var p = POIS.find(function(x){ return x.id === id; });
-        if(!p || p.lat == null || p.lng == null) return;
-        state.selectedId = id;
-        map.flyTo({ center: [parseFloat(p.lng), parseFloat(p.lat)], zoom: 17.2, pitch: 65, bearing: -45, duration: 900 });
-        var m = markers[id];
-        if(m && m.getPopup && !m.getPopup().isOpen()){ try{ m.togglePopup(); }catch(e){} }
-        renderList();
+        var poi = getSourcePois().find(function(item){ return String(item.id) === String(id); });
+        if(!poi) return;
+        state.selectedId = String(id);
+        map.flyTo({
+          center: [Number(poi.lng), Number(poi.lat)],
+          zoom: 17.2,
+          pitch: isCompactMap ? 45 : 65,
+          bearing: isCompactMap ? 0 : -45,
+          duration: 900
+        });
+        openPoiPopup(id, false);
       }
 
       var guidePanel = document.getElementById('guidePanel');
@@ -1753,8 +1896,9 @@
           if (touchControls) touchControls.hidden = false;
         }
         if (mode === "cart") {
-          var guideMarkers = window.RevistaDigital && window.RevistaDigital.guiapa &&
-            window.RevistaDigital.guiapa.markers;
+          var guiaApi = window.RevistaDigital && window.RevistaDigital.guiapa;
+          if (guiaApi && typeof guiaApi.setGuideMarkersVisible === "function") guiaApi.setGuideMarkersVisible(false);
+          var guideMarkers = guiaApi && guiaApi.markers;
           if (guideMarkers) Object.keys(guideMarkers).forEach(function (id) {
             if (guideMarkers[id] && typeof guideMarkers[id].remove === "function") guideMarkers[id].remove();
           });
