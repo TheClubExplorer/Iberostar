@@ -6,6 +6,13 @@
   <title>The Club Explorer - Playa Paraíso</title>
   
   <link href="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css" rel="stylesheet">
+  <script>
+    (function () {
+      if (window.matchMedia && window.matchMedia('(max-width: 900px)').matches && (window.devicePixelRatio || 1) > 1.5) {
+        Object.defineProperty(window, 'devicePixelRatio', { configurable: true, get: function () { return 1.5; } });
+      }
+    })();
+  </script>
   <script src="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js"></script>
 
   <script src="../js/datos-complejo.js?v=19"></script>
@@ -447,6 +454,7 @@
     }
     var BOUNDS = (sw&&ne)?[[sw[0],sw[1]],[ne[0],ne[1]]]:[[-86.9740,20.7500],[-86.9560,20.7680]];
 
+    var isCompactMap = window.matchMedia ? window.matchMedia('(max-width: 900px)').matches : (window.innerWidth <= 900);
     var map = new mapboxgl.Map({
       container: 'map',
       style: 'mapbox://styles/mapbox/standard',
@@ -454,13 +462,28 @@
       zoom: 16.25,
       minZoom: 15.7,
       maxZoom: 19.5,
-      pitch: 65,
+      pitch: isCompactMap ? 45 : 65,
       bearing: -45,
       maxBounds: BOUNDS,
-      antialias: true,
+      maxPitch: isCompactMap ? 45 : 85,
+      antialias: !isCompactMap,
+      fadeDuration: isCompactMap ? 0 : 300,
+      dragRotate: !isCompactMap,
+      touchPitch: !isCompactMap,
       lightPreset: 'day'
     });
     var mapReady = false;
+
+    window.addEventListener('resize', function(){
+      var compactNow = window.matchMedia ? window.matchMedia('(max-width: 900px)').matches : (window.innerWidth <= 900);
+      if (compactNow === isCompactMap) return;
+      isCompactMap = compactNow;
+      try { if (map.setMaxPitch) map.setMaxPitch(isCompactMap ? 45 : 85); } catch(e){}
+      if (isCompactMap) {
+        try { map.setPitch(Math.min(map.getPitch(), 45)); } catch(e){}
+        try { if (map.touchZoomRotate && map.touchZoomRotate.disableRotation) map.touchZoomRotate.disableRotation(); } catch(e){}
+      }
+    });
 
     map.addControl(new mapboxgl.NavigationControl({ visualizePitch: true }), 'top-right');
 
@@ -1659,9 +1682,14 @@
           mapLocked = mobileQuery.matches && locked;
           [map.dragPan, map.dragRotate, map.scrollZoom, map.touchZoomRotate, map.touchPitch, map.doubleClickZoom, map.boxZoom].forEach(function (handler) {
             if (!handler) return;
+            var compactDisabled = isCompactMap && (handler === map.dragRotate || handler === map.touchPitch);
             if (mapLocked && handler.isEnabled()) handler.disable();
-            else if (!mapLocked && !handler.isEnabled()) handler.enable();
+            else if (!mapLocked && !compactDisabled && !handler.isEnabled()) handler.enable();
+            else if (compactDisabled && handler.isEnabled()) handler.disable();
           });
+          if (!mapLocked && isCompactMap && map.touchZoomRotate && map.touchZoomRotate.disableRotation) {
+            map.touchZoomRotate.disableRotation();
+          }
           if (activateButton) activateButton.hidden = !mapLocked;
           if (touchControls) touchControls.hidden = !mobileQuery.matches;
           if (lockButton) {
