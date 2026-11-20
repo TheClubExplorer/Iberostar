@@ -448,6 +448,21 @@
       (country) => country.destinations
     );
   }
+  function collageHotelImages(country, hotels = []) {
+    const images = [];
+    (hotels || []).forEach((hotel) => {
+      if (hotel.image) images.push(hotel.image);
+      if (hotel.destinationImage) images.push(hotel.destinationImage);
+    });
+    if (country?.image) images.push(country.image);
+    const restaurantHotels = window.RevistaDigital.restaurantes?.getRestaurantHotels?.() || {};
+    const byCountry = restaurantHotels[country?.slug || country?.key || ""] || [];
+    byCountry.forEach((hotel) => (hotel.photos || []).forEach((image) => {
+      if (image) images.push(image);
+    }));
+    return images.filter(Boolean);
+  }
+
   const initializedPortalCarousels = new WeakSet();
   function renderPortalHeroCarousel(images, label, className = "", imageClass = "", sizes = "(max-width:850px) 100vw, 45vw") {
     const seenImages = new Set();
@@ -457,7 +472,7 @@
       if (seenImages.has(sourceKey)) return false;
       seenImages.add(sourceKey);
       return true;
-    }).slice(0, 6);
+    }).slice(0, 12);
     if (!sources.length) return "";
     const slides = sources.map((src, index) => `<div class="portal-hero-carousel-slide${index === 0 ? " is-active" : ""}" aria-hidden="${index !== 0}">
       ${RI.img(src, {
@@ -1160,7 +1175,10 @@
       let heading = en ? "Find your next destination" : "Encuentre su próximo destino";
       let intro = en ? "Explore Iberostar hotels and destinations. Choose a country to get started." : "Explore hoteles y destinos Iberostar. Elija un país para comenzar.";
       let cards = renderCards(countryCards, (item) => item.route, "country");
-      let heroImages = countryCards.map((item) => item.image);
+      let heroImages = [
+        ...countryCards.map((item) => item.image),
+        ...Object.values(catalog).flatMap((country) => collageHotelImages(country, country.destinations?.flatMap((destination) => destination.hotels) || []))
+      ];
       let breadcrumb = en ? "IBEROSTAR · DESTINATIONS" : "IBEROSTAR · DESTINOS";
       let countryMapMarkup = "";
       let countryHotels = [];
@@ -1171,7 +1189,8 @@
         heroImages = [
           countryData.image,
           ...countryData.destinations.map((destination) => destination.image),
-          ...countryData.destinations.flatMap((destination) => destination.hotels.map((hotel) => hotel.image))
+          ...countryData.destinations.flatMap((destination) => destination.hotels.map((hotel) => hotel.image)),
+          ...collageHotelImages(countryData, countryData.destinations.flatMap((destination) => destination.hotels))
         ];
         countryHotels = countryData.destinations.flatMap((destination) => destination.hotels.map((hotel) => ({
           ...hotel,
