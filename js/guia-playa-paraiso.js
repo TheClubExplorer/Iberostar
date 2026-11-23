@@ -725,26 +725,52 @@
         var poiId = panoramaButton.getAttribute("data-poi-id");
         if (pannellum360 && typeof pannellum360.open === "function" && hotelName) {
           pannellum360.open(hotelName, "restaurantes", label, poiId);
+          window.RevistaDigital?.guiapa?.syncBackTo360Button?.();
           return;
         }
-        // Fallback: navegar a /360 solo si pannellum360 no está disponible
-        try {
-          window.sessionStorage.setItem("club360RestaurantSelection", JSON.stringify({
-            hotelName: hotelName,
-            label: label
-          }));
-        } catch (error) {
-          console.warn("No se pudo guardar el restaurante para la exploración 360°.", error);
-          return;
-        }
-        var routes = window.RevistaDigital.routes;
-        if (routes && typeof routes.navigate === "function") {
-          routes.navigate("/360");
-        } else {
-          var baseHref = document.querySelector("base")?.href || window.location.href;
-          window.location.assign(new URL("360", baseHref).href);
-        }
+        navigateTo360Fallback(hotelName, "restaurantes", label, poiId);
       });
+    }
+  }
+
+  function bindPoiPopupActions(popup) {
+    var attempts = 0;
+    function attempt() {
+      var element = popup && typeof popup.getElement === "function" ? popup.getElement() : null;
+      if (element && element.querySelector("[data-poi-360-hotel], [data-popup-menu-toggle], [data-map-carousel]")) {
+        initializePoiPopup(element);
+        window.setTimeout(function () {
+          var refreshed = popup && typeof popup.getElement === "function" ? popup.getElement() : null;
+          if (refreshed) initializePoiPopup(refreshed);
+        }, 350);
+        return;
+      }
+      if (attempts < 12) {
+        attempts += 1;
+        window.setTimeout(attempt, 40);
+      }
+    }
+    window.setTimeout(attempt, 0);
+  }
+
+  function navigateTo360Fallback(hotelName, zoneKey, label, poiId) {
+    try {
+      window.sessionStorage.setItem("club360RestaurantSelection", JSON.stringify({
+        hotelName: hotelName,
+        zoneKey: zoneKey,
+        label: label,
+        poiId: poiId || ""
+      }));
+    } catch (error) {
+      console.warn("No se pudo guardar el restaurante para la exploración 360°.", error);
+      return;
+    }
+    var routes = window.RevistaDigital.routes;
+    if (routes && typeof routes.navigate === "function") {
+      routes.navigate("/360");
+    } else {
+      var baseHref = document.querySelector("base")?.href || window.location.href;
+      window.location.assign(new URL("360", baseHref).href);
     }
   }
 
@@ -848,8 +874,13 @@
     if (panoButton) {
       panoButton.addEventListener("click", function () {
         closeDiningOverlay();
+        var panoZone = isRestaurant ? "restaurantes" : "bares";
+        var panoHotelName = panoHotel || poi.hotelId || poi.hotel;
         if (pannellum360 && typeof pannellum360.open === "function") {
-          pannellum360.open(panoHotel || poi.hotelId || poi.hotel, isRestaurant ? "restaurantes" : "bares", poi.name, poi.id);
+          pannellum360.open(panoHotelName, panoZone, poi.name, poi.id);
+          window.RevistaDigital?.guiapa?.syncBackTo360Button?.();
+        } else {
+          navigateTo360Fallback(panoHotelName, panoZone, poi.name, poi.id);
         }
       });
     }
@@ -912,7 +943,7 @@
         popupOptions = { className: "gp-map-poi-pop", minWidth: 230, maxWidth: 280 };
         m.bindPopup(poiPopupMarkup(p), popupOptions);
         m.on("popupopen", function (event) {
-          initializePoiPopup(event.popup.getElement());
+          bindPoiPopupActions(event.popup);
         });
         m.on("popupclose", function (event) {
           var popupElement = event.popup.getElement();
@@ -963,7 +994,7 @@
           popupOptions = { className: 'gp-bar-pop', minWidth: 220, maxWidth: 280 };
           if (compactBar) {
             m.on("popupopen", function (event) {
-              initializePoiPopup(event.popup.getElement());
+              bindPoiPopupActions(event.popup);
             });
           }
         } else {
@@ -982,6 +1013,7 @@
     gp._poiLabelLayer = labels;
     return layer;
   };
+  gp.bindPoiPopupActions = bindPoiPopupActions;
   window.RevistaDigital.guiapa = gp;
 })();
 
@@ -2568,6 +2600,9 @@
       focusOn(map, target, targetZoom);
       gp._userFocusedMap = map;
       if (marker && typeof marker.openPopup === "function") marker.openPopup();
+      if (marker && typeof marker.getPopup === "function" && typeof gp.bindPoiPopupActions === "function") {
+        gp.bindPoiPopupActions(marker.getPopup());
+      }
       // No desplazar la página si ya estamos viendo el mapa (p. ej. al usar el
       // menú flotante móvil); solo se trae a la vista cuando está fuera.
       if (!opts.noScroll) revealMap(map);
@@ -2692,6 +2727,31 @@ function poiCommonInfoHtml(poi) {
   }).join("") + '</div>';
 }
 
+  function buildBackTo360Button() {
+    try {
+      var stored = window.sessionStorage.getItem("club360LastViewed");
+      if (!stored) return "";
+      var data = JSON.parse(stored);
+      if (!data || !data.label) return "";
+      return '<button type="button" class="guide-back-to-360" data-back-to-360="true" aria-label="Volver a la exploración 360° de ' + escapeHtml(data.label) + '"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="currentColor"/></svg> Volver al 360°: ' + escapeHtml(data.label) + '</button>';
+    } catch (e) { return ""; }
+  }
+
+  gp.syncBackTo360Button = function () { syncBackTo360Button(); };
+
+  function syncBackTo360Button() {
+    var host = document.querySelector(".guide-explorer-head--panel") || document.querySelector(".guide-explorer-title");
+    if (!host) return;
+    var existing = host.querySelector("[data-back-to-360]");
+    var markup = buildBackTo360Button();
+    if (!markup) {
+      if (existing && existing.parentNode) existing.parentNode.removeChild(existing);
+      return;
+    }
+    if (existing) existing.outerHTML = markup;
+    else host.insertAdjacentHTML("beforeend", markup);
+  }
+
   gp.renderExplorer = function (mount, options) {
     if (!mount) return null;
     var opts = options || {};
@@ -2707,20 +2767,10 @@ function poiCommonInfoHtml(poi) {
       '<input id="guideSearchInput" type="search" placeholder="Buscar restaurante, bar, piscina…" aria-label="Buscar lugar por nombre" autocomplete="off" />' +
       "</label>";
     
-    // Check for last viewed 360° to show "Volver al 360°" button
-    var backTo360Html = "";
-    try {
-      var last360 = window.sessionStorage.getItem("club360LastViewed");
-      if (last360) {
-        var last360Data = JSON.parse(last360);
-        if (last360Data && last360Data.label) {
-          backTo360Html = '<button type="button" class="guide-back-to-360" data-back-to-360="true" aria-label="Volver a la exploración 360° de ' + escapeHtml(last360Data.label) + '"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="currentColor"/></svg> Volver al 360°: ' + escapeHtml(last360Data.label) + '</button>';
-        }
-      }
-    } catch (e) { /* ignore */ }
-    
+    var backTo360Html = buildBackTo360Button();
+
     var head = panelMode
-      ? ""
+      ? '<div class="guide-explorer-head guide-explorer-head--panel">' + backTo360Html + '</div>'
       : '<div class="guide-explorer-head">' +
           '<div class="guide-explorer-title">' +
             '<p class="portal-kicker">GUÍA INTERACTIVA · THE CLUB</p>' +
@@ -2920,6 +2970,7 @@ function poiCommonInfoHtml(poi) {
           if (hotelName) {
             var panoZone = (panoPoi.category === "bar" || panoPoi.category === "discoteca") ? "bares" : "restaurantes";
             window.RevistaDigital.pannellum360.open(hotelName, panoZone, panoPoi.name, panoPoi.id);
+            window.RevistaDigital?.guiapa?.syncBackTo360Button?.();
           }
         }
         return;

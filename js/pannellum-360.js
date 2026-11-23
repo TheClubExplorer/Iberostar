@@ -720,7 +720,10 @@ const RESTAURANTES_PARAISO = {
     if (hotelRoute && hotelRoute !== currentPath) {
       routes.navigate(hotelRoute);
     } else {
+      guide._routeNotice = notice;
       guide.selectPoi(destination.id);
+      if (typeof guide.routeToPoi === "function") guide.routeToPoi(destination.id);
+      delete guide._pendingRouteRequest;
     }
     // Limpieza agresiva DESPUÉS de navegar al mapa: en móvil puede quedar el
     // backdrop del 360, la clase body.pano-360-open (overflow: hidden) o la
@@ -743,8 +746,6 @@ const RESTAURANTES_PARAISO = {
       var panel = document.getElementById("guideMobileActions");
       if (panel) {
         panel.setAttribute("hidden", "");
-        panel.style.display = "none";
-        panel.innerHTML = "";
       }
     }, 0);
   }
@@ -793,6 +794,14 @@ const RESTAURANTES_PARAISO = {
   }
 
   pannellum360.open = function (hotelName, zoneKey, label, requestedPoiId) {
+    try {
+      window.sessionStorage.setItem("club360LastViewed", JSON.stringify({
+        hotelName: hotelName,
+        zoneKey: zoneKey,
+        label: label,
+        poiId: requestedPoiId || ""
+      }));
+    } catch (error) { /* noop */ }
     ensurePannellum().then(() => {
       var canonicalHotel = canonicalHotelNameValue(hotelName) || hotelName;
 

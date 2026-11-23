@@ -3362,6 +3362,9 @@ body.guide-expanded-open { overflow:hidden !important; overscroll-behavior:none;
 /* Guia interactiva THE CLUB - Explorador de lugares */
 .guide-explorer { display: flex; flex-direction: column; gap: 18px; }
 .guide-explorer-head { display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-end; justify-content: space-between; }
+.guide-explorer-head--panel { align-items: flex-start; }
+.guide-back-to-360 { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; margin-top: 8px; padding: 8px 12px; border: 1px solid rgba(11,61,102,.24); border-radius: 999px; background: rgba(255,252,248,.94); color: var(--green-deep); font: 600 12px/1.2 var(--font-body); cursor: pointer; }
+.guide-back-to-360:hover, .guide-back-to-360:focus-visible { background: var(--paper-alt); }
 .guide-explorer-title { max-width: 620px; }
 .guide-explorer-title h2 { margin: 8px 0 6px; color: var(--green-deep); font: 500 clamp(24px, 3vw, 36px)/1.1 Georgia, serif; }
 .guide-explorer-title p { margin: 0; color: var(--muted); font: 15px/1.6 var(--font-body); }

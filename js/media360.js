@@ -225,8 +225,8 @@
       backBtn.addEventListener("click", (event) => {
         event.preventDefault();
         event.stopPropagation();
-        if (window.RevistaDigital?.router?.go) {
-          window.RevistaDigital.router.go("/restaurantes");
+        if (window.RevistaDigital?.routes?.navigate) {
+          window.RevistaDigital.routes.navigate("/restaurantes");
           return;
         }
         if (window.history.length > 1) {

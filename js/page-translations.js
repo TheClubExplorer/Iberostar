@@ -2331,6 +2331,8 @@
     if (value === "Volver a restaurantes") return "Back to restaurants";
     match = value.match(/^Volver a restaurantes de (.+)$/i);
     if (match) return "Back to restaurants in " + (translationFor(match[1]) || match[1]);
+    match = value.match(/^Volver a la exploración 360° de (.+)$/i);
+    if (match) return "Back to the 360° tour of " + (translationFor(match[1]) || match[1]);
     match = value.match(/^Volver a (.+)$/i);
     if (match) return "Back to " + (translationFor(match[1]) || match[1]);
     match = value.match(/^Más restaurantes de (.+)$/i);
@@ -2397,6 +2399,10 @@
     if (match) return match[1] + " of " + match[2] + " places";
     match = value.match(/^(\d+) lugares$/i);
     if (match) return match[1] + " places";
+    match = value.match(/^Dirigiéndote a (.+)$/i);
+    if (match) return "Heading to " + (match[1] === "el destino" ? "the destination" : match[1]);
+    match = value.match(/^Volver al 360°:\s*(.+)$/i);
+    if (match) return "Back to 360°: " + match[1];
     match = value.match(/^(\d+) lugar(?:es)? pendiente de verificación \(sin ubicación confirmada\)$/i);
     if (match) return match[1] + " place" + (match[1] === "1" ? "" : "s") + " pending verification (location not confirmed)";
     match = value.match(/^¡Bienvenido! Nos alegra tenerle tan cerca de (.+)\. Preparamos todo para que su visita sea mágica\.$/i);

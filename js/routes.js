@@ -726,7 +726,7 @@
         stage.classList.toggle("is-mapbox", activate);
         frame.hidden = !activate;
         if (activate && !frame.src) {
-          frame.src = `${href("/mapbox/mapbox-guia-playa-paraiso.html")}?embed=1&mode=complex&v=12`;
+          frame.src = `${href("/mapbox/mapbox-guia-playa-paraiso.html")}?embed=1&mode=complex&v=22`;
           frame.addEventListener("load", () => {
             sendMapboxCommand(frame, { command: "resize" });
             syncMapboxFrameViewport(frame);
@@ -830,6 +830,17 @@
       if (!hotel || typeof window.RevistaDigital?.carritoGolf?.openPage !== "function") return;
       if (activeMapboxFullscreen?.frame === frame) setMapboxFullscreen(frame, false);
       window.RevistaDigital.carritoGolf.openPage(hotel.slug);
+      return;
+    }
+    if (event.data.type === "mapbox-command" && event.data.command === "open-360") {
+      if (!frame || typeof window.RevistaDigital?.pannellum360?.open !== "function") return;
+      if (activeMapboxFullscreen?.frame === frame) setMapboxFullscreen(frame, false);
+      window.RevistaDigital.pannellum360.open(
+        event.data.hotelName,
+        event.data.zoneKey,
+        event.data.label,
+        event.data.poiId
+      );
       return;
     }
     if (event.data.type !== "mapbox-cart-request") return;
@@ -1061,7 +1072,7 @@
           </div>
           <div class="hotel-cart-map-wrap">
             <div id="cartTrackingMap" class="hotel-cart-map" role="application" aria-label="Mapa de seguimiento del carrito de golf">
-              <iframe class="cart-mapbox-frame" title="Seguimiento 3D del carrito de golf" data-mapbox-src="${escapeHtml(`${href("/mapbox/mapbox-guia-playa-paraiso.html")}?embed=1&mode=cart&v=12`)}" hidden></iframe>
+              <iframe class="cart-mapbox-frame" title="Seguimiento 3D del carrito de golf" data-mapbox-src="${escapeHtml(`${href("/mapbox/mapbox-guia-playa-paraiso.html")}?embed=1&mode=cart&v=22`)}" hidden></iframe>
             </div>
             <button type="button" class="cart-map-expand" data-cart-back-to-trip>Ampliar mapa</button>
             <button type="button" class="cart-panel-reopen" data-cart-panel-toggle aria-expanded="false">Mostrar solicitud</button>
@@ -1792,7 +1803,7 @@
             ${zonePanelMarkup}
           </div>
         </section>`) : "";
-    const guideMarkup = "";
+    const guideMarkup = window.RevistaDigital?.pannellum360?.renderSection?.(displayName) || "";
 
     return `
       <main class="portal-page">

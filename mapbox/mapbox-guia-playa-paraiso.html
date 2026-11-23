@@ -22,7 +22,7 @@
     })();
   </script>
   <script src="../js/i18n.js?v=14"></script>
-  <script src="../js/page-translations.js?v=13"></script>
+  <script src="../js/page-translations.js?v=16"></script>
   <script>
     window.addEventListener("storage", function (event) {
       if (event.key === "revista_lang" && window.RevistaDigital && window.RevistaDigital.i18n) {
@@ -30,8 +30,28 @@
       }
     });
   </script>
+  <script>
+    (function () {
+      if (window.parent === window) return;
+      window.RevistaDigital = window.RevistaDigital || {};
+      window.RevistaDigital.pannellum360 = {
+        isPlayaParaiso: function () { return true; },
+        canonicalHotelName: function (name) { return name; },
+        open: function (hotelName, zoneKey, label, poiId) {
+          window.parent.postMessage({
+            type: "mapbox-command",
+            command: "open-360",
+            hotelName: hotelName,
+            zoneKey: zoneKey,
+            label: label,
+            poiId: poiId
+          }, window.location.origin);
+        }
+      };
+    })();
+  </script>
   <script src="../js/datos-complejo.js?v=22"></script>
-  <script src="../js/guia-playa-paraiso.js?v=64"></script>
+  <script src="../js/guia-playa-paraiso.js?v=72"></script>
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
@@ -1182,9 +1202,13 @@
         var dirBtn = '<button class="gp-dir" type="button" data-map-action="directions" data-name="'+name+'" data-lat="'+lat+'" data-lng="'+lng+'">Cómo llegar</button>';
         var isCartEligible = p.category === 'restaurante' || p.category === 'golf';
         var cartBtn = isCartEligible ? '<button class="gp-cart-btn" type="button" data-map-action="cart" data-id="'+esc(p.id)+'">Solicitar carrito</button>' : '';
+        var panoApi = window.RevistaDigital && window.RevistaDigital.pannellum360;
+        var hasPano360 = (p.category === 'restaurante' || p.category === 'bar' || p.category === 'discoteca') &&
+          panoApi && typeof panoApi.isPlayaParaiso === 'function' && panoApi.isPlayaParaiso(p.hotelId || p.hotel);
+        var panoBtn = hasPano360 ? '<button class="gp-dir gp-map-carousel-360-link" type="button" data-map-action="pano-360" data-id="'+esc(p.id)+'" data-hotel="'+esc(p.hotelId || p.hotel || '')+'" data-label="'+name+'" data-zone="'+esc(p.category === 'bar' || p.category === 'discoteca' ? 'bares' : 'restaurantes')+'">Ver exploración 360°</button>' : '';
         if(p.category === 'club') return '<div class="gp-club-popup"><div class="gp-club-popup-badge"><img class="gp-club-popup-logo" src="../branding/IB_THE_CLUB_VV_POS_RGB-320.webp" alt="The Club" /></div><h3 class="gp-club-popup-name">'+name+'</h3><p class="gp-club-popup-hours">'+hours+'</p>'+(desc?'<p class="gp-club-popup-desc">'+desc+'</p>':'')+dirBtn+'</div>';
         if(p.category === 'starprestige') return '<div class="gp-sp-popup"><div class="gp-sp-popup-badge"><span class="gp-sp-popup-star">✦</span>STAR PRESTIGE</div><h3 class="gp-sp-popup-name">'+name+'</h3>'+(desc?'<p class="gp-sp-popup-desc">'+desc+'</p>':'')+'<p class="gp-sp-popup-hours">'+hours+'</p>'+dirBtn+'</div>';
-        return '<div><strong style="font-size:14px;color:#0f172a;">'+name+'</strong>'+(desc?'<p style="font-size:11px;color:#475569;margin:4px 0;">'+desc+'</p>':'')+'<small style="color:#64748b;display:block;margin-bottom:6px;">'+hours+'</small>'+dirBtn+cartBtn+'</div>';
+        return '<div><strong style="font-size:14px;color:#0f172a;">'+name+'</strong>'+(desc?'<p style="font-size:11px;color:#475569;margin:4px 0;">'+desc+'</p>':'')+'<small style="color:#64748b;display:block;margin-bottom:6px;">'+hours+'</small>'+dirBtn+panoBtn+cartBtn+'</div>';
       }
 
       function getCartRequestFormHTML(poi){
@@ -1255,6 +1279,18 @@
             var action = actionButton.getAttribute('data-map-action');
             if(action === 'directions'){
               window.irAlPunto(actionButton.getAttribute('data-name'), actionButton.getAttribute('data-lat'), actionButton.getAttribute('data-lng'));
+              return;
+            }
+            if(action === 'pano-360'){
+              var panoApi = window.RevistaDigital && window.RevistaDigital.pannellum360;
+              if(panoApi && typeof panoApi.open === 'function'){
+                panoApi.open(
+                  actionButton.getAttribute('data-hotel'),
+                  actionButton.getAttribute('data-zone'),
+                  actionButton.getAttribute('data-label'),
+                  actionButton.getAttribute('data-id')
+                );
+              }
               return;
             }
             if(action === 'cart'){
