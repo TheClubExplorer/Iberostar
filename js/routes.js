@@ -14,6 +14,23 @@
     "iberostar-paraiso-lindo",
     "iberostar-paraiso-joia"
   ]);
+  const HOTEL_BANNER_VIDEOS = {
+    "iberostar-paraiso-beach": "src/Videos/BEACH.mp4",
+    "iberostar-paraiso-joia": "src/Videos/JOIA.mp4",
+    "iberostar-paraiso-lindo": "src/Videos/LINDO.mp4",
+    "iberostar-paraiso-del-mar": "src/Videos/MAR.mp4",
+    "iberostar-paraiso-maya": "src/Videos/MAYA.mp4"
+  };
+  const IBEROSTAR_BANNER_VIDEO = "src/Videos/iberostar.mp4";
+  const PORTAL_HERO_IMAGE_REPLACEMENTS = {
+    "src/paraiso-del-mar/banner/ParaisoDelMar.jpg": "src/paraiso-del-mar/banner/PMA_GAST_0026.jpg",
+    "src/ParaisoDelMar 1.jpg": "src/paraiso-del-mar/banner/PMA_GAST_0011.jpg",
+    "src/paraiso-beach/banner/paraisoBeach.jpg": "src/paraiso-beach/banner/PBE_STPR_0005.jpg",
+    "src/ParaisoLindo1.jpg": "src/paraiso-lindo/banner/PLI_VIEWS_0009.jpg",
+    "src/paraisoBeach1.jpg": "src/paraiso-beach/banner/PBE_POOL_0003.jpg",
+    "src/paraisoMaya 1.jpg": "src/paraiso-maya/banner/PMY_POOL_0049.jpg"
+  };
+  const replacePortalHeroImages = (images) => (images || []).map((image) => PORTAL_HERO_IMAGE_REPLACEMENTS[image] || image);
   const PORTAL_WEATHER_CITY_BY_COUNTRY = {
     mexico: "Cancún",
     jamaica: "Montego Bay",
@@ -464,27 +481,54 @@
   }
 
   const initializedPortalCarousels = new WeakSet();
-  function renderPortalHeroCarousel(images, label, className = "", imageClass = "", sizes = "(max-width:850px) 100vw, 45vw") {
+  function renderPortalHeroCarousel(images, label, className = "", imageClass = "", sizes = "(max-width:850px) 100vw, 45vw", options = {}) {
+    const video = typeof options.video === "string" && options.video.trim() ? options.video.trim() : "";
+    const baseNameOf = (value) => String(value || "")
+      .trim()
+      .split("/").pop()
+      .replace(/\.[^.]+$/, "")
+      .toLowerCase()
+      .replace(/[\s_-]+/g, "");
+    const posterBase = options.poster ? baseNameOf(options.poster) : "";
+    const coverKey = posterBase.replace(/1$/, "");
+    const isCoverImage = (image) => {
+      if (!coverKey) return false;
+      const key = baseNameOf(image);
+      return key === coverKey || key === `${coverKey}1`;
+    };
     const seenImages = new Set();
     const sources = (images || []).filter((image) => {
       if (typeof image !== "string" || !image.trim()) return false;
+      if (isCoverImage(image) && (video || baseNameOf(image) !== posterBase)) return false;
       const sourceKey = image.trim().replace(/%20/gi, " ").replace(/\\/g, "/").toLowerCase().replace(/\.(?:jpe?g|png|webp)$/i, "");
       if (seenImages.has(sourceKey)) return false;
       seenImages.add(sourceKey);
       return true;
     }).slice(0, 12);
-    if (!sources.length) return "";
-    const slides = sources.map((src, index) => `<div class="portal-hero-carousel-slide${index === 0 ? " is-active" : ""}" aria-hidden="${index !== 0}">
-      ${RI.img(src, {
-        cls: imageClass,
-        alt: "",
-        priority: index === 0,
-        loading: "eager",
-        sizes
-      })}
-    </div>`).join("");
-    const controls = sources.length > 1 ? `<div class="portal-hero-carousel-controls">
-      <div class="portal-hero-carousel-dots" data-i18n-aria="carouselSelectImage" aria-label="Seleccionar imagen">${sources.map((_, index) => `<button type="button" class="portal-hero-carousel-dot${index === 0 ? " is-active" : ""}" data-carousel-slide="${index}" data-i18n-aria="carouselShowImage${index + 1}" aria-label="Mostrar imagen ${index + 1}" aria-current="${index === 0 ? "true" : "false"}"></button>`).join("")}</div>
+    if (!sources.length && !video) return "";
+    const slideItems = [];
+    if (video) slideItems.push({ type: "video", src: video });
+    sources.forEach((src) => slideItems.push({ type: "image", src }));
+    const slides = slideItems.map((item, index) => {
+      const active = index === 0 ? " is-active" : "";
+      const hidden = index !== 0;
+      if (item.type === "video") {
+        return `<div class="portal-hero-carousel-slide portal-hero-carousel-slide--video${active}" aria-hidden="${hidden}">
+          <video class="${imageClass}" src="${escapeHtml(item.src)}"${options.poster ? ` poster="${escapeHtml(options.poster)}"` : ""} autoplay muted loop playsinline preload="metadata"></video>
+        </div>`;
+      }
+      return `<div class="portal-hero-carousel-slide${active}" aria-hidden="${hidden}">
+        ${RI.img(item.src, {
+          cls: imageClass,
+          alt: "",
+          priority: index === 0,
+          loading: "eager",
+          sizes
+        })}
+      </div>`;
+    }).join("");
+    const controls = slideItems.length > 1 ? `<div class="portal-hero-carousel-controls">
+      <div class="portal-hero-carousel-dots" data-i18n-aria="carouselSelectImage" aria-label="Seleccionar imagen">${slideItems.map((_, index) => `<button type="button" class="portal-hero-carousel-dot${index === 0 ? " is-active" : ""}" data-carousel-slide="${index}" data-i18n-aria="carouselShowImage${index + 1}" aria-label="Mostrar imagen ${index + 1}" aria-current="${index === 0 ? "true" : "false"}"></button>`).join("")}</div>
     </div>` : "";
     return `<div class="portal-hero-carousel ${className}" data-portal-hero-carousel data-i18n-aria="carouselRegion" role="region" aria-roledescription="carrusel" aria-label="Carrusel de imágenes: ${escapeHtml(label)}">${slides}${controls}</div>`;
   }
@@ -506,6 +550,15 @@
           const active = index === activeIndex;
           slide.classList.toggle("is-active", active);
           slide.setAttribute("aria-hidden", String(!active));
+          const video = slide.querySelector("video");
+          if (video) {
+            if (active) {
+              const playback = video.play();
+              if (playback && playback.catch) playback.catch(() => {});
+            } else {
+              video.pause();
+            }
+          }
         });
         dots.forEach((dot, index) => {
           const active = index === activeIndex;
@@ -531,7 +584,7 @@
               stop();
               return;
             }
-            if (autoPlayQuery.matches && !document.hidden) goTo(activeIndex + 1);
+            if (autoPlayQuery.matches && !document.hidden && !slides[activeIndex]?.querySelector("video")) goTo(activeIndex + 1);
           }, 6000);
         }
       };
@@ -666,7 +719,7 @@
         stage.classList.toggle("is-mapbox", activate);
         frame.hidden = !activate;
         if (activate && !frame.src) {
-          frame.src = `${href("/mapbox/mapbox-guia-playa-paraiso.html")}?embed=1&mode=complex&v=5`;
+          frame.src = `${href("/mapbox/mapbox-guia-playa-paraiso.html")}?embed=1&mode=complex&v=8`;
           frame.addEventListener("load", () => {
             sendMapboxCommand(frame, { command: "resize" });
             syncMapboxFrameViewport(frame);
@@ -1001,7 +1054,7 @@
           </div>
           <div class="hotel-cart-map-wrap">
             <div id="cartTrackingMap" class="hotel-cart-map" role="application" aria-label="Mapa de seguimiento del carrito de golf">
-              <iframe class="cart-mapbox-frame" title="Seguimiento 3D del carrito de golf" data-mapbox-src="${escapeHtml(`${href("/mapbox/mapbox-guia-playa-paraiso.html")}?embed=1&mode=cart&v=5`)}" hidden></iframe>
+              <iframe class="cart-mapbox-frame" title="Seguimiento 3D del carrito de golf" data-mapbox-src="${escapeHtml(`${href("/mapbox/mapbox-guia-playa-paraiso.html")}?embed=1&mode=cart&v=8`)}" hidden></iframe>
             </div>
             <button type="button" class="cart-map-expand" data-cart-back-to-trip>Ampliar mapa</button>
             <button type="button" class="cart-panel-reopen" data-cart-panel-toggle aria-expanded="false">Mostrar solicitud</button>
@@ -1108,10 +1161,10 @@
         view.innerHTML = `<main class="portal-page">
           ${portalNav(getPortalNavModel(route))}
           <section class="portal-destination-hero portal-complex-hero portal-hero--fullbleed">
-            ${renderPortalHeroCarousel([
+            ${renderPortalHeroCarousel(replacePortalHeroImages([
               destination.image || "src/paraiso-del-mar/banner/ParaisoDelMar.jpg",
               ...complexHotels.map((hotel) => hotel.image)
-            ], destination.name)}
+            ]), destination.name)}
             <span class="portal-hero-weather weather-chip-dark weather-chip-overlay weather-live" data-weather-city="${PORTAL_WEATHER_CITY_BY_COUNTRY[countrySlug] || "Cancún"}">Clima</span>
             <div>
               <p class="portal-kicker">${escapeHtml(complexPage.kicker || `EL COMPLEJO · ${destination.name.toUpperCase()}`)}</p>
@@ -1186,12 +1239,12 @@
         heading = countryData.name; intro = en ? `Discover the destinations of ${countryData.name}.` : `Descubra los destinos de ${countryData.name}.`;
         breadcrumb = en ? `DESTINATIONS · ${countryData.name.toUpperCase()}` : `DESTINOS · ${countryData.name.toUpperCase()}`;
         cards = renderCards(countryData.destinations, (item) => `/${country}/${item.slug}`, "destination");
-        heroImages = [
+        heroImages = replacePortalHeroImages([
           countryData.image,
           ...countryData.destinations.map((destination) => destination.image),
           ...countryData.destinations.flatMap((destination) => destination.hotels.map((hotel) => hotel.image)),
           ...collageHotelImages(countryData, countryData.destinations.flatMap((destination) => destination.hotels))
-        ];
+        ]);
         countryHotels = countryData.destinations.flatMap((destination) => destination.hotels.map((hotel) => ({
           ...hotel,
           countrySlug: country,
@@ -1209,7 +1262,8 @@
       const quickLinks = isHome
         ? renderPortalQuickLinks(countryCards, (item) => item.route, en ? "Quick access to countries" : "Acceso rápido a países", (item) => item.destinations)
         : renderPortalQuickLinks(countryData.destinations, (item) => `/${country}/${item.slug}`, en ? "Quick access to destinations" : "Acceso rápido a destinos", (item) => item.hotels.length);
-      view.innerHTML = `<main class="portal-page">${!isHome ? portalNav(getPortalNavModel(route)) : ""}<section class="portal-hero portal-hero--fullbleed"><span class="portal-hero-weather weather-chip-dark weather-chip-overlay weather-live" data-weather-city="${PORTAL_WEATHER_CITY_BY_COUNTRY[country] || "Cancún"}">Clima</span><div><p class="portal-kicker">${breadcrumb}</p><h1>${heading}</h1><p>${intro}</p>${!isHome ? "" : `<a class="portal-hero-link" href="${href("/mexico/riviera-maya")}" data-app-route="/mexico/riviera-maya">${en ? "Discover Iberostar Playa Paraíso" : "Conozca Iberostar Playa Paraíso"} <span>→</span></a><div class="portal-hero-stats" aria-label="${en ? "Destination summary" : "Resumen de destinos"}"><span><strong>${Object.keys(catalog).length}</strong> ${en ? "countries" : "países"}</span><span><strong>${totalDestinations}</strong> ${en ? "destinations" : "destinos"}</span><span><strong>${totalHotels}</strong> ${en ? "hotels" : "hoteles"}</span></div>`}</div>${renderPortalHeroCarousel(heroImages, isHome ? (en ? "our destinations" : "nuestros destinos") : countryData.name)}</section><section class="portal-section"><div class="portal-section-heading"><div><p class="portal-kicker">${isHome ? (en ? "OUR COUNTRIES" : "NUESTROS PAÍSES") : (en ? "DESTINATIONS" : "DESTINOS")}</p><h2>${isHome ? (en ? "Travel your way" : "Viaje a su manera") : (en ? "Choose where to stay" : "Elija dónde hospedarse")}</h2></div>${!isHome ? `<a href="${href("/")}" data-app-route="/">${en ? "All countries" : "Todos los países"}</a>` : ""}</div>${countryQuickLinks}${quickLinks}<div class="destination-grid portal-card-carousel">${cards}</div></section>${countryMapMarkup}</main>`;
+      const countryHeroOptions = country === "mexico" ? { video: IBEROSTAR_BANNER_VIDEO, poster: heroImages[0] } : {};
+      view.innerHTML = `<main class="portal-page">${!isHome ? portalNav(getPortalNavModel(route)) : ""}<section class="portal-hero portal-hero--fullbleed"><span class="portal-hero-weather weather-chip-dark weather-chip-overlay weather-live" data-weather-city="${PORTAL_WEATHER_CITY_BY_COUNTRY[country] || "Cancún"}">Clima</span><div><p class="portal-kicker">${breadcrumb}</p><h1>${heading}</h1><p>${intro}</p>${!isHome ? "" : `<a class="portal-hero-link" href="${href("/mexico/riviera-maya")}" data-app-route="/mexico/riviera-maya">${en ? "Discover Iberostar Playa Paraíso" : "Conozca Iberostar Playa Paraíso"} <span>→</span></a><div class="portal-hero-stats" aria-label="${en ? "Destination summary" : "Resumen de destinos"}"><span><strong>${Object.keys(catalog).length}</strong> ${en ? "countries" : "países"}</span><span><strong>${totalDestinations}</strong> ${en ? "destinations" : "destinos"}</span><span><strong>${totalHotels}</strong> ${en ? "hotels" : "hoteles"}</span></div>`}</div>${renderPortalHeroCarousel(heroImages, isHome ? (en ? "our destinations" : "nuestros destinos") : countryData.name, "", "", "(max-width:850px) 100vw, 45vw", countryHeroOptions)}</section><section class="portal-section"><div class="portal-section-heading"><div><p class="portal-kicker">${isHome ? (en ? "OUR COUNTRIES" : "NUESTROS PAÍSES") : (en ? "DESTINATIONS" : "DESTINOS")}</p><h2>${isHome ? (en ? "Travel your way" : "Viaje a su manera") : (en ? "Choose where to stay" : "Elija dónde hospedarse")}</h2></div>${!isHome ? `<a href="${href("/")}" data-app-route="/">${en ? "All countries" : "Todos los países"}</a>` : ""}</div>${countryQuickLinks}${quickLinks}<div class="destination-grid portal-card-carousel">${cards}</div></section>${countryMapMarkup}</main>`;
       initPortalHeroCarousels(view);
       const countryMap = view.querySelector("#countryMap");
       if (countryMap) {
@@ -1228,7 +1282,9 @@
       document.body.dataset.appMode = "portal";
       document.body.dataset.routeManaged = "true";
       const mapDescription = destination.mapNotice || en ? "Select a marker to open the hotel card." : "Seleccione un marcador para abrir la ficha del hotel.";
-      view.innerHTML = `<main class="portal-page">${portalNav(getPortalNavModel(route))}<section class="portal-destination-hero portal-hero--fullbleed">${renderPortalHeroCarousel([destination.image, ...hotels.map((hotel) => hotel.image)], destination.name)}<span class="portal-hero-weather weather-chip-dark weather-chip-overlay weather-live" data-weather-city="${PORTAL_WEATHER_CITY_BY_COUNTRY[country] || "Cancún"}">Clima</span><div><p class="portal-kicker">${escapeHtml(countryData.name).toUpperCase()} · ${en ? "DESTINATION" : "DESTINO"}</p><h1>${escapeHtml(destination.name)}</h1><p>${escapeHtml(destination.description)}</p>${destination.complex ? `<a class="portal-hero-link" href="${href("/complejo-playa-paraiso")}" data-app-route="/complejo-playa-paraiso">${en ? "View Playa Paraíso complex →" : "Ver el complejo Playa Paraíso →"}</a>` : ""}</div></section><section class="portal-section"><div class="portal-section-heading"><div><p class="portal-kicker">${en ? "ACCOMMODATIONS" : "ALOJAMIENTOS"}</p><h2>${en ? "Hotels in" : "Hoteles en"} ${escapeHtml(destination.name)}</h2></div></div>${renderCountryQuickLinks(catalog, en ? "Quick access to countries" : "Acceso rápido a países")}${renderPortalQuickLinks(hotels, (hotel) => `/${country}/${destination.slug}/${hotel.slug}`, en ? "Quick access to hotels" : "Acceso rápido a hoteles")}<div class="destination-grid destination-grid--hotels portal-card-carousel">${renderCards(hotels, (hotel) => `/${country}/${destination.slug}/${hotel.slug}`, "hotel")}</div></section></main>`;
+      const destinationHeroImages = replacePortalHeroImages([destination.image, ...hotels.map((hotel) => hotel.image)]);
+      const destinationHeroOptions = country === "mexico" && destination.slug === "riviera-maya" ? { video: IBEROSTAR_BANNER_VIDEO, poster: destinationHeroImages[0] } : {};
+      view.innerHTML = `<main class="portal-page">${portalNav(getPortalNavModel(route))}<section class="portal-destination-hero portal-hero--fullbleed">${renderPortalHeroCarousel(destinationHeroImages, destination.name, "", "", "(max-width:850px) 100vw, 45vw", destinationHeroOptions)}<span class="portal-hero-weather weather-chip-dark weather-chip-overlay weather-live" data-weather-city="${PORTAL_WEATHER_CITY_BY_COUNTRY[country] || "Cancún"}">Clima</span><div><p class="portal-kicker">${escapeHtml(countryData.name).toUpperCase()} · ${en ? "DESTINATION" : "DESTINO"}</p><h1>${escapeHtml(destination.name)}</h1><p>${escapeHtml(destination.description)}</p>${destination.complex ? `<a class="portal-hero-link" href="${href("/complejo-playa-paraiso")}" data-app-route="/complejo-playa-paraiso">${en ? "View Playa Paraíso complex →" : "Ver el complejo Playa Paraíso →"}</a>` : ""}</div></section><section class="portal-section"><div class="portal-section-heading"><div><p class="portal-kicker">${en ? "ACCOMMODATIONS" : "ALOJAMIENTOS"}</p><h2>${en ? "Hotels in" : "Hoteles en"} ${escapeHtml(destination.name)}</h2></div></div>${renderCountryQuickLinks(catalog, en ? "Quick access to countries" : "Acceso rápido a países")}${renderPortalQuickLinks(hotels, (hotel) => `/${country}/${destination.slug}/${hotel.slug}`, en ? "Quick access to hotels" : "Acceso rápido a hoteles")}<div class="destination-grid destination-grid--hotels portal-card-carousel">${renderCards(hotels, (hotel) => `/${country}/${destination.slug}/${hotel.slug}`, "hotel")}</div></section></main>`;
       initPortalHeroCarousels(view);
       const mapElement = view.querySelector("#destinationMap");
       if (mapElement) window.RevistaDigital.mapas?.initializeDestinationMap(mapElement, { countrySlug: country, destination });
@@ -1611,7 +1667,10 @@
           heroImage,
           ...bannerImages,
           ...Object.values(official || {}).filter(Array.isArray).flat()
-        ], displayName, "hotel-portal-hero-carousel", "hotel-portal-hero-bg", "100vw")}
+        ], displayName, "hotel-portal-hero-carousel", "hotel-portal-hero-bg", "100vw", {
+          video: HOTEL_BANNER_VIDEOS[hotel.slug],
+          poster: heroImage
+        })}
         <div class="hotel-portal-hero-scrim"></div>
         <span class="hotel-portal-hero-weather weather-chip-dark weather-chip-overlay weather-live" data-weather-city="${PORTAL_WEATHER_CITY_BY_COUNTRY[countrySlug] || "Cancún"}">Clima</span>
           <div class="hotel-portal-hero-content">
@@ -1858,9 +1917,9 @@
           const marker = L.marker(item.coordinates)
             .addTo(map)
             .bindPopup(`<strong>${escapeHtml(item.name)}</strong><br><small>${escapeHtml(destination.name)}, ${escapeHtml(countryData.name)}</small><br><a href="${href(hotelRoute)}" data-app-route="${hotelRoute}">Ver ficha →</a>`);
-          const guideHotel = window.RevistaDigital.guiapa?.poiForHotel?.(item.name);
-          if (guideHotel) window.RevistaDigital.guiapa.registerMarker(guideHotel.id, marker);
-          window.RevistaDigital.guiapa?.registerMarker?.(item.name, marker);
+          const guide = window.RevistaDigital.guiapa;
+          const guideHotelId = guide?.hotelPoiIdForName?.(item.name) || guide?.poiForHotel?.(item.name)?.id || null;
+          if (guide && guideHotelId) guide.registerMarker(guideHotelId, marker);
         });
       } else {
         L.marker(coordinates)
@@ -2002,11 +2061,9 @@
         .addTo(map)
         .bindPopup(`<strong>${escapeHtml(item.name)}</strong><br><a href="${href(route)}" data-app-route="${route}">Ver ficha →</a>`);
       try {
-        const guideHotel = window.RevistaDigital.guiapa?.poiForHotel?.(item.name);
-        const hotelId = guideHotel ? guideHotel.id : ("hotel:" + hotelSlug);
-        window.RevistaDigital.guiapa?.registerMarker?.(hotelId, hotelMarker);
-        // Aseguramos que el marcador también quede accesible por nombre/slug
-        window.RevistaDigital.guiapa?.registerMarker?.(item.name, hotelMarker);
+        const guide = window.RevistaDigital.guiapa;
+        const hotelId = guide?.hotelPoiIdForName?.(item.name) || guide?.poiForHotel?.(item.name)?.id || null;
+        if (guide && hotelId) guide.registerMarker(hotelId, hotelMarker);
       } catch (e) { /* ignore guide marker registry errors */ }
     });
     // Renderiza los POIs antes del encuadre para incluirlos en los límites

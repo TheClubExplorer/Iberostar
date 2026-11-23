@@ -1162,6 +1162,32 @@
         } catch (e) { /* ignore */ }
       }
     });
+    if (category === "hotel") {
+      try { if (gp._poiLayer && typeof gp._poiLayer.remove === "function") gp._poiLayer.remove(); } catch (e) {}
+      try { if (gp._poiLabelLayer && typeof gp._poiLabelLayer.remove === "function") gp._poiLabelLayer.remove(); } catch (e) {}
+    } else {
+      try { if (gp._poiLayer && typeof gp._poiLayer.addTo === "function" && !gp._map.hasLayer(gp._poiLayer)) gp._poiLayer.addTo(gp._map); } catch (e) {}
+      try { if (gp._poiLabelLayer && typeof gp._poiLabelLayer.addTo === "function" && gp._poiLabelLayer.getLayers && gp._poiLabelLayer.getLayers().length && !gp._map.hasLayer(gp._poiLabelLayer)) gp._poiLabelLayer.addTo(gp._map); } catch (e) {}
+    }
+    if (category === "hotel" && gp._map && typeof gp._map.fitBounds === "function" && window.L && window.L.latLngBounds) {
+      var hotelPoints = [];
+      pois.forEach(function (p) {
+        if (p.category !== "hotel" || p.external === true) return;
+        var hotelMarker = gp._markers[p.id];
+        if (hotelMarker && typeof hotelMarker.getLatLng === "function") hotelPoints.push(hotelMarker.getLatLng());
+      });
+      if (hotelPoints.length) {
+        try {
+          var fitOptions = { padding: [48, 48], maxZoom: 16 };
+          if (typeof gp.isMobilePoiGuide === "function" && gp.isMobilePoiGuide()) {
+            var mapSize = gp._map.getSize ? gp._map.getSize() : null;
+            var bottom = mapSize ? Math.round(mapSize.y * 0.4) : 220;
+            fitOptions = { paddingTopLeft: [20, 20], paddingBottomRight: [20, bottom], maxZoom: 16 };
+          }
+          gp._map.fitBounds(window.L.latLngBounds(hotelPoints), fitOptions);
+        } catch (e) { /* ignore */ }
+      }
+    }
   };
 
   gp.bindMap = function (map) {
@@ -1183,6 +1209,18 @@
     if (!findPoi(id)) return false;
     gp._pendingRouteRequest = { id: id, notice: notice || "" };
     return true;
+  };
+
+  var HOTEL_POI_IDS = {
+    "Iberostar Paraíso del Mar": "del-mar",
+    "Iberostar Paraíso Beach": "beach",
+    "Iberostar Paraíso Lindo": "lindo",
+    "Iberostar Paraíso Maya": "maya",
+    "Iberostar Paraíso JOIA": "joia"
+  };
+
+  gp.hotelPoiIdForName = function (hotelName) {
+    return HOTEL_POI_IDS[hotelName] || null;
   };
 
   gp.poiForHotel = function (hotelName) {
