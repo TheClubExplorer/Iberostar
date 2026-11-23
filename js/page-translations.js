@@ -2251,6 +2251,61 @@
     "disponibles": "available",
     "para": "for",
     "información en preparación": "information in preparation",
+    "Iberostar, inicio": "Iberostar, home",
+    "Navegación principal": "Main navigation",
+    "Navegación de páginas": "Page navigation",
+    "Buscar hoteles": "Search hotels",
+    "carrusel": "carousel",
+    "Salir de pantalla completa": "Exit fullscreen",
+    "Descubrir el hotel ↓": "Discover the hotel ↓",
+    "Exterior": "Exterior",
+    "Explore los lugares del complejo": "Explore places in the complex",
+    "Consultar horario en la app de Iberostar": "Check hours in the Iberostar app",
+    "Consultar en la app de Iberostar": "Check in the Iberostar app",
+    "Amenidades": "Amenities",
+    "Especialidades": "Specialties",
+    "Recomendada": "Recommended",
+    "No requerida": "Not required",
+    "Reservas": "Reservations",
+    "Lugar": "Place",
+    "Registramos su": "We recorded your",
+    "Buscando un carrito para recogerte en": "Looking for a cart to pick you up at",
+    "y llevarte a": "and take you to",
+    "Registramos su solicitud de carrito de golf para": "We have recorded your golf cart request for",
+    "Dirigiéndote a": "Heading to",
+    "Volver a la exploración 360° de": "Back to the 360° tour of",
+    "pendiente de verificación (sin ubicación confirmada)": "pending verification (location not confirmed)",
+    "Guía": "Guide",
+    "Bloquear mapa": "Lock map",
+    "Pantalla completa": "Fullscreen",
+    "Ruta hacia:": "Route to:",
+    "Tiempo": "Time",
+    "Seleccione un lugar y pulse «Cómo llegar».": "Select a place and tap “Get directions”.",
+    "Recalcular": "Recalculate",
+    "Limpiar": "Clear",
+    "Mi ubicación": "My location",
+    "Guía interactiva · The Club": "Interactive guide · The Club",
+    "Ampliar": "Expand",
+    "Buscar lugar...": "Search place...",
+    "Reducir": "Collapse",
+    "Tu ubicación": "Your location",
+    "Punto de encuentro o detalles": "Meeting point or details",
+    "No se encontraron lugares.": "No places found.",
+    "Ruta a pie marcada.": "Walking route set.",
+    "Ruta en coche marcada.": "Driving route set.",
+    "Calculando ruta a pie...": "Calculating walking route...",
+    "No se pudo calcular una ruta. Compruebe la conexión e inténtelo de nuevo.": "Could not calculate a route. Check your connection and try again.",
+    "Obteniendo tu ubicación para recalcular la ruta...": "Getting your location to recalculate the route...",
+    "Obteniendo tu ubicación para calcular la ruta...": "Getting your location to calculate the route...",
+    "Este navegador no admite geolocalización.": "This browser does not support geolocation.",
+    "No se puede calcular la ruta sin ubicación.": "A route cannot be calculated without your location.",
+    "Ubicación en tiempo real activada.": "Real-time location enabled.",
+    "Ubicación actualizada": "Location updated",
+    "Permiso de ubicación denegado. Actívelo en los ajustes del navegador.": "Location permission denied. Enable it in your browser settings.",
+    "No se pudo obtener la ubicación. Compruebe el GPS y vuelva a intentarlo.": "Could not get your location. Check GPS and try again.",
+    "Solicitando permiso de ubicación...": "Requesting location permission...",
+    "No se pudo iniciar la geolocalización.": "Could not start geolocation.",
+    "No se pudo enviar la solicitud. Inténtelo de nuevo.": "Could not send the request. Please try again.",
   };
 
   function translateText(value) {
@@ -2342,6 +2397,8 @@
     if (match) return match[1] + " of " + match[2] + " places";
     match = value.match(/^(\d+) lugares$/i);
     if (match) return match[1] + " places";
+    match = value.match(/^(\d+) lugar(?:es)? pendiente de verificación \(sin ubicación confirmada\)$/i);
+    if (match) return match[1] + " place" + (match[1] === "1" ? "" : "s") + " pending verification (location not confirmed)";
     match = value.match(/^¡Bienvenido! Nos alegra tenerle tan cerca de (.+)\. Preparamos todo para que su visita sea mágica\.$/i);
     if (match) return "Welcome! We’re glad to have you near " + match[1] + ". We’ve prepared everything to make your visit special.";
     match = value.match(/^Solicitud ([\w-]+)(?: · (.+?))?(?: · ruta por calles)?$/i);
@@ -2499,7 +2556,10 @@
     translateDocument();
   }
 
-  if (document.body && window.MutationObserver) {
+  var observingDocument = false;
+  function observeDocument() {
+    if (observingDocument || !document.body || !window.MutationObserver) return;
+    observingDocument = true;
     var observer = new MutationObserver(function (records) {
       records.forEach(function (record) {
         if (record.type === "characterData") translateNode(record.target);
@@ -2507,5 +2567,10 @@
       });
     });
     observer.observe(document.body, { subtree: true, childList: true, characterData: true });
+  }
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", observeDocument, { once: true });
+  } else {
+    observeDocument();
   }
 })();

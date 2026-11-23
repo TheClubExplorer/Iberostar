@@ -21,6 +21,13 @@
     "iberostar-paraiso-del-mar": "src/Videos/MAR.mp4",
     "iberostar-paraiso-maya": "src/Videos/MAYA.mp4"
   };
+  const HOTEL_BANNER_LOGOS = {
+    "iberostar-paraiso-beach": "src/LOGOS-IBEROSTAR/IB_WAVES_PARAISO_BEACH_WHITE_RGB.svg",
+    "iberostar-paraiso-joia": "src/LOGOS-IBEROSTAR/LOGO_JOIA_PARAISO_WHITE_RGB.svg",
+    "iberostar-paraiso-lindo": "src/LOGOS-IBEROSTAR/IB_SELECTION_PARAISO_LINDO_WHITE_RGB.svg",
+    "iberostar-paraiso-del-mar": "src/LOGOS-IBEROSTAR/IB_WAVES_PARAISO_DEL_MAR_WHITE_RGB.svg",
+    "iberostar-paraiso-maya": "src/LOGOS-IBEROSTAR/IB_SELECTION_PARAISO_MAYA_SUITES_WHITE_RGB.svg"
+  };
   const IBEROSTAR_BANNER_VIDEO = "src/Videos/iberostar.mp4";
   const PORTAL_HERO_IMAGE_REPLACEMENTS = {
     "src/paraiso-del-mar/banner/ParaisoDelMar.jpg": "src/paraiso-del-mar/banner/PMA_GAST_0026.jpg",
@@ -530,7 +537,7 @@
     const controls = slideItems.length > 1 ? `<div class="portal-hero-carousel-controls">
       <div class="portal-hero-carousel-dots" data-i18n-aria="carouselSelectImage" aria-label="Seleccionar imagen">${slideItems.map((_, index) => `<button type="button" class="portal-hero-carousel-dot${index === 0 ? " is-active" : ""}" data-carousel-slide="${index}" data-i18n-aria="carouselShowImage${index + 1}" aria-label="Mostrar imagen ${index + 1}" aria-current="${index === 0 ? "true" : "false"}"></button>`).join("")}</div>
     </div>` : "";
-    return `<div class="portal-hero-carousel ${className}" data-portal-hero-carousel data-i18n-aria="carouselRegion" role="region" aria-roledescription="carrusel" aria-label="Carrusel de imágenes: ${escapeHtml(label)}">${slides}${controls}</div>`;
+    return `<div class="portal-hero-carousel ${className}" data-portal-hero-carousel data-i18n-aria="carouselRegion" data-i18n-roledescription="carousel" role="region" aria-roledescription="carrusel" aria-label="Carrusel de imágenes: ${escapeHtml(label)}">${slides}${controls}</div>`;
   }
   function initPortalHeroCarousels(root) {
     if (!root) return;
@@ -719,7 +726,7 @@
         stage.classList.toggle("is-mapbox", activate);
         frame.hidden = !activate;
         if (activate && !frame.src) {
-          frame.src = `${href("/mapbox/mapbox-guia-playa-paraiso.html")}?embed=1&mode=complex&v=8`;
+          frame.src = `${href("/mapbox/mapbox-guia-playa-paraiso.html")}?embed=1&mode=complex&v=12`;
           frame.addEventListener("load", () => {
             sendMapboxCommand(frame, { command: "resize" });
             syncMapboxFrameViewport(frame);
@@ -1054,7 +1061,7 @@
           </div>
           <div class="hotel-cart-map-wrap">
             <div id="cartTrackingMap" class="hotel-cart-map" role="application" aria-label="Mapa de seguimiento del carrito de golf">
-              <iframe class="cart-mapbox-frame" title="Seguimiento 3D del carrito de golf" data-mapbox-src="${escapeHtml(`${href("/mapbox/mapbox-guia-playa-paraiso.html")}?embed=1&mode=cart&v=8`)}" hidden></iframe>
+              <iframe class="cart-mapbox-frame" title="Seguimiento 3D del carrito de golf" data-mapbox-src="${escapeHtml(`${href("/mapbox/mapbox-guia-playa-paraiso.html")}?embed=1&mode=cart&v=12`)}" hidden></iframe>
             </div>
             <button type="button" class="cart-map-expand" data-cart-back-to-trip>Ampliar mapa</button>
             <button type="button" class="cart-panel-reopen" data-cart-panel-toggle aria-expanded="false">Mostrar solicitud</button>
@@ -1642,6 +1649,7 @@
     const fullAddress = page?.location || locationLine;
     const destinationRoute = `/${countrySlug}/${destination.slug}`;
     const hotelRoute = `${destinationRoute}/${hotel.slug}`;
+    const heroLogo = HOTEL_BANNER_LOGOS[hotel.slug] || "";
 
     const pools = (media.piscinas?.length ? media.piscinas : (official?.piscinas || []));
     const dining = (media.restaurante?.length ? media.restaurante : (official?.restaurante || []));
@@ -1662,7 +1670,7 @@
     if (services.length) navItems.push(["servicios", "Servicios"]);
 
     const heroMarkup = `
-      <section class="hotel-portal-hero">
+      <section class="hotel-portal-hero${heroLogo ? " hotel-portal-hero--branded" : ""}">
         ${renderPortalHeroCarousel([
           heroImage,
           ...bannerImages,
@@ -1672,6 +1680,7 @@
           poster: heroImage
         })}
         <div class="hotel-portal-hero-scrim"></div>
+        ${heroLogo ? `<img class="hotel-portal-hero-logo" src="${escapeHtml(heroLogo)}" alt="">` : ""}
         <span class="hotel-portal-hero-weather weather-chip-dark weather-chip-overlay weather-live" data-weather-city="${PORTAL_WEATHER_CITY_BY_COUNTRY[countrySlug] || "Cancún"}">Clima</span>
           <div class="hotel-portal-hero-content">
             <p class="portal-kicker">${escapeHtml(countryData.name).toUpperCase()} · ${escapeHtml(destination.name).toUpperCase()}</p>

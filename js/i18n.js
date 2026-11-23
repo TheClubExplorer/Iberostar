@@ -66,6 +66,7 @@
       previousCountry: "Ver país anterior",
       nextCountry: "Ver siguiente país",
       carouselRegion: "Carrusel de imágenes",
+      carousel: "carrusel",
       carouselSelectImage: "Seleccionar imagen",
       carouselShowImage1: "Mostrar imagen 1",
       carouselShowImage2: "Mostrar imagen 2",
@@ -187,6 +188,7 @@
       previousCountry: "View previous country",
       nextCountry: "View next country",
       carouselRegion: "Image carousel",
+      carousel: "carousel",
       carouselSelectImage: "Select image",
       carouselShowImage1: "Show image 1",
       carouselShowImage2: "Show image 2",
@@ -306,6 +308,12 @@
       const key = el.getAttribute("data-i18n-placeholder");
       const text = t(key);
       if (text) el.placeholder = text;
+    });
+
+    document.querySelectorAll("[data-i18n-roledescription]").forEach((el) => {
+      const key = el.getAttribute("data-i18n-roledescription");
+      const text = t(key);
+      if (text) el.setAttribute("aria-roledescription", text);
     });
 
     const langToggleBtn = document.getElementById("langToggleBtn");
