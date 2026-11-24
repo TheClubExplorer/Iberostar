@@ -85,7 +85,7 @@ const RESTAURANTES_PARAISO = {
     ],
     "JOIA Paraíso by Iberostar": [
       ["Lobby Bar El Mirador", "Lobby bar"],
-      ["Ember Steak House / La Brisa", "Ember: Especialidad — Cortes de carne a la parrilla · La Brisa: Restaurante de alberca / Almuerzo frente al mar"],
+      ["Ember Steak House / La Brisa", "Ember (Steak House): 18:30 – 22:00 h · Casual Elegante · Reserva recomendada. Cortes premium a la parrilla (Ribeye, New York, Filet Mignon, Arrachera) con salsas y guarniciones clásicas. La Brisa: 11:30 – 16:00 h · Casual de playa · Sin reserva. Almuerzo frente al mar (buffet y a la carta) con mariscos frescos, ceviches, parrilla al momento (pesca del día, hamburguesas), tacos, pizzas y postres tropicales."],
       ["The Grand Cellar / Wine Cellar", "Experiencia de Cata de Vinos y Maridaje"],
       ["Star Cafe JOIA", "Coffee Shop & Snacks"],
       ["Lobby Café Iberostar Selection Paraíso Maya", "Coffee Shop & Snacks"]
@@ -521,7 +521,7 @@ const RESTAURANTES_PARAISO = {
     ],
     "JOIA Paraíso by Iberostar": [
       { id: "lobby-bar-el-mirador", name: "Lobby Bar El Mirador", lat: 20.756335, lng: -86.962712, description: "Lobby bar" },
-      { id: "la-brisa", name: "Ember Steak House / La Brisa", lat: 20.7546463, lng: -86.9597269, description: "Ember: Especialidad — Cortes de carne a la parrilla · La Brisa: Restaurante de alberca / Almuerzo frente al mar" },
+      { id: "la-brisa", name: "Ember Steak House / La Brisa", lat: 20.7546463, lng: -86.9597269, description: "Ember (Steak House): 18:30 – 22:00 h · Casual Elegante · Reserva recomendada. Cortes premium a la parrilla (Ribeye, New York, Filet Mignon, Arrachera) con salsas y guarniciones clásicas. La Brisa: 11:30 – 16:00 h · Casual de playa · Sin reserva. Almuerzo frente al mar (buffet y a la carta) con mariscos frescos, ceviches, parrilla al momento (pesca del día, hamburguesas), tacos, pizzas y postres tropicales." },
       { id: "punta-sal-ceviche", name: "Punta Sal Ceviche & Beach Bar", lat: 20.754750, lng: -86.959584, description: "Ceviche & Beach Bar" },
       { id: "grand-cellar", name: "The Grand Cellar / Wine Cellar", lat: 20.756344, lng: -86.962658, description: "Experiencia de Cata de Vinos y Maridaje" },
       { id: "joia-cafe", name: "Café de JOIA", lat: 20.756068, lng: -86.962852, description: "Coffee Shop & Snacks" },

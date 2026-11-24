@@ -128,7 +128,7 @@
     {"id":"olivetti","name":"The Olivetti","category":"restaurante","hotelId":"Iberostar Selection Paraíso Maya","lat":20.7567218,"lng":-86.9604135,"description":"Restaurante italiano — Spaghetti Factory","source":"Google Maps","verified":true,"tipo":"especialidad","cocina":"Restaurante Italiano","cuisine":"Italian Restaurant","carta":"Entrantes / Antipasti: Carpaccio de res con virutas de parmesano y vinagreta balsámica, ensalada caprese con mozzarella fresca de búfala y jitomate bola, bruschettas al pomodoro con albahaca. Pastas y Risottos: Lasaña clásica boloñesa al horno, ravioles rellenos de queso ricota y espinaca en salsa de mantequilla con salvia, fettuccine a los cuatro quesos o frutos del mar, risotto de setas y hongos silvestres. Platos Fuertes: Escalopines de ternera al marsala, pechuga de pollo a la parmesana con costra crocante y pescado blanco en salsa ligera de alcaparras y vino blanco. Postres: Tiramisú tradicional al café con queso mascarpone, panna cotta de frutos rojos y cannoli sicilianos.","menu":"Appetizers / Antipasti: Beef carpaccio with parmesan shavings and balsamic vinaigrette, caprese salad with fresh buffalo mozzarella and bola tomato, pomodoro bruschettas with basil. Pastas and Risottos: Classic baked bolognese lasagna, ricotta and spinach ravioli in butter and sage sauce, four-cheese or seafood fettuccine, wild mushroom risotto. Main Courses: Marsala veal scaloppini, parmesan-crusted chicken breast and white fish in light caper and white wine sauce. Desserts: Traditional coffee tiramisu with mascarpone, red fruit panna cotta and Sicilian cannoli.","horario":"18:30 - 22:00 h","hours":"18:30 - 22:00","vestimenta":"Smart Casual","dressCode":"Smart Casual","reservas":true,"reservation":true,"especialidades":"Carpaccio de res con virutas de parmesano, ensalada caprese, bruschettas al pomodoro, lasaña boloñesa, ravioles de ricota y espinaca, fettuccine, risotto de setas, escalopines al marsala, pollo a la parmesana, pescado blanco, tiramisú, panna cotta, cannoli sicilianos.","specialties":"Beef carpaccio with parmesan shavings, caprese salad, pomodoro bruschettas, baked bolognese lasagna, ricotta and spinach ravioli, fettuccine, wild mushroom risotto, marsala veal scaloppini, parmesan chicken breast, white fish with caper and white wine sauce, coffee tiramisu, red fruit panna cotta, Sicilian cannoli.","signatureDishes":["Carpaccio de res con virutas de parmesano","Ensalada caprese","Lasaña clásica boloñesa","Ravioles de queso ricota y espinaca","Risotto de setas y hongos silvestres","Escalopines de ternera al marsala","Tiramisú tradicional al café","Cannoli sicilianos"]},
     {"id":"lemon-spices","name":"Lemon & Spices","category":"restaurante","hotelId":"Iberostar Waves Paraíso Lindo","lat":20.7589371,"lng":-86.9634247,"description":"Restaurante asiático","source":"Google Maps","verified":true,"tipo":"especialidad","cocina":"Internacional / Mediterráneo de Especialidad","cuisine":"International / Mediterranean Specialty","carta":"Entrantes: Selección de tapas y mezze mediterráneo (hummus con pan pita, aceitunas marinadas), ensalada griega con queso feta y aderezo de limón con orégano, crema ligera de espárragos y hierbas frescas. Platos Fuertes: Filete de pescado fresco sellado al sartén marinado con emulsión de limón amarillo, hierbas y alcaparras; cordero asado con costra de especias dulces y romero; pechuga de pollo confitada con toques de romero, ajo y reducción cítrica; opciones vegetarianas con verduras rostizadas al grill y cuscús aromático. Postres: Mousse ligera de limón con merengue flameado, tarta de higos o tartaleta de manzana especiada con canela.","menu":"Appetizers: Mediterranean tapas and mezze selection (hummus with pita bread, marinated olives), Greek salad with feta cheese and lemon-oregano dressing, light asparagus and fresh herbs cream. Main Courses: Seared fresh fish fillet marinated with yellow lemon emulsion, herbs and capers; roasted lamb with sweet spice crust and rosemary; confit chicken breast with rosemary, garlic and citrus reduction; vegetarian options with grilled vegetables and aromatic couscous. Desserts: Light lemon mousse with flamed meringue, fig tart or cinnamon-spiced apple tartlet.","horario":"18:30 - 22:00 h","hours":"18:30 - 22:00","vestimenta":"Smart Casual","dressCode":"Smart Casual","reservas":true,"reservation":true,"especialidades":"Tapas y mezze mediterráneo, hummus con pan pita, ensalada griega con queso feta, crema de espárragos, filete de pescado fresco, cordero asado con especias dulces y romero, pollo confitado, verduras rostizadas al grill, cuscús aromático, mousse de limón con merengue flameado, tarta de higos, tartaleta de manzana especiada.","specialties":"Mediterranean tapas and mezze, hummus with pita bread, Greek salad with feta cheese, asparagus cream, seared fresh fish fillet, roasted lamb with sweet spice crust and rosemary, confit chicken breast, grilled vegetables, aromatic couscous, light lemon mousse with flamed meringue, fig tart, cinnamon-spiced apple tartlet.","signatureDishes":["Hummus con pan pita","Ensalada griega con queso feta","Filete de pescado fresco con emulsión de limón amarillo","Cordero asado con costra de especias dulces y romero","Pechuga de pollo confitada","Mousse ligera de limón con merengue flameado","Tarta de higos","Tartaleta de manzana especiada con canela"]},
     {"id":"under-the-sea","name":"American Seafood Grill Under the Sea","category":"restaurante","hotelId":"Iberostar Selection Paraíso Maya","lat":20.75687,"lng":-86.95974,"description":"Restaurante de mariscos","source":"Google Maps","verified":true,"tipo":"especialidad","cocina":"Especialidad de Mariscos","cuisine":"Seafood Specialty","carta":"Entrantes y Sopas: Cóctel clásico de camarón en salsa coctelera casera, ceviche mixto de pescado blanco y calamar marinado con lima, sopa espesa de almejas y mariscos (clam chowder). Platos Fuertes: Filete de salmón sellado a la parrilla sobre cama de vegetales al vapor, brochetas de camarones jumbo marinados con ajo y pimentón, parrillada mixta de mariscos (pesca del día, calamar y mejillones), lomo de res con cola de langosta/camarones (estilo surf and turf). Menú Infantil: Dedos de pescado crujientes con papas a la francesa, pasta con mantequilla o salsa de tomate. Postres: Tarta de queso americana con coulis de frambuesa, helados tropicales y pastel de chocolate cremoso.","menu":"Starters and Soups: Classic shrimp cocktail with homemade cocktail sauce, mixed ceviche of white fish and squid marinated with lime, thick clam and seafood chowder soup. Main Courses: Grilled seared salmon fillet over steamed vegetables, jumbo shrimp skewers marinated with garlic and paprika, mixed seafood grill (catch of the day, squid and mussels), beef tenderloin with lobster tail/shrimp (surf and turf style). Kids Menu: Crispy fish fingers with french fries, pasta with butter or tomato sauce. Desserts: American cheesecake with raspberry coulis, tropical ice creams and creamy chocolate cake.","horario":"18:00 - 22:00 h","hours":"18:00 - 22:00","vestimenta":"Smart Casual","dressCode":"Smart Casual","reservas":true,"reservation":true,"especialidades":"Cóctel clásico de camarón, ceviche mixto de pescado blanco y calamar, sopa espesa de almejas y mariscos, filete de salmón a la parrilla, brochetas de camarones jumbo, parrillada mixta de mariscos, lomo de res con cola de langosta, dedos de pescado crujientes, pasta con mantequilla, tarta de queso americana con coulis de frambuesa, helados tropicales, pastel de chocolate cremoso.","specialties":"Classic shrimp cocktail, mixed ceviche of white fish and squid, thick clam and seafood chowder, grilled seared salmon fillet, jumbo shrimp skewers, mixed seafood grill, beef tenderloin with lobster tail (surf and turf), crispy fish fingers, pasta with butter or tomato sauce, American cheesecake with raspberry coulis, tropical ice creams, creamy chocolate cake.","signatureDishes":["Cóctel clásico de camarón","Ceviche mixto de pescado blanco y calamar","Sopa espesa de almejas y mariscos","Filete de salmón sellado a la parrilla","Brochetas de camarones jumbo","Parrillada mixta de mariscos","Lomo de res con cola de langosta","Tarta de queso americana con coulis de frambuesa"]},
-    {"id":"la-brisa","name":"Ember Steak House / La Brisa","category":"restaurante","categories":["restaurante","bar"],"hotelId":"JOIA Paraíso by Iberostar","lat":20.7546463,"lng":-86.9597269,"description":"","carta":"Ember (Steak house)\nHorario: 18:30 – 22:00 h\nTipo: Especialidad — Cortes de carne a la parrilla\nDress code: Casual Elegante (Smart Casual)\nReserva: Recomendada\nCarta: Entradas clásicas de asador (carpaccio de res, empanadas, ensalada César), sopa de cebolla o crema de jitomate asado. Platos principales con cortes de carne premium a la parrilla (Ribeye, New York, Filet Mignon, Arrachera) acompañados de salsas a elegir (chimichurri, pimienta, reducción de vino tinto) y guarniciones (espárragos a la parrilla, puré de papa rústico, macarrones con queso).\nEspecialidades: Cortes de carne premium a la parrilla (Ribeye, Filet Mignon), empanadas argentinas, carpaccio de res.\n\nLa Brisa\nHorario: 11:30 – 16:00 h\nTipo: Restaurante de alberca / Almuerzo frente al mar\nDress code: Casual de playa / Informal\nReserva: No requerida\nCarta: Estaciones de buffet y opciones a la carta con mariscos frescos, ceviches, aguachiles y barra de ensaladas. Parrilla al momento con pesca del día, pechuga de pollo, hamburguesas gourmet, tacos, pizzas, guarniciones calientes, fruta fresca y barra de postres tropicales.\nEspecialidades: Ceviches y aguachiles frescos, pesca del día a la parrilla, pizzas, comida relajada de alberca.","menu":"Ember (Steakhouse)\nHours: 18:30 – 22:00\nType: Specialty — Grilled premium meat cuts\nDress code: Smart Casual\nReservation: Recommended\nMenu: Classic steakhouse appetizers (beef carpaccio, empanadas, Caesar salad), onion soup or roasted tomato cream. Main courses featuring premium grilled meat cuts (Ribeye, New York, Filet Mignon, Flank Steak) accompanied by a choice of sauces (chimichurri, peppercorn, red wine reduction) and sides (grilled asparagus, rustic mashed potatoes, mac and cheese).\nSpecialties: Premium grilled meat cuts (Ribeye, Filet Mignon), Argentine empanadas, beef carpaccio.\n\nLa Brisa\nHours: 11:30 – 16:00\nType: Pool restaurant / Beachfront lunch\nDress code: Beach casual / Informal\nReservation: Not required\nMenu: Buffet stations and a la carte options featuring fresh seafood, ceviches, aguachiles, and a salad bar. Made-to-order grill with catch of the day, chicken breast, gourmet burgers, tacos, pizzas, hot sides, fresh fruit, and a tropical dessert bar.\nSpecialties: Fresh ceviches and aguachiles, grilled catch of the day, pizzas, relaxed pool dining.","horario":"Ember (Steak house): 18:30 – 22:00 h\nLa Brisa: 11:30 – 16:00 h","hours":"Ember (Steakhouse): 18:30 – 22:00\nLa Brisa: 11:30 – 16:00","verified":true,"tipo":"especialidad","cocina":"Ember: Especialidad — Cortes de carne a la parrilla · La Brisa: Restaurante de alberca / Almuerzo frente al mar","cuisine":"Ember: Specialty — Grilled premium meat cuts · La Brisa: Pool restaurant / Beachfront lunch","vestimenta":"Ember: Casual Elegante (Smart Casual) · La Brisa: Casual de playa / Informal","dressCode":"Ember: Smart Casual · La Brisa: Beach casual / Informal","reservas":"Ember: Recomendada · La Brisa: No requerida","reservation":"Ember: Recomendada · La Brisa: No requerida","especialidades":"Ember: Cortes de carne premium a la parrilla (Ribeye, Filet Mignon), empanadas argentinas, carpaccio de res. · La Brisa: Ceviches y aguachiles frescos, pesca del día a la parrilla, pizzas, comida relajada de alberca.","specialties":"Ember: Premium grilled meat cuts (Ribeye, Filet Mignon), Argentine empanadas, beef carpaccio. · La Brisa: Fresh ceviches and aguachiles, grilled catch of the day, pizzas, relaxed pool dining.","signatureDishes":["Ember: Ribeye","Ember: Filet Mignon","Ember: Empanadas argentinas","Ember: Carpaccio de res","La Brisa: Ceviches y aguachiles frescos","La Brisa: Pesca del día a la parrilla","La Brisa: Pizzas"]},
+    {"id":"la-brisa","name":"Ember Steak House / La Brisa","category":"restaurante","categories":["restaurante","bar"],"hotelId":"JOIA Paraíso by Iberostar","lat":20.7546463,"lng":-86.9597269,"description":"","carta":"Ember (Steak House)\n\nDatos: 18:30 – 22:00 h · Casual Elegante · Reserva recomendada.\n\nES: Cortes premium a la parrilla (Ribeye, New York, Filet Mignon, Arrachera) con salsas y guarniciones clásicas, además de entradas de asador como carpaccio de res, empanadas y sopas.\n\nEN: Premium grilled cuts (Ribeye, New York, Filet Mignon, flank steak) with classic sauces and sides, alongside traditional steakhouse starters like beef carpaccio, empanadas, and soups.\n\nLa Brisa\n\nDatos: 11:30 – 16:00 h · Casual de playa · Sin reserva.\n\nES: Almuerzo frente al mar (buffet y a la carta) con mariscos frescos, ceviches, parrilla al momento (pesca del día, hamburguesas), tacos, pizzas y postres tropicales.\n\nEN: Oceanfront buffet and à la carte lunch featuring fresh seafood, ceviches, a made-to-order grill (catch of the day, burgers), tacos, pizzas, and tropical desserts.","menu":"Ember (Steak House)\n\nData: 18:30 – 22:00 h · Smart Casual · Reservation recommended.\n\nES: Cortes premium a la parrilla (Ribeye, New York, Filet Mignon, Arrachera) con salsas y guarniciones clásicas, además de entradas de asador como carpaccio de res, empanadas y sopas.\n\nEN: Premium grilled cuts (Ribeye, New York, Filet Mignon, flank steak) with classic sauces and sides, alongside traditional steakhouse starters like beef carpaccio, empanadas, and soups.\n\nLa Brisa\n\nData: 11:30 – 16:00 h · Beach Casual · No reservation.\n\nES: Almuerzo frente al mar (buffet y a la carta) con mariscos frescos, ceviches, parrilla al momento (pesca del día, hamburguesas), tacos, pizzas y postres tropicales.\n\nEN: Oceanfront buffet and à la carte lunch featuring fresh seafood, ceviches, a made-to-order grill (catch of the day, burgers), tacos, pizzas, and tropical desserts.", "horario":"Ember (Steak house): 18:30 – 22:00 h\nLa Brisa: 11:30 – 16:00 h","hours":"Ember (Steakhouse): 18:30 – 22:00\nLa Brisa: 11:30 – 16:00","verified":true,"tipo":"especialidad","cocina":"Ember: Especialidad — Cortes de carne a la parrilla · La Brisa: Restaurante de alberca / Almuerzo frente al mar","cuisine":"Ember: Specialty — Grilled premium meat cuts · La Brisa: Pool restaurant / Beachfront lunch","vestimenta":"Ember: Casual Elegante (Smart Casual) · La Brisa: Casual de playa / Informal","dressCode":"Ember: Smart Casual · La Brisa: Beach casual / Informal","reservas":"Ember: Recomendada · La Brisa: No requerida","reservation":"Ember: Recomendada · La Brisa: No requerida","especialidades":"Ember: Cortes de carne premium a la parrilla (Ribeye, Filet Mignon), empanadas argentinas, carpaccio de res. · La Brisa: Ceviches y aguachiles frescos, pesca del día a la parrilla, pizzas, comida relajada de alberca.","specialties":"Ember: Premium grilled meat cuts (Ribeye, Filet Mignon), Argentine empanadas, beef carpaccio. · La Brisa: Fresh ceviches and aguachiles, grilled catch of the day, pizzas, relaxed pool dining.","signatureDishes":["Ember: Ribeye","Ember: Filet Mignon","Ember: Empanadas argentinas","Ember: Carpaccio de res","La Brisa: Ceviches y aguachiles frescos","La Brisa: Pesca del día a la parrilla","La Brisa: Pizzas"]},
     {"id":"punta-sal-ceviche","name":"Punta Sal Ceviche & Beach Bar","category":"bar","hotelId":"JOIA Paraíso by Iberostar","lat":20.754750,"lng":-86.959584,"description":"Ceviche & Beach Bar frente al mar; bebidas en la arena de 10:00 a 18:00 h","verified":true,"carta":"Ceviches frescos · Tiraditos · Cócteles de mariscos · Cervezas artesanales · Vinos blancos · Margaritas de frutas tropicales","menu":"Fresh ceviches · Tiraditos · Seafood cocktails · Craft beers · White wines · Tropical fruit margaritas","horario":"10:00 - 18:00 h","hours":"10:00 - 18:00"},
     {"id":"grand-cellar","name":"The Grand Cellar / Wine Cellar","category":"snacks","hotelId":"JOIA Paraíso by Iberostar","lat":20.756344,"lng":-86.962658,"description":"The Wine Cellar (Cava de Vinos). Coordenadas: 20.756344, -86.962658. Horarios de Cata: 17:00 y 19:00 h. Operación diaria: Degustaciones programadas de Lunes a Domingo. Costo: $700 MXN por persona lunes a sábado, $1,400 MXN domingos. Catas privadas disponibles contactando a Concierge.","verified":true,"carta":"Menú (Cata y Maridaje por día): Lunes y Miércoles (Tequila/Mezcal y Vinos Mexicanos): queso Oaxaca ahumado, chicharrón, sikil pak, chapulines y mermelada de chile. Martes (Vinos Españoles): queso manchego, Idiazábal, Mahón, jamón serrano y embutido ibérico. Jueves (Vinos Argentinos): tabla de carne con queso, chorizo, camarón y empanadas con chimichurri. Viernes (Vinos Italianos): burrata trufada, Asiago, provolone, coppa y prosciutto. Sábado y Domingo (Vinos del Nuevo Mundo y Burbujas): queso camembert, queso azul, paté de campaña y paté en croûte.","menu":"Menu (Tasting and Pairing by day): Monday and Wednesday (Tequila/Mezcal and Mexican Wines): smoked Oaxaca cheese, chicharrón, sikil pak, chapulines and chili jam. Tuesday (Spanish Wines): manchego, Idiazábal, Mahón, serrano ham and Iberian sausage. Thursday (Argentine Wines): meat board with cheese, chorizo, shrimp and chimichurri empanadas. Friday (Italian Wines): truffled burrata, Asiago, provolone, coppa and prosciutto. Saturday and Sunday (New World Wines and Sparkling): camembert, blue cheese, country pâté and pâté en croûte.","horario":"Catas 17:00 y 19:00 h · Lunes a Domingo","hours":"Tastings 5:00 PM and 7:00 PM · Monday to Sunday","vestimenta":"Casual Elegante (Smart Casual)","dressCode":"Smart Casual","reservas":true,"reservation":true,"especialidades":"Catas de vino privadas, maridaje guiado por sommelier experto y botellas de colección","specialties":"Private wine tastings, sommelier-guided pairing, and collection bottles"},
     {"id":"joia-cafe","name":"Star Cafe JOIA","category":"snacks","hotelId":"JOIA Paraíso by Iberostar","lat":20.756068,"lng":-86.962852,"description":"Star Café (Lobby JOIA Paraíso). Coordenadas: 20.756068, -86.962852. Horario: Abierto 24 horas. Operación diaria: Horario continuo (24 h) · Lunes a Domingo.","verified":true,"tipo":"cafeteria","cocina":"Coffee Shop & Snacks","cuisine":"Coffee Shop & Snacks","carta":"Menú (Bebidas y Coffee Shop): cafés tradicionales (espresso, capuchino, latte), especialidades (caramel macchiato, moca blanco) y barra de frappés (café, caramelo, moca, chocolate blanco). También sirven tés calientes (chai, negro, verde, manzanilla) y tés fríos (frutos rojos, limón y jengibre, limonada de durazno). Opciones de leche: entera, light, deslactosada, semi, soja y almendra. Acompañado de panadería, sándwiches fríos, ensaladas y postres.","menu":"Menu (Drinks and Coffee Shop): traditional coffees (espresso, cappuccino, latte), specialties (caramel macchiato, white mocha) and frappé bar (coffee, caramel, mocha, white chocolate). Also hot teas (chai, black, green, chamomile) and cold teas (red fruits, lemon and ginger, peach lemonade). Milk options: whole, light, lactose-free, semi, soy and almond. Accompanied by bakery, cold sandwiches, salads and desserts.","horario":"Abierto 24 horas","hours":"Open 24 hours","vestimenta":"Casual / Informal","dressCode":"Casual / Informal","reservas":false,"reservation":false,"especialidades":"Café barista, sándwiches fríos, panadería dulce y repostería disponible las 24 horas","specialties":"Barista coffee, cold sandwiches, sweet bakery and pastries available 24 hours"},
@@ -353,14 +353,24 @@
       // que viene en el catálogo de datos.
       if (entry.horarioTexto) poi.hours = entry.horarioTexto;
       if (!poi.hours && entry.hours) poi.hours = entry.hours;
-      if (entry.cocina || entry.cuisine) poi.cuisine = entry.cocina || entry.cuisine;
+      if (entry.hours) poi.hoursEn = entry.hours;
+      if (entry.cocina || entry.cuisine) {
+        poi.cocina = entry.cocina || entry.cuisine;
+        poi.cuisine = entry.cuisine || entry.cocina;
+      }
       if (entry.carta) poi.carta = entry.carta;
+      if (entry.menu) poi.menu = entry.menu;
       if (entry.treatments) poi.treatments = entry.treatments;
+      if (entry.treatmentsEn) poi.treatmentsEn = entry.treatmentsEn;
       if (entry.packages) poi.packages = entry.packages;
+      if (entry.packagesEn) poi.packagesEn = entry.packagesEn;
       if (entry.teeTimes) poi.teeTimes = entry.teeTimes;
-       if (entry.amenities || entry.amenidades) poi.amenities = entry.amenities || entry.amenidades;
-       if (entry.services || entry.servicios) poi.services = entry.services || entry.servicios;
-       if (entry.description || entry.descripcion) poi.description = entry.description || entry.descripcion;
+      if (entry.amenities || entry.amenidades) poi.amenities = entry.amenities || entry.amenidades;
+      if (entry.amenitiesEn) poi.amenitiesEn = entry.amenitiesEn;
+      if (entry.services || entry.servicios) poi.services = entry.services || entry.servicios;
+      if (entry.servicesEn) poi.servicesEn = entry.servicesEn;
+      if (entry.description || entry.descripcion) poi.description = entry.description || entry.descripcion;
+      if (entry.descriptionEn) poi.descriptionEn = entry.descriptionEn;
   // Vestimenta / codigo de vestimenta.
   if (entry.vestimenta || entry.dressCode) {
     poi.vestimenta = entry.vestimenta || entry.dressCode;
@@ -373,12 +383,12 @@
   if (poi.reservas === undefined && poi.reservation !== undefined) poi.reservas = poi.reservation;
   // Especialidades / platillos insignia / cocteles.
   if (entry.especialidades || entry.especialidad) poi.especialidades = entry.especialidades || entry.especialidad;
+  if (entry.specialties) poi.specialties = entry.specialties;
   if (entry.signatureDishes || entry.platillosInsignia) {
     poi.signatureDishes = entry.signatureDishes || entry.platillosInsignia;
     poi.platillosInsignia = entry.platillosInsignia || entry.signatureDishes;
   }
   if (entry.cocteles || entry.cocktails || entry.bebidas) poi.cocteles = entry.cocteles || entry.cocktails || entry.bebidas;
-  if (entry.menu) poi.menu = entry.menu;
   // Hotel / ubicacion de referencia.
   if (entry.hotel) {
     poi.hotel = entry.hotel;
@@ -519,7 +529,9 @@
   };
 
   function poiHoursText(poi) {
-    return poi && (poi.hours || poi.horarioTexto || poi.horario) || "";
+    if (!poi) return "";
+    if (isEnglishUi()) return poi.hoursEn || poi.hours || poi.horarioTexto || poi.horario || "";
+    return poi.horarioTexto || poi.hours || poi.horario || "";
   }
 
   function poiMenuText(poi) {
@@ -527,6 +539,80 @@
     var english = window.RevistaDigital.i18n?.getLang?.() === "en";
     return english ? (poi.menu || poi.carta || "") : (poi.carta || poi.menu || "");
   }
+
+  function isEnglishUi() {
+    return window.RevistaDigital.i18n?.getLang?.() === "en";
+  }
+
+  function pickLang(es, en) {
+    if (isEnglishUi()) return (en != null && en !== "") ? en : (es != null ? es : "");
+    return (es != null && es !== "") ? es : (en != null ? en : "");
+  }
+
+  function valueToText(value) {
+    if (value == null) return "";
+    return Array.isArray(value) ? value.join(", ") : String(value);
+  }
+
+  function poiNameText(poi) {
+    return poi ? valueToText(pickLang(poi.name, poi.nameEn)) : "";
+  }
+
+  function poiDescriptionText(poi) {
+    return poi ? valueToText(pickLang(poi.description, poi.descriptionEn)) : "";
+  }
+
+  function poiCuisineText(poi) {
+    return poi ? valueToText(pickLang(poi.cocina, poi.cuisine)) : "";
+  }
+
+  function poiSpecialtiesText(poi) {
+    if (!poi) return "";
+    var es = poi.especialidades || poi.signatureDishes || poi.platillosInsignia || "";
+    var en = poi.specialties || "";
+    return valueToText(pickLang(es, en));
+  }
+
+  function poiTreatmentsText(poi) {
+    return poi ? valueToText(pickLang(poi.treatments, poi.treatmentsEn)) : "";
+  }
+
+  function poiPackagesText(poi) {
+    return poi ? valueToText(pickLang(poi.packages, poi.packagesEn)) : "";
+  }
+
+  function poiAmenitiesText(poi) {
+    return poi ? valueToText(pickLang(poi.amenities, poi.amenitiesEn)) : "";
+  }
+
+  function poiServicesText(poi) {
+    return poi ? valueToText(pickLang(poi.services, poi.servicesEn)) : "";
+  }
+
+  function poiDressCodeText(poi) {
+    return poi ? valueToText(pickLang(poi.vestimenta, poi.dressCode)) : "";
+  }
+
+  function poiCocktailsText(poi) {
+    if (!poi) return "";
+    var es = poi.cocteles || poi.cocktails || poi.bebidas || poi.coctelesInsignia || "";
+    var en = poi.cocktailsEn || poi.coctelesEn || poi.cocktails || poi.bebidas || "";
+    return valueToText(pickLang(es, en));
+  }
+
+  gp.poiHoursText = poiHoursText;
+  gp.poiMenuText = poiMenuText;
+  gp.poiNameText = poiNameText;
+  gp.poiDescriptionText = poiDescriptionText;
+  gp.poiCuisineText = poiCuisineText;
+  gp.poiSpecialtiesText = poiSpecialtiesText;
+  gp.poiTreatmentsText = poiTreatmentsText;
+  gp.poiPackagesText = poiPackagesText;
+  gp.poiAmenitiesText = poiAmenitiesText;
+  gp.poiServicesText = poiServicesText;
+  gp.poiDressCodeText = poiDressCodeText;
+  gp.poiCocktailsText = poiCocktailsText;
+  gp.isEnglishUi = isEnglishUi;
 
   function poiGalleryHotel(poi) {
     var direct = POI_GALLERY_HOTELS.find(function (hotel) { return hotel.name === poi.hotelId; });
@@ -645,8 +731,8 @@
   }
 
   function poiPopupMarkup(poi) {
-    var name = popupEscape(poi.name);
-    var description = popupEscape(poi.description || "");
+    var name = popupEscape(poiNameText(poi));
+    var description = popupEscape(poiDescriptionText(poi));
     var isRestaurant = poi.category === "restaurante";
     var isGolf = poi.category === "golf";
     var hotel = isRestaurant ? poiGalleryHotel(poi) : null;
@@ -670,7 +756,7 @@
     var menu = popupEscape(menuText || "");
     var menuLabel = english ? "Menu" : "Menú";
     var missingMenu = english ? "Not available yet." : "No disponible por ahora.";
-    var hoursHtml = hours ? '<p><strong>Horario:</strong> ' + hours + '</p>' : '';
+    var hoursHtml = hours ? '<p><strong>' + (english ? "Hours" : "Horario") + ':</strong> ' + hours + '</p>' : '';
     var menuHtml = menu ? '<p><strong>' + menuLabel + ':</strong> ' + menu + '</p>' : (isRestaurant ? '<p><strong>' + menuLabel + ':</strong> ' + missingMenu + '</p>' : '');
     var descriptionHtml = description ? '<small class="gp-map-poi-description">' + description + '</small>' : '';
     var details = (hoursHtml || menuHtml) ? '<div class="gp-map-poi-details">' + hoursHtml + menuHtml + '</div>' : '';
@@ -791,11 +877,11 @@
     closeDiningOverlay();
 
     var english = window.RevistaDigital.i18n?.getLang?.() === "en";
-    var name = popupEscape(poi.name);
+    var name = popupEscape(poiNameText(poi));
     var isRestaurant = poi.category === "restaurante";
     var images = poiGalleryImages(poi);
     var carousel = poiCarouselMarkup(images, name);
-    var description = popupEscape(poi.description || "");
+    var description = popupEscape(poiDescriptionText(poi));
     var hours = popupEscape(poiHoursText(poi));
     var menuText = popupEscape(poiMenuText(poi));
     var menuLabel = english ? "Menu" : "Menú";
@@ -813,6 +899,7 @@
 
     var overlay = document.createElement("div");
     overlay.className = "gp-dining-overlay";
+    overlay.dataset.poiId = poi.id;
     overlay.setAttribute("role", "dialog");
     overlay.setAttribute("aria-modal", "true");
     overlay.setAttribute("aria-label", name);
@@ -919,10 +1006,10 @@
       if (filterHotelId && p.hotelId && p.hotelId !== filterHotelId) return;
       if (p.lat == null || p.lng == null) return;
       if (p.kind === "area") {
-        var labelHtml = '<span style="display:inline-block;transform:translate(-50%,-50%);white-space:nowrap;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#0b3d66;background:rgba(255,255,255,.72);border:1px solid rgba(11,61,102,.35);border-radius:999px;padding:2px 10px;">' + (p.name || "") + "</span>";
+        var labelHtml = '<span style="display:inline-block;transform:translate(-50%,-50%);white-space:nowrap;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#0b3d66;background:rgba(255,255,255,.72);border:1px solid rgba(11,61,102,.35);border-radius:999px;padding:2px 10px;">' + (poiNameText(p) || "") + "</span>";
         var areaIcon = window.L.divIcon ? window.L.divIcon({ className: "gp-area-label", html: labelHtml, iconSize: [0, 0], iconAnchor: [0, 0] }) : null;
         var areaMarker = window.L.marker([p.lat, p.lng], areaIcon ? { icon: areaIcon } : {});
-        areaMarker.bindPopup("<strong>" + (p.name || "") + "</strong><br><small>" + (p.description || "") + "</small>");
+        areaMarker.bindPopup("<strong>" + (poiNameText(p) || "") + "</strong><br><small>" + (poiDescriptionText(p) || "") + "</small>");
         gp.registerMarker(p.id, areaMarker, labels);
         areaMarker.addTo(labels);
         return;
@@ -954,14 +1041,14 @@
           }
         });
       } else {
-        var name = p.name || "";
+        var name = poiNameText(p) || "";
         var dirButton = '<button type="button" class="gp-dir" data-lat="' + p.lat + '" data-lng="' + p.lng + '" data-name="' + name.replace(/"/g,'&quot;') + '">Cómo llegar</button>';
         var popup;
         if (p.category === "club") {
           popup = '<div class="gp-club-popup">'
             + '<div class="gp-club-popup-badge"><img class="gp-club-popup-logo" src="branding/IB_THE_CLUB_VV_POS_RGB-320.webp" alt="" /></div>'
             + '<h3 class="gp-club-popup-name">' + name + '</h3>'
-            + (p.hours ? '<p class="gp-club-popup-hours">' + p.hours + '</p>' : '')
+            + (poiHoursText(p) ? '<p class="gp-club-popup-hours">' + poiHoursText(p) + '</p>' : '')
             + dirButton
             + '</div>';
           popupOptions = { className: 'gp-club-pop', minWidth: 190, maxWidth: 230 };
@@ -969,8 +1056,8 @@
           popup = '<div class="gp-sp-popup">'
             + '<div class="gp-sp-popup-badge"><span class="gp-sp-popup-star">★</span>STAR PRESTIGE</div>'
             + '<h3 class="gp-sp-popup-name">' + name + '</h3>'
-            + (p.description ? '<p class="gp-sp-popup-desc">' + p.description + '</p>' : '')
-            + (p.hours ? '<p class="gp-sp-popup-hours">' + p.hours + '</p>' : '')
+            + (poiDescriptionText(p) ? '<p class="gp-sp-popup-desc">' + poiDescriptionText(p) + '</p>' : '')
+            + (poiHoursText(p) ? '<p class="gp-sp-popup-hours">' + poiHoursText(p) + '</p>' : '')
             + dirButton
             + '</div>';
           popupOptions = { className: 'gp-sp-pop', minWidth: 220, maxWidth: 260 };
@@ -980,7 +1067,7 @@
           var barMenuHtml = barMenu
             ? '<p class="gp-bar-popup-menu"><strong>' + (english ? 'Menu:' : 'Carta:') + '</strong> ' + popupEscape(barMenu) + '</p>'
             : '<p class="gp-bar-popup-menu"><strong>' + (english ? 'Menu:' : 'Carta:') + '</strong> ' + (english ? 'Not available yet.' : 'No disponible por ahora.') + '</p>';
-          var barDescHtml = p.description ? '<small class="gp-bar-popup-desc">' + popupEscape(p.description) + '</small>' : '';
+          var barDescHtml = poiDescriptionText(p) ? '<small class="gp-bar-popup-desc">' + popupEscape(poiDescriptionText(p)) + '</small>' : '';
           var barHoursHtml = '<p class="gp-bar-popup-hours"><strong>' + (english ? 'Hours:' : 'Horario:') + '</strong> ' + popupEscape(poiHoursText(p) || (english ? 'Please check with the hotel.' : 'Consultar en el hotel.')) + '</p>';
           var compactBar = gp.isMobilePoiGuide() && p.category === "bar";
           popup = '<div class="gp-bar-popup">' +
@@ -998,7 +1085,7 @@
             });
           }
         } else {
-          popup = '<strong>' + name + '</strong><br><small>' + (p.description||'') + '</small><br>' + dirButton;
+          popup = '<strong>' + name + '</strong><br><small>' + poiDescriptionText(p) + '</small><br>' + dirButton;
         }
         m.bindPopup(popup, popupOptions);
       }
@@ -1011,8 +1098,39 @@
     } catch (e) { /* ignore label layer errors */ }
     gp._poiLayer = layer;
     gp._poiLabelLayer = labels;
+    gp._poiLayerConfig = { filterHotelId: filterHotelId || null, options: options || null };
     return layer;
   };
+
+  // Reconstruye la capa de POIs conservando el filtro activo y los popups
+  // abiertos. Se usa al cambiar de idioma para refrescar los textos.
+  gp.refreshPoiLayer = function () {
+    if (!gp._map) return;
+    var config = gp._poiLayerConfig;
+    if (!config) return;
+    var openIds = [];
+    Object.keys(gp._markers || {}).forEach(function (id) {
+      var marker = gp._markers[id];
+      try {
+        if (marker && typeof marker.isPopupOpen === "function" && marker.isPopupOpen()) openIds.push(id);
+      } catch (e) { /* ignore */ }
+    });
+    try { if (gp._poiLabelLayer && typeof gp._poiLabelLayer.remove === "function") gp._poiLabelLayer.remove(); } catch (e) { /* ignore */ }
+    try { if (gp._poiLayer && typeof gp._poiLayer.remove === "function") gp._poiLayer.remove(); } catch (e) { /* ignore */ }
+    gp._poiLayer = null;
+    gp._poiLabelLayer = null;
+    gp.addPoiLayer(gp._map, config.filterHotelId, config.options);
+    if (gp._currentFilter && gp._currentFilter !== "all") {
+      try { gp.filterMapMarkers(gp._currentFilter); } catch (e) { /* ignore */ }
+    }
+    openIds.forEach(function (id) {
+      var marker = gp._markers && gp._markers[id];
+      if (marker && typeof marker.openPopup === "function") {
+        try { marker.openPopup(); } catch (e) { /* ignore */ }
+      }
+    });
+  };
+
   gp.bindPoiPopupActions = bindPoiPopupActions;
   window.RevistaDigital.guiapa = gp;
 })();
@@ -1154,6 +1272,7 @@
 
   gp.filterMapMarkers = function (category) {
     if (!gp._map || !gp._markers) return;
+    gp._currentFilter = category || "all";
     var pois = gp.POIS || [];
     var poisById = {};
     pois.forEach(function (p) { poisById[p.id] = p; });
@@ -1285,6 +1404,27 @@
     discoteca: "Discoteca"
   };
 
+  var CATEGORY_LABELS_EN = {
+    hotel: "Hotels",
+    club: "THE CLUB",
+    starprestige: "Star Prestige",
+    concierge: "Concierge",
+    restaurante: "Restaurants",
+    bar: "Bars",
+    piscina: "Pools",
+    spa: "Spa",
+    golf: "Golf",
+    playa: "Beach",
+    comer: "Shopping",
+    deportes: "Sports",
+    entretenimiento: "Entertainment",
+    servicio: "Services",
+    wellness: "Wellness",
+    kids: "Kids",
+    conv: "Conventions",
+    discoteca: "Nightclub"
+  };
+
   function normalize(value) {
     return String(value == null ? "" : value)
       .normalize("NFD")
@@ -1303,7 +1443,9 @@
   }
 
   function poiHoursText(poi) {
-    return poi && (poi.hours || poi.horarioTexto || poi.horario) || "";
+    if (!poi) return "";
+    if (isEnglishUi()) return poi.hoursEn || poi.hours || poi.horarioTexto || poi.horario || "";
+    return poi.horarioTexto || poi.hours || poi.horario || "";
   }
 
   function poiMenuText(poi) {
@@ -1312,8 +1454,13 @@
     return english ? (poi.menu || poi.carta || "") : (poi.carta || poi.menu || "");
   }
 
+  function isEnglishUi() {
+    return window.RevistaDigital.i18n?.getLang?.() === "en";
+  }
+
   function categoryLabel(cat) {
-    return CATEGORY_LABELS[cat] || cat || "Lugar";
+    var labels = isEnglishUi() ? CATEGORY_LABELS_EN : CATEGORY_LABELS;
+    return labels[cat] || CATEGORY_LABELS[cat] || cat || "Lugar";
   }
 
   function categoryColor(cat) {
@@ -1463,7 +1610,7 @@
       if (filter !== "all" && !gp.poiMatchesCategory(p, filter)) return false;
       if (query) {
         var labels = Array.isArray(p.categories) && p.categories.length ? p.categories.map(categoryLabel).join(" ") : categoryLabel(p.category);
-        var haystack = normalize([p.name, p.description, p.hotelId, labels].join(" "));
+        var haystack = normalize([gp.poiNameText(p), gp.poiDescriptionText(p), gp.poiMenuText(p), gp.poiSpecialtiesText(p), p.hotelId, labels].join(" "));
         if (haystack.indexOf(query) === -1) return false;
       }
       return true;
@@ -1473,9 +1620,11 @@
   var state = { mount: null, filter: "all", query: "", selectedId: null, legendMount: null };
 
   function categoryChips() {
-    var chips = ['<button type="button" class="guide-chip is-active" data-guide-filter="all" aria-pressed="true">Todos <span>' + includedPois().length + "</span></button>"];
+    var allActive = state.filter === "all";
+    var chips = ['<button type="button" class="guide-chip' + (allActive ? " is-active" : "") + '" data-guide-filter="all" aria-pressed="' + allActive + '">' + (isEnglishUi() ? "All" : "Todos") + ' <span>' + includedPois().length + "</span></button>"];
     presentCategories().forEach(function (entry) {
-      chips.push('<button type="button" class="guide-chip" data-guide-filter="' + escapeHtml(entry.key) + '" aria-pressed="false"><span class="guide-chip-dot" style="background:' + categoryColor(entry.key) + '"></span>' + escapeHtml(categoryLabel(entry.key)) + " <span>" + entry.count + "</span></button>");
+      var active = state.filter === entry.key;
+      chips.push('<button type="button" class="guide-chip' + (active ? " is-active" : "") + '" data-guide-filter="' + escapeHtml(entry.key) + '" aria-pressed="' + active + '"><span class="guide-chip-dot" style="background:' + categoryColor(entry.key) + '"></span>' + escapeHtml(categoryLabel(entry.key)) + " <span>" + entry.count + "</span></button>");
     });
     return chips.join("");
   }
@@ -1493,9 +1642,11 @@
     });
     var noteHtml = "";
     if (pendingCount > 0) {
-      noteHtml = '<p class="guide-legend-note"><span class="guide-dot guide-dot--pending"></span>' + pendingCount + ' lugar' + (pendingCount === 1 ? '' : 'es') + ' pendiente de verificación (sin ubicación confirmada)</p>';
+      noteHtml = isEnglishUi()
+        ? '<p class="guide-legend-note"><span class="guide-dot guide-dot--pending"></span>' + pendingCount + ' place' + (pendingCount === 1 ? '' : 's') + ' pending verification (no confirmed location)</p>'
+        : '<p class="guide-legend-note"><span class="guide-dot guide-dot--pending"></span>' + pendingCount + ' lugar' + (pendingCount === 1 ? '' : 'es') + ' pendiente de verificación (sin ubicación confirmada)</p>';
     }
-    return '<h3 class="guide-legend-title">Leyenda de categorías</h3><ul class="guide-legend-list">' + items + '</ul>' + noteHtml;
+    return '<h3 class="guide-legend-title">' + (isEnglishUi() ? "Category legend" : "Leyenda de categorías") + '</h3><ul class="guide-legend-list">' + items + '</ul>' + noteHtml;
   }
 
   function renderLegend() {
@@ -1508,9 +1659,13 @@
     var count = state.mount.querySelector("#guideCount");
     if (!list) return;
     var pois = queryPois(state);
-    if (count) count.textContent = pois.length + " de " + includedPois().length + " lugares";
+    if (count) count.textContent = isEnglishUi()
+      ? (pois.length + " of " + includedPois().length + " places")
+      : (pois.length + " de " + includedPois().length + " lugares");
     if (!pois.length) {
-      list.innerHTML = '<li class="guide-empty">Ajuste la búsqueda para ver más lugares.</li>';
+      list.innerHTML = isEnglishUi()
+        ? '<li class="guide-empty">Adjust the search to see more places.</li>'
+        : '<li class="guide-empty">Ajuste la búsqueda para ver más lugares.</li>';
       return;
     }
     list.innerHTML = pois.map(function (p) {
@@ -1527,7 +1682,7 @@
       }
       return '<li class="guide-item' + active + (p.category === "hotel" ? " guide-item--hotel" : "") + '" data-id="' + escapeHtml(p.id) + '" tabindex="0" role="button">' +
         '<span class="guide-dot" style="background:' + categoryColor(p.category) + '"></span>' +
-        '<span class="guide-item-body"><span class="guide-item-name">' + escapeHtml(p.name) + '</span><span class="guide-item-meta">' + meta + "</span></span>" +
+        '<span class="guide-item-body"><span class="guide-item-name">' + escapeHtml(gp.poiNameText(p)) + '</span><span class="guide-item-meta">' + meta + "</span></span>" +
         brandHtml +
         "</li>";
     }).join("");
@@ -2087,7 +2242,7 @@
         }
       }
     }
-    if (titleEl) titleEl.textContent = poi.name || "";
+    if (titleEl) titleEl.textContent = gp.poiNameText(poi) || "";
     body.innerHTML = mobilePoiInfoHtml(poi) +
       '<div class="guide-mobile-actions-buttons">' + btns + "</div>" +
       '<div class="guide-route-box" id="guideMobileRouteBox" role="status" aria-live="polite"></div>' +
@@ -2097,7 +2252,7 @@
       var rows = info ? Array.prototype.slice.call(info.querySelectorAll(".guide-detail-row")) : [];
       var hiddenRows = rows.filter(function (row) {
         var label = row.querySelector("strong");
-        return !label || label.textContent !== "Horario";
+        return !label || (label.textContent !== "Horario" && label.textContent !== "Hours");
       });
       var buttonsEl = body.querySelector(".guide-mobile-actions-buttons");
       var buttons = buttonsEl ? Array.prototype.slice.call(buttonsEl.children) : [];
@@ -2264,62 +2419,74 @@
       actions = '<p class="guide-pending-note">La información de este lugar se está actualizando; en breve estará disponible en el mapa y con ruta.</p>' +
         (bookingActions ? '<div class="guide-detail-actions">' + bookingActions + "</div>" : "");
     }
+    var english = isEnglishUi();
+    var hoursFallback = english ? "Please check the Iberostar app." : "Consultar horario en la app de Iberostar";
+    var cuisineFallback = english ? "Please check the Iberostar app." : "Consultar en la app de Iberostar";
+    var missingMenu = english ? "Not available yet" : "No disponible por ahora";
     var extraInfo = "";
     // Desglose de horarios por servicio (desayuno / comida / cena / bar).
     var scheduleRows = "";
-    if (poi.breakfast) scheduleRows += '<p class="guide-detail-row"><strong>Desayuno</strong> ' + escapeHtml(poi.breakfast) + "</p>";
-    if (poi.lunch) scheduleRows += '<p class="guide-detail-row"><strong>Comida</strong> ' + escapeHtml(poi.lunch) + "</p>";
-    if (poi.dinner) scheduleRows += '<p class="guide-detail-row"><strong>Cena</strong> ' + escapeHtml(poi.dinner) + "</p>";
+    if (poi.breakfast) scheduleRows += '<p class="guide-detail-row"><strong>' + (english ? "Breakfast" : "Desayuno") + '</strong> ' + escapeHtml(poi.breakfast) + "</p>";
+    if (poi.lunch) scheduleRows += '<p class="guide-detail-row"><strong>' + (english ? "Lunch" : "Comida") + '</strong> ' + escapeHtml(poi.lunch) + "</p>";
+    if (poi.dinner) scheduleRows += '<p class="guide-detail-row"><strong>' + (english ? "Dinner" : "Cena") + '</strong> ' + escapeHtml(poi.dinner) + "</p>";
     if (poi.late) scheduleRows += '<p class="guide-detail-row"><strong>Bar</strong> ' + escapeHtml(poi.late) + "</p>";
 
     if (poi.category === "restaurante") {
-      var hours = poi.hours || "Consultar horario en la app de Iberostar";
-      var cuisine = poi.cuisine || "Consultar en la app de Iberostar";
+      var hours = poiHoursText(poi) || hoursFallback;
+      var cuisine = gp.poiCuisineText(poi) || cuisineFallback;
+      var restaurantMenu = poiMenuText(poi);
       extraInfo = '<div class="guide-extra-info">' +
-        (scheduleRows ? "" : '<p class="guide-detail-row"><strong>Horario</strong> ' + escapeHtml(hours) + "</p>") +
+        (scheduleRows ? "" : '<p class="guide-detail-row"><strong>' + (english ? "Hours" : "Horario") + '</strong> ' + escapeHtml(hours) + "</p>") +
         scheduleRows +
-        '<p class="guide-detail-row"><strong>Cocina</strong> ' + escapeHtml(cuisine) + "</p>" +
-        (poi.menu ? '<p class="guide-detail-row"><strong>Menú</strong> ' + escapeHtml(poi.menu) + "</p>" : "") +
+        '<p class="guide-detail-row"><strong>' + (english ? "Cuisine" : "Cocina") + '</strong> ' + escapeHtml(cuisine) + "</p>" +
+        (restaurantMenu ? '<p class="guide-detail-row"><strong>' + (english ? "Menu" : "Menú") + '</strong> ' + escapeHtml(restaurantMenu) + "</p>" : "") +
         "</div>";
     } else if (poi.category === "spa") {
-      var spaHours = poi.hours || "Consultar horario en la app de Iberostar";
-      var treatments = poi.treatments || "Consulte los tratamientos disponibles en la app de Iberostar.";
+      var spaHours = poiHoursText(poi) || hoursFallback;
+      var treatments = gp.poiTreatmentsText(poi) || (english ? "Check available treatments in the Iberostar app." : "Consulte los tratamientos disponibles en la app de Iberostar.");
+      var spaPackages = gp.poiPackagesText(poi);
       extraInfo = '<div class="guide-extra-info">' +
-        '<p class="guide-detail-row"><strong>Horario</strong> ' + escapeHtml(spaHours) + "</p>" +
-        '<p class="guide-detail-row"><strong>Tratamientos</strong> ' + escapeHtml(treatments) + "</p>" +
-        (poi.packages ? '<p class="guide-detail-row"><strong>Paquetes</strong> ' + escapeHtml(poi.packages) + "</p>" : "") +
+        '<p class="guide-detail-row"><strong>' + (english ? "Hours" : "Horario") + '</strong> ' + escapeHtml(spaHours) + "</p>" +
+        '<p class="guide-detail-row"><strong>' + (english ? "Treatments" : "Tratamientos") + '</strong> ' + escapeHtml(treatments) + "</p>" +
+        (spaPackages ? '<p class="guide-detail-row"><strong>' + (english ? "Packages" : "Paquetes") + '</strong> ' + escapeHtml(spaPackages) + "</p>" : "") +
         "</div>";
     } else if (poi.category === "golf") {
-      var golfHours = poi.hours || "Consultar horario en la app de Iberostar";
-      var golfPackages = poi.packages || "Consulte los paquetes en la app de Iberostar.";
+      var golfHours = poiHoursText(poi) || hoursFallback;
+      var golfPackages = gp.poiPackagesText(poi) || (english ? "Check packages in the Iberostar app." : "Consulte los paquetes en la app de Iberostar.");
       extraInfo = '<div class="guide-extra-info">' +
-        '<p class="guide-detail-row"><strong>Horario</strong> ' + escapeHtml(golfHours) + "</p>" +
+        '<p class="guide-detail-row"><strong>' + (english ? "Hours" : "Horario") + '</strong> ' + escapeHtml(golfHours) + "</p>" +
         (poi.teeTimes ? '<p class="guide-detail-row"><strong>Tee times</strong> ' + escapeHtml(poi.teeTimes) + "</p>" : "") +
-        '<p class="guide-detail-row"><strong>Paquetes</strong> ' + escapeHtml(golfPackages) + "</p>" +
+        '<p class="guide-detail-row"><strong>' + (english ? "Packages" : "Paquetes") + '</strong> ' + escapeHtml(golfPackages) + "</p>" +
         "</div>";
     } else if (poi.category === "bar" || poi.category === "discoteca") {
       var barHours = poiHoursText(poi);
       var barMenu = poiMenuText(poi);
-      var barMenuLabel = window.RevistaDigital.i18n?.getLang?.() === "en" ? "Menu" : "Carta";
+      var barCuisine = gp.poiCuisineText(poi);
+      var barMenuLabel = english ? "Menu" : "Carta";
       extraInfo = '<div class="guide-extra-info">' +
-        '<p class="guide-detail-row"><strong>Horario</strong> ' + escapeHtml(barHours || "Consultar horario en la app de Iberostar") + "</p>" +
-        (poi.cuisine ? '<p class="guide-detail-row"><strong>Concepto</strong> ' + escapeHtml(poi.cuisine) + "</p>" : "") +
-        '<p class="guide-detail-row"><strong>' + barMenuLabel + '</strong> ' + escapeHtml(barMenu || "No disponible por ahora") + "</p>" +
+        '<p class="guide-detail-row"><strong>' + (english ? "Hours" : "Horario") + '</strong> ' + escapeHtml(barHours || hoursFallback) + "</p>" +
+        (barCuisine ? '<p class="guide-detail-row"><strong>' + (english ? "Concept" : "Concepto") + '</strong> ' + escapeHtml(barCuisine) + "</p>" : "") +
+        '<p class="guide-detail-row"><strong>' + barMenuLabel + '</strong> ' + escapeHtml(barMenu || missingMenu) + "</p>" +
         "</div>";
     } else if (poi.category === "club" || poi.category === "starprestige") {
-      var memberAmenities = Array.isArray(poi.amenities) ? poi.amenities.join(", ") : (poi.amenities || "");
-      var memberServices = Array.isArray(poi.services) ? poi.services.join(", ") : (poi.services || "");
+      var memberHours = poiHoursText(poi);
+      var memberAmenities = gp.poiAmenitiesText(poi);
+      var memberServices = gp.poiServicesText(poi);
       extraInfo = '<div class="guide-extra-info">' +
-        (poi.hours ? '<p class="guide-detail-row"><strong>Horario</strong> ' + escapeHtml(poi.hours) + "</p>" : "") +
-        (memberAmenities ? '<p class="guide-detail-row"><strong>Amenidades</strong> ' + escapeHtml(memberAmenities) + "</p>" : "") +
-        (memberServices ? '<p class="guide-detail-row"><strong>Servicios incluidos</strong> ' + escapeHtml(memberServices) + "</p>" : "") +
+        (memberHours ? '<p class="guide-detail-row"><strong>' + (english ? "Hours" : "Horario") + '</strong> ' + escapeHtml(memberHours) + "</p>" : "") +
+        (memberAmenities ? '<p class="guide-detail-row"><strong>' + (english ? "Amenities" : "Amenidades") + '</strong> ' + escapeHtml(memberAmenities) + "</p>" : "") +
+        (memberServices ? '<p class="guide-detail-row"><strong>' + (english ? "Included services" : "Servicios incluidos") + '</strong> ' + escapeHtml(memberServices) + "</p>" : "") +
         "</div>";
-    } else if (poi.hours || poi.menu || poi.packages) {
+    } else if (poiHoursText(poi) || poiMenuText(poi) || gp.poiPackagesText(poi)) {
+      var genericHours = poiHoursText(poi);
+      var genericCuisine = gp.poiCuisineText(poi);
+      var genericMenu = poiMenuText(poi);
+      var genericPackages = gp.poiPackagesText(poi);
       extraInfo = '<div class="guide-extra-info">' +
-        (poi.hours ? '<p class="guide-detail-row"><strong>Horario</strong> ' + escapeHtml(poi.hours) + "</p>" : "") +
-        (poi.cuisine ? '<p class="guide-detail-row"><strong>Concepto</strong> ' + escapeHtml(poi.cuisine) + "</p>" : "") +
-        (poi.menu ? '<p class="guide-detail-row"><strong>Carta</strong> ' + escapeHtml(poi.menu) + "</p>" : "") +
-        (poi.packages ? '<p class="guide-detail-row"><strong>Paquetes</strong> ' + escapeHtml(poi.packages) + "</p>" : "") +
+        (genericHours ? '<p class="guide-detail-row"><strong>' + (english ? "Hours" : "Horario") + '</strong> ' + escapeHtml(genericHours) + "</p>" : "") +
+        (genericCuisine ? '<p class="guide-detail-row"><strong>' + (english ? "Concept" : "Concepto") + '</strong> ' + escapeHtml(genericCuisine) + "</p>" : "") +
+        (genericMenu ? '<p class="guide-detail-row"><strong>' + (english ? "Menu" : "Carta") + '</strong> ' + escapeHtml(genericMenu) + "</p>" : "") +
+        (genericPackages ? '<p class="guide-detail-row"><strong>' + (english ? "Packages" : "Paquetes") + '</strong> ' + escapeHtml(genericPackages) + "</p>" : "") +
         "</div>";
     }
     detail.innerHTML =
@@ -2329,9 +2496,9 @@
         '<div class="guide-book-box" id="guideBookBox"></div>' +
       '</div>' +
       '<span class="guide-dot guide-dot--lg" style="background:' + categoryColor(poi.category) + '"></span>' +
-      '<h3 class="guide-detail-title">' + escapeHtml(poi.name) + "</h3>" +
+      '<h3 class="guide-detail-title">' + escapeHtml(gp.poiNameText(poi)) + "</h3>" +
       '<p class="guide-detail-cat">' + escapeHtml(categoryLabel(poi.category)) + ((poi.hotelId || poi.hotel || poi.zone) ? ' · ' + escapeHtml(poi.hotelId || poi.hotel || poi.zone) : '') + "</p>" +
-      (poi.description ? '<p class="guide-detail-desc">' + escapeHtml(poi.description) + "</p>" : "") +
+      (gp.poiDescriptionText(poi) ? '<p class="guide-detail-desc">' + escapeHtml(gp.poiDescriptionText(poi)) + "</p>" : "") +
       zone +
       extraInfo +
       poiCommonInfoHtml(poi) +
@@ -2618,18 +2785,23 @@
       document.getElementById("guideActivitiesList");
     if (!list) return;
     var actividades = gp.ACTIVIDADES || [];
+    var english = isEnglishUi();
     if (!actividades.length) {
-      list.innerHTML = '<li class="guide-activity-empty">No hay actividades programadas para hoy.</li>';
+      list.innerHTML = english
+        ? '<li class="guide-activity-empty">No activities scheduled for today.</li>'
+        : '<li class="guide-activity-empty">No hay actividades programadas para hoy.</li>';
       return;
     }
     list.innerHTML = actividades.map(function (item, index) {
       var poi = item.poiId ? findPoi(item.poiId) : null;
       var can = poi && canMap(poi);
+      var activityName = english ? (item.nombreEn || item.nombre) : item.nombre;
+      var activityPlace = english ? (item.lugarEn || item.lugar) : item.lugar;
       return '<li class="guide-activity-item' + (can ? " is-linked" : "") + '"' +
         (can ? ' data-activity-id="' + escapeHtml(item.poiId) + '" tabindex="0" role="button"' : "") + ">" +
         '<span class="guide-activity-time">' + escapeHtml(item.hora) + "</span>" +
-        '<span class="guide-activity-name">' + escapeHtml(item.nombre) + "</span>" +
-        '<span class="guide-activity-location">' + escapeHtml(item.lugar || "") + "</span>" +
+        '<span class="guide-activity-name">' + escapeHtml(activityName) + "</span>" +
+        '<span class="guide-activity-location">' + escapeHtml(activityPlace || "") + "</span>" +
         "</li>";
     }).join("");
   }
@@ -2665,39 +2837,39 @@
 
 function mobilePoiInfoHtml(poi) {
   if (!poi) return "";
+  var english = isEnglishUi();
   var rows = [];
   var location = poi.hotel || poi.hotelId || poi.zone || "";
   var hours = poiHoursText(poi);
   var menu = poiMenuText(poi);
-  if (hours) rows.push(["Horario", hours]);
-  if (poi.cuisine) rows.push([poi.category === "restaurante" ? "Cocina" : "Concepto", poi.cuisine]);
-  if (menu) rows.push([poi.category === "bar" || poi.category === "discoteca" ? "Carta" : "Menú", menu]);
-  var specialties = "";
-  if (poi.especialidades) specialties = String(poi.especialidades);
-  else if (Array.isArray(poi.signatureDishes)) specialties = poi.signatureDishes.join(", ");
-  else if (poi.signatureDishes) specialties = String(poi.signatureDishes);
-  else if (Array.isArray(poi.platillosInsignia)) specialties = poi.platillosInsignia.join(", ");
-  else if (poi.platillosInsignia) specialties = String(poi.platillosInsignia);
-  if (specialties && specialties !== poi.menu) rows.push(["Especialidades", specialties]);
-  var cocteles = poi.cocteles || poi.cocktails || poi.bebidas || poi.coctelesInsignia;
-  if (cocteles) rows.push(["Cócteles", Array.isArray(cocteles) ? cocteles.join(", ") : String(cocteles)]);
-  if (poi.treatments) rows.push(["Tratamientos", poi.treatments]);
-  if (poi.packages) rows.push(["Paquetes", poi.packages]);
+  if (hours) rows.push([english ? "Hours" : "Horario", hours]);
+  var cuisine = gp.poiCuisineText(poi);
+  if (cuisine) rows.push([poi.category === "restaurante" ? (english ? "Cuisine" : "Cocina") : (english ? "Concept" : "Concepto"), cuisine]);
+  if (menu) rows.push([poi.category === "bar" || poi.category === "discoteca" ? (english ? "Menu" : "Carta") : (english ? "Menu" : "Men\u00fa"), menu]);
+  var specialties = gp.poiSpecialtiesText(poi);
+  if (specialties && specialties !== menu) rows.push([english ? "Specialties" : "Especialidades", specialties]);
+  var cocteles = gp.poiCocktailsText(poi);
+  if (cocteles) rows.push([english ? "Cocktails" : "C\u00f3cteles", cocteles]);
+  var treatments = gp.poiTreatmentsText(poi);
+  if (treatments) rows.push([english ? "Treatments" : "Tratamientos", treatments]);
+  var packages = gp.poiPackagesText(poi);
+  if (packages) rows.push([english ? "Packages" : "Paquetes", packages]);
   if (poi.teeTimes) rows.push(["Tee times", poi.teeTimes]);
-  var amenities = Array.isArray(poi.amenities) ? poi.amenities.join(", ") : (poi.amenities ? String(poi.amenities) : "");
-  if (amenities) rows.push(["Amenidades", amenities]);
-  var services = Array.isArray(poi.services) ? poi.services.join(", ") : (poi.services ? String(poi.services) : "");
-  if (services) rows.push(["Servicios", services]);
-  var dress = poi.dressCode || poi.vestimenta;
-  if (dress) rows.push(["Código de vestimenta", dress]);
+  var amenities = gp.poiAmenitiesText(poi);
+  if (amenities) rows.push([english ? "Amenities" : "Amenidades", amenities]);
+  var services = gp.poiServicesText(poi);
+  if (services) rows.push([english ? "Services" : "Servicios", services]);
+  var dress = gp.poiDressCodeText(poi);
+  if (dress) rows.push([english ? "Dress code" : "C\u00f3digo de vestimenta", dress]);
   var r = (poi.reservation !== undefined ? poi.reservation : poi.reservas);
   var reservationText = "";
-  if (r !== undefined && r !== null && r !== "") reservationText = (typeof r === "boolean") ? (r ? "Recomendada" : "No requerida") : String(r);
-  if (reservationText) rows.push(["Reservas", reservationText]);
-  if (poi.description) rows.push(["Descripción", poi.description]);
+  if (r !== undefined && r !== null && r !== "") reservationText = (typeof r === "boolean") ? (r ? (english ? "Recommended" : "Recomendada") : (english ? "Not required" : "No requerida")) : String(r);
+  if (reservationText) rows.push([english ? "Reservations" : "Reservas", reservationText]);
+  var description = gp.poiDescriptionText(poi);
+  if (description) rows.push([english ? "Description" : "Descripci\u00f3n", description]);
   if (!rows.length) return "";
   var html = '<div class="guide-mobile-actions-info">';
-  html += '<p class="guide-mobile-actions-cat">' + escapeHtml(categoryLabel(poi.category)) + (location ? ' · ' + escapeHtml(location) : '') + '</p>';
+  html += '<p class="guide-mobile-actions-cat">' + escapeHtml(categoryLabel(poi.category)) + (location ? ' \u00b7 ' + escapeHtml(location) : '') + '</p>';
   html += rows.map(function (row) { return '<p class="guide-detail-row"><strong>' + escapeHtml(row[0]) + '</strong> ' + escapeHtml(row[1]) + '</p>'; }).join("");
   html += '</div>';
   return html;
@@ -2705,22 +2877,19 @@ function mobilePoiInfoHtml(poi) {
 
 function poiCommonInfoHtml(poi) {
   if (!poi) return "";
+  var english = isEnglishUi();
   var rows = [];
-  var specialties = "";
-  if (poi.especialidades) specialties = String(poi.especialidades);
-  else if (Array.isArray(poi.signatureDishes)) specialties = poi.signatureDishes.join(", ");
-  else if (poi.signatureDishes) specialties = String(poi.signatureDishes);
-  else if (Array.isArray(poi.platillosInsignia)) specialties = poi.platillosInsignia.join(", ");
-  else if (poi.platillosInsignia) specialties = String(poi.platillosInsignia);
-  if (specialties && specialties !== poi.menu) rows.push(["Especialidades", specialties]);
-  var cocteles = poi.cocteles || poi.cocktails || poi.bebidas || poi.coctelesInsignia;
-  if (cocteles) rows.push(["Cócteles", Array.isArray(cocteles) ? cocteles.join(", ") : String(cocteles)]);
-  var dress = poi.dressCode || poi.vestimenta;
-  if (dress) rows.push(["Código de vestimenta", dress]);
+  var menu = poiMenuText(poi);
+  var specialties = gp.poiSpecialtiesText(poi);
+  if (specialties && specialties !== menu) rows.push([english ? "Specialties" : "Especialidades", specialties]);
+  var cocteles = gp.poiCocktailsText(poi);
+  if (cocteles) rows.push([english ? "Cocktails" : "C\u00f3cteles", cocteles]);
+  var dress = gp.poiDressCodeText(poi);
+  if (dress) rows.push([english ? "Dress code" : "C\u00f3digo de vestimenta", dress]);
   var r = (poi.reservation !== undefined ? poi.reservation : poi.reservas);
   var reservationText = "";
-  if (r !== undefined && r !== null && r !== "") reservationText = (typeof r === "boolean") ? (r ? "Recomendada" : "No requerida") : String(r);
-  if (reservationText) rows.push(["Reservas", reservationText]);
+  if (r !== undefined && r !== null && r !== "") reservationText = (typeof r === "boolean") ? (r ? (english ? "Recommended" : "Recomendada") : (english ? "Not required" : "No requerida")) : String(r);
+  if (reservationText) rows.push([english ? "Reservations" : "Reservas", reservationText]);
   if (!rows.length) return "";
   return '<div class="guide-extra-info guide-common-info">' + rows.map(function (row) {
     return '<p class="guide-detail-row"><strong>' + escapeHtml(row[0]) + '</strong> ' + escapeHtml(row[1]) + '</p>';
@@ -3017,4 +3186,28 @@ function poiCommonInfoHtml(poi) {
     mount.innerHTML = legendMarkup();
     return true;
   };
+
+  function refreshGuideLanguage() {
+    if (typeof gp.refreshPoiLayer === "function") {
+      try { gp.refreshPoiLayer(); } catch (e) { /* ignore */ }
+    }
+    if (!state.mount) return;
+    var filters = state.mount.querySelector("#guideFilters");
+    if (filters) filters.innerHTML = categoryChips();
+    renderLegend();
+    renderList();
+    renderActivities();
+    renderDetail(state.selectedId ? findPoi(state.selectedId) : null);
+  }
+
+  gp.refreshGuideLanguage = refreshGuideLanguage;
+
+  window.addEventListener("languagechange", function () {
+    refreshGuideLanguage();
+    var overlay = document.querySelector(".gp-dining-overlay");
+    if (!overlay) return;
+    var overlayId = overlay.dataset ? overlay.dataset.poiId : null;
+    if (!overlayId || overlay.querySelector("form")) return;
+    try { gp.openDiningOverlay(overlayId); } catch (e) { /* ignore */ }
+  });
 })();
