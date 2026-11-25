@@ -78,4 +78,3 @@ const pendingLocationCount = inventory.filter(x => x.lat != null && !x.verified)
 console.log("Verificados con coordenadas:", verifiedCount);
 console.log("Pendientes de coordenadas:", pendingCoordsCount);
 console.log("Pendientes de ubicación:", pendingLocationCount);
-

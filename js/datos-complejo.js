@@ -1,4 +1,4 @@
-// Datos operativos del complejo Playa Paraíso (Iberostar The Club)
+﻿// Datos operativos del complejo Playa Paraíso (Iberostar The Club)
 // ------------------------------------------------------------------
 // Fuente única de datos oficiales: cartas, horarios, tratamientos,
 // paquetes y actividades del día. Actualizado con la información

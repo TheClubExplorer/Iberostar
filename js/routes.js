@@ -726,7 +726,7 @@
         stage.classList.toggle("is-mapbox", activate);
         frame.hidden = !activate;
         if (activate && !frame.src) {
-          frame.src = `${href("/mapbox/mapbox-guia-playa-paraiso.html")}?embed=1&mode=complex&v=22`;
+          frame.src = `${href("/mapbox/mapbox-guia-playa-paraiso.html")}?embed=1&mode=complex&v=23`;
           frame.addEventListener("load", () => {
             sendMapboxCommand(frame, { command: "resize" });
             syncMapboxFrameViewport(frame);
@@ -841,6 +841,13 @@
         event.data.label,
         event.data.poiId
       );
+      return;
+    }
+    if (event.data.type === "mapbox-open-menu") {
+      const poiId = String(event.data.poiId || "");
+      if (!frame || !poiId) return;
+      if (activeMapboxFullscreen?.frame === frame) setMapboxFullscreen(frame, false);
+      window.RevistaDigital?.guiapa?.openDiningOverlay?.(poiId);
       return;
     }
     if (event.data.type !== "mapbox-cart-request") return;
@@ -1072,7 +1079,7 @@
           </div>
           <div class="hotel-cart-map-wrap">
             <div id="cartTrackingMap" class="hotel-cart-map" role="application" aria-label="Mapa de seguimiento del carrito de golf">
-              <iframe class="cart-mapbox-frame" title="Seguimiento 3D del carrito de golf" data-mapbox-src="${escapeHtml(`${href("/mapbox/mapbox-guia-playa-paraiso.html")}?embed=1&mode=cart&v=22`)}" hidden></iframe>
+              <iframe class="cart-mapbox-frame" title="Seguimiento 3D del carrito de golf" data-mapbox-src="${escapeHtml(`${href("/mapbox/mapbox-guia-playa-paraiso.html")}?embed=1&mode=cart&v=23`)}" hidden></iframe>
             </div>
             <button type="button" class="cart-map-expand" data-cart-back-to-trip>Ampliar mapa</button>
             <button type="button" class="cart-panel-reopen" data-cart-panel-toggle aria-expanded="false">Mostrar solicitud</button>
@@ -1251,8 +1258,6 @@
         ...Object.values(catalog).flatMap((country) => collageHotelImages(country, country.destinations?.flatMap((destination) => destination.hotels) || []))
       ];
       let breadcrumb = en ? "IBEROSTAR · DESTINATIONS" : "IBEROSTAR · DESTINOS";
-      let countryMapMarkup = "";
-      let countryHotels = [];
       if (!isHome) {
         heading = countryData.name; intro = en ? `Discover the destinations of ${countryData.name}.` : `Descubra los destinos de ${countryData.name}.`;
         breadcrumb = en ? `DESTINATIONS · ${countryData.name.toUpperCase()}` : `DESTINOS · ${countryData.name.toUpperCase()}`;
@@ -1263,16 +1268,6 @@
           ...countryData.destinations.flatMap((destination) => destination.hotels.map((hotel) => hotel.image)),
           ...collageHotelImages(countryData, countryData.destinations.flatMap((destination) => destination.hotels))
         ]);
-        countryHotels = countryData.destinations.flatMap((destination) => destination.hotels.map((hotel) => ({
-          ...hotel,
-          countrySlug: country,
-          countryName: countryData.name,
-          destinationSlug: destination.slug,
-          destinationName: destination.name
-        }))).filter((hotel) => Array.isArray(state()?.hotelCoordinates?.[hotel.name]));
-        if (countryHotels.length) {
-          countryMapMarkup = `<section class="portal-map-section"><div><p class="portal-kicker">${en ? "LOCATION" : "UBICACIÓN"}</p><h2>${en ? "Map of" : "Mapa de"} ${escapeHtml(countryData.name)}</h2><p>${en ? "Explore hotels available in the destinations of" : "Explore los hoteles disponibles en los destinos de"} ${escapeHtml(countryData.name)}.</p></div><div class="portal-map-frame"><div class="portal-destination-map" id="countryMap" role="application" aria-label="${en ? "Map of hotels in" : "Mapa de hoteles en"} ${escapeHtml(countryData.name)}"></div>${portalMapActions(countryHotels)}</div></section>`;
-        }
       }
       const countryQuickLinks = !isHome
         ? renderCountryQuickLinks(catalog, en ? "Quick access to countries" : "Acceso rápido a países")
@@ -1281,12 +1276,8 @@
         ? renderPortalQuickLinks(countryCards, (item) => item.route, en ? "Quick access to countries" : "Acceso rápido a países", (item) => item.destinations)
         : renderPortalQuickLinks(countryData.destinations, (item) => `/${country}/${item.slug}`, en ? "Quick access to destinations" : "Acceso rápido a destinos", (item) => item.hotels.length);
       const countryHeroOptions = country === "mexico" ? { video: IBEROSTAR_BANNER_VIDEO, poster: heroImages[0] } : {};
-      view.innerHTML = `<main class="portal-page">${!isHome ? portalNav(getPortalNavModel(route)) : ""}<section class="portal-hero portal-hero--fullbleed"><span class="portal-hero-weather weather-chip-dark weather-chip-overlay weather-live" data-weather-city="${PORTAL_WEATHER_CITY_BY_COUNTRY[country] || "Cancún"}">Clima</span><div><p class="portal-kicker">${breadcrumb}</p><h1>${heading}</h1><p>${intro}</p>${!isHome ? "" : `<a class="portal-hero-link" href="${href("/mexico/riviera-maya")}" data-app-route="/mexico/riviera-maya">${en ? "Discover Iberostar Playa Paraíso" : "Conozca Iberostar Playa Paraíso"} <span>→</span></a><div class="portal-hero-stats" aria-label="${en ? "Destination summary" : "Resumen de destinos"}"><span><strong>${Object.keys(catalog).length}</strong> ${en ? "countries" : "países"}</span><span><strong>${totalDestinations}</strong> ${en ? "destinations" : "destinos"}</span><span><strong>${totalHotels}</strong> ${en ? "hotels" : "hoteles"}</span></div>`}</div>${renderPortalHeroCarousel(heroImages, isHome ? (en ? "our destinations" : "nuestros destinos") : countryData.name, "", "", "(max-width:850px) 100vw, 45vw", countryHeroOptions)}</section><section class="portal-section"><div class="portal-section-heading"><div><p class="portal-kicker">${isHome ? (en ? "OUR COUNTRIES" : "NUESTROS PAÍSES") : (en ? "DESTINATIONS" : "DESTINOS")}</p><h2>${isHome ? (en ? "Travel your way" : "Viaje a su manera") : (en ? "Choose where to stay" : "Elija dónde hospedarse")}</h2></div>${!isHome ? `<a href="${href("/")}" data-app-route="/">${en ? "All countries" : "Todos los países"}</a>` : ""}</div>${countryQuickLinks}${quickLinks}<div class="destination-grid portal-card-carousel">${cards}</div></section>${countryMapMarkup}</main>`;
+      view.innerHTML = `<main class="portal-page">${!isHome ? portalNav(getPortalNavModel(route)) : ""}<section class="portal-hero portal-hero--fullbleed"><span class="portal-hero-weather weather-chip-dark weather-chip-overlay weather-live" data-weather-city="${PORTAL_WEATHER_CITY_BY_COUNTRY[country] || "Cancún"}">Clima</span><div><p class="portal-kicker">${breadcrumb}</p><h1>${heading}</h1><p>${intro}</p>${!isHome ? "" : `<a class="portal-hero-link" href="${href("/mexico/riviera-maya")}" data-app-route="/mexico/riviera-maya">${en ? "Discover Iberostar Playa Paraíso" : "Conozca Iberostar Playa Paraíso"} <span>→</span></a><div class="portal-hero-stats" aria-label="${en ? "Destination summary" : "Resumen de destinos"}"><span><strong>${Object.keys(catalog).length}</strong> ${en ? "countries" : "países"}</span><span><strong>${totalDestinations}</strong> ${en ? "destinations" : "destinos"}</span><span><strong>${totalHotels}</strong> ${en ? "hotels" : "hoteles"}</span></div>`}</div>${renderPortalHeroCarousel(heroImages, isHome ? (en ? "our destinations" : "nuestros destinos") : countryData.name, "", "", "(max-width:850px) 100vw, 45vw", countryHeroOptions)}</section><section class="portal-section"><div class="portal-section-heading"><div><p class="portal-kicker">${isHome ? (en ? "OUR COUNTRIES" : "NUESTROS PAÍSES") : (en ? "DESTINATIONS" : "DESTINOS")}</p><h2>${isHome ? (en ? "Travel your way" : "Viaje a su manera") : (en ? "Choose where to stay" : "Elija dónde hospedarse")}</h2></div>${!isHome ? `<a href="${href("/")}" data-app-route="/">${en ? "All countries" : "Todos los países"}</a>` : ""}</div>${countryQuickLinks}${quickLinks}<div class="destination-grid portal-card-carousel">${cards}</div></section></main>`;
       initPortalHeroCarousels(view);
-      const countryMap = view.querySelector("#countryMap");
-      if (countryMap) {
-        window.RevistaDigital.mapas?.initializeAllHotelsMap(countryMap, countryHotels, { countrySlug: country });
-      }
       return true;
     }
     if (countryData && parts.length === 2) {
@@ -1346,7 +1337,7 @@
     return `<div class="restaurant-search-bar" role="search" aria-label="Buscar restaurantes">
       <div class="restaurant-search-field">
         <span class="restaurant-search-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"></circle><path d="m20 20-3.6-3.6"></path></svg></span>
-        <input class="restaurant-search-input" type="search" inputmode="search" placeholder="Buscar restaurante, cocina o hotel" aria-label="Buscar restaurante, cocina o hotel" autocomplete="off" data-restaurant-search aria-controls="restaurantHotelResults restaurantCountryResults" />
+        <input id="restaurantSearch" name="restaurantSearch" class="restaurant-search-input" type="search" inputmode="search" placeholder="Buscar restaurante, cocina o hotel" aria-label="Buscar restaurante, cocina o hotel" autocomplete="off" data-restaurant-search aria-controls="restaurantHotelResults restaurantCountryResults" />
         <button class="restaurant-search-clear" type="button" aria-label="Limpiar búsqueda" data-restaurant-search-clear hidden>×</button>
       </div>
       <p class="restaurant-search-status" role="status" aria-live="polite" data-restaurant-search-status hidden></p>
@@ -1803,8 +1794,6 @@
             ${zonePanelMarkup}
           </div>
         </section>`) : "";
-    const guideMarkup = window.RevistaDigital?.pannellum360?.renderSection?.(displayName) || "";
-
     return `
       <main class="portal-page">
         ${portalNav(getPortalNavModel(hotelRoute))}
@@ -1817,7 +1806,6 @@
 
         ${mapMarkup}
         ${transportMarkup}
-        ${guideMarkup}
         ${servicesMarkup}
       </main>
     `;
@@ -1951,7 +1939,7 @@
       if (position && Number.isFinite(position.latitude) && Number.isFinite(position.longitude)) {
         const size = 28;
         const personSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="' + size + '" height="' + size + '"><path d="M12 0 L16 5.5 L8 5.5 Z" fill="#d4af37"/><circle cx="12" cy="8" r="4" fill="#d4af37"/><path d="M12 14c-4.41 0-8 2.59-8 6h16c0-3.41-3.59-6-8-6z" fill="#d4af37"/></svg>';
-        const pulseSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" width="72" height="72"><circle cx="36" cy="36" r="18" fill="none" stroke="#d4af37" stroke-width="2" opacity="0.6"><animate attributeName="r" from="18" to="32" dur="1.5s" repeatCount="indefinite"/><animate attributeName="opacity" from="0.6" to="0" dur="1.5s" repeatCount="indefinite"/></circle></svg>';
+        const pulseSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" width="72" height="72"><circle class="user-pulse-ring" cx="36" cy="36" r="18" fill="none" stroke="#d4af37" stroke-width="2" opacity="0.6"></circle></svg>';
         const html = '<div class="user-marker-wrap" style="position:relative;width:' + size + 'px;height:' + size + 'px;display:flex;align-items:center;justify-content:center;"><div class="user-marker-pulse" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:72px;height:72px;pointer-events:none;">' + pulseSvg + '</div><div class="user-marker-icon" style="position:relative;z-index:1;line-height:0;">' + personSvg + '</div></div>';
         state().userMarker = L.marker([position.latitude, position.longitude], {
           icon: L.divIcon({ className: "user-marker-div", html, iconSize: [size, size], iconAnchor: [size / 2, size / 2] })
@@ -2128,7 +2116,7 @@
     if (position) {
         const size = 28;
         const personSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="' + size + '" height="' + size + '"><path d="M12 0 L16 5.5 L8 5.5 Z" fill="#d4af37"/><circle cx="12" cy="8" r="4" fill="#d4af37"/><path d="M12 14c-4.41 0-8 2.59-8 6h16c0-3.41-3.59-6-8-6z" fill="#d4af37"/></svg>';
-        const pulseSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" width="72" height="72"><circle cx="36" cy="36" r="18" fill="none" stroke="#d4af37" stroke-width="2" opacity="0.6"><animate attributeName="r" from="18" to="32" dur="1.5s" repeatCount="indefinite"/><animate attributeName="opacity" from="0.6" to="0" dur="1.5s" repeatCount="indefinite"/></circle></svg>';
+        const pulseSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" width="72" height="72"><circle class="user-pulse-ring" cx="36" cy="36" r="18" fill="none" stroke="#d4af37" stroke-width="2" opacity="0.6"></circle></svg>';
         const html = '<div class="user-marker-wrap" style="position:relative;width:' + size + 'px;height:' + size + 'px;display:flex;align-items:center;justify-content:center;"><div class="user-marker-pulse" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:72px;height:72px;pointer-events:none;">' + pulseSvg + '</div><div class="user-marker-icon" style="position:relative;z-index:1;line-height:0;">' + personSvg + '</div></div>';
         state().userMarker = L.marker([position.latitude, position.longitude], {
           icon: L.divIcon({ className: "user-marker-div", html: html, iconSize: [size, size], iconAnchor: [size/2, size/2] })
@@ -2198,6 +2186,20 @@
     }
   }
 
+  function routeGuidePoiFromCoordinates(lat, lng) {
+    const guia = window.RevistaDigital?.guiapa;
+    if (!guia || !Array.isArray(guia.POIS)) return false;
+    const poi = guia.POIS.find((item) =>
+      item && Number.isFinite(Number(item.lat)) && Number.isFinite(Number(item.lng)) &&
+      Math.abs(Number(item.lat) - lat) < 0.0002 &&
+      Math.abs(Number(item.lng) - lng) < 0.0002
+    );
+    if (!poi || typeof guia.routeToPoi !== "function") return false;
+    if (typeof guia.selectPoi === "function") guia.selectPoi(poi.id, { noScroll: true });
+    guia.routeToPoi(poi.id);
+    return true;
+  }
+
   document.addEventListener("click", (event) => {
     const locateButton = event.target.closest(".portal-locate");
     if (locateButton) {
@@ -2252,7 +2254,9 @@
       const lng = parseFloat(gpdir.dataset.lng);
       const nm = gpdir.dataset.name || "POI";
       if (!isNaN(lat) && !isNaN(lng)) {
-        try { window.RevistaDigital?.mapas?.openDirections?.(nm, [lat, lng]); } catch (e) {}
+        if (!routeGuidePoiFromCoordinates(lat, lng)) {
+          try { window.RevistaDigital?.mapas?.openDirections?.(nm, [lat, lng]); } catch (e) {}
+        }
       }
       return;
     }
