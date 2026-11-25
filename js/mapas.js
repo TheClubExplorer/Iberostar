@@ -7,6 +7,34 @@
     return window.RevistaDigital?.i18n?.t?.(key, fallback) || fallback;
   }
 
+  function popupEscape(value) {
+    return String(value == null ? "" : value).replace(/[&<>"']/g, (character) => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;"
+    })[character]);
+  }
+
+  function hotelFichaPopup(name, subtitle) {
+    const english = window.RevistaDigital?.i18n?.getLang?.() === "en";
+    const question = english ? "Would you like to view this card?" : "¿Quieres ver esta ficha?";
+    const label = english ? "Explore points of interest" : "Ver puntos de interés";
+    return '<div class="gp-hotel-popup">'
+      + '<strong class="gp-hotel-popup-name">' + popupEscape(name) + '</strong>'
+      + (subtitle ? '<small class="gp-hotel-popup-place">' + popupEscape(subtitle) + '</small>' : '')
+      + '<p class="gp-hotel-popup-question">' + question + '</p>'
+      + '<button type="button" class="gp-map-menu-toggle gp-hotel-popup-action" data-hotel-pois="' + popupEscape(name) + '">' + label + '</button>'
+      + '</div>';
+  }
+
+  document.addEventListener("click", (event) => {
+    const button = event.target?.closest?.("[data-hotel-pois]");
+    if (!button) return;
+    event.preventDefault();
+    event.stopPropagation();
+    window.dispatchEvent(new CustomEvent("revistadigital:openHotelPois", {
+      detail: { hotelName: button.getAttribute("data-hotel-pois") }
+    }));
+  });
+
   // En móvil el mapa empieza bloqueado: un dedo desplaza la página y un toque
   // activa el mapa. "Bloquear mapa" devuelve el scroll y "Pantalla completa"
   // abre el mapa a pantalla completa con su propio botón de salida.
@@ -1797,7 +1825,6 @@
     const destination = routeInfo.destination || {};
     if (!hotels.length && !Array.isArray(destination.mapCenter)) return;
 
-    const projectBase = new URL(document.querySelector("base")?.href || window.location.href, window.location.href).pathname.replace(/\/+$/, "");
     const points = hotels.map((hotel) => state().hotelCoordinates[hotel.name]);
     mapas.loadLeaflet().then((L) => {
       const map = L.map(element, {
@@ -1818,9 +1845,8 @@
       }).addTo(map);
 
       hotels.forEach((hotel, index) => {
-        const route = `${projectBase}/${routeInfo.countrySlug}/${routeInfo.destination.slug}/${hotel.slug}`;
         const marker = L.marker(points[index]).addTo(map);
-        marker.bindPopup(`<strong>${hotel.name}</strong><br><a href="${route}" data-app-route="/${routeInfo.countrySlug}/${routeInfo.destination.slug}/${hotel.slug}">Abrir ficha del hotel →</a>`);
+        marker.bindPopup(hotelFichaPopup(hotel.name));
       });
       if (!hotels.length && Array.isArray(destination.mapCenter)) {
         L.marker(destination.mapCenter)
@@ -1879,7 +1905,7 @@
         touchRotate: true,
         rotateControl: { closeOnZeroBearing: false, position: "bottomright" }
       });
-      mapas.attachTouchScrollGuard(map, element);
+      if (options.touchGuard !== false) mapas.attachTouchScrollGuard(map, element);
       state().activeMap = map;
       state().userMarker = null;
       state().routeLine = null;
@@ -1891,8 +1917,7 @@
       const markers = L.featureGroup();
       mappedHotels.forEach((hotel) => {
         const coordinates = state().hotelCoordinates[hotel.name];
-        const route = `/${hotel.countrySlug}/${hotel.destinationSlug}/${hotel.slug}`;
-        L.marker(coordinates).bindPopup(`<strong>${hotel.name}</strong><br><small>${hotel.destinationName}, ${hotel.countryName}</small><br><a href="${route}" data-app-route="${route}">Abrir ficha del hotel →</a>`).addTo(markers);
+        L.marker(coordinates).bindPopup(hotelFichaPopup(hotel.name, `${hotel.destinationName}, ${hotel.countryName}`)).addTo(markers);
       });
       addCurrentUserMarker(map, L);
       markers.addTo(map);

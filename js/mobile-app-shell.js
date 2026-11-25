@@ -2,6 +2,56 @@
   "use strict";
 
   var MQ = window.matchMedia("(max-width: 768px)");
+  var HOTEL_POI_RADIUS = 200;
+  var HOTEL_POI_ORIGINS = {
+    "Iberostar Selection Paraíso del Mar": [
+      [20.7612389, -86.9640931],
+      [20.762034, -86.962601],
+      [20.7615600, -86.9631079],
+      [20.7608500, -86.9630000],
+      [20.7614300, -86.9653800]
+    ],
+    "Iberostar Waves Paraíso Beach": [
+      [20.7584000, -86.9585000],
+      [20.7589509, -86.9583723],
+      [20.7586720, -86.9590080],
+      [20.7585610, -86.9596730],
+      [20.7582520, -86.9577750]
+    ],
+    "Iberostar Waves Paraíso Lindo": [
+      [20.7596096, -86.9639649],
+      [20.7600720, -86.9652570],
+      [20.7599330, -86.9658300],
+      [20.7580290, -86.9634370],
+      [20.7581760, -86.9631160],
+      [20.7580560, -86.9618530]
+    ],
+    "Iberostar Selection Paraíso Maya": [
+      [20.7578835, -86.9648766],
+      [20.7574900, -86.9645230],
+      [20.7574500, -86.9613520],
+      [20.7578100, -86.9615200],
+      [20.7568700, -86.9597400]
+    ],
+    "JOIA Paraíso by Iberostar": [
+      [20.7563073, -86.9629786],
+      [20.7561600, -86.9622900],
+      [20.7560800, -86.9613300],
+      [20.7547000, -86.9605000],
+      [20.7551200, -86.9613700]
+    ]
+  };
+  var HOTEL_POI_EXCLUDED_IDS = {
+    "preview-gallery": true,
+    "courtesy-room": true,
+    "waterfall-jacuzzi": true,
+    "meeting-room": true,
+    "billiards-library": true
+  };
+  var HOTEL_POI_FORCED_IDS = {
+    "Iberostar Waves Paraíso Lindo": ["pool-bar-las-olas", "la-pagoda", "lemon-spices", "starmarket", "el-tapatio", "bar-el-puente", "aqua-bar-las-rocas", "under-the-sea"],
+    "Iberostar Selection Paraíso Maya": ["bar-el-puente", "aqua-bar-las-rocas", "starmarket", "under-the-sea"]
+  };
   var ICONS = {
     map: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3 3 5v16l6-2 6 2 6-2V3l-6 2-6-2Z"/><path d="M9 3v16M15 5v16"/></svg>',
     explore: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m15 9-2 4-4 2 2-4 4-2Z"/></svg>',
@@ -53,6 +103,20 @@
   var globalClosed = false;
   var globalDrag = null;
   var globalGuideWasHome = false;
+  var globalPoiMode = false;
+  var globalPoiHotelId = null;
+  var globalPoiQuery = "";
+  var nearbyRouteLine = null;
+  var nearbyRouteRenderer = null;
+  var nearbyDot = null;
+  var nearbyBadge = null;
+  var nearbyRaf = 0;
+  var nearbyKey = "";
+  var nearbyItem = null;
+  var nearbyPoiLayer = null;
+  var nearbyPoiLabelLayer = null;
+  var nearbyPoiHotelId = null;
+  var nearbyPoiPreviousMap = null;
 
   function isMobile() {
     try { return MQ.matches; } catch (error) { return window.innerWidth <= 768; }
@@ -76,6 +140,12 @@
       if (value && value !== key) return value;
     } catch (error) { /* ignore */ }
     return lang() === "en" ? en : es;
+  }
+
+  function escapeHtml(value) {
+    return String(value == null ? "" : value).replace(/[&<>"']/g, function (character) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[character];
+    });
   }
 
   function getState() {
@@ -294,6 +364,7 @@
     globalSheet.className = "mgs-sheet";
     globalSheet.setAttribute("role", "region");
     globalSheet.innerHTML =
+      '<button type="button" class="mgs-icon-btn mgs-exit mgs-exit-corner" data-mgs-exit>×</button>' +
       '<div class="mgs-handle" role="button" tabindex="0">' +
         '<div class="mgs-grab"><span class="mgs-pill" aria-hidden="true"></span></div>' +
         '<button type="button" class="mgs-search" data-mgs-open>' +
@@ -307,8 +378,7 @@
         '<div class="mgs-panel-head">' +
           '<div class="mgs-title"><strong></strong><span></span></div>' +
           '<div class="mgs-panel-actions">' +
-            '<button type="button" class="mgs-icon-btn" data-mgs-minimize>⌄</button>' +
-            '<button type="button" class="mgs-icon-btn mgs-exit" data-mgs-exit>×</button>' +
+            '<button type="button" class="mgs-icon-btn" data-mgs-global>↩</button>' +
           '</div>' +
         '</div>' +
         '<input class="mgs-input" type="search" autocomplete="off" />' +
@@ -323,6 +393,20 @@
     globalList = globalSheet.querySelector(".mgs-list");
 
     globalSheet.addEventListener("click", function (event) {
+      if (event.target.closest("[data-mgs-global]")) {
+        exitGlobalPoiMode();
+        return;
+      }
+      var poiHotel = event.target.closest("[data-mgs-poi-hotel]");
+      if (poiHotel) {
+        switchGlobalPoiHotel(poiHotel.dataset.mgsPoiHotel);
+        return;
+      }
+      var poi = event.target.closest("[data-mgs-poi]");
+      if (poi) {
+        selectGlobalPoi(poi.dataset.mgsPoi);
+        return;
+      }
       var country = event.target.closest("[data-mgs-country]");
       var hotel = event.target.closest("[data-mgs-hotel]");
       if (country) {
@@ -338,12 +422,9 @@
       }
       if (event.target.closest("[data-mgs-open]")) {
         setGlobalGuideClosed(false);
-        setGlobalGuideOpen(true);
-        setTimeout(function () { globalInput.focus(); }, 240);
-        return;
-      }
-      if (event.target.closest("[data-mgs-minimize]")) {
-        setGlobalGuideOpen(false);
+        var expanded = !globalSheet.classList.contains("mgs-expanded");
+        setGlobalGuideOpen(expanded);
+        if (expanded) setTimeout(function () { globalInput.focus(); }, 240);
         return;
       }
       if (event.target.closest("[data-mgs-exit]")) setGlobalGuideClosed(true);
@@ -359,6 +440,11 @@
     globalHandle.addEventListener("touchend", onGlobalDragEnd);
     globalHandle.addEventListener("touchcancel", onGlobalDragEnd);
     globalInput.addEventListener("input", function (event) {
+      if (globalPoiMode) {
+        globalPoiQuery = event.target.value || "";
+        renderGlobalGuide();
+        return;
+      }
       globalQuery = event.target.value || "";
       renderGlobalGuide();
     });
@@ -372,8 +458,7 @@
       '<strong class="mgs-card-title"></strong>' +
       '<span class="mgs-card-meta"></span>' +
       '<div class="mgs-card-actions">' +
-        '<button type="button" class="mgs-card-action" data-mgs-card-action="center"></button>' +
-        '<button type="button" class="mgs-card-action mgs-card-action--primary" data-mgs-card-action="open"></button>' +
+        '<button type="button" class="mgs-card-action mgs-card-action--primary" data-mgs-card-action="route"></button>' +
       '</div>';
     globalCard.addEventListener("click", function (event) {
       var actionButton = event.target.closest("[data-mgs-card-action]");
@@ -383,8 +468,10 @@
         globalSelected = null;
         updateGlobalCard();
         renderGlobalGuide();
-      } else if (action === "open" && globalSelected) navigate(globalSelected.route);
-      else if (action === "center" && globalSelected) centerGlobalHotel(globalSelected);
+      } else if (action === "route" && globalSelected) {
+        setGlobalGuideClosed(true);
+        traceRouteToHotel(globalSelected);
+      }
     });
     document.body.appendChild(globalCard);
 
@@ -403,29 +490,45 @@
     syncGlobalGuide();
   }
 
+  function updateGlobalGuideToggleLabel() {
+    if (!globalSheet) return;
+    var english = lang() === "en";
+    var expanded = globalSheet.classList.contains("mgs-expanded");
+    var text = expanded ? (english ? "Minimize" : "Minimizar") : (english ? "Expand" : "Ampliar");
+    globalSheet.querySelector(".mgs-search-text").textContent = text;
+    globalSheet.querySelector(".mgs-open-arrow").textContent = expanded ? "⌄" : "↑";
+    globalSheet.querySelector(".mgs-search").setAttribute("aria-label", text);
+  }
+
   function updateGlobalGuideLabels() {
     if (!globalSheet || !globalCard || !globalReopen) return;
     var english = lang() === "en";
-    var guideTitle = label("menuGuia", "Guía global", "Global guide");
-    var searchLabel = label("navSearch", "Buscar hoteles, destinos…", "Search hotels, destinations…");
+    var guideTitle = globalPoiMode
+      ? (english ? "Interactive guide" : "Guía interactiva")
+      : label("menuGuia", "Guía global", "Global guide");
+    var searchLabel = globalPoiMode
+      ? (english ? "Search points of interest…" : "Buscar puntos de interés…")
+      : label("navSearch", "Buscar hoteles, destinos…", "Search hotels, destinations…");
     globalSheet.setAttribute("aria-label", guideTitle);
     globalSheet.querySelector(".mgs-title strong").textContent = guideTitle;
-    globalSheet.querySelector(".mgs-title span").textContent = english
-      ? "All countries, destinations and hotels"
-      : "Todos los países, destinos y hoteles";
-    globalSheet.querySelector(".mgs-search-text").textContent = english ? "Open global guide" : "Abrir guía global";
+    globalSheet.querySelector(".mgs-title span").textContent = globalPoiMode
+      ? (english ? "Points of interest at the selected hotel" : "Puntos de interés del hotel seleccionado")
+      : (english ? "All countries, destinations and hotels" : "Todos los países, destinos y hoteles");
+    updateGlobalGuideToggleLabel();
     globalSheet.querySelector(".mgs-search-hint").textContent = english ? "Explore" : "Explorar";
-    globalSheet.querySelector(".mgs-search").setAttribute("aria-label", english ? "Open global guide" : "Abrir guía global");
     globalInput.placeholder = searchLabel;
     globalInput.setAttribute("aria-label", searchLabel);
-    globalSheet.querySelector(".mgs-filter-label span").textContent = english ? "Filter by country" : "Filtrar por país";
-    globalSheet.querySelector("[data-mgs-minimize]").setAttribute("aria-label", english ? "Minimize" : "Minimizar");
+    globalSheet.querySelector(".mgs-filter-label span").textContent = globalPoiMode
+      ? (english ? "Filter by hotel" : "Filtrar por hotel")
+      : (english ? "Filter by country" : "Filtrar por país");
+    var globalBack = globalSheet.querySelector("[data-mgs-global]");
+    globalBack.style.display = globalPoiMode ? "" : "none";
+    globalBack.setAttribute("aria-label", english ? "Back to global guide" : "Volver a la guía global");
     globalSheet.querySelector("[data-mgs-exit]").setAttribute("aria-label", english ? "Close guide" : "Cerrar guía");
     globalReopen.querySelector("[data-mgs-reopen-label]").textContent = english ? "Global guide" : "Guía global";
     globalReopen.setAttribute("aria-label", english ? "Open global guide" : "Abrir guía global");
     globalCard.querySelector(".mgs-card-kicker").textContent = english ? "Selected hotel" : "Hotel seleccionado";
-    globalCard.querySelector('[data-mgs-card-action="open"]').textContent = english ? "Open hotel" : "Abrir ficha";
-    globalCard.querySelector('[data-mgs-card-action="center"]').textContent = english ? "Center map" : "Centrar mapa";
+    globalCard.querySelector('[data-mgs-card-action="route"]').textContent = english ? "Trace route" : "Trazar ruta";
     globalCard.querySelector('[data-mgs-card-action="close"]').setAttribute("aria-label", english ? "Close" : "Cerrar");
     if (globalHotels) renderGlobalGuide();
   }
@@ -472,6 +575,10 @@
 
   function renderGlobalGuide() {
     if (!globalSheet || !globalList) return;
+    if (globalPoiMode) {
+      renderGlobalPoiGuide();
+      return;
+    }
     globalHotels = globalHotels || collectGlobalHotels();
 
     var countriesWrap = globalSheet.querySelector(".mgs-countries");
@@ -531,6 +638,125 @@
       button.appendChild(place);
       globalList.appendChild(button);
     });
+  }
+
+  function globalPoiHotels() {
+    var gp = rd("guiapa");
+    if (!gp || !Array.isArray(gp.POIS)) return Object.keys(HOTEL_POI_ORIGINS);
+    return gp.POIS.filter(function (poi) { return poi && poi.category === "hotel"; })
+      .map(function (poi) { return poi.hotelId || poi.name; })
+      .filter(Boolean);
+  }
+
+  function shortGlobalPoiHotel(name) {
+    return String(name || "")
+      .replace(/^Iberostar\s+(Selection\s+|Waves\s+)?/i, "")
+      .replace(/\s+by Iberostar$/i, "");
+  }
+
+  function renderGlobalPoiGuide() {
+    var gp = rd("guiapa");
+    var pois = poisForHotel(globalPoiHotelId);
+    var hotels = globalPoiHotels();
+    var english = lang() === "en";
+    var countriesWrap = globalSheet.querySelector(".mgs-countries");
+    countriesWrap.textContent = "";
+    hotels.forEach(function (name) {
+      var button = document.createElement("button");
+      button.type = "button";
+      button.className = "mgs-country" + (poiHotelIdForHotel({ name: name }) === globalPoiHotelId ? " is-active" : "");
+      button.dataset.mgsPoiHotel = name;
+      button.textContent = shortGlobalPoiHotel(name);
+      countriesWrap.appendChild(button);
+    });
+    globalSheet.querySelector(".mgs-filter-label small").textContent = pois.length + (english ? " places" : " lugares");
+    var query = (globalPoiQuery || "").trim().toLowerCase();
+    var filtered = pois.filter(function (poi) {
+      if (!query) return true;
+      var name = gp && typeof gp.poiNameText === "function" ? gp.poiNameText(poi) : poi.name;
+      var description = gp && typeof gp.poiDescriptionText === "function" ? gp.poiDescriptionText(poi) : poi.description;
+      return (String(name || "") + " " + String(description || "") + " " + String(poi.category || "")).toLowerCase().indexOf(query) !== -1;
+    });
+    globalList.textContent = "";
+    if (!filtered.length) {
+      var empty = document.createElement("p");
+      empty.className = "mgs-empty";
+      empty.textContent = english ? "No points of interest found." : "No hay puntos de interés para esta búsqueda.";
+      globalList.appendChild(empty);
+      return;
+    }
+    filtered.forEach(function (poi) {
+      var button = document.createElement("button");
+      button.type = "button";
+      button.className = "mgs-hotel mgs-poi";
+      button.dataset.mgsPoi = poi.id;
+      var name = document.createElement("strong");
+      name.textContent = gp && typeof gp.poiNameText === "function" ? gp.poiNameText(poi) : poi.name;
+      var meta = document.createElement("span");
+      meta.textContent = (gp && typeof gp.poiDescriptionText === "function" ? gp.poiDescriptionText(poi) : poi.description) || poi.category || "";
+      button.appendChild(name);
+      button.appendChild(meta);
+      globalList.appendChild(button);
+    });
+  }
+
+  function setGlobalPoiMode(hotelId) {
+    if (!hotelId) return;
+    globalPoiMode = true;
+    globalPoiHotelId = hotelId;
+    globalPoiQuery = "";
+    globalCountry = "all";
+    globalSelected = null;
+    if (globalInput) globalInput.value = "";
+    if (globalSheet) globalSheet.classList.add("is-poi-mode");
+    setGlobalGuideClosed(false);
+    setGlobalGuideOpen(false);
+    updateGlobalGuideLabels();
+    renderGlobalGuide();
+  }
+
+  function exitGlobalPoiMode() {
+    if (!globalPoiMode) return;
+    globalPoiMode = false;
+    globalPoiHotelId = null;
+    globalPoiQuery = "";
+    if (globalInput) globalInput.value = "";
+    if (globalSheet) globalSheet.classList.remove("is-poi-mode");
+    clearNearbyPoiLayer();
+    setGlobalGuideClosed(false);
+    setGlobalGuideOpen(true);
+    updateGlobalGuideLabels();
+    renderGlobalGuide();
+  }
+
+  function switchGlobalPoiHotel(name) {
+    var hotelId = poiHotelIdForHotel({ name: name });
+    if (!hotelId) return;
+    globalPoiHotelId = hotelId;
+    globalPoiQuery = "";
+    if (globalInput) globalInput.value = "";
+    clearNearbyPoiLayer();
+    showNearbyPoiLayer(hotelId, true);
+    renderGlobalGuide();
+  }
+
+  function selectGlobalPoi(id) {
+    var gp = rd("guiapa");
+    if (!gp || !id || !shellMap) return;
+    var poi = (gp.POIS || []).filter(function (item) { return item && item.id === id; })[0];
+    if (!poi || poi.lat == null || poi.lng == null) return;
+    if (gp._map !== shellMap) {
+      if (typeof gp.bindMap === "function") gp.bindMap(shellMap);
+      else gp._map = shellMap;
+    }
+    if (typeof gp.selectPoi === "function") {
+      gp.selectPoi(id, { noScroll: true });
+    } else {
+      try { shellMap.stop(); shellMap.flyTo([Number(poi.lat), Number(poi.lng)], 17, { animate: true, duration: 0.6 }); } catch (error) {}
+      var marker = gp._markers && gp._markers[id];
+      if (marker && typeof marker.openPopup === "function") marker.openPopup();
+    }
+    setGlobalGuideOpen(false);
   }
 
   function globalCountryLabel(hotel) {
@@ -607,6 +833,7 @@
   function setGlobalGuideOpen(expanded) {
     if (!globalSheet) return;
     globalSheet.classList.toggle("mgs-expanded", !!expanded);
+    globalSheet.classList.toggle("mgs-minimized", !expanded && !globalClosed && globalSheet.classList.contains("is-visible"));
     if (expanded) document.body.dataset.guideExpanded = "1";
     else delete document.body.dataset.guideExpanded;
     if (globalHandle) globalHandle.setAttribute("aria-expanded", expanded ? "true" : "false");
@@ -615,6 +842,7 @@
       globalSelected = null;
       renderGlobalGuide();
     }
+    updateGlobalGuideToggleLabel();
     updateGlobalCard();
   }
 
@@ -622,6 +850,7 @@
     globalClosed = !!closed;
     if (!globalSheet || !globalReopen) return;
     globalSheet.classList.toggle("is-visible", !globalClosed);
+    globalSheet.classList.toggle("mgs-minimized", !globalClosed && globalSheet.classList.contains("is-visible") && !globalSheet.classList.contains("mgs-expanded"));
     globalReopen.classList.toggle("is-visible", globalClosed && isGlobalGuideHomeMap());
     if (globalClosed) {
       globalSheet.classList.remove("mgs-expanded");
@@ -629,13 +858,14 @@
       if (globalHandle) globalHandle.setAttribute("aria-expanded", "false");
       updateGlobalCard();
     }
+    updateGlobalGuideToggleLabel();
   }
 
   function globalPeekHeight() {
     try {
-      var value = parseFloat(getComputedStyle(document.body).getPropertyValue("--mob-guide-peek"));
-      return isFinite(value) ? value : 76;
-    } catch (error) { return 76; }
+      var value = parseFloat(getComputedStyle(document.body).getPropertyValue("--mob-guide-collapsed-peek"));
+      return isFinite(value) ? value : 118;
+    } catch (error) { return 118; }
   }
 
   function onGlobalDragStart(event) {
@@ -675,11 +905,15 @@
     globalSelected = null;
     globalQuery = "";
     globalCountry = "all";
+    globalPoiMode = false;
+    globalPoiHotelId = null;
+    globalPoiQuery = "";
     if (globalInput) globalInput.value = "";
-    if (globalSheet) globalSheet.classList.remove("mgs-expanded");
+    if (globalSheet) globalSheet.classList.remove("mgs-expanded", "mgs-minimized", "is-poi-mode");
     delete document.body.dataset.guideExpanded;
     if (globalHandle) globalHandle.setAttribute("aria-expanded", "false");
     if (globalReopen) globalReopen.classList.remove("is-visible");
+    updateGlobalGuideToggleLabel();
     updateGlobalCard();
   }
 
@@ -698,12 +932,14 @@
     }
     if (!globalHotels) globalHotels = collectGlobalHotels();
     globalSheet.classList.toggle("is-visible", !globalClosed);
+    globalSheet.classList.toggle("mgs-minimized", !globalClosed && !globalSheet.classList.contains("mgs-expanded"));
     if (globalReopen) globalReopen.classList.toggle("is-visible", globalClosed);
     renderGlobalGuide();
     if (globalClosed) {
       globalSheet.classList.remove("mgs-expanded");
       delete document.body.dataset.guideExpanded;
     }
+    updateGlobalGuideToggleLabel();
     updateGlobalCard();
   }
 
@@ -1125,7 +1361,7 @@
     }
 
     mapInitializing = true;
-    mapas.initializeAllHotelsMap(mapElement, hotels, {});
+    mapas.initializeAllHotelsMap(mapElement, hotels, { touchGuard: false });
     captureMap();
   }
 
@@ -1186,6 +1422,490 @@
     }
   }
 
+  function isHomeMapVisible() {
+    return active && document.body.dataset.mobileHome === "1" && document.body.dataset.mobileSheet === "map";
+  }
+
+  function clearNearbyPoiLayer() {
+    var gp = rd("guiapa");
+    if (nearbyPoiLayer) {
+      try {
+        if (typeof nearbyPoiLayer.remove === "function") nearbyPoiLayer.remove();
+        else if (shellMap) shellMap.removeLayer(nearbyPoiLayer);
+      } catch (error) {}
+    }
+    if (nearbyPoiLabelLayer) {
+      try {
+        if (typeof nearbyPoiLabelLayer.remove === "function") nearbyPoiLabelLayer.remove();
+        else if (shellMap) shellMap.removeLayer(nearbyPoiLabelLayer);
+      } catch (error) {}
+    }
+    if (gp && nearbyPoiLayer) {
+      if (gp._poiLayer === nearbyPoiLayer) gp._poiLayer = null;
+      if (gp._poiLabelLayer === nearbyPoiLabelLayer) gp._poiLabelLayer = null;
+      gp._poiLayerConfig = null;
+      if (gp._map === shellMap && nearbyPoiPreviousMap !== shellMap) gp._map = nearbyPoiPreviousMap || null;
+    }
+    nearbyPoiLayer = null;
+    nearbyPoiLabelLayer = null;
+    nearbyPoiHotelId = null;
+    nearbyPoiPreviousMap = null;
+    delete document.body.dataset.mobileNearbyPois;
+  }
+
+  function clearNearbyMapHint() {
+    clearNearbyPoiLayer();
+    if (nearbyRaf) {
+      window.cancelAnimationFrame(nearbyRaf);
+      nearbyRaf = 0;
+    }
+    if (shellMap && window.L) {
+      if (nearbyBadge) {
+        try { shellMap.removeLayer(nearbyBadge); } catch (error) {}
+      }
+      if (nearbyDot) {
+        try { shellMap.removeLayer(nearbyDot); } catch (error) {}
+      }
+      if (nearbyRouteLine) {
+        try { shellMap.removeLayer(nearbyRouteLine); } catch (error) {}
+      }
+      if (nearbyRouteRenderer) {
+        try { shellMap.removeLayer(nearbyRouteRenderer); } catch (error) {}
+      }
+    }
+    nearbyBadge = null;
+    nearbyDot = null;
+    nearbyRouteLine = null;
+    nearbyRouteRenderer = null;
+    nearbyKey = "";
+    nearbyItem = null;
+    delete document.body.dataset.mobileNearby;
+  }
+
+  function nearbyDistanceLabel(meters) {
+    var mapas = rd("mapas");
+    if (mapas && typeof mapas.formatApproximateDistance === "function") {
+      return mapas.formatApproximateDistance(meters);
+    }
+    return meters < 1000 ? Math.round(meters) + " m" : (meters / 1000).toFixed(1) + " km";
+  }
+
+  function normalizePoiHotelName(value) {
+    return String(value || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, " ")
+      .trim();
+  }
+
+  function poiHotelIdForHotel(hotel) {
+    var gp = rd("guiapa");
+    if (!gp || !Array.isArray(gp.POIS) || !hotel) return null;
+    var names = [hotel.name, hotel.displayName];
+    if (hotel.hotel) names.push(hotel.hotel.name, hotel.hotel.displayName);
+    var normalizedNames = names.map(normalizePoiHotelName).filter(Boolean);
+    if (!normalizedNames.length) return null;
+    var hotelPois = gp.POIS.filter(function (poi) { return poi && poi.category === "hotel"; });
+    if (!hotelPois.length) return null;
+
+    function poiIdFor(poi) {
+      return poi.hotelId || poi.name || null;
+    }
+
+    for (var index = 0; index < hotelPois.length; index += 1) {
+      var poi = hotelPois[index];
+      var poiNames = [poi.hotelId, poi.name].map(normalizePoiHotelName).filter(Boolean);
+      var exact = normalizedNames.some(function (name) { return poiNames.indexOf(name) !== -1; });
+      if (exact) return poiIdFor(poi);
+    }
+
+    if (typeof gp.hotelPoiIdForName === "function") {
+      for (var nameIndex = 0; nameIndex < names.length; nameIndex += 1) {
+        var poiId = gp.hotelPoiIdForName(names[nameIndex]);
+        if (!poiId) continue;
+        var byId = hotelPois.filter(function (candidate) { return candidate.id === poiId; })[0];
+        if (byId) return poiIdFor(byId);
+      }
+    }
+
+    var combined = normalizedNames.join(" ");
+    var aliases = [
+      { id: "del-mar", tokens: ["del mar", "para del mar"] },
+      { id: "beach", tokens: ["beach", "para beach"] },
+      { id: "lindo", tokens: ["lindo", "para lindo"] },
+      { id: "maya", tokens: ["maya", "para maya"] },
+      { id: "joia", tokens: ["joia", "para joia"] }
+    ];
+    for (var aliasIndex = 0; aliasIndex < aliases.length; aliasIndex += 1) {
+      var alias = aliases[aliasIndex];
+      var matched = alias.tokens.some(function (token) { return combined.indexOf(token) !== -1; });
+      if (!matched) continue;
+      var aliasPoi = hotelPois.filter(function (candidate) { return candidate.id === alias.id; })[0];
+      if (aliasPoi) return poiIdFor(aliasPoi);
+    }
+    return null;
+  }
+
+  function poiDistanceMeters(origin, destination) {
+    var mapas = rd("mapas");
+    if (mapas && typeof mapas.distanceBetweenCoordinates === "function") {
+      var measured = mapas.distanceBetweenCoordinates(
+        { latitude: origin[0], longitude: origin[1] },
+        { latitude: destination[0], longitude: destination[1] }
+      );
+      if (Number.isFinite(measured)) return measured;
+    }
+    var radians = Math.PI / 180;
+    var deltaLat = (destination[0] - origin[0]) * radians;
+    var deltaLng = (destination[1] - origin[1]) * radians;
+    var lat1 = origin[0] * radians;
+    var lat2 = destination[0] * radians;
+    var value = Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2)
+      + Math.cos(lat1) * Math.cos(lat2) * Math.sin(deltaLng / 2) * Math.sin(deltaLng / 2);
+    return 2 * 6371000 * Math.atan2(Math.sqrt(value), Math.sqrt(1 - value));
+  }
+
+  function poiOriginsFor(hotelId) {
+    var normalizedId = normalizePoiHotelName(hotelId);
+    var keys = Object.keys(HOTEL_POI_ORIGINS);
+    for (var index = 0; index < keys.length; index += 1) {
+      if (normalizePoiHotelName(keys[index]) === normalizedId) return HOTEL_POI_ORIGINS[keys[index]];
+    }
+    return [];
+  }
+
+  function poisForHotel(hotelId) {
+    var gp = rd("guiapa");
+    if (!gp || !Array.isArray(gp.POIS) || !hotelId) return [];
+    var origins = poiOriginsFor(hotelId);
+    if (!origins.length) return [];
+    var normalizedId = normalizePoiHotelName(hotelId);
+    var forced = HOTEL_POI_FORCED_IDS[hotelId] || [];
+    return gp.POIS.filter(function (poi) {
+      if (!poi || poi.category === "hotel" || poi.external === true || poi.lat == null || poi.lng == null) return false;
+      if (HOTEL_POI_EXCLUDED_IDS[poi.id]) return false;
+      if (forced.indexOf(poi.id) !== -1) return true;
+      var poiHotel = normalizePoiHotelName(poi.hotelId || poi.hotel || "");
+      if (poiHotel && poiHotel !== normalizedId) return false;
+      return origins.some(function (origin) {
+        return poiDistanceMeters(origin, [Number(poi.lat), Number(poi.lng)]) <= HOTEL_POI_RADIUS;
+      });
+    });
+  }
+
+  function nearbyHotelFor(latlng) {
+    var mapas = rd("mapas");
+    if (!mapas || typeof mapas.evaluateNearbyContext !== "function" || !latlng) return null;
+    var context = mapas.evaluateNearbyContext({ latitude: latlng[0], longitude: latlng[1] });
+    if (!context || context.type !== "hotel" || !context.hotel) return null;
+    var state = getState();
+    var coords = state && state.hotelCoordinates && state.hotelCoordinates[context.hotel.name];
+    if (!Array.isArray(coords) || coords.length < 2) {
+      coords = [context.hotel.latitude, context.hotel.longitude];
+    }
+    var latitude = Number(coords[0]);
+    var longitude = Number(coords[1]);
+    if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return null;
+    return { context: context, latlng: [latitude, longitude] };
+  }
+
+  function nearbyBadgeText(item, distance) {
+    var english = lang() === "en";
+    return {
+      eyebrow: english ? "You're nearby" : "Estás cerca de",
+      name: String(item.context.hotel.name || "").replace(/^Iberostar\s+/i, ""),
+      meta: distance + " · " + (english ? "Trace route" : "Trazar ruta") + " →"
+    };
+  }
+
+  function syncNearbyPoiButton(item) {
+    var element = nearbyBadge && nearbyBadge.getElement ? nearbyBadge.getElement() : null;
+    var button = element && element.querySelector("[data-nearby-pois]");
+    if (!button) return null;
+    var hotelId = poiHotelIdForHotel(item && item.context && item.context.hotel);
+    var count = hotelId ? poisForHotel(hotelId).length : 0;
+    if (!count) {
+      button.hidden = true;
+      return null;
+    }
+    var active = !!nearbyPoiLayer && nearbyPoiHotelId === hotelId;
+    button.hidden = false;
+    button.dataset.hotelId = hotelId;
+    button.setAttribute("aria-pressed", active ? "true" : "false");
+    button.textContent = lang() === "en"
+      ? (active ? "Hide points of interest" : "Explore points of interest")
+      : (active ? "Ocultar puntos de interés" : "Explorar puntos de interés");
+    return hotelId;
+  }
+
+  function createNearbyBadge(item, distance) {
+    if (!shellMap || !window.L) return;
+    var text = nearbyBadgeText(item, distance);
+    var html = '<div class="shell-nearby-poi">' +
+      '<span class="shell-nearby-poi__stem" aria-hidden="true"></span>' +
+      '<div class="shell-nearby-poi__card" role="button" tabindex="0" data-nearby-route="' + escapeHtml(item.context.route) + '">' +
+        '<span class="shell-nearby-poi__eyebrow">' + escapeHtml(text.eyebrow) + '</span>' +
+        '<strong>' + escapeHtml(text.name) + '</strong>' +
+        '<span class="shell-nearby-poi__meta">' + escapeHtml(text.meta) + '</span>' +
+        '<button type="button" class="shell-nearby-poi__pois" data-nearby-pois hidden aria-pressed="false">' + escapeHtml(lang() === "en" ? "Explore points of interest" : "Explorar puntos de interés") + '</button>' +
+      '</div>' +
+    '</div>';
+
+    nearbyBadge = window.L.marker(item.latlng, {
+      icon: window.L.divIcon({
+        className: "shell-nearby-poi-icon",
+        html: html,
+        iconSize: [1, 1],
+        iconAnchor: [0, 0]
+      }),
+      zIndexOffset: 1300,
+      keyboard: false
+    }).addTo(shellMap);
+
+    var element = nearbyBadge.getElement();
+    if (!element) return;
+    try {
+      window.L.DomEvent.disableClickPropagation(element);
+      window.L.DomEvent.disableScrollPropagation(element);
+    } catch (error) {}
+    var card = element.querySelector(".shell-nearby-poi__card");
+    if (!card) return;
+    card.addEventListener("click", function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      retraceNearbyRoute();
+    });
+    card.addEventListener("keydown", function (event) {
+      if (event.target !== card) return;
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        retraceNearbyRoute();
+      }
+    });
+    syncNearbyPoiButton(item);
+    var poisButton = element.querySelector("[data-nearby-pois]");
+    if (poisButton) {
+      poisButton.addEventListener("click", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        toggleNearbyPois();
+      });
+      poisButton.addEventListener("keydown", function (event) {
+        event.stopPropagation();
+      });
+    }
+  }
+
+  function animateNearbyRoute(userLatLng, hotelLatLng) {
+    if (!shellMap || !window.L || !window.L.svg) return;
+    var L = window.L;
+    nearbyRouteRenderer = L.svg({ padding: 0.5 });
+    nearbyRouteRenderer.addTo(shellMap);
+    nearbyRouteLine = L.polyline([userLatLng, hotelLatLng], {
+      renderer: nearbyRouteRenderer,
+      color: "#d4af37",
+      weight: 4,
+      opacity: 0.95,
+      lineCap: "round",
+      className: "shell-nearby-route"
+    }).addTo(shellMap);
+
+    var path = nearbyRouteLine.getElement();
+    if (path && typeof path.getTotalLength === "function" && typeof path.animate === "function") {
+      var length = path.getTotalLength();
+      path.style.strokeDasharray = length + " " + length;
+      path.style.strokeDashoffset = String(length);
+      path.animate(
+        [{ strokeDashoffset: String(length) }, { strokeDashoffset: "0" }],
+        { duration: 1150, easing: "cubic-bezier(.22,.8,.25,1)", fill: "forwards" }
+      );
+    }
+
+    nearbyDot = L.circleMarker(userLatLng, {
+      renderer: nearbyRouteRenderer,
+      radius: 5,
+      color: "#fffdf8",
+      weight: 2,
+      fillColor: "#d4af37",
+      fillOpacity: 1,
+      className: "shell-nearby-dot"
+    }).addTo(shellMap);
+
+    var started = null;
+    function step(now) {
+      if (!nearbyDot || !nearbyRouteLine) return;
+      if (started === null) started = now;
+      var progress = Math.min(1, (now - started) / 1150);
+      var eased = 1 - Math.pow(1 - progress, 3);
+      var latitude = userLatLng[0] + (hotelLatLng[0] - userLatLng[0]) * eased;
+      var longitude = userLatLng[1] + (hotelLatLng[1] - userLatLng[1]) * eased;
+      try { nearbyDot.setLatLng([latitude, longitude]); } catch (error) {}
+      nearbyRaf = progress < 1 ? window.requestAnimationFrame(step) : 0;
+    }
+    nearbyRaf = window.requestAnimationFrame(step);
+  }
+
+  function renderNearbyRoute(item, userLatLng) {
+    clearNearbyMapHint();
+    nearbyKey = item.context.route;
+    nearbyItem = item;
+    createNearbyBadge(item, nearbyDistanceLabel(item.context.distance));
+    animateNearbyRoute(userLatLng, item.latlng);
+    try {
+      var bounds = window.L.latLngBounds([userLatLng, item.latlng]).pad(0.35);
+      if (shellMap.flyToBounds) shellMap.flyToBounds(bounds, { maxZoom: 16, duration: 0.9 });
+      else shellMap.fitBounds(bounds, { maxZoom: 16 });
+    } catch (error) {}
+    document.body.dataset.mobileNearby = item.context.route;
+  }
+
+  function showNearbyPoiLayer(hotelId, fit) {
+    var gp = rd("guiapa");
+    var pois = poisForHotel(hotelId);
+    if (!gp || typeof gp.addPoiLayer !== "function" || !shellMap || !window.L || !pois.length) return false;
+    clearNearbyPoiLayer();
+    nearbyPoiPreviousMap = gp._map || null;
+    if (gp._map !== shellMap) gp._map = shellMap;
+    var originalPois = gp.POIS;
+    var layer = null;
+    try {
+      gp.POIS = pois;
+      layer = gp.addPoiLayer(shellMap, null, { disableClusteringAtZoom: 15 });
+    } finally {
+      gp.POIS = originalPois;
+    }
+    if (!layer) {
+      if (gp._map === shellMap) gp._map = nearbyPoiPreviousMap || null;
+      nearbyPoiPreviousMap = null;
+      return false;
+    }
+    nearbyPoiLayer = layer;
+    nearbyPoiLabelLayer = gp._poiLabelLayer || null;
+    nearbyPoiHotelId = hotelId;
+    document.body.dataset.mobileNearbyPois = hotelId;
+    syncNearbyPoiButton(nearbyItem);
+    if (fit !== false) {
+      try {
+        var points = pois.map(function (poi) { return [Number(poi.lat), Number(poi.lng)]; });
+        var bounds = window.L.latLngBounds(points).pad(0.3);
+        if (shellMap.flyToBounds) {
+          shellMap.flyToBounds(bounds, { maxZoom: 16, duration: 0.85, paddingTopLeft: [16, 96], paddingBottomRight: [16, 160] });
+        } else {
+          shellMap.fitBounds(bounds, { maxZoom: 16 });
+        }
+      } catch (error) {}
+    }
+    return true;
+  }
+
+  function toggleNearbyPois() {
+    if (!nearbyItem || !isHomeMapVisible() || !shellMap) return;
+    var hotelId = poiHotelIdForHotel(nearbyItem.context.hotel);
+    if (!hotelId || !poisForHotel(hotelId).length) return;
+    if (nearbyPoiLayer && nearbyPoiHotelId === hotelId) {
+      clearNearbyPoiLayer();
+      if (globalPoiMode) exitGlobalPoiMode();
+      syncNearbyPoiButton(nearbyItem);
+      return;
+    }
+    if (showNearbyPoiLayer(hotelId, true)) setGlobalPoiMode(hotelId);
+  }
+
+  function openHotelPoisByName(hotelName) {
+    if (!hotelName || !shellMap) return false;
+    var hotelId = poiHotelIdForHotel({ name: hotelName });
+    if (!hotelId || !poisForHotel(hotelId).length) return false;
+    if (nearbyPoiLayer && nearbyPoiHotelId === hotelId) clearNearbyPoiLayer();
+    if (!showNearbyPoiLayer(hotelId, true)) return false;
+    setGlobalPoiMode(hotelId);
+    return true;
+  }
+
+  function retraceNearbyRoute() {
+    if (!nearbyItem) return;
+    var item = nearbyItem;
+    var userLatLng = currentUserLatLng();
+    if (!userLatLng) {
+      var locate = document.getElementById("mobileMapLocate");
+      if (locate) locate.click();
+      return;
+    }
+    renderNearbyRoute(item, userLatLng);
+  }
+
+  function traceRouteToHotel(hotel) {
+    if (!hotel || !isHomeMapVisible() || !shellMap) return false;
+    var userLatLng = currentUserLatLng();
+    if (!userLatLng) {
+      var locate = document.getElementById("mobileMapLocate");
+      if (locate) locate.click();
+      return true;
+    }
+    var state = getState();
+    var coords = state && state.hotelCoordinates && state.hotelCoordinates[hotel.name];
+    if (!Array.isArray(coords) || coords.length < 2) {
+      coords = [hotel.latitude, hotel.longitude];
+    }
+    var latitude = Number(coords[0]);
+    var longitude = Number(coords[1]);
+    if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return false;
+    var mapas = rd("mapas");
+    var distance = 0;
+    if (mapas && typeof mapas.distanceBetweenCoordinates === "function") {
+      distance = mapas.distanceBetweenCoordinates(
+        { latitude: userLatLng[0], longitude: userLatLng[1] },
+        { latitude: latitude, longitude: longitude }
+      );
+    }
+    var item = {
+      context: {
+        hotel: hotel,
+        route: hotel.route || "",
+        distance: Number.isFinite(distance) ? distance : 0
+      },
+      latlng: [latitude, longitude]
+    };
+    renderNearbyRoute(item, userLatLng);
+    return true;
+  }
+
+  function updateNearbyBadge(item, distance) {
+    var element = nearbyBadge && nearbyBadge.getElement ? nearbyBadge.getElement() : null;
+    if (!element) return;
+    var text = nearbyBadgeText(item, distance);
+    var eyebrow = element.querySelector(".shell-nearby-poi__eyebrow");
+    var name = element.querySelector(".shell-nearby-poi__card strong");
+    var meta = element.querySelector(".shell-nearby-poi__meta");
+    if (eyebrow) eyebrow.textContent = text.eyebrow;
+    if (name) name.textContent = text.name;
+    if (meta) meta.textContent = text.meta;
+    syncNearbyPoiButton(item);
+  }
+
+  function updateNearbyMapHint(latlng) {
+    if (!isHomeMapVisible() || !shellMap || !window.L || !latlng) {
+      clearNearbyMapHint();
+      return;
+    }
+    var item = nearbyHotelFor(latlng);
+    if (!item) {
+      clearNearbyMapHint();
+      return;
+    }
+    var distance = nearbyDistanceLabel(item.context.distance);
+    if (nearbyKey === item.context.route && nearbyBadge) {
+      try { nearbyBadge.setLatLng(item.latlng); } catch (error) {}
+      if (nearbyRouteLine) {
+        try { nearbyRouteLine.setLatLngs([latlng, item.latlng]); } catch (error) {}
+      }
+      updateNearbyBadge(item, distance);
+      document.body.dataset.mobileNearby = item.context.route;
+      return;
+    }
+    renderNearbyRoute(item, latlng);
+  }
+
   function focusShellOnLocation(latlng, animated) {
     if (!shellMap) {
       pendingLocation = latlng;
@@ -1199,6 +1919,7 @@
     } catch (error) {
       try { shellMap.setView(latlng, 15); } catch (ignored) { /* ignore */ }
     }
+    updateNearbyMapHint(latlng);
   }
 
   function onLocationDetected(event) {
@@ -1207,7 +1928,7 @@
     var latlng = [detail.latitude, detail.longitude];
     pendingLocation = latlng;
     if (!active || !shellMap) return;
-    if (document.body.dataset.mobileSheet === "map" && document.body.dataset.mobileHome === "1") {
+    if (isHomeMapVisible()) {
       pendingLocation = null;
       setTimeout(function () { focusShellOnLocation(latlng, true); }, 120);
     }
@@ -1280,6 +2001,7 @@
 
   function setSheet(mode, tab) {
     document.body.dataset.mobileSheet = mode;
+    if (mode !== "map") clearNearbyMapHint();
     if (handle) handle.setAttribute("aria-expanded", mode === "section" ? "true" : "false");
 
     if (!shell) return;
@@ -1291,8 +2013,11 @@
       var state = getState();
       if (state && shellMap) state.activeMap = shellMap;
       setTimeout(function () {
-        if (shellMap) { try { shellMap.invalidateSize(); } catch (error) { /* ignore */ } }
-      }, 360);
+        if (shellMap) {
+          try { shellMap.invalidateSize(); } catch (error) { /* ignore */ }
+          updateNearbyMapHint(currentUserLatLng());
+        }
+      }, 380);
       if (pendingLocation) {
         var location = pendingLocation;
         pendingLocation = null;
@@ -1398,6 +2123,7 @@
   function deactivate() {
     if (!active) return;
     active = false;
+    clearNearbyMapHint();
     document.body.classList.remove("mobile-app-active");
     delete document.body.dataset.mobileSheet;
     delete document.body.dataset.mobileRender;
@@ -1434,6 +2160,7 @@
     initHomeMap();
     syncFromDom();
     syncGlobalGuide();
+    updateNearbyMapHint(currentUserLatLng());
   }
 
   function initialize() {
@@ -1454,6 +2181,16 @@
       if (globalHotels) renderGlobalGuide();
       updateGlobalCard();
     });
+    window.addEventListener("revistadigital:traceWelcomeRoute", function (event) {
+      var detail = event && event.detail;
+      if (!detail || !detail.hotel) return;
+      if (traceRouteToHotel(detail.hotel) && event.cancelable) event.preventDefault();
+    });
+    window.addEventListener("revistadigital:openHotelPois", function (event) {
+      var detail = event && event.detail;
+      if (!detail || !detail.hotelName) return;
+      if (openHotelPoisByName(detail.hotelName) && event.cancelable) event.preventDefault();
+    });
     window.addEventListener("popstate", scheduleSync);
     window.addEventListener("pageshow", function (event) {
       if (!event.persisted) return;
@@ -1466,6 +2203,12 @@
     });
     window.addEventListener("languagechange", function () {
       updateLabels();
+      if (nearbyPoiHotelId) {
+        var hotelId = nearbyPoiHotelId;
+        clearNearbyPoiLayer();
+        showNearbyPoiLayer(hotelId, false);
+      }
+      updateNearbyMapHint(currentUserLatLng());
     });
 
     function onMediaChange() {

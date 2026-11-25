@@ -2757,8 +2757,7 @@ function ensureLocationWelcomeElement() {
       <small class="location-welcome-hotel-distance"></small>
     </div>
     <div class="location-welcome-actions">
-      <a class="location-welcome-btn primary" data-role="hotel" href="#" hidden>Ver este hotel</a>
-      <button type="button" class="location-welcome-btn ghost" data-role="directions" hidden>Cómo llegar</button>
+      <button type="button" class="location-welcome-btn primary" data-role="directions" hidden>Trazar ruta</button>
     </div>`;
   document.body.appendChild(element);
   element.querySelector(".location-welcome-close").addEventListener("click", dismissLocationWelcome);
@@ -2786,30 +2785,18 @@ function showLocationWelcome(coords) {
     `¡Bienvenido! Nos alegra tenerle tan cerca de ${region.name}. Preparamos todo para que su visita sea mágica.`;
 
   const hotelBox = element.querySelector(".location-welcome-hotel");
-  const hotelLink = element.querySelector('[data-role="hotel"]');
   const directionsButton = element.querySelector('[data-role="directions"]');
 
   if (nearest?.hotel) {
-    const hotelRoute = `/${nearest.countrySlug}/${nearest.destination.slug}/${nearest.hotel.slug}`;
     hotelBox.hidden = false;
     element.querySelector(".location-welcome-hotel-name").textContent = nearest.hotel.name;
     element.querySelector(".location-welcome-hotel-distance").textContent =
       `${nearby.matchedLocation && nearby.matchedLocation !== nearest.hotel.name ? nearby.matchedLocation + " · " : ""}a unos ${formatApproximateDistance(nearest.distance)} de usted · ${region.name}, ${country.name}`;
 
-    hotelLink.hidden = false;
-    hotelLink.href = hotelRoute;
-    hotelLink.dataset.appRoute = hotelRoute;
-    hotelLink.onclick = (event) => {
-      event.preventDefault();
-      dismissLocationWelcome();
-      window.RevistaDigital?.routes?.navigate?.(hotelRoute);
-    };
-
     directionsButton.hidden = false;
-    directionsButton.onclick = () => startWelcomeDirections(nearest);
+    directionsButton.onclick = () => startWelcomeRouteTrace(nearest);
   } else {
     hotelBox.hidden = true;
-    hotelLink.hidden = true;
     directionsButton.hidden = true;
   }
 
@@ -2840,32 +2827,29 @@ function dismissLocationWelcome() {
   }, 340);
 }
 
-function startWelcomeDirections(nearest) {
+function startWelcomeRouteTrace(nearest) {
   if (!nearest?.hotel) return;
-  const hotelRoute = `/${nearest.countrySlug}/${nearest.destination.slug}/${nearest.hotel.slug}`;
   const hotelName = nearest.hotel.name;
   const coordinates = [nearest.hotel.latitude, nearest.hotel.longitude];
+  const hotelRoute = `/${nearest.countrySlug}/${nearest.destination.slug}/${nearest.hotel.slug}`;
+  const hotel = Object.assign({}, nearest.hotel, { route: hotelRoute });
 
   dismissLocationWelcome();
-  window.RevistaDigital?.routes?.navigate?.(hotelRoute);
 
-  // Esperamos a que la ficha del hotel tenga su mapa listo para trazar la ruta
-  // con el motor propio de la revista (OSRM), sin salir a Google Maps.
-  let attempts = 0;
-  const timer = setInterval(() => {
-    attempts += 1;
-    const mapElement = document.querySelector("#hotelPortalMap");
-    const map = window.RevistaDigital.state?.activeMap;
-    if (mapElement && map && map._container === mapElement) {
-      clearInterval(timer);
-      setTimeout(() => {
-        window.RevistaDigital.mapas?.openDirections?.(hotelName, coordinates);
-        mapElement.scrollIntoView({ behavior: "smooth", block: "center" });
-      }, 350);
-    } else if (attempts >= 48) {
-      clearInterval(timer);
-    }
-  }, 250);
+  let handled = false;
+  if (typeof window.CustomEvent === "function") {
+    const event = new CustomEvent("revistadigital:traceWelcomeRoute", {
+      cancelable: true,
+      detail: {
+        hotel: hotel,
+        nearest: nearest,
+        coordinates: coordinates
+      }
+    });
+    handled = !window.dispatchEvent(event);
+  }
+  if (handled) return;
+  window.RevistaDigital?.mapas?.openDirections?.(hotelName, coordinates);
 }
 
 function autoDetectLocation() {
