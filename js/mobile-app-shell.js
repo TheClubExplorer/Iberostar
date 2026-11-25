@@ -20,7 +20,6 @@
   ];
 
   var shell = null;
-  var dock = null;
   var exploreSheet = null;
   var guideOverlay = null;
   var guideCountry = null;
@@ -40,6 +39,20 @@
   var drag = null;
   var suppressClick = false;
   var observer = null;
+  var globalObserver = null;
+  var globalSheet = null;
+  var globalHandle = null;
+  var globalInput = null;
+  var globalList = null;
+  var globalCard = null;
+  var globalReopen = null;
+  var globalHotels = null;
+  var globalCountry = "all";
+  var globalQuery = "";
+  var globalSelected = null;
+  var globalClosed = false;
+  var globalDrag = null;
+  var globalGuideWasHome = false;
 
   function isMobile() {
     try { return MQ.matches; } catch (error) { return window.innerWidth <= 768; }
@@ -147,28 +160,6 @@
     document.body.appendChild(shell);
     mapElement = shell.querySelector("#mobileHomeMap");
     handle = shell.querySelector("#mobileSheetHandle");
-
-    dock = document.createElement("div");
-    dock.id = "mobileHomeDock";
-    dock.className = "mobile-home-dock";
-    dock.innerHTML =
-      '<button type="button" class="mobile-dock-search" data-dock="search">' + ICONS.search + '<span data-dock-search-label></span></button>' +
-      '<div class="mobile-dock-chips">' +
-        '<button type="button" class="mobile-dock-chip" data-dock="hotels"></button>' +
-        '<button type="button" class="mobile-dock-chip" data-dock="restaurants"></button>' +
-        '<button type="button" class="mobile-dock-chip" data-dock="guide"></button>' +
-        '<button type="button" class="mobile-dock-chip" data-dock="pano"></button>' +
-      '</div>' +
-      '<button type="button" class="mobile-dock-guide" data-dock="guide">' +
-        '<span class="mobile-dock-guide-icon">' + ICONS.map + '</span>' +
-        '<span class="mobile-dock-guide-copy"><strong data-dock-guide-title></strong><small data-dock-guide-subtitle></small></span>' +
-        '<span class="mobile-dock-guide-arrow" aria-hidden="true">→</span>' +
-      '</button>';
-    document.body.appendChild(dock);
-    dock.addEventListener("click", function (event) {
-      var trigger = event.target.closest("[data-dock]");
-      if (trigger) onDockAction(trigger.dataset.dock);
-    });
 
     exploreSheet = document.createElement("section");
     exploreSheet.id = "mobileExploreSheet";
@@ -279,6 +270,7 @@
     });
 
     shell.querySelector("#mobileMapRecenter").addEventListener("click", recenterMap);
+    buildGlobalGuideSheet();
     handle.addEventListener("click", function () {
       if (suppressClick) {
         suppressClick = false;
@@ -292,6 +284,427 @@
     handle.addEventListener("pointercancel", onDragEnd);
 
     updateLabels();
+  }
+
+  function buildGlobalGuideSheet() {
+    if (globalSheet) return;
+
+    globalSheet = document.createElement("section");
+    globalSheet.id = "mobileGlobalGuide";
+    globalSheet.className = "mgs-sheet";
+    globalSheet.setAttribute("role", "region");
+    globalSheet.innerHTML =
+      '<div class="mgs-handle" role="button" tabindex="0">' +
+        '<div class="mgs-grab"><span class="mgs-pill" aria-hidden="true"></span></div>' +
+        '<button type="button" class="mgs-search" data-mgs-open>' +
+          '<span class="mgs-search-icon" aria-hidden="true">⌕</span>' +
+          '<span class="mgs-search-text"></span>' +
+          '<span class="mgs-search-hint"></span>' +
+          '<span class="mgs-open-arrow" aria-hidden="true">↑</span>' +
+        '</button>' +
+      '</div>' +
+      '<div class="mgs-body">' +
+        '<div class="mgs-panel-head">' +
+          '<div class="mgs-title"><strong></strong><span></span></div>' +
+          '<div class="mgs-panel-actions">' +
+            '<button type="button" class="mgs-icon-btn" data-mgs-minimize>⌄</button>' +
+            '<button type="button" class="mgs-icon-btn mgs-exit" data-mgs-exit>×</button>' +
+          '</div>' +
+        '</div>' +
+        '<input class="mgs-input" type="search" autocomplete="off" />' +
+        '<div class="mgs-filter-label"><span></span><small></small></div>' +
+        '<div class="mgs-countries"></div>' +
+        '<div class="mgs-list"></div>' +
+      '</div>';
+    document.body.appendChild(globalSheet);
+
+    globalHandle = globalSheet.querySelector(".mgs-handle");
+    globalInput = globalSheet.querySelector(".mgs-input");
+    globalList = globalSheet.querySelector(".mgs-list");
+
+    globalSheet.addEventListener("click", function (event) {
+      var country = event.target.closest("[data-mgs-country]");
+      var hotel = event.target.closest("[data-mgs-hotel]");
+      if (country) {
+        globalCountry = country.dataset.mgsCountry;
+        globalQuery = "";
+        globalInput.value = "";
+        renderGlobalGuide();
+        return;
+      }
+      if (hotel) {
+        selectGlobalHotel(hotel.dataset.mgsHotel);
+        return;
+      }
+      if (event.target.closest("[data-mgs-open]")) {
+        setGlobalGuideClosed(false);
+        setGlobalGuideOpen(true);
+        setTimeout(function () { globalInput.focus(); }, 240);
+        return;
+      }
+      if (event.target.closest("[data-mgs-minimize]")) {
+        setGlobalGuideOpen(false);
+        return;
+      }
+      if (event.target.closest("[data-mgs-exit]")) setGlobalGuideClosed(true);
+    });
+
+    globalHandle.addEventListener("keydown", function (event) {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      event.preventDefault();
+      setGlobalGuideOpen(!globalSheet.classList.contains("mgs-expanded"));
+    });
+    globalHandle.addEventListener("touchstart", onGlobalDragStart, { passive: true });
+    globalHandle.addEventListener("touchmove", onGlobalDragMove, { passive: false });
+    globalHandle.addEventListener("touchend", onGlobalDragEnd);
+    globalHandle.addEventListener("touchcancel", onGlobalDragEnd);
+    globalInput.addEventListener("input", function (event) {
+      globalQuery = event.target.value || "";
+      renderGlobalGuide();
+    });
+
+    globalCard = document.createElement("div");
+    globalCard.id = "mobileGlobalGuideCard";
+    globalCard.className = "mgs-card";
+    globalCard.hidden = true;
+    globalCard.innerHTML =
+      '<div class="mgs-card-top"><span class="mgs-card-kicker"></span><button type="button" class="mgs-card-close" data-mgs-card-action="close">×</button></div>' +
+      '<strong class="mgs-card-title"></strong>' +
+      '<span class="mgs-card-meta"></span>' +
+      '<div class="mgs-card-actions">' +
+        '<button type="button" class="mgs-card-action" data-mgs-card-action="center"></button>' +
+        '<button type="button" class="mgs-card-action mgs-card-action--primary" data-mgs-card-action="open"></button>' +
+      '</div>';
+    globalCard.addEventListener("click", function (event) {
+      var actionButton = event.target.closest("[data-mgs-card-action]");
+      if (!actionButton) return;
+      var action = actionButton.dataset.mgsCardAction;
+      if (action === "close") {
+        globalSelected = null;
+        updateGlobalCard();
+        renderGlobalGuide();
+      } else if (action === "open" && globalSelected) navigate(globalSelected.route);
+      else if (action === "center" && globalSelected) centerGlobalHotel(globalSelected);
+    });
+    document.body.appendChild(globalCard);
+
+    globalReopen = document.createElement("button");
+    globalReopen.id = "mobileGlobalGuideReopen";
+    globalReopen.className = "mgs-reopen";
+    globalReopen.type = "button";
+    globalReopen.innerHTML = '<span aria-hidden="true">⌕</span><span data-mgs-reopen-label></span>';
+    globalReopen.addEventListener("click", function () {
+      setGlobalGuideClosed(false);
+      setGlobalGuideOpen(true);
+    });
+    document.body.appendChild(globalReopen);
+
+    updateGlobalGuideLabels();
+    syncGlobalGuide();
+  }
+
+  function updateGlobalGuideLabels() {
+    if (!globalSheet || !globalCard || !globalReopen) return;
+    var english = lang() === "en";
+    var guideTitle = label("menuGuia", "Guía global", "Global guide");
+    var searchLabel = label("navSearch", "Buscar hoteles, destinos…", "Search hotels, destinations…");
+    globalSheet.setAttribute("aria-label", guideTitle);
+    globalSheet.querySelector(".mgs-title strong").textContent = guideTitle;
+    globalSheet.querySelector(".mgs-title span").textContent = english
+      ? "All countries, destinations and hotels"
+      : "Todos los países, destinos y hoteles";
+    globalSheet.querySelector(".mgs-search-text").textContent = english ? "Open global guide" : "Abrir guía global";
+    globalSheet.querySelector(".mgs-search-hint").textContent = english ? "Explore" : "Explorar";
+    globalSheet.querySelector(".mgs-search").setAttribute("aria-label", english ? "Open global guide" : "Abrir guía global");
+    globalInput.placeholder = searchLabel;
+    globalInput.setAttribute("aria-label", searchLabel);
+    globalSheet.querySelector(".mgs-filter-label span").textContent = english ? "Filter by country" : "Filtrar por país";
+    globalSheet.querySelector("[data-mgs-minimize]").setAttribute("aria-label", english ? "Minimize" : "Minimizar");
+    globalSheet.querySelector("[data-mgs-exit]").setAttribute("aria-label", english ? "Close guide" : "Cerrar guía");
+    globalReopen.querySelector("[data-mgs-reopen-label]").textContent = english ? "Global guide" : "Guía global";
+    globalReopen.setAttribute("aria-label", english ? "Open global guide" : "Abrir guía global");
+    globalCard.querySelector(".mgs-card-kicker").textContent = english ? "Selected hotel" : "Hotel seleccionado";
+    globalCard.querySelector('[data-mgs-card-action="open"]').textContent = english ? "Open hotel" : "Abrir ficha";
+    globalCard.querySelector('[data-mgs-card-action="center"]').textContent = english ? "Center map" : "Centrar mapa";
+    globalCard.querySelector('[data-mgs-card-action="close"]').setAttribute("aria-label", english ? "Close" : "Cerrar");
+    if (globalHotels) renderGlobalGuide();
+  }
+
+  function isGlobalGuideHomeMap() {
+    return isMobile()
+      && document.body.classList.contains("mobile-app-active")
+      && document.body.dataset.mobileHome === "1"
+      && document.body.dataset.mobileSheet === "map";
+  }
+
+  function collectGlobalHotels() {
+    var hotels = [];
+    try {
+      var catalog = rd("hoteles").getDestinationCatalog();
+      var state = getState();
+      var coordinates = (state && state.hotelCoordinates) || {};
+      Object.keys(catalog || {}).forEach(function (countrySlug) {
+        var country = catalog[countrySlug];
+        (country.destinations || []).forEach(function (destination) {
+          (destination.hotels || []).forEach(function (hotel) {
+            var position = coordinates[hotel.name] || [hotel.latitude, hotel.longitude];
+            if (!Array.isArray(position) || position.length < 2) return;
+            var latitude = Number(position[0]);
+            var longitude = Number(position[1]);
+            if (!isFinite(latitude) || !isFinite(longitude)) return;
+            hotels.push({
+              name: hotel.name,
+              slug: hotel.slug,
+              route: "/" + countrySlug + "/" + destination.slug + "/" + hotel.slug,
+              countryName: country.name,
+              countrySlug: countrySlug,
+              destinationName: destination.name,
+              destinationSlug: destination.slug,
+              latitude: latitude,
+              longitude: longitude
+            });
+          });
+        });
+      });
+    } catch (error) { /* ignore */ }
+    return hotels;
+  }
+
+  function renderGlobalGuide() {
+    if (!globalSheet || !globalList) return;
+    globalHotels = globalHotels || collectGlobalHotels();
+
+    var countriesWrap = globalSheet.querySelector(".mgs-countries");
+    var seenCountries = {};
+    var countries = [];
+    globalHotels.forEach(function (hotel) {
+      if (seenCountries[hotel.countrySlug]) return;
+      seenCountries[hotel.countrySlug] = true;
+      countries.push(hotel);
+    });
+
+    globalSheet.querySelector(".mgs-filter-label small").textContent = lang() === "en"
+      ? countries.length + " countries"
+      : countries.length + " países";
+    countriesWrap.textContent = "";
+    addGlobalCountry("all", lang() === "en" ? "All" : "Todos");
+    countries.forEach(function (hotel) {
+      addGlobalCountry(hotel.countrySlug, globalCountryLabel(hotel));
+    });
+
+    var query = (globalQuery || "").trim().toLowerCase();
+    var filtered = globalHotels.filter(function (hotel) {
+      if (globalCountry !== "all" && hotel.countrySlug !== globalCountry) return false;
+      if (!query) return true;
+      var haystack = (hotel.name + " " + hotel.countryName + " " + hotel.destinationName).toLowerCase();
+      return haystack.indexOf(query) !== -1;
+    });
+
+    globalList.textContent = "";
+    if (!filtered.length) {
+      var empty = document.createElement("p");
+      empty.className = "mgs-empty";
+      empty.textContent = lang() === "en" ? "No hotels found." : "No hay hoteles para esta búsqueda.";
+      globalList.appendChild(empty);
+      return;
+    }
+
+    var currentCountry = "";
+    filtered.forEach(function (hotel) {
+      if (hotel.countryName !== currentCountry) {
+        currentCountry = hotel.countryName;
+        var heading = document.createElement("p");
+        heading.className = "mgs-country-heading";
+        heading.textContent = hotel.countryName;
+        globalList.appendChild(heading);
+      }
+      var button = document.createElement("button");
+      button.type = "button";
+      button.className = "mgs-hotel";
+      button.dataset.mgsHotel = hotel.name;
+      if (globalSelected && globalSelected.name === hotel.name) button.classList.add("is-selected");
+      var name = document.createElement("strong");
+      name.textContent = hotel.name;
+      var place = document.createElement("span");
+      place.textContent = hotel.destinationName;
+      button.appendChild(name);
+      button.appendChild(place);
+      globalList.appendChild(button);
+    });
+  }
+
+  function globalCountryLabel(hotel) {
+    var shortLabels = {
+      mexico: "México",
+      jamaica: "Jamaica",
+      "republica-dominicana": lang() === "en" ? "Dominican Rep." : "Rep. Dominicana",
+      brasil: "Brasil"
+    };
+    return shortLabels[hotel.countrySlug] || hotel.countryName;
+  }
+
+  function addGlobalCountry(slug, text) {
+    var countriesWrap = globalSheet.querySelector(".mgs-countries");
+    var button = document.createElement("button");
+    button.type = "button";
+    button.className = "mgs-country" + (globalCountry === slug ? " is-active" : "");
+    button.dataset.mgsCountry = slug;
+    button.textContent = text;
+    countriesWrap.appendChild(button);
+  }
+
+  function selectGlobalHotel(name) {
+    var hotel = (globalHotels || []).filter(function (item) { return item.name === name; })[0];
+    if (!hotel) return;
+    globalSelected = hotel;
+    setGlobalGuideOpen(false);
+    centerGlobalHotel(hotel);
+    updateGlobalCard();
+    renderGlobalGuide();
+  }
+
+  function centerGlobalHotel(hotel) {
+    var state = getState();
+    var map = state && state.activeMap;
+    if (!map || !isFinite(hotel.latitude) || !isFinite(hotel.longitude)) return;
+    var container = typeof map.getContainer === "function" ? map.getContainer() : null;
+    if (container && container.id !== "mobileHomeMap") return;
+    try { if (typeof map.invalidateSize === "function") map.invalidateSize(); } catch (error) { /* ignore */ }
+    var target = [hotel.latitude, hotel.longitude];
+    if (typeof map.flyTo === "function") map.flyTo(target, 14, { animate: true, duration: 0.8 });
+    else if (typeof map.setView === "function") map.setView(target, 14, { animate: true });
+  }
+
+  function globalDistanceLabel(hotel) {
+    var state = getState();
+    var position = state && state.currentPosition;
+    if (!position || !isFinite(position.latitude) || !isFinite(position.longitude)) return "";
+    var radians = Math.PI / 180;
+    var latitudeDelta = (hotel.latitude - position.latitude) * radians;
+    var longitudeDelta = (hotel.longitude - position.longitude) * radians;
+    var a = Math.sin(latitudeDelta / 2) * Math.sin(latitudeDelta / 2)
+      + Math.cos(position.latitude * radians) * Math.cos(hotel.latitude * radians)
+      * Math.sin(longitudeDelta / 2) * Math.sin(longitudeDelta / 2);
+    var kilometers = 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return (lang() === "en" ? " · " + kilometers.toFixed(1) + " km away" : " · A " + kilometers.toFixed(1) + " km");
+  }
+
+  function updateGlobalCard() {
+    if (!globalCard) return;
+    var visible = !!(globalSelected && isGlobalGuideHomeMap() && !globalClosed);
+    if (!visible) {
+      globalCard.hidden = true;
+      delete document.body.dataset.guideCard;
+      return;
+    }
+    globalCard.querySelector(".mgs-card-title").textContent = globalSelected.name;
+    globalCard.querySelector(".mgs-card-meta").textContent = globalSelected.countryName
+      + " · " + globalSelected.destinationName + globalDistanceLabel(globalSelected);
+    globalCard.hidden = false;
+    document.body.dataset.guideCard = "1";
+  }
+
+  function setGlobalGuideOpen(expanded) {
+    if (!globalSheet) return;
+    globalSheet.classList.toggle("mgs-expanded", !!expanded);
+    if (expanded) document.body.dataset.guideExpanded = "1";
+    else delete document.body.dataset.guideExpanded;
+    if (globalHandle) globalHandle.setAttribute("aria-expanded", expanded ? "true" : "false");
+    globalSheet.style.transform = "";
+    if (expanded && globalSelected) {
+      globalSelected = null;
+      renderGlobalGuide();
+    }
+    updateGlobalCard();
+  }
+
+  function setGlobalGuideClosed(closed) {
+    globalClosed = !!closed;
+    if (!globalSheet || !globalReopen) return;
+    globalSheet.classList.toggle("is-visible", !globalClosed);
+    globalReopen.classList.toggle("is-visible", globalClosed && isGlobalGuideHomeMap());
+    if (globalClosed) {
+      globalSheet.classList.remove("mgs-expanded");
+      delete document.body.dataset.guideExpanded;
+      if (globalHandle) globalHandle.setAttribute("aria-expanded", "false");
+      updateGlobalCard();
+    }
+  }
+
+  function globalPeekHeight() {
+    try {
+      var value = parseFloat(getComputedStyle(document.body).getPropertyValue("--mob-guide-peek"));
+      return isFinite(value) ? value : 76;
+    } catch (error) { return 76; }
+  }
+
+  function onGlobalDragStart(event) {
+    if (!globalSheet || !globalSheet.classList.contains("is-visible")) return;
+    if (!event.touches || !event.touches.length) return;
+    if (event.target.closest("button, input")) return;
+    var max = Math.max(0, globalSheet.offsetHeight - globalPeekHeight());
+    globalDrag = {
+      startY: event.touches[0].clientY,
+      base: globalSheet.classList.contains("mgs-expanded") ? 0 : max,
+      current: globalSheet.classList.contains("mgs-expanded") ? 0 : max,
+      max: max
+    };
+    globalSheet.style.transition = "none";
+  }
+
+  function onGlobalDragMove(event) {
+    if (!globalDrag || !event.touches || !event.touches.length) return;
+    var delta = event.touches[0].clientY - globalDrag.startY;
+    var offset = Math.min(globalDrag.max, Math.max(0, globalDrag.base + delta));
+    globalDrag.current = offset;
+    globalSheet.style.transform = "translateY(" + offset + "px)";
+    if (event.cancelable) event.preventDefault();
+  }
+
+  function onGlobalDragEnd() {
+    if (!globalDrag || !globalSheet) return;
+    var expanded = globalDrag.current < globalDrag.max * 0.55;
+    globalSheet.style.transition = "";
+    globalSheet.style.transform = "";
+    globalDrag = null;
+    setGlobalGuideOpen(expanded);
+  }
+
+  function resetGlobalGuideState() {
+    globalClosed = false;
+    globalSelected = null;
+    globalQuery = "";
+    globalCountry = "all";
+    if (globalInput) globalInput.value = "";
+    if (globalSheet) globalSheet.classList.remove("mgs-expanded");
+    delete document.body.dataset.guideExpanded;
+    if (globalHandle) globalHandle.setAttribute("aria-expanded", "false");
+    if (globalReopen) globalReopen.classList.remove("is-visible");
+    updateGlobalCard();
+  }
+
+  function syncGlobalGuide() {
+    if (!globalSheet) return;
+    var homeMap = isGlobalGuideHomeMap();
+    if (!homeMap) {
+      resetGlobalGuideState();
+      globalGuideWasHome = false;
+      globalSheet.classList.remove("is-visible");
+      return;
+    }
+    if (!globalGuideWasHome) {
+      resetGlobalGuideState();
+      globalGuideWasHome = true;
+    }
+    if (!globalHotels) globalHotels = collectGlobalHotels();
+    globalSheet.classList.toggle("is-visible", !globalClosed);
+    if (globalReopen) globalReopen.classList.toggle("is-visible", globalClosed);
+    renderGlobalGuide();
+    if (globalClosed) {
+      globalSheet.classList.remove("mgs-expanded");
+      delete document.body.dataset.guideExpanded;
+    }
+    updateGlobalCard();
   }
 
   function updateLabels() {
@@ -311,29 +724,7 @@
     if (handle) {
       handle.setAttribute("aria-label", lang() === "en" ? "Expand or collapse content" : "Ampliar o contraer contenido");
     }
-    if (dock) {
-      var searchLabel = dock.querySelector("[data-dock-search-label]");
-      if (searchLabel) searchLabel.textContent = label("navSearch", "Buscar hoteles, destinos…", "Search hotels, destinations…");
-      var chipLabels = {
-        hotels: label("navExplore", "Hoteles", "Hotels"),
-        restaurants: label("menuRestaurants", "Restaurantes", "Dining"),
-        guide: label("menuGuia", "Guía complejo", "Resort guide"),
-        pano: "360°"
-      };
-      Array.prototype.forEach.call(dock.querySelectorAll(".mobile-dock-chip"), function (button) {
-        var text = chipLabels[button.dataset.dock];
-        if (text) {
-          button.textContent = text;
-          button.setAttribute("aria-label", text);
-        }
-      });
-      var guideTitle = dock.querySelector("[data-dock-guide-title]");
-      var guideSubtitle = dock.querySelector("[data-dock-guide-subtitle]");
-      if (guideTitle) guideTitle.textContent = label("menuGuia", "Guía interactiva", "Interactive guide");
-      if (guideSubtitle) guideSubtitle.textContent = lang() === "en"
-        ? "Countries, destinations and hotel entries"
-        : "Países, destinos y entradas a hoteles";
-    }
+    updateGlobalGuideLabels();
     if (exploreSheet) {
       var en = lang() === "en";
       var setText = function (selector, text) {
@@ -866,7 +1257,15 @@
       navigate("/360");
       return;
     }
-    if (action === "guide") openGuide();
+    if (action === "guide") {
+      pendingMode = "map";
+      pendingTab = "map";
+      if (document.querySelector("#appView .portal-hero-stats")) setSheet("map", "map");
+      else navigate("/");
+      setGlobalGuideClosed(false);
+      setGlobalGuideOpen(true);
+      return;
+    }
   }
 
   function toggleSheet() {
@@ -900,6 +1299,7 @@
         setTimeout(function () { focusShellOnLocation(location, true); }, 380);
       }
     }
+    syncGlobalGuide();
   }
 
   function onDragStart(event) {
@@ -1003,6 +1403,7 @@
     delete document.body.dataset.mobileRender;
     delete document.body.dataset.mobileHome;
     document.body.style.removeProperty("--mob-drag");
+    syncGlobalGuide();
   }
 
   function apply() {
@@ -1032,6 +1433,7 @@
 
     initHomeMap();
     syncFromDom();
+    syncGlobalGuide();
   }
 
   function initialize() {
@@ -1045,8 +1447,20 @@
       observer.observe(document.body, { childList: true });
       if (appView) observer.observe(appView, { childList: true, subtree: true });
       if (bookShell) observer.observe(bookShell, { childList: true, subtree: true });
+      globalObserver = new window.MutationObserver(syncGlobalGuide);
+      globalObserver.observe(document.body, { attributes: true, attributeFilter: ["class", "data-mobile-home", "data-mobile-sheet"] });
     }
+    window.addEventListener("revistadigital:locationdetected", function () {
+      if (globalHotels) renderGlobalGuide();
+      updateGlobalCard();
+    });
     window.addEventListener("popstate", scheduleSync);
+    window.addEventListener("pageshow", function (event) {
+      if (!event.persisted) return;
+      globalGuideWasHome = false;
+      resetGlobalGuideState();
+      syncGlobalGuide();
+    });
     document.addEventListener("keydown", function (event) {
       if (event.key === "Escape" && document.body.dataset.mobileGuide === "1") closeGuide();
     });
