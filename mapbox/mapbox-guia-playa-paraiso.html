@@ -667,8 +667,14 @@
       return coordinates;
     }
 
-    // Obtiene ruta peatonal usando Valhalla (mejor para dentro del complejo)
     function requestPedestrianRoute(origin, destination, signal){
+      return requestMapboxRoute(origin, destination, "pedestrian", signal).catch(function(error){
+        if(signal && signal.aborted) throw error;
+        return requestValhallaPedestrianRoute(origin, destination, signal);
+      });
+    }
+
+    function requestValhallaPedestrianRoute(origin, destination, signal){
       var payload = {
         locations: [
           { lat: origin[0], lon: origin[1] },
@@ -755,11 +761,8 @@
       });
     }
 
-    // Decide el perfil de ruta: peatonal si ambos puntos están dentro del complejo
     function getPreferredRouteProfile(origin, destination){
-      var originComplex = isComplexDestination(origin[0], origin[1]);
-      var destComplex = isComplexDestination(destination[0], destination[1]);
-      return (originComplex && destComplex) ? "pedestrian" : "driving";
+      return "pedestrian";
     }
 
     function positionRouteInfo(){
@@ -905,11 +908,7 @@
       var primaryRequest = prefer === "pedestrian"
         ? requestPedestrianRoute(origin, destination, abortController.signal)
         : requestDrivingRoute(origin, destination, abortController.signal);
-      primaryRequest.catch(function(error){
-        if(abortController.signal.aborted) throw error;
-        console.warn("El proveedor de rutas principal falló; se intentará Mapbox:", error);
-        return requestMapboxRoute(origin, destination, prefer, abortController.signal);
-      }).then(function(result){
+      primaryRequest.then(function(result){
         if(abortController.signal.aborted || rutaActiva !== activeRoute) return;
         if(!Number.isFinite(result.distance) || !Number.isFinite(result.duration)){
           throw new Error("El proveedor devolvió distancia o duración inválida.");

@@ -108,6 +108,10 @@
   var globalPoiQuery = "";
   var nearbyRouteLine = null;
   var nearbyRouteRenderer = null;
+  var nearbyRouteAbort = null;
+  var nearbyRouteToken = 0;
+  var nearbyRouteDetail = "";
+  var nearbyRerouteAt = 0;
   var nearbyDot = null;
   var nearbyBadge = null;
   var nearbyRaf = 0;
@@ -1453,16 +1457,12 @@
     delete document.body.dataset.mobileNearbyPois;
   }
 
-  function clearNearbyMapHint() {
-    clearNearbyPoiLayer();
+  function clearNearbyRouteLayers() {
     if (nearbyRaf) {
       window.cancelAnimationFrame(nearbyRaf);
       nearbyRaf = 0;
     }
     if (shellMap && window.L) {
-      if (nearbyBadge) {
-        try { shellMap.removeLayer(nearbyBadge); } catch (error) {}
-      }
       if (nearbyDot) {
         try { shellMap.removeLayer(nearbyDot); } catch (error) {}
       }
@@ -1473,10 +1473,25 @@
         try { shellMap.removeLayer(nearbyRouteRenderer); } catch (error) {}
       }
     }
-    nearbyBadge = null;
     nearbyDot = null;
     nearbyRouteLine = null;
     nearbyRouteRenderer = null;
+  }
+
+  function clearNearbyMapHint() {
+    clearNearbyPoiLayer();
+    if (nearbyRouteAbort) {
+      try { nearbyRouteAbort.abort(); } catch (error) {}
+      nearbyRouteAbort = null;
+    }
+    nearbyRouteToken += 1;
+    nearbyRouteDetail = "";
+    nearbyRerouteAt = 0;
+    clearNearbyRouteLayers();
+    if (shellMap && window.L && nearbyBadge) {
+      try { shellMap.removeLayer(nearbyBadge); } catch (error) {}
+    }
+    nearbyBadge = null;
     nearbyKey = "";
     nearbyItem = null;
     delete document.body.dataset.mobileNearby;
@@ -1610,12 +1625,12 @@
     return { context: context, latlng: [latitude, longitude] };
   }
 
-  function nearbyBadgeText(item, distance) {
+  function nearbyBadgeText(item, distance, detail) {
     var english = lang() === "en";
     return {
       eyebrow: english ? "You're nearby" : "Estás cerca de",
       name: String(item.context.hotel.name || "").replace(/^Iberostar\s+/i, ""),
-      meta: distance + " · " + (english ? "Trace route" : "Trazar ruta") + " →"
+      meta: (detail || distance) + " · " + (english ? "Trace route" : "Trazar ruta") + " →"
     };
   }
 
@@ -1639,9 +1654,9 @@
     return hotelId;
   }
 
-  function createNearbyBadge(item, distance) {
+  function createNearbyBadge(item, distance, detail) {
     if (!shellMap || !window.L) return;
-    var text = nearbyBadgeText(item, distance);
+    var text = nearbyBadgeText(item, distance, detail);
     var html = '<div class="shell-nearby-poi">' +
       '<span class="shell-nearby-poi__stem" aria-hidden="true"></span>' +
       '<div class="shell-nearby-poi__card" role="button" tabindex="0" data-nearby-route="' + escapeHtml(item.context.route) + '">' +
@@ -1697,12 +1712,107 @@
     }
   }
 
-  function animateNearbyRoute(userLatLng, hotelLatLng) {
+  function appendNearbyPathPoint(path, point) {
+    if (!Array.isArray(point)) return;
+    var latitude = Number(point[0]);
+    var longitude = Number(point[1]);
+    if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return;
+    var last = path[path.length - 1];
+    if (!last || Math.abs(last[0] - latitude) > 0.000001 || Math.abs(last[1] - longitude) > 0.000001) {
+      path.push([latitude, longitude]);
+    }
+  }
+
+  function nearbyRoutePath(userLatLng, hotelLatLng, coordinates) {
+    var path = [];
+    appendNearbyPathPoint(path, userLatLng);
+    if (Array.isArray(coordinates)) {
+      coordinates.forEach(function (point) { appendNearbyPathPoint(path, point); });
+    }
+    appendNearbyPathPoint(path, hotelLatLng);
+    return path;
+  }
+
+  function nearbyRoutePointAt(path, progress) {
+    if (!path.length) return null;
+    if (path.length === 1) return path[0];
+    var segments = [];
+    var total = 0;
+    for (var index = 1; index < path.length; index += 1) {
+      var distance = poiDistanceMeters(path[index - 1], path[index]);
+      segments.push(distance);
+      total += distance;
+    }
+    if (!total) return path[0];
+    var remaining = total * Math.max(0, Math.min(1, progress));
+    for (var segmentIndex = 0; segmentIndex < segments.length; segmentIndex += 1) {
+      var length = segments[segmentIndex];
+      if (length && remaining <= length) {
+        var ratio = remaining / length;
+        var from = path[segmentIndex];
+        var to = path[segmentIndex + 1];
+        return [from[0] + (to[0] - from[0]) * ratio, from[1] + (to[1] - from[1]) * ratio];
+      }
+      remaining -= length;
+    }
+    return path[path.length - 1];
+  }
+
+  function fitNearbyBounds(points) {
+    if (!shellMap || !window.L || !Array.isArray(points) || !points.length) return;
+    try {
+      var bounds = window.L.latLngBounds(points).pad(0.35);
+      if (shellMap.flyToBounds) shellMap.flyToBounds(bounds, { maxZoom: 16, duration: 0.9 });
+      else shellMap.fitBounds(bounds, { maxZoom: 16 });
+    } catch (error) {}
+  }
+
+  function routeDeviationMeters(point, path) {
+    if (!point || !Array.isArray(path) || path.length < 2) return Infinity;
+    var radians = Math.PI / 180;
+    var origin = path[0];
+    function local(coordinates) {
+      return [
+        (coordinates[1] - origin[1]) * 111320 * Math.cos(origin[0] * radians),
+        (coordinates[0] - origin[0]) * 110540
+      ];
+    }
+    var target = local(point);
+    var minimum = Infinity;
+    for (var index = 1; index < path.length; index += 1) {
+      var from = local(path[index - 1]);
+      var to = local(path[index]);
+      var dx = to[0] - from[0];
+      var dy = to[1] - from[1];
+      var lengthSquared = dx * dx + dy * dy;
+      var ratio = lengthSquared ? ((target[0] - from[0]) * dx + (target[1] - from[1]) * dy) / lengthSquared : 0;
+      ratio = Math.max(0, Math.min(1, ratio));
+      var offsetX = target[0] - (from[0] + dx * ratio);
+      var offsetY = target[1] - (from[1] + dy * ratio);
+      minimum = Math.min(minimum, Math.sqrt(offsetX * offsetX + offsetY * offsetY));
+    }
+    return minimum;
+  }
+
+  function maybeRerouteNearby(latlng) {
+    if (!nearbyItem || !nearbyRouteLine || !isHomeMapVisible()) return;
+    var now = Date.now();
+    if (now - nearbyRerouteAt < 8000) return;
+    var latlngs = typeof nearbyRouteLine.getLatLngs === "function" ? nearbyRouteLine.getLatLngs() : [];
+    var path = [];
+    latlngs.forEach(function (position) { appendNearbyPathPoint(path, [position.lat, position.lng]); });
+    if (path.length < 2 || routeDeviationMeters(latlng, path) < 25) return;
+    nearbyRerouteAt = now;
+    renderNearbyRoute(nearbyItem, latlng);
+  }
+
+  function animateNearbyRoute(userLatLng, hotelLatLng, coordinates) {
     if (!shellMap || !window.L || !window.L.svg) return;
     var L = window.L;
+    var path = nearbyRoutePath(userLatLng, hotelLatLng, coordinates);
     nearbyRouteRenderer = L.svg({ padding: 0.5 });
     nearbyRouteRenderer.addTo(shellMap);
-    nearbyRouteLine = L.polyline([userLatLng, hotelLatLng], {
+    nearbyRouteLine = L.polyline(path, {
       renderer: nearbyRouteRenderer,
       color: "#d4af37",
       weight: 4,
@@ -1711,12 +1821,12 @@
       className: "shell-nearby-route"
     }).addTo(shellMap);
 
-    var path = nearbyRouteLine.getElement();
-    if (path && typeof path.getTotalLength === "function" && typeof path.animate === "function") {
-      var length = path.getTotalLength();
-      path.style.strokeDasharray = length + " " + length;
-      path.style.strokeDashoffset = String(length);
-      path.animate(
+    var element = nearbyRouteLine.getElement();
+    if (element && typeof element.getTotalLength === "function" && typeof element.animate === "function") {
+      var length = element.getTotalLength();
+      element.style.strokeDasharray = length + " " + length;
+      element.style.strokeDashoffset = String(length);
+      element.animate(
         [{ strokeDashoffset: String(length) }, { strokeDashoffset: "0" }],
         { duration: 1150, easing: "cubic-bezier(.22,.8,.25,1)", fill: "forwards" }
       );
@@ -1738,26 +1848,72 @@
       if (started === null) started = now;
       var progress = Math.min(1, (now - started) / 1150);
       var eased = 1 - Math.pow(1 - progress, 3);
-      var latitude = userLatLng[0] + (hotelLatLng[0] - userLatLng[0]) * eased;
-      var longitude = userLatLng[1] + (hotelLatLng[1] - userLatLng[1]) * eased;
-      try { nearbyDot.setLatLng([latitude, longitude]); } catch (error) {}
+      var position = nearbyRoutePointAt(path, eased);
+      if (position) {
+        try { nearbyDot.setLatLng(position); } catch (error) {}
+      }
       nearbyRaf = progress < 1 ? window.requestAnimationFrame(step) : 0;
     }
     nearbyRaf = window.requestAnimationFrame(step);
   }
 
   function renderNearbyRoute(item, userLatLng) {
-    clearNearbyMapHint();
+    var sameBadge = nearbyKey === item.context.route && nearbyBadge;
+    if (!sameBadge) clearNearbyMapHint();
+    else if (nearbyRouteAbort) {
+      try { nearbyRouteAbort.abort(); } catch (error) {}
+      nearbyRouteAbort = null;
+    }
+    var token = ++nearbyRouteToken;
     nearbyKey = item.context.route;
     nearbyItem = item;
-    createNearbyBadge(item, nearbyDistanceLabel(item.context.distance));
+    nearbyRerouteAt = Date.now();
+    nearbyRouteDetail = "";
+    var distance = nearbyDistanceLabel(item.context.distance);
+    if (sameBadge) {
+      try { nearbyBadge.setLatLng(item.latlng); } catch (error) {}
+      updateNearbyBadge(item, distance, "");
+    } else {
+      createNearbyBadge(item, distance, "");
+    }
+    clearNearbyRouteLayers();
     animateNearbyRoute(userLatLng, item.latlng);
-    try {
-      var bounds = window.L.latLngBounds([userLatLng, item.latlng]).pad(0.35);
-      if (shellMap.flyToBounds) shellMap.flyToBounds(bounds, { maxZoom: 16, duration: 0.9 });
-      else shellMap.fitBounds(bounds, { maxZoom: 16 });
-    } catch (error) {}
+    fitNearbyBounds([userLatLng, item.latlng]);
     document.body.dataset.mobileNearby = item.context.route;
+
+    var mapas = rd("mapas");
+    if (!mapas || typeof mapas.computeRoute !== "function") return;
+    var controller = typeof AbortController === "function" ? new AbortController() : null;
+    nearbyRouteAbort = controller;
+    mapas.computeRoute({
+      origin: userLatLng,
+      destination: item.latlng,
+      prefer: "pedestrian",
+      signal: controller ? controller.signal : undefined
+    }).then(function (result) {
+      if (token !== nearbyRouteToken) return;
+      nearbyRouteAbort = null;
+      var coordinates = Array.isArray(result.coordinates) ? result.coordinates : [];
+      clearNearbyRouteLayers();
+      animateNearbyRoute(userLatLng, item.latlng, coordinates);
+      var detail = "";
+      var minutes = Number.isFinite(result.duration) ? Math.max(1, Math.round(result.duration / 60)) : null;
+      if (Number.isFinite(result.distance) && minutes != null) {
+        detail = nearbyDistanceLabel(result.distance) + " · " + minutes + " min";
+      } else if (Number.isFinite(result.distance)) {
+        detail = nearbyDistanceLabel(result.distance);
+      }
+      nearbyRouteDetail = detail;
+      updateNearbyBadge(item, distance, detail);
+      var routePoints = [];
+      appendNearbyPathPoint(routePoints, userLatLng);
+      coordinates.forEach(function (point) { appendNearbyPathPoint(routePoints, point); });
+      appendNearbyPathPoint(routePoints, item.latlng);
+      fitNearbyBounds(routePoints);
+    }).catch(function (error) {
+      if (token !== nearbyRouteToken || (error && error.name === "AbortError")) return;
+      nearbyRouteAbort = null;
+    });
   }
 
   function showNearbyPoiLayer(hotelId, fit) {
@@ -1870,10 +2026,10 @@
     return true;
   }
 
-  function updateNearbyBadge(item, distance) {
+  function updateNearbyBadge(item, distance, detail) {
     var element = nearbyBadge && nearbyBadge.getElement ? nearbyBadge.getElement() : null;
     if (!element) return;
-    var text = nearbyBadgeText(item, distance);
+    var text = nearbyBadgeText(item, distance, detail);
     var eyebrow = element.querySelector(".shell-nearby-poi__eyebrow");
     var name = element.querySelector(".shell-nearby-poi__card strong");
     var meta = element.querySelector(".shell-nearby-poi__meta");
@@ -1896,10 +2052,15 @@
     var distance = nearbyDistanceLabel(item.context.distance);
     if (nearbyKey === item.context.route && nearbyBadge) {
       try { nearbyBadge.setLatLng(item.latlng); } catch (error) {}
-      if (nearbyRouteLine) {
-        try { nearbyRouteLine.setLatLngs([latlng, item.latlng]); } catch (error) {}
+      if (nearbyRouteLine && typeof nearbyRouteLine.getLatLngs === "function") {
+        var positions = nearbyRouteLine.getLatLngs();
+        if (positions.length && typeof window.L.latLng === "function") {
+          positions[0] = window.L.latLng(latlng[0], latlng[1]);
+          try { nearbyRouteLine.setLatLngs(positions); } catch (error) {}
+        }
       }
-      updateNearbyBadge(item, distance);
+      updateNearbyBadge(item, distance, nearbyRouteDetail);
+      maybeRerouteNearby(latlng);
       document.body.dataset.mobileNearby = item.context.route;
       return;
     }

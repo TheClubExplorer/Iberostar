@@ -1189,11 +1189,38 @@
     return mapas.decodePolyline(encoded, 6);
   };
 
-  // Proveedor peatonal: Valhalla (costing pedestrian), geometría polyline6.
-  // costing_options evita que el peatón salga a calzadas vehiculares y prioriza
-  // andadores, senderos y caminos iluminados. search_radius acota el snapping
-  // para que los puntos no se anclen a la vía exterior más cercana.
-  mapas.requestPedestrianRoute = function (origin, destination, signal) {
+  mapas.MAPBOX_ACCESS_TOKEN = "pk.eyJ1IjoibW9vdHVuIiwiYSI6ImNtdzI2ajd3MDAwMTQyeXBwMWtwd2RhZjUifQ.xdPmfb2yTy5yzVNCeLJglQ";
+
+  mapas.requestMapboxWalkingRoute = function (origin, destination, signal) {
+    if (signal && signal.aborted) return Promise.reject(makeAbortError());
+    const token = (typeof window !== "undefined" && window.MAPBOX_ACCESS_TOKEN) || mapas.MAPBOX_ACCESS_TOKEN;
+    if (!token) return Promise.reject(new Error("Mapbox Directions requiere un token público."));
+    const coordinates = `${origin[1]},${origin[0]};${destination[1]},${destination[0]}`;
+    const url = `https://api.mapbox.com/directions/v5/mapbox/walking/${coordinates}`
+      + `?geometries=geojson&overview=full&steps=false&access_token=${encodeURIComponent(token)}`;
+
+    return fetch(url, signal ? { signal } : undefined)
+      .then((response) => {
+        if (!response.ok) throw new Error(`Mapbox Directions no disponible (${response.status}).`);
+        return response.json();
+      })
+      .then((data) => {
+        const route = data && data.code === "Ok" && Array.isArray(data.routes) ? data.routes[0] : null;
+        const geometry = route && route.geometry && route.geometry.coordinates;
+        if (!route || !Array.isArray(geometry) || !geometry.length) {
+          throw new Error((data && data.message) || "Mapbox no encontró una ruta peatonal.");
+        }
+        return {
+          provider: "mapbox",
+          profile: "pedestrian",
+          distance: route.distance,
+          duration: route.duration,
+          coordinates: geometry.map(([longitude, latitude]) => [latitude, longitude])
+        };
+      });
+  };
+
+  mapas.requestValhallaPedestrianRoute = function (origin, destination, signal) {
     if (signal && signal.aborted) return Promise.reject(makeAbortError());
     const payload = {
       locations: [
@@ -1240,6 +1267,13 @@
           coordinates
         };
       });
+  };
+
+  mapas.requestPedestrianRoute = function (origin, destination, signal) {
+    return mapas.requestMapboxWalkingRoute(origin, destination, signal).catch((error) => {
+      if (signal && signal.aborted) throw error;
+      return mapas.requestValhallaPedestrianRoute(origin, destination, signal);
+    });
   };
 
   // Proveedor en coche: OSRM (respaldo), geometría GeoJSON.
@@ -1344,7 +1378,10 @@
       coordinates[1] >= bounds[0][1] && coordinates[1] <= bounds[1][1];
   };
 
+  mapas.forceWalkingRoutes = true;
+
   mapas.getPreferredRouteProfile = function (origin, destination) {
+    if (mapas.forceWalkingRoutes) return "pedestrian";
     return mapas.isComplexDestination(origin) && mapas.isComplexDestination(destination)
       ? "pedestrian"
       : "driving";

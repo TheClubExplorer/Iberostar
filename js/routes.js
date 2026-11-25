@@ -726,7 +726,7 @@
         stage.classList.toggle("is-mapbox", activate);
         frame.hidden = !activate;
         if (activate && !frame.src) {
-          frame.src = `${href("/mapbox/mapbox-guia-playa-paraiso.html")}?embed=1&mode=complex&v=23`;
+          frame.src = `${href("/mapbox/mapbox-guia-playa-paraiso.html")}?embed=1&mode=complex&v=24`;
           frame.addEventListener("load", () => {
             sendMapboxCommand(frame, { command: "resize" });
             syncMapboxFrameViewport(frame);
@@ -1079,7 +1079,7 @@
           </div>
           <div class="hotel-cart-map-wrap">
             <div id="cartTrackingMap" class="hotel-cart-map" role="application" aria-label="Mapa de seguimiento del carrito de golf">
-              <iframe class="cart-mapbox-frame" title="Seguimiento 3D del carrito de golf" data-mapbox-src="${escapeHtml(`${href("/mapbox/mapbox-guia-playa-paraiso.html")}?embed=1&mode=cart&v=23`)}" hidden></iframe>
+              <iframe class="cart-mapbox-frame" title="Seguimiento 3D del carrito de golf" data-mapbox-src="${escapeHtml(`${href("/mapbox/mapbox-guia-playa-paraiso.html")}?embed=1&mode=cart&v=24`)}" hidden></iframe>
             </div>
             <button type="button" class="cart-map-expand" data-cart-back-to-trip>Ampliar mapa</button>
             <button type="button" class="cart-panel-reopen" data-cart-panel-toggle aria-expanded="false">Mostrar solicitud</button>
