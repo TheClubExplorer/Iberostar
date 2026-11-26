@@ -136,12 +136,12 @@
   var loginError = null;
   var loginSubmit = null;
   var loginName = null;
-  var loginConfirm = null;
+  var loginReveal = null;
   var loginHotel = null;
   var loginShift = null;
   var loginCode = null;
   var loginDriverCode = null;
-  var loginMode = "register";
+  var loginMode = "login";
   var loginRole = "socio";
   var loginBusy = false;
   var authPanel = null;
@@ -197,8 +197,7 @@
 
   function ensureHeaderActions() {
     var header = document.getElementById("siteHeader");
-    var menu = document.getElementById("mobileMenuButton");
-    if (!header || !menu) return;
+    if (!header) return;
 
     if (!document.getElementById("mobileSearchShortcut")) {
       var search = document.createElement("button");
@@ -210,7 +209,7 @@
         var trigger = document.getElementById("openSearchButton");
         if (trigger) trigger.click();
       });
-      header.insertBefore(search, menu);
+      header.appendChild(search);
     }
 
     if (!document.getElementById("mobileLangShortcut")) {
@@ -222,7 +221,7 @@
         var trigger = document.getElementById("langToggleBtn");
         if (trigger) trigger.click();
       });
-      header.insertBefore(language, menu);
+      header.appendChild(language);
     }
 
     if (!document.getElementById("mobileAccountButton")) {
@@ -233,7 +232,7 @@
       accountButton.innerHTML = ICONS.user;
       accountButton.hidden = true;
       accountButton.addEventListener("click", openAuthPanel);
-      header.insertBefore(accountButton, menu);
+      header.appendChild(accountButton);
     } else {
       accountButton = document.getElementById("mobileAccountButton");
     }
@@ -272,6 +271,7 @@
     if (!loginOverlay) return;
     var en = lang() === "en";
     var registering = loginMode === "register";
+    var showingPassword = Boolean(loginPassword && loginPassword.type === "text");
     var setValue = function (selector, value) {
       var node = loginOverlay.querySelector(selector);
       if (node) node.textContent = value;
@@ -282,38 +282,32 @@
       : (en ? "THE CLUB · SECURE ACCESS" : "THE CLUB · ACCESO SEGURO"));
     setValue("[data-login-title]", registering ? (en ? "Create account" : "Crear cuenta") : (en ? "Secure sign in" : "Acceso seguro"));
     setValue("[data-login-copy]", registering
-      ? (en
-        ? "Register as a driver or member with an invitation code."
-        : "Regístrate como chofer o socio con un código de invitación.")
-      : (en
-        ? "Sign in with your member number and password."
-        : "Ingresa con tu número de socio y contraseña."));
-    setValue("[data-login-mode-title]", en ? "Access mode" : "Modo de acceso");
-    setValue("[data-login-role-title]", en ? "Profile type" : "Tipo de perfil");
+      ? (en ? "Create your account in a few steps." : "Crea tu cuenta en unos pasos.")
+      : (en ? "Enter your member number and password." : "Ingresa tu número de socio y contraseña."));
+    setValue("[data-login-role-title]", en ? "Account type" : "Tipo de cuenta");
     setValue("[data-login-credentials-title]", registering
-      ? (en ? "Account details" : "Datos de la cuenta")
+      ? (en ? "Your details" : "Tus datos")
       : (en ? "Member access" : "Acceso de socio"));
     setValue("[data-login-driver-title]", en ? "Driver details" : "Datos del chofer");
-    setValue("[data-login-member-title]", en ? "Member invitation" : "Invitación socio");
     setValue('[data-login-mode="login"]', en ? "Sign in" : "Entrar");
     setValue('[data-login-mode="register"]', en ? "Register" : "Registrarme");
     setValue('[data-login-role="socio"]', en ? "Member" : "Socio");
     setValue('[data-login-role="chofer"]', en ? "Driver" : "Chofer");
     setValue("[data-login-email-label]", registering ? (en ? "Email" : "Email") : (en ? "Member number" : "Número de socio"));
     setValue("[data-login-password-label]", registering ? (en ? "Password (min. 6 characters)" : "Contraseña (mín. 6 caracteres)") : (en ? "Password" : "Contraseña"));
-    setValue("[data-login-confirm-label]", en ? "Repeat password" : "Repetir contraseña");
+    setValue("[data-login-reveal]", showingPassword ? (en ? "Hide" : "Ocultar") : (en ? "Show" : "Ver"));
     setValue("[data-login-name-label]", en ? "Full name" : "Nombre completo");
     setValue("[data-login-driver-code-label]", en ? "Driver number" : "Número de chofer");
     setValue("[data-login-hotel-label]", en ? "Assigned hotel" : "Hotel asignado");
     setValue("[data-login-shift-label]", en ? "Shift" : "Turno");
-    setValue("[data-login-code-label]", en ? "Member number (invitation code)" : "Número de socio (código de invitación)");
+    setValue("[data-login-code-label]", en ? "Member number" : "Número de socio");
     setValue("[data-login-submit]", loginBusy
       ? (registering ? (en ? "Creating…" : "Creando cuenta…") : (en ? "Signing in…" : "Entrando…"))
       : (registering ? (en ? "Create account" : "Crear cuenta") : (en ? "Sign in" : "Entrar")));
     setValue("[data-login-note]", registering
       ? (en
-        ? "Drivers can register freely. Members need an invitation code."
-        : "Los choferes pueden registrarse libremente. Los socios necesitan un código de invitación.")
+        ? "Members need an active invitation code. Drivers register with their number."
+        : "Los socios necesitan un código activo. Los choferes se registran con su número.")
       : (en
         ? "Use your member number and password."
         : "Usa tu número de socio y contraseña."));
@@ -329,10 +323,14 @@
     Array.prototype.forEach.call(loginOverlay.querySelectorAll("[data-member-field]"), function (field) {
       field.hidden = !registering || loginRole !== "socio";
     });
-    if (loginEmail) loginEmail.setAttribute("type", registering ? "email" : "text");
-    if (loginEmail) loginEmail.setAttribute("inputmode", registering ? "email" : "text");
+    if (loginEmail) {
+      loginEmail.setAttribute("type", registering ? "email" : "text");
+      loginEmail.setAttribute("inputmode", registering ? "email" : "numeric");
+      loginEmail.setAttribute("autocomplete", registering ? "email" : "username");
+    }
     if (loginPassword) loginPassword.setAttribute("autocomplete", registering ? "new-password" : "current-password");
-    [loginSubmit, loginEmail, loginPassword, loginName, loginConfirm, loginHotel, loginShift, loginCode, loginDriverCode].forEach(function (input) {
+    if (loginReveal) loginReveal.setAttribute("aria-pressed", showingPassword ? "true" : "false");
+    [loginSubmit, loginEmail, loginPassword, loginReveal, loginName, loginHotel, loginShift, loginCode, loginDriverCode].forEach(function (input) {
       if (input) input.disabled = loginBusy;
     });
   }
@@ -390,21 +388,22 @@
       setLoginError("El servicio de registro no está disponible.");
       return;
     }
+    var email = loginEmail ? loginEmail.value.trim() : "";
     var password = loginPassword ? loginPassword.value : "";
-    var confirmation = loginConfirm ? loginConfirm.value : "";
-    if (password.length < 6) {
-      setLoginError("La contraseña debe tener al menos 6 caracteres.");
+    if (!email) {
+      setLoginError("Escribe tu email.");
+      if (loginEmail) loginEmail.focus();
       return;
     }
-    if (password !== confirmation) {
-      setLoginError("Las contraseñas no coinciden.");
-      if (loginConfirm) loginConfirm.focus();
+    if (password.length < 6) {
+      setLoginError("La contraseña debe tener al menos 6 caracteres.");
+      if (loginPassword) loginPassword.focus();
       return;
     }
     setLoginError("");
     setLoginBusy(true);
     auth.signUp({
-      email: loginEmail ? loginEmail.value : "",
+      email: email,
       password: password,
       role: loginRole,
       displayName: loginName ? loginName.value : "",
@@ -421,8 +420,8 @@
             ? "Check your email to confirm the account, then sign in."
             : "Revisa tu email para confirmar la cuenta y luego entra.");
           if (loginPassword) loginPassword.value = "";
-          if (loginConfirm) loginConfirm.value = "";
           if (loginCode) loginCode.value = "";
+          if (loginDriverCode) loginDriverCode.value = "";
           return;
         }
         hideLogin();
@@ -432,14 +431,13 @@
         setLoginBusy(false);
         setLoginError((error && error.message) || "No se pudo crear la cuenta.");
         if (loginPassword) loginPassword.value = "";
-        if (loginConfirm) loginConfirm.value = "";
         if (loginPassword) loginPassword.focus();
       }
     );
   }
 
   function showLogin() {
-    setLoginMode("register");
+    setLoginMode("login");
     if (loginOverlay) loginOverlay.hidden = false;
     document.body.dataset.mobileLogin = "1";
   }
@@ -449,7 +447,6 @@
     delete document.body.dataset.mobileLogin;
     setLoginError("");
     if (loginPassword) loginPassword.value = "";
-    if (loginConfirm) loginConfirm.value = "";
     if (loginCode) loginCode.value = "";
     if (loginDriverCode) loginDriverCode.value = "";
   }
@@ -691,7 +688,7 @@
     loginOverlay.innerHTML =
       '<div class="mobile-login__brand">' +
         '<picture>' +
-          '<source type="image/webp" srcset="src/logo%20png-01-320.webp 320w, src/logo%20png-01-640.webp 640w, src/logo%20png-01-1280.webp 1280w, src/logo%20png-01.webp 1920w" sizes="132px" />' +
+          '<source type="image/webp" srcset="src/logo%20png-01-320.webp 320w, src/logo%20png-01-640.webp 640w, src/logo%20png-01-1280.webp 1280w, src/logo%20png-01.webp 1920w" sizes="(max-width:420px) 58vw, 176px" />' +
           '<img src="src/logo%20png-01.png" alt="Iberostar The Club" loading="eager" decoding="async" />' +
         '</picture>' +
       '</div>' +
@@ -701,11 +698,10 @@
           '<h1 class="mobile-login__title" data-login-title></h1>' +
           '<p class="mobile-login__copy" data-login-copy></p>' +
         '</header>' +
-        '<section class="mobile-login__section">' +
-          '<p class="mobile-login__section-title" data-login-mode-title></p>' +
+        '<section class="mobile-login__section mobile-login__section--tabs">' +
           '<div class="mobile-login__tabs" role="group" aria-label="Modo de acceso">' +
-            '<button type="button" class="mobile-login__tab" data-login-mode="login" aria-pressed="false"></button>' +
-            '<button type="button" class="mobile-login__tab" data-login-mode="register" aria-pressed="true"></button>' +
+            '<button type="button" class="mobile-login__tab" data-login-mode="login" aria-pressed="true"></button>' +
+            '<button type="button" class="mobile-login__tab" data-login-mode="register" aria-pressed="false"></button>' +
           '</div>' +
         '</section>' +
         '<section class="mobile-login__section" data-register-field hidden>' +
@@ -715,45 +711,45 @@
             '<button type="button" class="mobile-login__role" data-login-role="chofer" aria-pressed="false"></button>' +
           '</div>' +
         '</section>' +
-        '<section class="mobile-login__section">' +
-          '<p class="mobile-login__section-title" data-login-credentials-title></p>' +
+        '<section class="mobile-login__section" data-register-field data-member-field hidden>' +
           '<label class="mobile-login__field">' +
-            '<span data-login-email-label></span>' +
-            '<input id="mobileLoginEmail" name="email" type="email" inputmode="email" autocomplete="username" />' +
-          '</label>' +
-          '<label class="mobile-login__field">' +
-            '<span data-login-password-label></span>' +
-            '<input id="mobileLoginPassword" name="password" type="password" autocomplete="current-password" />' +
-          '</label>' +
-          '<label class="mobile-login__field" data-register-field hidden>' +
-            '<span data-login-confirm-label></span>' +
-            '<input id="mobileLoginConfirm" name="confirm" type="password" autocomplete="new-password" />' +
-          '</label>' +
-          '<label class="mobile-login__field" data-register-field hidden>' +
-            '<span data-login-name-label></span>' +
-            '<input id="mobileLoginName" name="displayName" type="text" autocomplete="name" />' +
+            '<span data-login-code-label></span>' +
+            '<input id="mobileLoginCode" name="registrationCode" type="text" inputmode="numeric" autocomplete="off" />' +
           '</label>' +
         '</section>' +
         '<section class="mobile-login__section" data-register-field data-driver-field hidden>' +
           '<p class="mobile-login__section-title" data-login-driver-title></p>' +
           '<label class="mobile-login__field">' +
             '<span data-login-driver-code-label></span>' +
-            '<input id="mobileLoginDriverCode" name="accessCode" type="text" autocomplete="off" />' +
+            '<input id="mobileLoginDriverCode" name="accessCode" type="text" inputmode="numeric" autocomplete="off" />' +
           '</label>' +
-          '<label class="mobile-login__field">' +
-            '<span data-login-hotel-label></span>' +
-            '<input id="mobileLoginHotel" name="assignedHotel" type="text" autocomplete="organization" />' +
-          '</label>' +
-          '<label class="mobile-login__field">' +
-            '<span data-login-shift-label></span>' +
-            '<input id="mobileLoginShift" name="shift" type="text" autocomplete="off" />' +
-          '</label>' +
+          '<div class="mobile-login__row">' +
+            '<label class="mobile-login__field">' +
+              '<span data-login-hotel-label></span>' +
+              '<input id="mobileLoginHotel" name="assignedHotel" type="text" autocomplete="organization" />' +
+            '</label>' +
+            '<label class="mobile-login__field">' +
+              '<span data-login-shift-label></span>' +
+              '<input id="mobileLoginShift" name="shift" type="text" autocomplete="off" />' +
+            '</label>' +
+          '</div>' +
         '</section>' +
-        '<section class="mobile-login__section" data-register-field data-member-field hidden>' +
-          '<p class="mobile-login__section-title" data-login-member-title></p>' +
+        '<section class="mobile-login__section">' +
+          '<p class="mobile-login__section-title" data-login-credentials-title></p>' +
           '<label class="mobile-login__field">' +
-            '<span data-login-code-label></span>' +
-            '<input id="mobileLoginCode" name="registrationCode" type="text" autocomplete="off" />' +
+            '<span data-login-email-label></span>' +
+            '<input id="mobileLoginEmail" name="email" type="text" inputmode="numeric" autocomplete="username" />' +
+          '</label>' +
+          '<div class="mobile-login__field mobile-login__field--password">' +
+            '<label for="mobileLoginPassword" data-login-password-label></label>' +
+            '<div class="mobile-login__input">' +
+              '<input id="mobileLoginPassword" name="password" type="password" autocomplete="current-password" />' +
+              '<button type="button" class="mobile-login__reveal" data-login-reveal aria-pressed="false"></button>' +
+            '</div>' +
+          '</div>' +
+          '<label class="mobile-login__field" data-register-field hidden>' +
+            '<span data-login-name-label></span>' +
+            '<input id="mobileLoginName" name="displayName" type="text" autocomplete="name" />' +
           '</label>' +
         '</section>' +
         '<div class="mobile-login__actions">' +
@@ -767,7 +763,7 @@
     loginForm = loginOverlay.querySelector("#mobileLoginForm");
     loginEmail = loginOverlay.querySelector("#mobileLoginEmail");
     loginPassword = loginOverlay.querySelector("#mobileLoginPassword");
-    loginConfirm = loginOverlay.querySelector("#mobileLoginConfirm");
+    loginReveal = loginOverlay.querySelector("[data-login-reveal]");
     loginName = loginOverlay.querySelector("#mobileLoginName");
     loginHotel = loginOverlay.querySelector("#mobileLoginHotel");
     loginShift = loginOverlay.querySelector("#mobileLoginShift");
@@ -782,6 +778,15 @@
     });
 
     loginOverlay.addEventListener("click", function (event) {
+      var revealTrigger = event.target.closest("[data-login-reveal]");
+      if (revealTrigger) {
+        if (loginPassword) {
+          loginPassword.type = loginPassword.type === "password" ? "text" : "password";
+          updateLoginLabels();
+          loginPassword.focus();
+        }
+        return;
+      }
       var modeTrigger = event.target.closest("[data-login-mode]");
       if (modeTrigger) {
         setLoginMode(modeTrigger.dataset.loginMode);

@@ -109,14 +109,6 @@
     max-height: 34px;
   }
 
-  body.mobile-app-active #mobileMenuButton {
-    width: 44px;
-    height: 44px;
-    flex-basis: 44px;
-    border-radius: 14px;
-    background: rgba(255, 253, 248, .94);
-  }
-
   body.mobile-app-active[data-mobile-render="app"] .app-view,
   body.mobile-app-active[data-mobile-render="stage"] .magazine-stage {
     position: fixed !important;
@@ -1482,29 +1474,19 @@
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    padding: calc(112px + env(safe-area-inset-top, 0px)) 18px calc(24px + env(safe-area-inset-bottom, 0px));
-    background: linear-gradient(180deg, var(--cream) 0%, var(--white) 100%);
+    gap: 10px;
+    padding: calc(16px + env(safe-area-inset-top, 0px)) 16px calc(20px + env(safe-area-inset-bottom, 0px));
+    background: var(--white);
     overflow-y: auto;
     pointer-events: auto;
   }
 
-  .mobile-login::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    right: 0;
-    left: 0;
-    height: calc(94px + env(safe-area-inset-top, 0px));
-    border-bottom: 1px solid var(--gold);
-    background: var(--cream);
-  }
-
   .mobile-login__brand {
-    position: absolute;
-    top: calc(20px + env(safe-area-inset-top, 0px));
-    left: 22px;
+    position: relative;
     z-index: 1;
-    width: 126px;
+    flex: 0 0 auto;
+    width: min(58vw, 176px);
+    margin: auto auto 2px;
   }
 
   .mobile-login__brand picture,
@@ -1521,50 +1503,52 @@
     position: relative;
     z-index: 1;
     width: 100%;
-    margin: auto 0;
+    margin: 0 auto auto;
     max-width: 420px;
-    padding: 20px 18px 18px;
+    padding: 18px 16px 16px;
     border: 1px solid var(--gold);
     border-top: 4px solid var(--gold);
-    border-radius: 14px;
+    border-radius: 12px;
     background: var(--white);
     box-shadow: 0 18px 48px rgba(185, 163, 133, .24);
   }
 
   .mobile-login__header {
-    padding-bottom: 12px;
+    padding-bottom: 10px;
+    text-align: center;
   }
 
   .mobile-login__mark {
-    margin: 0 0 10px;
+    margin: 0 0 6px;
     color: var(--gold-deep);
     font: 700 10px/1.3 var(--font-ui);
     letter-spacing: .18em;
-    text-align: left;
   }
 
   .mobile-login__title {
     margin: 0;
     color: var(--gold-deep);
-    font: 600 26px/1.15 var(--font-display, Georgia, serif);
-    letter-spacing: 0;
-    text-align: left;
+    font: 600 23px/1.15 var(--font-display, Georgia, serif);
   }
 
   .mobile-login__copy {
-    margin: 10px 0 0;
+    margin: 6px 0 0;
     color: var(--ink);
-    font: 400 13px/1.55 var(--font-ui);
-    text-align: left;
+    font: 400 12px/1.45 var(--font-ui);
   }
 
   .mobile-login__section {
-    padding: 10px 0;
+    padding: 9px 0;
     border-top: 1px solid var(--border);
   }
 
+  .mobile-login__section--tabs {
+    padding-top: 0;
+    border-top: 0;
+  }
+
   .mobile-login__section-title {
-    margin: 0 0 8px;
+    margin: 0 0 6px;
     color: var(--gold-deep);
     font: 700 9px/1.2 var(--font-ui);
     letter-spacing: .16em;
@@ -1578,7 +1562,7 @@
   }
 
   .mobile-login__tab {
-    min-height: 38px;
+    min-height: 40px;
     border: 1px solid var(--gold);
     border-radius: 999px;
     background: var(--cream);
@@ -1598,15 +1582,15 @@
   .mobile-login__roles {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-    padding: 4px;
+    gap: 6px;
+    padding: 3px;
     border: 1px solid var(--border);
     border-radius: 9px;
     background: var(--cream);
   }
 
   .mobile-login__role {
-    min-height: 40px;
+    min-height: 38px;
     border: 1px solid transparent;
     border-radius: 7px;
     background: transparent;
@@ -1626,12 +1610,13 @@
 
   .mobile-login__field {
     display: block;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
   }
 
-  .mobile-login__field span {
+  .mobile-login__field span,
+  .mobile-login__field label {
     display: block;
-    margin-bottom: 6px;
+    margin-bottom: 5px;
     color: var(--gold-deep);
     font: 700 10px/1.2 var(--font-ui);
     letter-spacing: .12em;
@@ -1640,7 +1625,7 @@
 
   .mobile-login__field input {
     width: 100%;
-    height: 46px;
+    height: 44px;
     padding: 0 14px;
     border: 1px solid var(--border);
     border-radius: 9px;
@@ -1655,15 +1640,46 @@
     box-shadow: 0 0 0 3px rgba(185, 163, 133, .3);
   }
 
+  .mobile-login__row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .mobile-login__input {
+    position: relative;
+  }
+
+  .mobile-login__field--password input {
+    padding-right: 64px;
+  }
+
+  .mobile-login__reveal {
+    position: absolute;
+    top: 50%;
+    right: 6px;
+    transform: translateY(-50%);
+    min-height: 32px;
+    padding: 0 8px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--gold-deep);
+    cursor: pointer;
+    font: 700 10px/1 var(--font-ui);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+  }
+
   .mobile-login__actions {
-    padding-top: 12px;
+    padding-top: 10px;
     border-top: 1px solid var(--border);
   }
 
   .mobile-login__submit {
     width: 100%;
-    min-height: 52px;
-    margin-top: 6px;
+    min-height: 48px;
+    margin-top: 4px;
     border: 1px solid var(--gold-deep);
     border-radius: 9px;
     background: var(--gold);
@@ -1681,8 +1697,8 @@
 
   .mobile-login__error {
     min-height: 20px;
-    margin: 12px 0 0;
-    padding: 9px 11px;
+    margin: 10px 0 0;
+    padding: 8px 10px;
     border-left: 3px solid var(--gold-deep);
     border-radius: 6px;
     background: var(--cream);
@@ -1692,10 +1708,10 @@
   }
 
   .mobile-login__note {
-    margin: 4px 0 0;
+    margin: 6px 0 0;
     color: var(--gold-deep);
-    font: 400 11px/1.45 var(--font-ui);
-    text-align: left;
+    font: 400 11px/1.4 var(--font-ui);
+    text-align: center;
   }
 
   .mobile-auth-panel {

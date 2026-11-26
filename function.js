@@ -6676,7 +6676,6 @@ document.addEventListener("click", (event) => {
   }
 });
 // Panel de navegación móvil (lateral derecho).
-const mobileMenuButton = document.getElementById("mobileMenuButton");
 const mobileNavClose = document.getElementById("mobileNavClose");
 const siteNav = document.getElementById("siteNav");
 const navOverlay = document.getElementById("navOverlay");
@@ -6736,45 +6735,17 @@ function updateMobileNavActiveState() {
   });
 }
 
-function openMobileNav() {
-  if (!siteNav) return;
-  updateMobileNavActiveState();
-  siteNav.classList.add("is-open");
-  document.body.classList.add("mobile-nav-open");
-  mobileMenuButton?.classList.add("is-open");
-  if (navOverlay) {
-    navOverlay.hidden = false;
-    requestAnimationFrame(() => navOverlay.classList.add("is-open"));
-  }
-  mobileMenuButton?.setAttribute("aria-expanded", "true");
-  mobileMenuButton?.setAttribute("aria-label", "Cerrar menú");
-  lockBodyScrollForMobileNav();
-
-  window.requestAnimationFrame(() => {
-    const focusable = getMobileNavFocusableElements();
-    (focusable[0] || mobileNavClose || mobileMenuButton)?.focus?.();
-  });
-}
-
 function closeMobileNav() {
   if (!siteNav || !siteNav.classList.contains("is-open")) return;
   siteNav.classList.remove("is-open");
   document.body.classList.remove("mobile-nav-open");
-  mobileMenuButton?.classList.remove("is-open");
   if (navOverlay) {
     navOverlay.classList.remove("is-open");
     window.setTimeout(() => { navOverlay.hidden = true; }, 280);
   }
-  mobileMenuButton?.setAttribute("aria-expanded", "false");
-  mobileMenuButton?.setAttribute("aria-label", "Abrir menú");
   unlockBodyScrollForMobileNav();
-  mobileMenuButton?.focus?.();
 }
 
-mobileMenuButton?.addEventListener("click", () => {
-  if (siteNav?.classList.contains("is-open")) closeMobileNav();
-  else openMobileNav();
-});
 mobileNavClose?.addEventListener("click", closeMobileNav);
 navOverlay?.addEventListener("click", closeMobileNav);
 document.addEventListener("keydown", (event) => {
