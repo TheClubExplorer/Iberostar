@@ -1784,7 +1784,7 @@
     bar.className = "gp-route-bar";
     bar.setAttribute("role", "status");
     bar.setAttribute("aria-live", "polite");
-    bar.innerHTML = '<span class="gp-route-bar-label"></span><button type="button" class="gp-route-bar-cancel">Cancelar</button>';
+    bar.innerHTML = '<span class="gp-route-bar-label"></span><button type="button" class="gp-route-bar-cancel" aria-label="Cancelar ruta">Cancelar ruta</button>';
     document.body.appendChild(bar);
     var cancel = bar.querySelector(".gp-route-bar-cancel");
     if (cancel) {
@@ -1840,15 +1840,70 @@
     setTimeout(positionRouteBar, 260);
   }
 
+  function isHomeRoutePath(path) {
+    var clean = String(path || "").split(/[?#]/)[0].replace(/\/+$/, "");
+    return !clean || clean === "/" || /(?:^|\/)index\.html$/i.test(clean);
+  }
+
+  function syncRouteBarRoute(event) {
+    var detailPath = event && event.detail && event.detail.path ? String(event.detail.path) : "";
+    var path = detailPath || window.location.pathname || "";
+    var body = document.body;
+    var mobileHomeMap = body && body.classList.contains("mobile-app-active") &&
+      body.dataset.mobileSheet === "map" && body.dataset.mobileHome === "1" &&
+      (!detailPath || isHomeRoutePath(path));
+    var mapRoute = mobileHomeMap || /(?:^|\/)(?:mapa|map|hotel|hoteles|mexico|riviera-maya|destino|destinos|complejo|pais|country)(?:\/|$)/i.test(path);
+    document.body.dataset.routeBarAllowed = mapRoute ? "1" : "0";
+    renderRouteBar();
+  }
+
   window.addEventListener("resize", scheduleRouteBarPosition);
+  window.addEventListener("popstate", syncRouteBarRoute);
+  window.addEventListener("revistadigital:routeChange", syncRouteBarRoute);
   if (window.MutationObserver && document.body) {
-    new window.MutationObserver(scheduleRouteBarPosition).observe(document.body, { attributes: true, attributeFilter: ["class", "style", "hidden"], subtree: true });
+    new window.MutationObserver(scheduleRouteBarPosition).observe(document.body, {
+      attributes: true,
+      attributeFilter: ["class", "style", "hidden"],
+      subtree: true
+    });
+  }
+
+  function routeBarMapVisible() {
+    var body = document.body;
+    if (!body) return false;
+    var overlays = document.querySelectorAll(
+      "#mobileLogin:not([hidden]), #languageGate:not([hidden]), #locationWelcome:not([hidden]), " +
+      ".pano-360-modal, .search-modal[aria-hidden='false'], .cart-custom-menu:not([hidden]), " +
+      ".pano-360-action-overlay, [role='dialog']:not([hidden])"
+    );
+    for (var index = 0; index < overlays.length; index += 1) {
+      var overlay = overlays[index];
+      var overlayStyle = window.getComputedStyle ? window.getComputedStyle(overlay) : null;
+      var overlayRect = overlay.getBoundingClientRect ? overlay.getBoundingClientRect() : null;
+      if (overlayStyle && (overlayStyle.display === "none" || overlayStyle.visibility === "hidden" || Number(overlayStyle.opacity || 1) < 0.05)) continue;
+      if (overlayRect && overlayRect.width && overlayRect.height) return false;
+    }
+    if (body.classList.contains("mobile-app-active")) {
+      return body.dataset.mobileSheet === "map";
+    }
+    var maps = document.querySelectorAll(
+      "#mobileHomeMap, #hotelMap, #generalMap, #hotelPortalMap, #destinationMap, " +
+      "#allHotelsMap, #countryMap, #complexPortalMap, .hotel-complex-map-wrap, .interactive-map"
+    );
+    for (var mapIndex = 0; mapIndex < maps.length; mapIndex += 1) {
+      var map = maps[mapIndex];
+      var mapStyle = window.getComputedStyle ? window.getComputedStyle(map) : null;
+      var mapRect = map.getBoundingClientRect ? map.getBoundingClientRect() : null;
+      if (mapStyle && (mapStyle.display === "none" || mapStyle.visibility === "hidden" || Number(mapStyle.opacity || 1) < 0.05)) continue;
+      if (mapRect && mapRect.width && mapRect.height) return true;
+    }
+    return false;
   }
 
   function renderRouteBar() {
     var focus = gp._routeFocus || {};
     var bar = document.getElementById("gpRouteBar");
-    if (!focus.active || !focus.id) {
+    if (!focus.active || !focus.id || !routeBarMapVisible()) {
       if (bar) bar.classList.remove("is-visible");
       return;
     }
@@ -1860,6 +1915,9 @@
   }
 
   function notifyRouteFocus() {
+    var focus = gp._routeFocus || {};
+    if (focus.active && focus.id) document.body.dataset.routeActive = "1";
+    else delete document.body.dataset.routeActive;
     applyRouteFocus();
     if (typeof gp._routeFocusHook === "function") gp._routeFocusHook(gp._routeFocus);
     renderRouteBar();
@@ -2140,8 +2198,7 @@
           html = '<p class="guide-route-status is-error">' + escapeHtml(route.info || "Intente calcular la ruta de nuevo.") + "</p>";
         }
         html += routeExternalLinksHtml(route);
-    html += routeExternalLinksHtml(route);
-    html += '<button type="button" class="guide-route-cancel">Cancelar ruta</button>';
+        html += '<button type="button" class="guide-route-cancel">Cancelar ruta</button>';
         box.innerHTML = notice + html;
         if (!skipReveal) revealFeedback(box);
         // El estado de ruta cambia la altura del menú flotante: lo recolocamos.
@@ -2178,6 +2235,13 @@
   function routeToPoi(id) {
     var poi = findPoi(id);
     if (!poi) return;
+    if (isMobileGuide()) {
+      try {
+        window.dispatchEvent(new CustomEvent("revistadigital:showMapForRoute", {
+          detail: { poiId: id || "" }
+        }));
+      } catch (e) { /* ignore */ }
+    }
     // En móvil, al trazar una ruta aseguramos que la guía NO esté expandida
     // (se muestra en su tamaño pequeño original) para que el mapa y la ruta
     // trazada queden visibles. No la colapsamos: se queda como al inicio.

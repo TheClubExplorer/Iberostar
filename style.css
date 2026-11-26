@@ -3576,6 +3576,9 @@ body.guide-expanded-open { overflow:hidden !important; overscroll-behavior:none;
 .guide-route-cancel:hover { border-color: var(--gold); }
 .gp-route-bar { position:fixed; bottom:calc(var(--gp-route-bottom,16px) + env(safe-area-inset-bottom)); left:50%; z-index:10900; display:flex; align-items:center; gap:10px; max-width:calc(100vw - 24px); padding:7px 8px 7px 14px; border-radius:999px; background:rgba(0,40,85,.94); color:#fff; box-shadow:0 6px 20px rgba(0,0,0,.25); font:600 12px/1.2 var(--font-ui); opacity:0; transform:translate(-50%,16px); pointer-events:none; transition:opacity .18s ease, transform .18s ease; }
 .gp-route-bar.is-visible { opacity:1; transform:translate(-50%,0); pointer-events:auto; }
+body.mobile-app-active:not([data-mobile-sheet="map"]) .gp-route-bar.is-visible,
+body[data-route-bar-allowed="0"] .gp-route-bar.is-visible,
+body:has(#mobileLogin:not([hidden]), #languageGate:not([hidden]), #locationWelcome:not([hidden]), .pano-360-modal, .search-modal[aria-hidden="false"], .cart-custom-menu:not([hidden])) .gp-route-bar.is-visible { display:none; }
 .gp-route-bar-label { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .gp-route-bar-cancel { flex:0 0 auto; padding:5px 11px; border:1px solid rgba(255,255,255,.6); border-radius:999px; background:rgba(255,255,255,.12); color:#fff; font:600 11px/1 var(--font-ui); cursor:pointer; }
 .gp-route-bar-cancel:hover { background:rgba(255,255,255,.22); }

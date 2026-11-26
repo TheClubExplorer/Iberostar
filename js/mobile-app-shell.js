@@ -80,6 +80,9 @@
   var guideQuery = "";
   var shellUserMarker = null;
   var pendingLocation = null;
+  var pendingGlobalPoiId = null;
+  var pendingGlobalPoiNotice = "";
+  var lastGlobalRoutePoiId = null;
   var mapElement = null;
   var handle = null;
   var mapBounds = null;
@@ -529,6 +532,7 @@
     shell.innerHTML =
       '<div class="mobile-app-map" id="mobileHomeMap" role="application"></div>' +
       '<div class="mobile-map-fabs">' +
+        '<button type="button" class="mobile-map-fab mobile-map-fab-cancel" id="mobileMapCancelRoute" aria-label="Cancelar ruta">Cancelar ruta</button>' +
         '<button type="button" class="mobile-map-fab" id="mobileMapLocate">' + ICONS.locate + '</button>' +
         '<button type="button" class="mobile-map-fab" id="mobileMapRecenter">' + ICONS.recenter + '</button>' +
       '</div>' +
@@ -656,6 +660,7 @@
     });
 
     shell.querySelector("#mobileMapRecenter").addEventListener("click", recenterMap);
+    shell.querySelector("#mobileMapCancelRoute").addEventListener("click", cancelRouteFromMap);
     buildGlobalGuideSheet();
     buildLoginOverlay();
     buildAuthPanel();
@@ -1242,12 +1247,15 @@
     renderGlobalGuide();
   }
 
-  function selectGlobalPoi(id) {
+  function selectGlobalPoi(id, notice) {
     var gp = rd("guiapa");
     if (!gp || !id || !shellMap) return;
     var poi = (gp.POIS || []).filter(function (item) { return item && item.id === id; })[0];
     if (!poi || poi.lat == null || poi.lng == null) return;
-    if (gp._map !== shellMap) {
+    var willBindMap = gp._map !== shellMap;
+    if (typeof gp.queueRouteToPoi === "function") gp.queueRouteToPoi(id, notice || "");
+    if (!willBindMap) gp._routeNotice = notice || "";
+    if (willBindMap) {
       if (typeof gp.bindMap === "function") gp.bindMap(shellMap);
       else gp._map = shellMap;
     }
@@ -1258,7 +1266,22 @@
       var marker = gp._markers && gp._markers[id];
       if (marker && typeof marker.openPopup === "function") marker.openPopup();
     }
+    if (!willBindMap && typeof gp.routeToPoi === "function") gp.routeToPoi(id);
+    lastGlobalRoutePoiId = id;
     setGlobalGuideOpen(false);
+  }
+
+  function flushPendingGlobalPoi() {
+    if (!pendingGlobalPoiId || !active || !shellMap) return;
+    if (document.body.dataset.mobileHome !== "1") return;
+    var id = pendingGlobalPoiId;
+    var notice = pendingGlobalPoiNotice;
+    pendingGlobalPoiId = null;
+    pendingGlobalPoiNotice = "";
+    pendingMode = "map";
+    pendingTab = "map";
+    setSheet("map", "map");
+    setTimeout(function () { selectGlobalPoi(id, notice); }, 120);
   }
 
   function globalCountryLabel(hotel) {
@@ -1882,6 +1905,7 @@
           pendingLocation = null;
           setTimeout(function () { focusShellOnLocation(location, true); }, 120);
         }
+        flushPendingGlobalPoi();
         return;
       }
       if (Date.now() - started < 4000) setTimeout(check, 100);
@@ -2592,7 +2616,26 @@
     if (isHomeMapVisible()) {
       pendingLocation = null;
       setTimeout(function () { focusShellOnLocation(latlng, true); }, 120);
+      if (lastGlobalRoutePoiId) {
+        var routeId = lastGlobalRoutePoiId;
+        lastGlobalRoutePoiId = null;
+        setTimeout(function () {
+          var gp = rd("guiapa");
+          if (gp && typeof gp.routeToPoi === "function") gp.routeToPoi(routeId);
+        }, 250);
+      }
     }
+  }
+
+  function cancelRouteFromMap() {
+    var gp = rd("guiapa");
+    if (gp && typeof gp.cancelRoute === "function") gp.cancelRoute();
+    else if (gp && typeof gp.clearRouteFocus === "function") gp.clearRouteFocus();
+    var mapas = rd("mapas");
+    if (mapas && typeof mapas.cancelRoute === "function") mapas.cancelRoute();
+    if (typeof window.cancelarRuta3d === "function") window.cancelarRuta3d();
+    delete document.body.dataset.routeActive;
+    if (shellMap) setTimeout(function () { try { shellMap.invalidateSize(); } catch (error) {} }, 0);
   }
 
   function recenterMap() {
@@ -2695,6 +2738,7 @@
     if (showTransport) document.body.dataset.mobileTransport = "1";
     else delete document.body.dataset.mobileTransport;
     document.body.dataset.mobileSheet = mode;
+    if (mode === "map") document.body.dataset.routeBarAllowed = "1";
     if (wasTransport && !showTransport) unmountTransportSheet();
     if (showTransport) mountTransportSheet();
     if (mode !== "map") clearNearbyMapHint();
@@ -2867,6 +2911,7 @@
 
     initHomeMap();
     syncFromDom();
+    flushPendingGlobalPoi();
     syncGlobalGuide();
     updateNearbyMapHint(currentUserLatLng());
   }
@@ -2905,6 +2950,29 @@
       var detail = event && event.detail;
       if (!detail || !detail.hotelName) return;
       if (openHotelPoisByName(detail.hotelName) && event.cancelable) event.preventDefault();
+    });
+    window.addEventListener("revistadigital:openGlobalPoi", function (event) {
+      var detail = event && event.detail;
+      var id = detail && (detail.poiId || detail.id);
+      if (!id || !isMobile()) return;
+      if (event.cancelable) event.preventDefault();
+      pendingGlobalPoiId = id;
+      pendingGlobalPoiNotice = detail.notice || "";
+      pendingMode = "map";
+      pendingTab = "map";
+      if (!document.querySelector("#appView .portal-hero-stats")) navigate("/");
+      else {
+        apply();
+        flushPendingGlobalPoi();
+      }
+    });
+    window.addEventListener("revistadigital:showMapForRoute", function () {
+      if (!isMobile()) return;
+      pendingMode = "map";
+      pendingTab = "map";
+      setSheet("map", "map");
+      var gp = rd("guiapa");
+      if (shellMap && gp && gp._map !== shellMap && typeof gp.bindMap === "function") gp.bindMap(shellMap);
     });
     window.addEventListener("popstate", scheduleSync);
     window.addEventListener("pageshow", function (event) {

@@ -678,7 +678,33 @@ const RESTAURANTES_PARAISO = {
     overlay.querySelector(".pano-360-action-close")?.addEventListener("click", close);
   }
 
-  function openRestaurantMap(hotelName, label, closePanorama) {
+  function openGlobalMapPoi(poiId, label, closePanorama, notice) {
+    if (!poiId) return false;
+    var event = new CustomEvent("revistadigital:openGlobalPoi", {
+      detail: { poiId: poiId, label: label, notice: notice || "" },
+      cancelable: true,
+      bubbles: true
+    });
+    window.dispatchEvent(event);
+    if (typeof closePanorama === "function") closePanorama();
+    setTimeout(function () {
+      document.body.classList.remove("pano-360-open");
+      document.body.style.removeProperty("overflow");
+      document.querySelectorAll(
+        ".pano-360-modal, .pano-360-action-overlay, .pano-360-floating-menu, " +
+        ".pano-360-floating-panel"
+      ).forEach(function (el) {
+        if (el.parentNode) el.parentNode.removeChild(el);
+      });
+      var guide = window.RevistaDigital && window.RevistaDigital.guiapa;
+      if (guide && typeof guide.renderMobileActions === "function") guide.renderMobileActions(null);
+      var panel = document.getElementById("guideMobileActions");
+      if (panel) panel.setAttribute("hidden", "");
+    }, 0);
+    return event.defaultPrevented;
+  }
+
+  function openRestaurantMap(hotelName, label, closePanorama, requestedPoiId) {
     const guide = window.RevistaDigital?.guiapa;
     const routes = window.RevistaDigital?.routes;
     // findHotelPortalRoute y poiForHotel buscan en estructuras que pueden
@@ -687,7 +713,12 @@ const RESTAURANTES_PARAISO = {
     var canonicalKey = resolveHotelKey(hotelName);
     var hotelRoute = routes?.findHotelPortalRoute?.(hotelName)
       || routes?.findHotelPortalRoute?.(canonicalKey);
-    const restaurantPoi = findRestaurantPoi(label, hotelName);
+    var requestedPoi = requestedPoiId ? findGuidePoiById(requestedPoiId) : null;
+    var requestedCategory = requestedPoi ? normalizeText(requestedPoi.category) : "";
+    const restaurantPoi = requestedPoi &&
+      (requestedCategory === "restaurante" || requestedCategory === "bar" || requestedCategory === "discoteca")
+      ? requestedPoi
+      : findRestaurantPoi(label, hotelName);
     const hasRestaurantCoordinates = restaurantPoi?.verified === true &&
       Number.isFinite(restaurantPoi.lat) && Number.isFinite(restaurantPoi.lng);
     var hotelPoi = guide?.poiForHotel?.(hotelName);
@@ -704,7 +735,15 @@ const RESTAURANTES_PARAISO = {
         ? `No hay ubicación interior verificada para ${label}; la ruta se traza hasta ${hotelName}.`
         : `No hay ubicación verificada para ${label} ni para ${hotelName}.`;
 
-    if (!destination || typeof routes.navigate !== "function" ||
+    if (!destination) {
+      console.warn(`No se pudo preparar el mapa o la ruta para ${label} en ${hotelName}.`);
+      window.alert("No fue posible preparar el mapa y la ruta para este restaurante.");
+      return;
+    }
+
+    if (openGlobalMapPoi(destination.id, label, closePanorama, notice)) return;
+
+    if (typeof routes.navigate !== "function" ||
         typeof guide?.queueRouteToPoi !== "function" ||
         !guide.queueRouteToPoi(destination.id, notice)) {
       console.warn(`No se pudo preparar el mapa o la ruta para ${label} en ${hotelName}.`);
@@ -712,7 +751,6 @@ const RESTAURANTES_PARAISO = {
       return;
     }
 
-    closePanorama();
     // Solo navegar si hay una ruta de hotel diferente a la actual; si ya
     // estamos en el mapa del complejo, quedarse en la misma página y centrar
     // el mapa en el restaurante.
@@ -909,19 +947,25 @@ const RESTAURANTES_PARAISO = {
       if (mapBtn) {
         mapBtn.addEventListener("click", () => {
           if (isRestaurantView) {
-            openRestaurantMap(hotelName, label, closeModal);
+            openRestaurantMap(hotelName, label, closeModal, requestedPoiId);
             return;
           }
           const poiId = mapBtn.getAttribute("data-poi");
-          closeModal();
+          if (!poiId) {
+            closeModal();
+            return;
+          }
+          if (openGlobalMapPoi(poiId, label, closeModal, "")) return;
           const gp = window.RevistaDigital && window.RevistaDigital.guiapa;
-          if (!poiId || !gp || typeof gp.selectPoi !== "function") return;
+          if (!gp || typeof gp.selectPoi !== "function") return;
           const guideMount = document.getElementById("guideExplorer") ||
             document.querySelector("[data-hotel-guide]");
           if (guideMount && typeof guideMount.scrollIntoView === "function") {
             try { guideMount.scrollIntoView({ behavior: "smooth", block: "start" }); } catch (e) { /* ignore */ }
           }
+          if (typeof gp.queueRouteToPoi === "function") gp.queueRouteToPoi(poiId, "");
           gp.selectPoi(poiId);
+          if (typeof gp.routeToPoi === "function") gp.routeToPoi(poiId);
         });
       }
       const menuBtn = modal.querySelector(".pano-360-menu");

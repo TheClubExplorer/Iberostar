@@ -273,6 +273,34 @@
     height: 22px;
   }
 
+  .mobile-map-fab-cancel {
+    position: absolute;
+    right: 0;
+    bottom: calc(100% + 10px);
+    display: none;
+    width: 50px;
+    height: 50px;
+    padding: 0;
+    border-color: rgba(255, 255, 255, .5);
+    background: #002855;
+    color: #fff;
+    font-size: 0;
+    line-height: 1;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .mobile-map-fab-cancel::before {
+    content: "×";
+    margin: 0;
+    font-size: 22px;
+    line-height: 1;
+  }
+
+  body.mobile-app-active[data-mobile-sheet="map"][data-route-active="1"] .mobile-map-fab-cancel {
+    display: inline-flex;
+  }
+
   body.mobile-app-active .location-status {
     display: none !important;
   }
@@ -284,6 +312,11 @@
 
   body.mobile-app-active .leaflet-top {
     top: calc(var(--mob-header) + env(safe-area-inset-top, 0px) + 10px);
+  }
+
+  body.mobile-app-active:not([data-mobile-sheet="map"]) .leaflet-control-zoom,
+  body.mobile-app-active:not([data-mobile-sheet="map"]) .leaflet-control-rotate {
+    display: none !important;
   }
 
   body.mobile-app-active[data-mobile-home="1"][data-mobile-sheet="map"] .leaflet-bottom {

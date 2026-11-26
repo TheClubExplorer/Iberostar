@@ -1494,14 +1494,14 @@
         <span class="destination-card-copy"><small>RESTAURANTES</small><strong>${escapeHtml(country.name)}</strong><span>${country.hotels.length} ${hotelWord} · ${country.restaurantCount} ${restaurantWord}</span><b>Ver carta →</b></span>
       </a>`;
       }).join("");
+      const restaurantHeroImage = "src/paraiso-del-mar/banner/ParaisoDelMar.jpg";
       view.innerHTML = `<main class="portal-page restaurant-portal-page">
         ${portalNav(getPortalNavModel(route))}
-        <section class="portal-hero">
+        <section class="portal-hero portal-hero--fullbleed">
           <div><p class="portal-kicker">RESTAURANTES</p><h1>Sabores de nuestros destinos</h1><p>Elija un país para descubrir la carta de restaurantes de cada hotel.</p></div>
-          ${RI.img("src/paraiso-del-mar/banner/ParaisoDelMar.jpg", {
-            alt: "",
-            priority: true,
-            sizes: "(max-width:600px) 100vw, 45vw"
+          ${renderPortalHeroCarousel([restaurantHeroImage], "restaurantes", "", "", "(max-width:850px) 100vw, 45vw", {
+            video: IBEROSTAR_BANNER_VIDEO,
+            poster: restaurantHeroImage
           })}
         </section>
         <section class="portal-section">
@@ -1510,6 +1510,7 @@
           <div class="destination-grid">${cards}</div>
         </section>
       </main>`;
+      initPortalHeroCarousels(view);
       return true;
     }
 
@@ -2169,6 +2170,7 @@
       history.pushState({ appRoute: path, restaurantReturnRoute, cartReturnRoute }, "", target);
     }
     handleRouteChange(path);
+    window.dispatchEvent(new CustomEvent("revistadigital:routeChange", { detail: { path: path } }));
     window.RevistaDigital.siteTour?.onRouteChange?.(getCurrentRoute());
   }
   document.addEventListener("click", (event) => {
