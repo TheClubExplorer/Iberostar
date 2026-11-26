@@ -56,21 +56,25 @@
     map: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3 3 5v16l6-2 6 2 6-2V3l-6 2-6-2Z"/><path d="M9 3v16M15 5v16"/></svg>',
     explore: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m15 9-2 4-4 2 2-4 4-2Z"/></svg>',
     restaurants: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3v7a3 3 0 0 0 6 0V3M9 3v18M17 3c2 2 2 5 0 7v11"/></svg>',
+    transport: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h12a3 3 0 0 1 3 3v5H6a3 3 0 0 1-3-3V7Z"/><path d="M3 10h15"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>',
     pano: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>',
     search: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>',
     locate: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>',
-    recenter: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 15v5h-5M20 9V4h-5M4 15v5h5"/><circle cx="12" cy="12" r="3"/></svg>'
+    recenter: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 15v5h-5M20 9V4h-5M4 15v5h5"/><circle cx="12" cy="12" r="3"/></svg>',
+    user: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c.8-4 3.8-6 8-6s7.2 2 8 6"/></svg>'
   };
 
   var TAB_DEFS = [
     { id: "map", route: "/", es: "Mapa", en: "Map" },
     { id: "explore", route: "/", es: "Explorar", en: "Explore" },
     { id: "restaurants", route: "/restaurantes", es: "Restaurantes", en: "Dining" },
+    { id: "transport", route: "/carrito-golf", es: "Transporte", en: "Transportation" },
     { id: "pano", route: "/360", es: "360°", en: "360°" }
   ];
 
   var shell = null;
   var exploreSheet = null;
+  var transportSheet = null;
   var guideOverlay = null;
   var guideCountry = null;
   var guideQuery = "";
@@ -121,6 +125,24 @@
   var nearbyPoiLabelLayer = null;
   var nearbyPoiHotelId = null;
   var nearbyPoiPreviousMap = null;
+  var authState = null;
+  var loginOverlay = null;
+  var loginForm = null;
+  var loginEmail = null;
+  var loginPassword = null;
+  var loginError = null;
+  var loginSubmit = null;
+  var loginName = null;
+  var loginConfirm = null;
+  var loginHotel = null;
+  var loginShift = null;
+  var loginCode = null;
+  var loginDriverCode = null;
+  var loginMode = "register";
+  var loginRole = "socio";
+  var loginBusy = false;
+  var authPanel = null;
+  var accountButton = null;
 
   function isMobile() {
     try { return MQ.matches; } catch (error) { return window.innerWidth <= 768; }
@@ -200,6 +222,19 @@
       header.insertBefore(language, menu);
     }
 
+    if (!document.getElementById("mobileAccountButton")) {
+      accountButton = document.createElement("button");
+      accountButton.type = "button";
+      accountButton.id = "mobileAccountButton";
+      accountButton.className = "mobile-header-btn mobile-account-btn";
+      accountButton.innerHTML = ICONS.user;
+      accountButton.hidden = true;
+      accountButton.addEventListener("click", openAuthPanel);
+      header.insertBefore(accountButton, menu);
+    } else {
+      accountButton = document.getElementById("mobileAccountButton");
+    }
+
     updateHeaderLabels();
   }
 
@@ -214,6 +249,275 @@
       language.textContent = lang() === "en" ? "ES" : "EN";
       language.setAttribute("aria-label", lang() === "en" ? "Cambiar a español" : "Switch to English");
     }
+    if (accountButton) {
+      accountButton.hidden = !authState;
+      accountButton.setAttribute("aria-label", lang() === "en" ? "Account and services" : "Cuenta y servicios");
+    }
+  }
+
+  function setLoginRole(role) {
+    loginRole = role === "chofer" ? "chofer" : "socio";
+    if (!loginOverlay) return;
+    Array.prototype.forEach.call(loginOverlay.querySelectorAll("[data-login-role]"), function (button) {
+      button.setAttribute("aria-pressed", button.dataset.loginRole === loginRole ? "true" : "false");
+    });
+    updateLoginLabels();
+    if (loginEmail) loginEmail.focus();
+  }
+
+  function updateLoginLabels() {
+    if (!loginOverlay) return;
+    var en = lang() === "en";
+    var registering = loginMode === "register";
+    var setValue = function (selector, value) {
+      var node = loginOverlay.querySelector(selector);
+      if (node) node.textContent = value;
+    };
+    loginOverlay.dataset.loginView = loginMode;
+    setValue("[data-login-mark]", registering
+      ? (en ? "THE CLUB · CREATE ACCOUNT" : "THE CLUB · ALTA DE CUENTA")
+      : (en ? "THE CLUB · SECURE ACCESS" : "THE CLUB · ACCESO SEGURO"));
+    setValue("[data-login-title]", registering ? (en ? "Create account" : "Crear cuenta") : (en ? "Secure sign in" : "Acceso seguro"));
+    setValue("[data-login-copy]", registering
+      ? (en
+        ? "Register as a driver or member with an invitation code."
+        : "Regístrate como chofer o socio con un código de invitación.")
+      : (en
+        ? "Sign in with your member number and password."
+        : "Ingresa con tu número de socio y contraseña."));
+    setValue("[data-login-mode-title]", en ? "Access mode" : "Modo de acceso");
+    setValue("[data-login-role-title]", en ? "Profile type" : "Tipo de perfil");
+    setValue("[data-login-credentials-title]", registering
+      ? (en ? "Account details" : "Datos de la cuenta")
+      : (en ? "Member access" : "Acceso de socio"));
+    setValue("[data-login-driver-title]", en ? "Driver details" : "Datos del chofer");
+    setValue("[data-login-member-title]", en ? "Member invitation" : "Invitación socio");
+    setValue('[data-login-mode="login"]', en ? "Sign in" : "Entrar");
+    setValue('[data-login-mode="register"]', en ? "Register" : "Registrarme");
+    setValue('[data-login-role="socio"]', en ? "Member" : "Socio");
+    setValue('[data-login-role="chofer"]', en ? "Driver" : "Chofer");
+    setValue("[data-login-email-label]", registering ? (en ? "Email" : "Email") : (en ? "Member number" : "Número de socio"));
+    setValue("[data-login-password-label]", registering ? (en ? "Password (min. 6 characters)" : "Contraseña (mín. 6 caracteres)") : (en ? "Password" : "Contraseña"));
+    setValue("[data-login-confirm-label]", en ? "Repeat password" : "Repetir contraseña");
+    setValue("[data-login-name-label]", en ? "Full name" : "Nombre completo");
+    setValue("[data-login-driver-code-label]", en ? "Driver number" : "Número de chofer");
+    setValue("[data-login-hotel-label]", en ? "Assigned hotel" : "Hotel asignado");
+    setValue("[data-login-shift-label]", en ? "Shift" : "Turno");
+    setValue("[data-login-code-label]", en ? "Member number (invitation code)" : "Número de socio (código de invitación)");
+    setValue("[data-login-submit]", loginBusy
+      ? (registering ? (en ? "Creating…" : "Creando cuenta…") : (en ? "Signing in…" : "Entrando…"))
+      : (registering ? (en ? "Create account" : "Crear cuenta") : (en ? "Sign in" : "Entrar")));
+    setValue("[data-login-note]", registering
+      ? (en
+        ? "Drivers can register freely. Members need an invitation code."
+        : "Los choferes pueden registrarse libremente. Los socios necesitan un código de invitación.")
+      : (en
+        ? "Use your member number and password."
+        : "Usa tu número de socio y contraseña."));
+    Array.prototype.forEach.call(loginOverlay.querySelectorAll("[data-login-mode]"), function (button) {
+      button.setAttribute("aria-pressed", button.dataset.loginMode === loginMode ? "true" : "false");
+    });
+    Array.prototype.forEach.call(loginOverlay.querySelectorAll("[data-register-field]"), function (field) {
+      field.hidden = !registering;
+    });
+    Array.prototype.forEach.call(loginOverlay.querySelectorAll("[data-driver-field]"), function (field) {
+      field.hidden = !registering || loginRole !== "chofer";
+    });
+    Array.prototype.forEach.call(loginOverlay.querySelectorAll("[data-member-field]"), function (field) {
+      field.hidden = !registering || loginRole !== "socio";
+    });
+    if (loginEmail) loginEmail.setAttribute("type", registering ? "email" : "text");
+    if (loginEmail) loginEmail.setAttribute("inputmode", registering ? "email" : "text");
+    if (loginPassword) loginPassword.setAttribute("autocomplete", registering ? "new-password" : "current-password");
+    [loginSubmit, loginEmail, loginPassword, loginName, loginConfirm, loginHotel, loginShift, loginCode, loginDriverCode].forEach(function (input) {
+      if (input) input.disabled = loginBusy;
+    });
+  }
+
+  function setLoginMode(mode) {
+    loginMode = mode === "register" ? "register" : "login";
+    setLoginError("");
+    updateLoginLabels();
+    if (loginEmail) loginEmail.focus();
+  }
+
+  function setLoginError(message) {
+    if (loginError) loginError.textContent = message || "";
+  }
+
+  function setLoginBusy(busy) {
+    loginBusy = !!busy;
+    updateLoginLabels();
+  }
+
+  function submitLogin() {
+    if (loginMode === "register") {
+      submitRegister();
+      return;
+    }
+    var auth = rd("appAuth");
+    if (loginBusy) return;
+    if (!auth || typeof auth.signIn !== "function") {
+      setLoginError("El servicio de acceso no está disponible.");
+      return;
+    }
+    setLoginError("");
+    setLoginBusy(true);
+    auth.signIn(loginEmail ? loginEmail.value : "", loginPassword ? loginPassword.value : "").then(
+      function () {
+        setLoginBusy(false);
+        hideLogin();
+        apply();
+      },
+      function (error) {
+        setLoginBusy(false);
+        setLoginError((error && error.message) || "No se pudo iniciar sesión.");
+        if (loginPassword) {
+          loginPassword.value = "";
+          loginPassword.focus();
+        }
+      }
+    );
+  }
+
+  function submitRegister() {
+    var auth = rd("appAuth");
+    if (loginBusy) return;
+    if (!auth || typeof auth.signUp !== "function") {
+      setLoginError("El servicio de registro no está disponible.");
+      return;
+    }
+    var password = loginPassword ? loginPassword.value : "";
+    var confirmation = loginConfirm ? loginConfirm.value : "";
+    if (password.length < 6) {
+      setLoginError("La contraseña debe tener al menos 6 caracteres.");
+      return;
+    }
+    if (password !== confirmation) {
+      setLoginError("Las contraseñas no coinciden.");
+      if (loginConfirm) loginConfirm.focus();
+      return;
+    }
+    setLoginError("");
+    setLoginBusy(true);
+    auth.signUp({
+      email: loginEmail ? loginEmail.value : "",
+      password: password,
+      role: loginRole,
+      displayName: loginName ? loginName.value : "",
+      assignedHotel: loginHotel ? loginHotel.value : "",
+      shift: loginShift ? loginShift.value : "",
+      registrationCode: loginCode ? loginCode.value : "",
+      accessCode: loginDriverCode ? loginDriverCode.value : ""
+    }).then(
+      function (result) {
+        setLoginBusy(false);
+        if (result && result.needsConfirmation) {
+          setLoginMode("login");
+          setLoginError(lang() === "en"
+            ? "Check your email to confirm the account, then sign in."
+            : "Revisa tu email para confirmar la cuenta y luego entra.");
+          if (loginPassword) loginPassword.value = "";
+          if (loginConfirm) loginConfirm.value = "";
+          if (loginCode) loginCode.value = "";
+          return;
+        }
+        hideLogin();
+        apply();
+      },
+      function (error) {
+        setLoginBusy(false);
+        setLoginError((error && error.message) || "No se pudo crear la cuenta.");
+        if (loginPassword) loginPassword.value = "";
+        if (loginConfirm) loginConfirm.value = "";
+        if (loginPassword) loginPassword.focus();
+      }
+    );
+  }
+
+  function showLogin() {
+    setLoginMode("register");
+    if (loginOverlay) loginOverlay.hidden = false;
+    document.body.dataset.mobileLogin = "1";
+  }
+
+  function hideLogin() {
+    if (loginOverlay) loginOverlay.hidden = true;
+    delete document.body.dataset.mobileLogin;
+    setLoginError("");
+    if (loginPassword) loginPassword.value = "";
+    if (loginConfirm) loginConfirm.value = "";
+    if (loginCode) loginCode.value = "";
+    if (loginDriverCode) loginDriverCode.value = "";
+  }
+
+  function loginRequired() {
+    return !authState;
+  }
+
+  function openAuthPanel() {
+    if (!authState) return;
+    updateAuthPanel();
+    if (!authPanel) return;
+    authPanel.hidden = false;
+    document.body.dataset.mobileAuthPanel = "1";
+    var close = authPanel.querySelector("[data-auth-close]");
+    if (close) close.focus();
+  }
+
+  function closeAuthPanel() {
+    if (authPanel) authPanel.hidden = true;
+    delete document.body.dataset.mobileAuthPanel;
+  }
+
+  function updateAuthPanel() {
+    if (!authPanel) return;
+    var profile = authState && authState.profile;
+    var email = authState && authState.session && authState.session.user ? authState.session.user.email : "";
+    var en = lang() === "en";
+    var setValue = function (selector, value) {
+      var node = authPanel.querySelector(selector);
+      if (node) node.textContent = value;
+    };
+    var driverOnly = profile && profile.role === "chofer";
+    var memberOnly = profile && profile.role === "socio";
+
+    setValue("[data-auth-role-label]", !profile ? "" : profile.role === "chofer" ? (en ? "Driver" : "Chofer") : (en ? "Member" : "Socio"));
+    setValue("[data-auth-identity]", profile && profile.displayName ? profile.displayName : (en ? "Your account" : "Tu cuenta"));
+    setValue("[data-auth-email]", email || "");
+    setValue("[data-auth-code-label]", en ? "Member code" : "Código de socio");
+    setValue("[data-auth-code]", profile && profile.memberCode ? profile.memberCode : "—");
+    setValue("[data-auth-hotel-label]", en ? "Assigned hotel" : "Hotel asignado");
+    setValue("[data-auth-hotel]", profile && profile.assignedHotel ? profile.assignedHotel : (en ? "No active assignment" : "Sin asignación activa"));
+    setValue("[data-auth-shift-label]", en ? "Shift" : "Turno");
+    setValue("[data-auth-shift]", profile && profile.shift ? profile.shift : "—");
+    setValue("[data-auth-map]", en ? "View resort map" : "Ver mapa del complejo");
+    setValue("[data-auth-logout]", en ? "Sign out" : "Cerrar sesión");
+
+    Array.prototype.forEach.call(authPanel.querySelectorAll("[data-auth-driver-only]"), function (node) {
+      node.hidden = !driverOnly;
+    });
+    Array.prototype.forEach.call(authPanel.querySelectorAll("[data-auth-member-only]"), function (node) {
+      node.hidden = !memberOnly;
+    });
+    var mapButton = authPanel.querySelector("[data-auth-map]");
+    if (mapButton) mapButton.hidden = !driverOnly;
+  }
+
+  function onAuthState(state) {
+    authState = state && state.profile && state.session ? state : null;
+    if (authState) {
+      document.body.dataset.appRole = authState.profile.role;
+      hideLogin();
+      closeAuthPanel();
+    } else {
+      delete document.body.dataset.appRole;
+      closeAuthPanel();
+      showLogin();
+    }
+    updateHeaderLabels();
+    updateAuthPanel();
+    apply();
   }
 
   function buildShell() {
@@ -244,22 +548,13 @@
         '<button type="button" class="mobile-explore-close" data-explore="close" aria-label="Cerrar">×</button>' +
       '</div>' +
       '<button type="button" class="mobile-explore-search" data-explore="search">' + ICONS.search + '<span data-explore-search></span></button>' +
-      '<div class="mobile-explore-chips">' +
-        '<button type="button" class="mobile-explore-chip" data-explore="hotels"></button>' +
-        '<button type="button" class="mobile-explore-chip" data-explore="restaurants"></button>' +
-        '<button type="button" class="mobile-explore-chip" data-explore="guide"></button>' +
-        '<button type="button" class="mobile-explore-chip" data-explore="pano"></button>' +
-      '</div>' +
-      '<div class="mobile-explore-body">' +
-        '<section class="mobile-explore-section">' +
-          '<h3 data-explore-guide-heading></h3>' +
-          '<button type="button" class="mobile-explore-card mobile-explore-card--guide" data-explore="guide">' +
-            '<span class="mobile-explore-guide-icon">' + ICONS.map + '</span>' +
-            '<span><strong data-explore-guide-title></strong><small data-explore-guide-subtitle></small></span>' +
-            '<span aria-hidden="true">→</span>' +
-          '</button>' +
-        '</section>' +
-        '<section class="mobile-explore-section">' +
+        '<div class="mobile-explore-chips">' +
+          '<button type="button" class="mobile-explore-chip" data-explore="hotels"></button>' +
+          '<button type="button" class="mobile-explore-chip" data-explore="restaurants"></button>' +
+          '<button type="button" class="mobile-explore-chip" data-explore="pano"></button>' +
+        '</div>' +
+        '<div class="mobile-explore-body">' +
+          '<section class="mobile-explore-section">' +
           '<h3 data-explore-destinations-heading></h3>' +
           '<div class="mobile-explore-grid" id="mobileExploreDestinations"></div>' +
         '</section>' +
@@ -274,6 +569,23 @@
       if (!trigger) return;
       if (trigger.dataset.explore === "route") onExploreRoute(trigger.dataset.route);
       else onExploreAction(trigger.dataset.explore, trigger);
+    });
+
+    transportSheet = document.createElement("section");
+    transportSheet.id = "mobileTransportSheet";
+    transportSheet.className = "mobile-transport-sheet";
+    transportSheet.innerHTML =
+      '<div class="mobile-explore-head">' +
+        '<div><p data-transport-kicker></p><h2 data-transport-title></h2></div>' +
+        '<button type="button" class="mobile-explore-close" data-transport-close aria-label="Cerrar">×</button>' +
+      '</div>' +
+      '<div class="mobile-transport-mount cart-page"></div>';
+    document.body.appendChild(transportSheet);
+    transportSheet.addEventListener("click", function (event) {
+      if (!event.target.closest("[data-transport-close]")) return;
+      pendingMode = "map";
+      pendingTab = "map";
+      setSheet("map", "map");
     });
 
     guideOverlay = document.createElement("div");
@@ -345,6 +657,8 @@
 
     shell.querySelector("#mobileMapRecenter").addEventListener("click", recenterMap);
     buildGlobalGuideSheet();
+    buildLoginOverlay();
+    buildAuthPanel();
     handle.addEventListener("click", function () {
       if (suppressClick) {
         suppressClick = false;
@@ -358,6 +672,190 @@
     handle.addEventListener("pointercancel", onDragEnd);
 
     updateLabels();
+  }
+
+  function buildLoginOverlay() {
+    if (loginOverlay) return;
+
+    loginOverlay = document.createElement("div");
+    loginOverlay.id = "mobileLogin";
+    loginOverlay.className = "mobile-login";
+    loginOverlay.setAttribute("role", "dialog");
+    loginOverlay.setAttribute("aria-modal", "true");
+    loginOverlay.hidden = true;
+    loginOverlay.innerHTML =
+      '<div class="mobile-login__brand">' +
+        '<picture>' +
+          '<source type="image/webp" srcset="src/logo%20png-01-320.webp 320w, src/logo%20png-01-640.webp 640w, src/logo%20png-01-1280.webp 1280w, src/logo%20png-01.webp 1920w" sizes="132px" />' +
+          '<img src="src/logo%20png-01.png" alt="Iberostar The Club" loading="eager" decoding="async" />' +
+        '</picture>' +
+      '</div>' +
+      '<form class="mobile-login__card" id="mobileLoginForm">' +
+        '<header class="mobile-login__header">' +
+          '<p class="mobile-login__mark" data-login-mark></p>' +
+          '<h1 class="mobile-login__title" data-login-title></h1>' +
+          '<p class="mobile-login__copy" data-login-copy></p>' +
+        '</header>' +
+        '<section class="mobile-login__section">' +
+          '<p class="mobile-login__section-title" data-login-mode-title></p>' +
+          '<div class="mobile-login__tabs" role="group" aria-label="Modo de acceso">' +
+            '<button type="button" class="mobile-login__tab" data-login-mode="login" aria-pressed="false"></button>' +
+            '<button type="button" class="mobile-login__tab" data-login-mode="register" aria-pressed="true"></button>' +
+          '</div>' +
+        '</section>' +
+        '<section class="mobile-login__section" data-register-field hidden>' +
+          '<p class="mobile-login__section-title" data-login-role-title></p>' +
+          '<div class="mobile-login__roles" role="group" aria-label="Tipo de acceso">' +
+            '<button type="button" class="mobile-login__role" data-login-role="socio" aria-pressed="true"></button>' +
+            '<button type="button" class="mobile-login__role" data-login-role="chofer" aria-pressed="false"></button>' +
+          '</div>' +
+        '</section>' +
+        '<section class="mobile-login__section">' +
+          '<p class="mobile-login__section-title" data-login-credentials-title></p>' +
+          '<label class="mobile-login__field">' +
+            '<span data-login-email-label></span>' +
+            '<input id="mobileLoginEmail" name="email" type="email" inputmode="email" autocomplete="username" />' +
+          '</label>' +
+          '<label class="mobile-login__field">' +
+            '<span data-login-password-label></span>' +
+            '<input id="mobileLoginPassword" name="password" type="password" autocomplete="current-password" />' +
+          '</label>' +
+          '<label class="mobile-login__field" data-register-field hidden>' +
+            '<span data-login-confirm-label></span>' +
+            '<input id="mobileLoginConfirm" name="confirm" type="password" autocomplete="new-password" />' +
+          '</label>' +
+          '<label class="mobile-login__field" data-register-field hidden>' +
+            '<span data-login-name-label></span>' +
+            '<input id="mobileLoginName" name="displayName" type="text" autocomplete="name" />' +
+          '</label>' +
+        '</section>' +
+        '<section class="mobile-login__section" data-register-field data-driver-field hidden>' +
+          '<p class="mobile-login__section-title" data-login-driver-title></p>' +
+          '<label class="mobile-login__field">' +
+            '<span data-login-driver-code-label></span>' +
+            '<input id="mobileLoginDriverCode" name="accessCode" type="text" autocomplete="off" />' +
+          '</label>' +
+          '<label class="mobile-login__field">' +
+            '<span data-login-hotel-label></span>' +
+            '<input id="mobileLoginHotel" name="assignedHotel" type="text" autocomplete="organization" />' +
+          '</label>' +
+          '<label class="mobile-login__field">' +
+            '<span data-login-shift-label></span>' +
+            '<input id="mobileLoginShift" name="shift" type="text" autocomplete="off" />' +
+          '</label>' +
+        '</section>' +
+        '<section class="mobile-login__section" data-register-field data-member-field hidden>' +
+          '<p class="mobile-login__section-title" data-login-member-title></p>' +
+          '<label class="mobile-login__field">' +
+            '<span data-login-code-label></span>' +
+            '<input id="mobileLoginCode" name="registrationCode" type="text" autocomplete="off" />' +
+          '</label>' +
+        '</section>' +
+        '<div class="mobile-login__actions">' +
+          '<button type="submit" class="mobile-login__submit" data-login-submit></button>' +
+          '<p class="mobile-login__error" data-login-error role="alert" aria-live="polite"></p>' +
+          '<p class="mobile-login__note" data-login-note></p>' +
+        '</div>' +
+      '</form>';
+    document.body.appendChild(loginOverlay);
+
+    loginForm = loginOverlay.querySelector("#mobileLoginForm");
+    loginEmail = loginOverlay.querySelector("#mobileLoginEmail");
+    loginPassword = loginOverlay.querySelector("#mobileLoginPassword");
+    loginConfirm = loginOverlay.querySelector("#mobileLoginConfirm");
+    loginName = loginOverlay.querySelector("#mobileLoginName");
+    loginHotel = loginOverlay.querySelector("#mobileLoginHotel");
+    loginShift = loginOverlay.querySelector("#mobileLoginShift");
+    loginCode = loginOverlay.querySelector("#mobileLoginCode");
+    loginDriverCode = loginOverlay.querySelector("#mobileLoginDriverCode");
+    loginError = loginOverlay.querySelector("[data-login-error]");
+    loginSubmit = loginOverlay.querySelector("[data-login-submit]");
+    [loginCode, loginDriverCode].forEach(function (input) {
+      if (input) input.addEventListener("input", function () {
+        input.value = input.value.toUpperCase();
+      });
+    });
+
+    loginOverlay.addEventListener("click", function (event) {
+      var modeTrigger = event.target.closest("[data-login-mode]");
+      if (modeTrigger) {
+        setLoginMode(modeTrigger.dataset.loginMode);
+        return;
+      }
+      var roleTrigger = event.target.closest("[data-login-role]");
+      if (!roleTrigger) return;
+      setLoginRole(roleTrigger.dataset.loginRole);
+    });
+    loginForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+      submitLogin();
+    });
+
+    updateLoginLabels();
+  }
+
+  function buildAuthPanel() {
+    if (authPanel) return;
+
+    authPanel = document.createElement("div");
+    authPanel.id = "mobileAuthPanel";
+    authPanel.className = "mobile-auth-panel";
+    authPanel.setAttribute("role", "dialog");
+    authPanel.setAttribute("aria-modal", "true");
+    authPanel.hidden = true;
+    authPanel.innerHTML =
+      '<section class="mobile-auth-panel__sheet">' +
+        '<div class="mobile-auth-panel__grip" aria-hidden="true"></div>' +
+        '<div class="mobile-auth-panel__head">' +
+          '<div>' +
+            '<span class="mobile-auth-panel__role" data-auth-role-label></span>' +
+            '<h2 class="mobile-auth-panel__identity" data-auth-identity></h2>' +
+            '<p class="mobile-auth-panel__email" data-auth-email></p>' +
+          '</div>' +
+          '<button type="button" class="mobile-auth-panel__close" data-auth-close aria-label="Cerrar">×</button>' +
+        '</div>' +
+        '<div class="mobile-auth-panel__details">' +
+          '<div class="mobile-auth-panel__row" data-auth-member-only>' +
+            '<span data-auth-code-label></span><strong data-auth-code></strong>' +
+          '</div>' +
+          '<div class="mobile-auth-panel__row" data-auth-driver-only hidden>' +
+            '<span data-auth-hotel-label></span><strong data-auth-hotel></strong>' +
+          '</div>' +
+          '<div class="mobile-auth-panel__row" data-auth-driver-only hidden>' +
+            '<span data-auth-shift-label></span><strong data-auth-shift></strong>' +
+          '</div>' +
+        '</div>' +
+        '<div class="mobile-auth-panel__actions">' +
+          '<button type="button" class="mobile-auth-panel__primary" data-auth-map hidden></button>' +
+          '<button type="button" class="mobile-auth-panel__secondary" data-auth-logout></button>' +
+        '</div>' +
+      '</section>';
+    document.body.appendChild(authPanel);
+
+    authPanel.addEventListener("click", function (event) {
+      if (event.target === authPanel || event.target.closest("[data-auth-close]")) {
+        closeAuthPanel();
+        return;
+      }
+      if (event.target.closest("[data-auth-map]")) {
+        closeAuthPanel();
+        pendingMode = "map";
+        pendingTab = "map";
+        if (document.getElementById("appView") && !document.querySelector("#appView .portal-hero-stats")) navigate("/");
+        setSheet("map", "map");
+        return;
+      }
+      if (event.target.closest("[data-auth-logout]")) {
+        var auth = rd("appAuth");
+        if (!auth || typeof auth.signOut !== "function") {
+          onAuthState(null);
+          return;
+        }
+        auth.signOut().then(closeAuthPanel).catch(closeAuthPanel);
+      }
+    });
+
+    updateAuthPanel();
   }
 
   function buildGlobalGuideSheet() {
@@ -955,7 +1453,7 @@
       if (!definition) return;
       button.querySelector("span").textContent = definition.id === "pano"
         ? definition.en
-        : label(definition.id === "explore" ? "navExplore" : definition.id === "restaurants" ? "menuRestaurants" : "", definition.es, definition.en);
+        : label(definition.id === "explore" ? "navExplore" : definition.id === "restaurants" ? "menuRestaurants" : definition.id === "transport" ? "menuTransport" : "", definition.es, definition.en);
       button.setAttribute("aria-label", button.querySelector("span").textContent);
     });
     if (mapElement) {
@@ -974,9 +1472,6 @@
       setText("[data-explore-kicker]", en ? "DISCOVER" : "DESCUBRE");
       setText("[data-explore-title]", en ? "What would you like to explore?" : "¿Qué quieres explorar?");
       setText("[data-explore-search]", label("navSearch", en ? "Search hotels, destinations…" : "Buscar hoteles, destinos…", "Search hotels, destinations…"));
-      setText("[data-explore-guide-heading]", en ? "Interactive guide" : "Guía interactiva");
-      setText("[data-explore-guide-title]", en ? "Interactive guide" : "Guía interactiva");
-      setText("[data-explore-guide-subtitle]", en ? "Countries, destinations and hotel entries" : "Países, destinos y entradas a hoteles");
       setText("[data-explore-destinations-heading]", en ? "Destinations" : "Destinos");
       setText("[data-explore-hotels-heading]", en ? "Hotels" : "Hoteles");
       Array.prototype.forEach.call(exploreSheet.querySelectorAll(".mobile-explore-chip"), function (button) {
@@ -985,13 +1480,20 @@
           ? (en ? "Hotels" : "Hoteles")
           : action === "restaurants"
             ? label("menuRestaurants", en ? "Dining" : "Restaurantes", "Dining")
-            : action === "guide"
-              ? label("menuGuia", en ? "Resort guide" : "Guía interactiva", "Resort guide")
-              : "360°";
+            : "360°";
         button.textContent = text;
         button.setAttribute("aria-label", text);
       });
       populateExplore();
+    }
+    if (transportSheet) {
+      var transportEn = lang() === "en";
+      var setTransportText = function (selector, text) {
+        var node = transportSheet.querySelector(selector);
+        if (node) node.textContent = text;
+      };
+      setTransportText("[data-transport-kicker]", transportEn ? "MOBILITY" : "MOVILIDAD");
+      setTransportText("[data-transport-title]", label("menuTransport", transportEn ? "Transportation" : "Transporte", "Transportation"));
     }
     if (guideOverlay) {
       var guideEn = lang() === "en";
@@ -1007,6 +1509,8 @@
       if (document.body.dataset.mobileGuide === "1") renderGuide();
     }
     updateHeaderLabels();
+    updateLoginLabels();
+    updateAuthPanel();
   }
 
   function populateExplore() {
@@ -1297,10 +1801,6 @@
     if (action === "hotels") {
       var hotels = exploreSheet && exploreSheet.querySelector("#mobileExploreHotels");
       if (hotels && hotels.scrollIntoView) hotels.scrollIntoView({ block: "nearest", behavior: "smooth" });
-      return;
-    }
-    if (action === "guide") {
-      onDockAction("guide");
       return;
     }
     if (action === "restaurants") {
@@ -2108,6 +2608,11 @@
   function onTab(definition) {
     pendingMode = definition.id === "map" ? "map" : "section";
     pendingTab = definition.id;
+    if (definition.id === "transport") {
+      if (document.querySelector("#appView .portal-hero-stats")) setSheet("section", "transport");
+      else navigate("/");
+      return;
+    }
     setSheet(pendingMode, definition.id);
     navigate(definition.route);
   }
@@ -2160,8 +2665,38 @@
     setSheet(next, pendingTab);
   }
 
+  function mountTransportSheet() {
+    if (!transportSheet) return;
+    var mount = transportSheet.querySelector(".mobile-transport-mount");
+    if (!mount) return;
+    if (mount.dataset.cartMounted === "1") {
+      var activeCart = rd("carritoGolf");
+      if (activeCart && typeof activeCart._cartMapInvalidate === "function") activeCart._cartMapInvalidate(true);
+      return;
+    }
+    var routes = rd("routes");
+    if (!routes || typeof routes.mountCartSheet !== "function") return;
+    if (routes.mountCartSheet(mount)) mount.dataset.cartMounted = "1";
+  }
+
+  function unmountTransportSheet() {
+    if (!transportSheet) return;
+    var cart = rd("carritoGolf");
+    if (cart && typeof cart.teardown === "function") cart.teardown();
+    var mount = transportSheet.querySelector(".mobile-transport-mount");
+    if (!mount) return;
+    mount.innerHTML = "";
+    delete mount.dataset.cartMounted;
+  }
+
   function setSheet(mode, tab) {
+    var wasTransport = document.body.dataset.mobileTransport === "1";
+    var showTransport = tab === "transport" && document.body.dataset.mobileHome !== "0";
+    if (showTransport) document.body.dataset.mobileTransport = "1";
+    else delete document.body.dataset.mobileTransport;
     document.body.dataset.mobileSheet = mode;
+    if (wasTransport && !showTransport) unmountTransportSheet();
+    if (showTransport) mountTransportSheet();
     if (mode !== "map") clearNearbyMapHint();
     if (handle) handle.setAttribute("aria-expanded", mode === "section" ? "true" : "false");
 
@@ -2221,15 +2756,20 @@
   }
 
   function isNativeRoute() {
-    if (document.body.classList.contains("cart-map-focus-open")) return true;
+    if (document.body.classList.contains("cart-map-focus-open")) {
+      if (document.body.dataset.mobileTransport === "1" && document.querySelector("#mobileTransportSheet #hotel-carrito")) return false;
+      return true;
+    }
     return !!document.querySelector(".hotel-complex-map-wrap[data-guide-wrap], .hotel-guide-panel[data-guide-overlay]");
   }
 
   function inferTab(isHome) {
     if (pendingTab) return pendingTab;
+    if (document.body.dataset.mobileTransport === "1") return "transport";
     if (document.querySelector(".restaurant-portal-page, .restaurant-portal")) return "restaurants";
     if (document.querySelector(".media360-spread")) return "pano";
-    if (document.querySelector(".cart-page, #videosForm, .media-spread")) return "explore";
+    if (document.querySelector("#appView .cart-page, #appView .cart-portal-page")) return "transport";
+    if (document.querySelector("#videosForm, .media-spread")) return "explore";
     if (isHome || document.querySelector(".portal-page")) return "explore";
     return "explore";
   }
@@ -2302,6 +2842,13 @@
     ensureHeaderActions();
     buildShell();
 
+    if (loginRequired()) {
+      deactivate();
+      showLogin();
+      return;
+    }
+    hideLogin();
+
     if (isNativeRoute()) {
       deactivate();
       return;
@@ -2326,6 +2873,13 @@
 
   function initialize() {
     window.addEventListener("revistadigital:locationdetected", onLocationDetected);
+    ensureHeaderActions();
+    buildShell();
+
+    var auth = rd("appAuth");
+    if (auth && typeof auth.subscribe === "function") {
+      window.__mobileAuthUnsubscribe = auth.subscribe(onAuthState);
+    }
     apply();
 
     var appView = document.getElementById("appView");

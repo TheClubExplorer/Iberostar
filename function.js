@@ -2183,6 +2183,7 @@ let routeLine = null;
 let locationRequestPending = false;
 let locationRequestWatchdog = null;
 let autoLocationAttempted = false;
+let welcomeShownForSession = false;
 let activeHotelDetail = null;
 let activeRestaurantMenuIndex = null;
 let returnPageIndex = null;
@@ -2608,14 +2609,35 @@ function focusActiveMapOnLocation(isAuto) {
   }
 }
 
+function isWelcomeAllowed() {
+  const auth = window.RevistaDigital?.appAuth;
+  return !!(auth && typeof auth.getRole === "function" && auth.getRole() === "socio");
+}
+
+function maybeShowSocioWelcome() {
+  if (!isWelcomeAllowed()) {
+    welcomeShownForSession = false;
+    dismissLocationWelcome();
+    return;
+  }
+  if (welcomeShownForSession) return;
+  welcomeShownForSession = true;
+  const coords = currentPosition || window.RevistaDigital?.state?.currentPosition;
+  if (coords) {
+    showLocationWelcome(coords);
+    return;
+  }
+  requestCurrentLocation({ welcome: true, force: true });
+}
+
 function requestCurrentLocation(options = {}) {
-  const wantsWelcome = options && options.welcome === true;
+  const wantsWelcome = options && options.welcome === true && isWelcomeAllowed();
   const status = document.getElementById("locationStatus");
   document.body.dataset.locationRequested = "true";
 
   // Evitamos duplicar la detección automática, pero una petición manual
   // (botón "Ubicarme") siempre debe poder ejecutarse.
-  if (locationRequestPending && wantsWelcome) return;
+  if (locationRequestPending && wantsWelcome && !options.force) return;
 
   if (!navigator.geolocation) {
     status.textContent =
@@ -2683,7 +2705,10 @@ function requestCurrentLocation(options = {}) {
       updateGeneralUserMarker();
       updateHotelUserMarker();
       renderLocationStatus(currentPosition);
-      if (wantsWelcome) showLocationWelcome(currentPosition);
+      if (wantsWelcome) {
+        welcomeShownForSession = true;
+        showLocationWelcome(currentPosition);
+      }
     },
     (error) => {
       locationRequestPending = false;
@@ -2765,6 +2790,7 @@ function ensureLocationWelcomeElement() {
 }
 
 function showLocationWelcome(coords) {
+  if (!isWelcomeAllowed()) return;
   const nearby = findNearbyLocation(coords);
   // Solo mostramos la bienvenida mágica cuando reconocemos un destino/región Iberostar cercano.
   if (!nearby) return;
@@ -2854,10 +2880,10 @@ function startWelcomeRouteTrace(nearest) {
 
 function autoDetectLocation() {
   if (document.documentElement.dataset.tourPreview === "true") return;
-  if (autoLocationAttempted) return;
+  if (autoLocationAttempted || locationRequestPending) return;
   autoLocationAttempted = true;
   if (!navigator.geolocation) return;
-  const start = () => requestCurrentLocation({ welcome: true });
+  const start = () => requestCurrentLocation();
   if (navigator.permissions?.query) {
     navigator.permissions.query({ name: "geolocation" })
       .then((permission) => {
@@ -6806,6 +6832,15 @@ const mobileNavRouteObserver = new MutationObserver(() => {
 });
 mobileNavRouteObserver.observe(document.body, { attributes: true, attributeFilter: ["data-current-route"] });
 window.RevistaDigital.startLocationServices = startLocationServices;
+window.addEventListener("revistadigital:authStateChange", function (event) {
+  const role = event && event.detail && event.detail.profile ? event.detail.profile.role : null;
+  if (role !== "socio") {
+    welcomeShownForSession = false;
+    dismissLocationWelcome();
+    return;
+  }
+  maybeShowSocioWelcome();
+});
 if (typeof window.RevistaDigital.routes?.restoreCurrentRoute === "function") {
   if (document.body.dataset.routeManaged !== "true") {
     window.RevistaDigital.routes.restoreCurrentRoute();

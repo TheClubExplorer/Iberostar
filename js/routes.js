@@ -1167,6 +1167,31 @@
     return true;
   }
 
+  function mountCartSheet(container) {
+    const holder = document.createElement("div");
+    const hotels = getCartHotels();
+    const selected = getPreferredCartHotel(hotels);
+    if (!selected) return false;
+    const previousMode = document.body.dataset.appMode;
+    const previousManaged = document.body.dataset.routeManaged;
+    try {
+      if (!renderCartPortal("/carrito-golf", holder)) return false;
+      const section = holder.querySelector("#hotel-carrito");
+      if (!section || !container) return false;
+      container.innerHTML = "";
+      container.appendChild(section);
+      const cart = window.RevistaDigital && window.RevistaDigital.carritoGolf;
+      if (cart && typeof cart.teardown === "function") cart.teardown();
+      if (cart && typeof cart.init === "function") cart.init(container, selected);
+      return true;
+    } finally {
+      if (previousMode === undefined) delete document.body.dataset.appMode;
+      else document.body.dataset.appMode = previousMode;
+      if (previousManaged === undefined) delete document.body.dataset.routeManaged;
+      else document.body.dataset.routeManaged = previousManaged;
+    }
+  }
+
   function renderPortal(route) {
     const view = document.getElementById("appView");
     if (!view) return false;
@@ -2698,6 +2723,7 @@
   routes.restoreCurrentRoute = restoreCurrentRoute;
   routes.navigate = navigate;
   routes.renderPortal = renderPortal;
+  routes.mountCartSheet = mountCartSheet;
   routes.renderHotelPortal = renderHotelPortal;
   routes.findHotelPortalRoute = findHotelPortalRoute;
   routes.getRouteContext = getRouteContext;
