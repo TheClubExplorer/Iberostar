@@ -772,9 +772,7 @@
         '</div>'
       : "";
     var carousel = poiCarouselMarkup(images, name);
-    var cartButton = (isRestaurant || isGolf)
-      ? '<button type="button" class="gp-map-cart guide-cart" data-id="' + popupEscape(poi.id) + '" data-cat="' + popupEscape(poi.category) + '">Solicitar carrito</button>'
-      : "";
+    var cartButton = '<button type="button" class="gp-map-cart guide-cart" data-id="' + popupEscape(poi.id) + '" data-cat="' + popupEscape(poi.category) + '">Solicitar carrito</button>';
     var hours = popupEscape(poiHoursText(poi));
     var english = window.RevistaDigital.i18n?.getLang?.() === "en";
     var menuText = poiMenuText(poi);
@@ -787,18 +785,21 @@
     var details = (hoursHtml || menuHtml) ? '<div class="gp-map-poi-details">' + hoursHtml + menuHtml + '</div>' : '';
     var dirButton = '<button type="button" class="gp-dir" data-lat="' + poi.lat + '" data-lng="' + poi.lng + '" data-name="' + name + '">Cómo llegar</button>';
     var compactDining = gp.isMobilePoiGuide() && gp.hasDiningMenu(poi);
-    var extra = compactDining ? (descriptionHtml + menuHtml + carousel + pano360Btn + cartButton) : (details + carousel + pano360Btn + cartButton);
     var visibleDetails = compactDining && hoursHtml ? '<div class="gp-map-poi-details">' + hoursHtml + '</div>' : details;
     var toggle = isDiningPoi(poi)
       ? '<button type="button" class="gp-map-menu-toggle" data-popup-menu-toggle data-poi-id="' + popupEscape(poi.id) + '">' + gp.menuToggleLabel() + '</button>'
       : '';
+    var actions = '<div class="gp-map-actions">' +
+      dirButton +
+      cartButton +
+      toggle +
+      (compactDining ? '' : pano360Btn) +
+      '</div>';
     return '<div class="gp-map-poi-popup"><strong class="gp-map-poi-title">' + name + '</strong>' +
       (compactDining ? '' : descriptionHtml) +
       visibleDetails +
-      (compactDining ? '' : carousel + pano360Btn) +
-      dirButton +
-      (compactDining ? '' : cartButton) +
-      toggle +
+      (compactDining ? '' : carousel) +
+      actions +
       '</div>';
   }
 
@@ -836,7 +837,6 @@
         var poiId = panoramaButton.getAttribute("data-poi-id");
         if (pannellum360 && typeof pannellum360.open === "function" && hotelName) {
           pannellum360.open(hotelName, "restaurantes", label, poiId);
-          window.RevistaDigital?.guiapa?.syncBackTo360Button?.();
           return;
         }
         navigateTo360Fallback(hotelName, "restaurantes", label, poiId);
@@ -848,7 +848,7 @@
     var attempts = 0;
     function attempt() {
       var element = popup && typeof popup.getElement === "function" ? popup.getElement() : null;
-      if (element && element.querySelector("[data-poi-360-hotel], [data-popup-menu-toggle], [data-map-carousel]")) {
+      if (element && element.querySelector("[data-poi-360-hotel], [data-popup-menu-toggle], [data-map-carousel], .gp-map-cart")) {
         initializePoiPopup(element);
         window.setTimeout(function () {
           var refreshed = popup && typeof popup.getElement === "function" ? popup.getElement() : null;
@@ -1008,7 +1008,6 @@
         var panoHotelName = panoHotel || poi.hotelId || poi.hotel;
         if (pannellum360 && typeof pannellum360.open === "function") {
           pannellum360.open(panoHotelName, panoZone, poi.name, poi.id);
-          window.RevistaDigital?.guiapa?.syncBackTo360Button?.();
         } else {
           navigateTo360Fallback(panoHotelName, panoZone, poi.name, poi.id);
         }
@@ -1048,11 +1047,15 @@
       if (p.external === true) return;
       if (filterHotelId && p.hotelId && p.hotelId !== filterHotelId) return;
       if (p.lat == null || p.lng == null) return;
+      var layerCartButton = '<button type="button" class="gp-map-cart guide-cart" data-id="' + popupEscape(p.id) + '" data-cat="' + popupEscape(p.category) + '">Solicitar carrito</button>';
       if (p.kind === "area") {
         var labelHtml = '<span style="display:inline-block;transform:translate(-50%,-50%);white-space:nowrap;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#0b3d66;background:rgba(255,255,255,.72);border:1px solid rgba(11,61,102,.35);border-radius:999px;padding:2px 10px;">' + (poiNameText(p) || "") + "</span>";
         var areaIcon = window.L.divIcon ? window.L.divIcon({ className: "gp-area-label", html: labelHtml, iconSize: [0, 0], iconAnchor: [0, 0] }) : null;
         var areaMarker = window.L.marker([p.lat, p.lng], areaIcon ? { icon: areaIcon } : {});
-        areaMarker.bindPopup("<strong>" + (poiNameText(p) || "") + "</strong><br><small>" + (poiDescriptionText(p) || "") + "</small>");
+        areaMarker.bindPopup("<strong>" + (poiNameText(p) || "") + "</strong><br><small>" + (poiDescriptionText(p) || "") + "</small><div class=\"gp-map-actions\">" + layerCartButton + "</div>");
+        areaMarker.on("popupopen", function (event) {
+          bindPoiPopupActions(event.popup);
+        });
         gp.registerMarker(p.id, areaMarker, labels);
         areaMarker.addTo(labels);
         return;
@@ -1092,7 +1095,7 @@
             + '<div class="gp-club-popup-badge"><img class="gp-club-popup-logo" src="branding/IB_THE_CLUB_VV_POS_RGB-320.webp" alt="" /></div>'
             + '<h3 class="gp-club-popup-name">' + name + '</h3>'
             + (poiHoursText(p) ? '<p class="gp-club-popup-hours">' + poiHoursText(p) + '</p>' : '')
-            + dirButton
+            + '<div class="gp-map-actions">' + dirButton + layerCartButton + '</div>'
             + '</div>';
           popupOptions = { className: 'gp-club-pop', minWidth: 190, maxWidth: 230 };
         } else if (p.category === "starprestige") {
@@ -1101,7 +1104,7 @@
             + '<h3 class="gp-sp-popup-name">' + name + '</h3>'
             + (poiDescriptionText(p) ? '<p class="gp-sp-popup-desc">' + poiDescriptionText(p) + '</p>' : '')
             + (poiHoursText(p) ? '<p class="gp-sp-popup-hours">' + poiHoursText(p) + '</p>' : '')
-            + dirButton
+            + '<div class="gp-map-actions">' + dirButton + layerCartButton + '</div>'
             + '</div>';
           popupOptions = { className: 'gp-sp-pop', minWidth: 220, maxWidth: 260 };
         } else if (p.category === "bar" || p.category === "discoteca") {
@@ -1116,20 +1119,24 @@
           popup = '<div class="gp-bar-popup">' +
             '<strong class="gp-bar-popup-name">' + name + '</strong>' +
             barHoursHtml +
+            (compactBar ? '' : barMenuHtml + barDescHtml) +
+            '<div class="gp-map-actions">' +
             dirButton +
             (compactBar
               ? '<button type="button" class="gp-map-menu-toggle" data-popup-menu-toggle data-poi-id="' + popupEscape(p.id) + '">' + gp.menuToggleLabel() + '</button>'
-              : barMenuHtml + barDescHtml) +
+              : '') +
+            layerCartButton +
+            '</div>' +
             '</div>';
           popupOptions = { className: 'gp-bar-pop', minWidth: 220, maxWidth: 280 };
-          if (compactBar) {
-            m.on("popupopen", function (event) {
-              bindPoiPopupActions(event.popup);
-            });
-          }
         } else {
-          popup = '<strong>' + name + '</strong><br><small>' + poiDescriptionText(p) + '</small><br>' + dirButton;
+          popup = '<strong>' + name + '</strong><br><small>' + poiDescriptionText(p) + '</small><br>' +
+            '<div class="gp-map-actions">' + dirButton + layerCartButton + '</div>';
+          popupOptions = { className: "gp-generic-pop", minWidth: 210, maxWidth: 260 };
         }
+        m.on("popupopen", function (event) {
+          bindPoiPopupActions(event.popup);
+        });
         m.bindPopup(popup, popupOptions);
       }
       gp.registerMarker(p.id, m, layer);
@@ -2351,9 +2358,11 @@
     var menuButton = gp.isDiningPoi(poi)
       ? '<button type="button" class="guide-menu" data-id="' + escapeHtml(poi.id) + '">' + gp.menuToggleLabel() + "</button>"
       : "";
+    var cartButton = '<button type="button" class="guide-cart" data-id="' + escapeHtml(poi.id) + '" data-cat="' + escapeHtml(cat) + '">Solicitar carrito</button>';
     var btns = "";
     if (isArea) {
       btns += '<button type="button" class="guide-focus" data-id="' + escapeHtml(poi.id) + '">Ver en el mapa</button>';
+      btns += cartButton;
     } else if (verified) {
       btns += '<button type="button" class="guide-route" data-id="' + escapeHtml(poi.id) + '">Cómo llegar</button>';
       btns += '<button type="button" class="guide-focus" data-id="' + escapeHtml(poi.id) + '">Ver en el mapa</button>';
@@ -2364,20 +2373,16 @@
       if (cat === "restaurante" || cat === "spa" || cat === "golf") {
         var label = cat === "restaurante" ? "Reservar" : (cat === "spa" ? "Reservar cita" : "Reservar tee time");
         btns += '<button type="button" class="guide-book" data-id="' + escapeHtml(poi.id) + '" data-cat="' + cat + '">' + label + "</button>";
-        if (cat === "golf" || cat === "restaurante") {
-          btns += '<button type="button" class="guide-cart" data-id="' + escapeHtml(poi.id) + '" data-cat="' + cat + '">Solicitar carrito</button>';
-        }
       }
+      btns += cartButton;
     } else {
       btns += '<span class="guide-mobile-actions-note">Información en actualización; la ruta estará disponible pronto.</span>';
       btns += menuButton;
       if (cat === "restaurante" || cat === "spa" || cat === "golf") {
         var l2 = cat === "restaurante" ? "Reservar" : (cat === "spa" ? "Reservar cita" : "Reservar tee time");
         btns += '<button type="button" class="guide-book" data-id="' + escapeHtml(poi.id) + '" data-cat="' + cat + '">' + l2 + "</button>";
-        if (cat === "golf" || cat === "restaurante") {
-          btns += '<button type="button" class="guide-cart" data-id="' + escapeHtml(poi.id) + '" data-cat="' + cat + '">Solicitar carrito</button>';
-        }
       }
+      btns += cartButton;
     }
     if (titleEl) titleEl.textContent = gp.poiNameText(poi) || "";
     body.innerHTML = mobilePoiInfoHtml(poi) +
@@ -2531,14 +2536,11 @@
       var cat = poi.category;
       if (cat === "restaurante" || cat === "spa" || cat === "golf") {
         var label = cat === "restaurante" ? "Reservar" : (cat === "spa" ? "Reservar cita" : "Reservar tee time");
-        var html = '<button type="button" class="guide-book" data-id="' + escapeHtml(poi.id) + '" data-cat="' + cat + '">' + label + "</button>";
-        if (cat === "golf" || cat === "restaurante") {
-          html += '<button type="button" class="guide-cart" data-id="' + escapeHtml(poi.id) + '" data-cat="' + cat + '">Solicitar carrito</button>';
-        }
-        return html;
+        return '<button type="button" class="guide-book" data-id="' + escapeHtml(poi.id) + '" data-cat="' + cat + '">' + label + "</button>";
       }
       return "";
     })();
+    var cartAction = '<button type="button" class="guide-cart" data-id="' + escapeHtml(poi.id) + '" data-cat="' + escapeHtml(poi.category) + '">Solicitar carrito</button>';
     
     var pano360Btn = (hasPano360 && verified) ? '<button type="button" class="guide-pano360" data-id="' + escapeHtml(poi.id) + '">Ver exploración 360°</button>' : "";
     var menuButton = gp.isDiningPoi(poi)
@@ -2547,7 +2549,7 @@
     
     if (isArea) {
       actions = '<p class="guide-detail-desc">Se representa como <strong>área/etiqueta</strong> en el mapa: no es una instalación con ruta.</p>' +
-        '<div class="guide-detail-actions"><button type="button" class="guide-focus" data-id="' + escapeHtml(poi.id) + '">Ver en el mapa</button></div>';
+        '<div class="guide-detail-actions"><button type="button" class="guide-focus" data-id="' + escapeHtml(poi.id) + '">Ver en el mapa</button>' + cartAction + "</div>";
     } else if (verified) {
       actions = '<div class="guide-detail-actions">' +
         '<button type="button" class="guide-focus" data-id="' + escapeHtml(poi.id) + '">Ver en el mapa</button>' +
@@ -2555,10 +2557,11 @@
         menuButton +
         pano360Btn +
         bookingActions +
+        cartAction +
         "</div>";
     } else {
       actions = '<p class="guide-pending-note">La información de este lugar se está actualizando; en breve estará disponible en el mapa y con ruta.</p>' +
-        ((menuButton || bookingActions) ? '<div class="guide-detail-actions">' + menuButton + bookingActions + "</div>" : "");
+        '<div class="guide-detail-actions">' + menuButton + bookingActions + cartAction + "</div>";
     }
     var english = isEnglishUi();
     var hoursFallback = english ? "Please check the Iberostar app." : "Consultar horario en la app de Iberostar";
@@ -2995,31 +2998,6 @@ function poiCommonInfoHtml(poi) {
   }).join("") + '</div>';
 }
 
-  function buildBackTo360Button() {
-    try {
-      var stored = window.sessionStorage.getItem("club360LastViewed");
-      if (!stored) return "";
-      var data = JSON.parse(stored);
-      if (!data || !data.label) return "";
-      return '<button type="button" class="guide-back-to-360" data-back-to-360="true" aria-label="Volver a la exploración 360° de ' + escapeHtml(data.label) + '"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="currentColor"/></svg> Volver al 360°: ' + escapeHtml(data.label) + '</button>';
-    } catch (e) { return ""; }
-  }
-
-  gp.syncBackTo360Button = function () { syncBackTo360Button(); };
-
-  function syncBackTo360Button() {
-    var host = document.querySelector(".guide-explorer-head--panel") || document.querySelector(".guide-explorer-title");
-    if (!host) return;
-    var existing = host.querySelector("[data-back-to-360]");
-    var markup = buildBackTo360Button();
-    if (!markup) {
-      if (existing && existing.parentNode) existing.parentNode.removeChild(existing);
-      return;
-    }
-    if (existing) existing.outerHTML = markup;
-    else host.insertAdjacentHTML("beforeend", markup);
-  }
-
   gp.renderExplorer = function (mount, options) {
     if (!mount) return null;
     var opts = options || {};
@@ -3035,16 +3013,13 @@ function poiCommonInfoHtml(poi) {
       '<input id="guideSearchInput" type="search" placeholder="Buscar restaurante, bar, piscina…" aria-label="Buscar lugar por nombre" autocomplete="off" />' +
       "</label>";
     
-    var backTo360Html = buildBackTo360Button();
-
     var head = panelMode
-      ? '<div class="guide-explorer-head guide-explorer-head--panel">' + backTo360Html + '</div>'
+      ? '<div class="guide-explorer-head guide-explorer-head--panel"></div>'
       : '<div class="guide-explorer-head">' +
           '<div class="guide-explorer-title">' +
             '<p class="portal-kicker">GUÍA INTERACTIVA · THE CLUB</p>' +
             "<h2>Explore los lugares del complejo</h2>" +
             "<p>Busque por nombre o filtre por categoría. Seleccione un lugar verificado para verlo en el mapa.</p>" +
-            backTo360Html +
           "</div>" +
           searchField +
         "</div>";
@@ -3110,21 +3085,6 @@ function poiCommonInfoHtml(poi) {
           more.textContent = extra.hidden ? (more.getAttribute("data-label-more") || gp.moreActionsLabel()) : gp.menuCollapseLabel();
           try { positionMobileActions(state.mobilePoi); } catch (e) {}
         }
-        return;
-      }
-      var backTo360 = event.target.closest("[data-back-to-360]");
-      if (backTo360) {
-        event.preventDefault();
-        event.stopPropagation();
-        try {
-          var last360 = window.sessionStorage.getItem("club360LastViewed");
-          if (last360) {
-            var last360Data = JSON.parse(last360);
-            if (last360Data && window.RevistaDigital.pannellum360 && typeof window.RevistaDigital.pannellum360.open === "function") {
-              window.RevistaDigital.pannellum360.open(last360Data.hotelName, last360Data.zoneKey, last360Data.label);
-            }
-          }
-        } catch (e) { /* ignore */ }
         return;
       }
       var chip = event.target.closest("[data-guide-filter]");
@@ -3200,7 +3160,6 @@ function poiCommonInfoHtml(poi) {
           if (hotelName) {
             var panoZone = (panoPoi.category === "bar" || panoPoi.category === "discoteca") ? "bares" : "restaurantes";
             window.RevistaDigital.pannellum360.open(hotelName, panoZone, panoPoi.name, panoPoi.id);
-            window.RevistaDigital?.guiapa?.syncBackTo360Button?.();
           }
         }
         return;
@@ -3224,11 +3183,50 @@ function poiCommonInfoHtml(poi) {
     return { selectPoi: selectPoi, queryPois: queryPois };
   };
 
+  function cartPoiName(poi) {
+    if (!poi) return "";
+    if (typeof gp.poiNameText === "function") return gp.poiNameText(poi);
+    return poi.name || "";
+  }
+
+  function cartDestinationForPoi(poi) {
+    if (!poi) return null;
+    if (Number.isFinite(Number(poi.lat)) && Number.isFinite(Number(poi.lng))) {
+      return { id: poi.id, name: cartPoiName(poi), lat: Number(poi.lat), lng: Number(poi.lng) };
+    }
+    if (poi.hotelId && typeof gp.poiForHotel === "function") {
+      var hotelPoi = gp.poiForHotel(poi.hotelId);
+      if (hotelPoi && Number.isFinite(Number(hotelPoi.lat)) && Number.isFinite(Number(hotelPoi.lng))) {
+        return { id: hotelPoi.id, name: cartPoiName(hotelPoi), lat: Number(hotelPoi.lat), lng: Number(hotelPoi.lng) };
+      }
+    }
+    return null;
+  }
+
+  function requestCartFromMap(poi) {
+    var tracker = window.RevistaDigital && window.RevistaDigital.carritoGolf;
+    if (!tracker || typeof tracker.request !== "function") return false;
+    var destination = cartDestinationForPoi(poi);
+    var slug = document.body.dataset.hotelSlug || document.body.dataset.mobileNearbyHotelSlug || "";
+    try { slug = slug || window.sessionStorage.getItem("clubCartHotel") || ""; } catch (e) {}
+    var request = null;
+    if (slug && typeof tracker.requestForHotel === "function") {
+      request = tracker.requestForHotel(slug, { destination: destination, source: "guide-map" });
+    }
+    if (!request) request = tracker.request({ destination: destination, source: "guide-map" });
+    if (!request) return false;
+    try { window.sessionStorage.setItem("auto_fullscreen_transporte", "true"); } catch (e) {}
+    if (typeof tracker.openPage === "function") tracker.openPage(slug || "");
+    return true;
+  }
+
   gp.selectPoi = selectPoi;
   gp.requestCartForPoi = function (id) {
     var poi = findPoi(id);
-    if (!poi || (poi.category !== "restaurante" && poi.category !== "golf")) return false;
+    if (!poi) return false;
     selectPoi(id, { noScroll: isMobileGuide() });
+    var hasBox = !!mobileActionsRoot("#guideMobileBookBox") || !!(state.mount && state.mount.querySelector("#guideBookBox"));
+    if (!hasBox) return requestCartFromMap(poi);
     renderBookingPanel(poi, "cart");
     return true;
   };

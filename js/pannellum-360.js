@@ -307,15 +307,18 @@ const RESTAURANTES_PARAISO = {
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillStyle = "#ffffff";
-    ctx.font = `700 ${Math.round(H * 0.066)}px 'EB Garamond', Georgia, serif`;
+    ctx.font = `400 ${Math.round(H * 0.066)}px "adobe-garamond-pro", Georgia, serif`;
+    ctx.letterSpacing = "0.025em";
     ctx.shadowColor = "rgba(0,0,0,0.6)";
     ctx.shadowBlur = 18;
     ctx.fillText(String(label || zoneKey).toUpperCase(), W / 2, H * 0.40);
     ctx.shadowBlur = 0;
 
-    ctx.font = `500 ${Math.round(H * 0.028)}px Arial, sans-serif`;
+    ctx.font = `100 ${Math.round(H * 0.028)}px "Echoes Sans", sans-serif`;
+    ctx.letterSpacing = "0.1em";
     ctx.fillStyle = "rgba(255,255,255,0.92)";
-    ctx.fillText("Playa Paraíso · " + hotelName, W / 2, H * 0.47);
+    ctx.fillText(("Playa Paraíso · " + hotelName).toUpperCase(), W / 2, H * 0.47);
+    ctx.letterSpacing = "0px";
 
     return canvas;
   }

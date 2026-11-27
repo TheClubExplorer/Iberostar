@@ -51,13 +51,24 @@
     })();
   </script>
   <script src="../js/datos-complejo.js?v=22"></script>
-  <script src="../js/guia-playa-paraiso.js?v=83"></script>
-  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="../js/guia-playa-paraiso.js?v=87"></script>
+  <link href="https://use.typekit.net/vyw7bid.css" rel="stylesheet">
 
   <style>
+    @font-face {
+      font-family: "Echoes Sans";
+      src: url("../fonts/EchoesSans-Thin.otf") format("opentype");
+      font-style: normal;
+      font-weight: 100;
+      font-display: swap;
+    }
+
     :root {
-      --font-display: "Adobe Garamond Pro", Georgia, serif;
-      --font-body: Arial, Helvetica, sans-serif;
+      --font-adobe: "adobe-garamond-pro", Georgia, serif;
+      --font-echoes: "Echoes Sans", sans-serif;
+      --font-display: var(--font-adobe);
+      --font-ui: var(--font-echoes);
+      --font-body: var(--font-adobe);
     }
 
     .user-pulse-ring { transform-origin:36px 36px; animation:userPulse 1.5s ease-out infinite; }
@@ -152,12 +163,12 @@
     .route-info .btn-recalcular { margin-top: 10px; padding: 8px 14px; border: 1px solid #caa867; background: transparent; color: #caa867; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; font-family: var(--font-display); text-transform: uppercase; letter-spacing: 0.1em; }
     .route-info .btn-recalcular:hover { background: #caa867; color: #ffffff; }
     .route-info .btn-limpiar { margin: 10px 0 0 6px; padding: 8px 10px; border: 1px solid #8c734b; background: transparent; color: #5a3e1b; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; font-family: var(--font-display); }
-    .gp-route-bar { position: fixed; bottom: calc(var(--gp-route-bottom,16px) + env(safe-area-inset-bottom)); left: 50%; z-index: 200002; display: flex; align-items: center; gap: 10px; max-width: calc(100vw - 24px); padding: 7px 8px 7px 14px; border-radius: 999px; background: rgba(0,40,85,0.94); color: #ffffff; box-shadow: 0 6px 20px rgba(0,0,0,0.25); font: 600 12px/1.2 var(--font-body); opacity: 0; transform: translate(-50%,16px); pointer-events: none; transition: opacity .18s ease, transform .18s ease; }
+    .gp-route-bar { position: fixed; bottom: calc(var(--gp-route-bottom,16px) + env(safe-area-inset-bottom)); left: 50%; z-index: 200002; display: flex; align-items: center; gap: 10px; max-width: calc(100vw - 24px); padding: 7px 8px 7px 14px; border-radius: 999px; background: rgba(0,40,85,0.94); color: #ffffff; box-shadow: 0 6px 20px rgba(0,0,0,0.25); font: 100 12px/1.2 var(--font-echoes); opacity: 0; transform: translate(-50%,16px); pointer-events: none; transition: opacity .18s ease, transform .18s ease; }
     .gp-route-bar.is-visible { opacity: 1; transform: translate(-50%,0); pointer-events: auto; }
     .gp-route-bar-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .gp-route-bar-cancel { flex: 0 0 auto; padding: 5px 11px; border: 1px solid rgba(255,255,255,0.6); border-radius: 999px; background: rgba(255,255,255,0.12); color: #ffffff; font: 600 11px/1 var(--font-body); cursor: pointer; }
+    .gp-route-bar-cancel { flex: 0 0 auto; padding: 5px 11px; border: 1px solid rgba(255,255,255,0.6); border-radius: 999px; background: rgba(255,255,255,0.12); color: #ffffff; font: 100 11px/1 var(--font-echoes); cursor: pointer; }
     .gp-route-bar-cancel:hover { background: rgba(255,255,255,0.22); }
-    .location-control { position: fixed; top: 128px; left: 18px; z-index: 200000; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; max-width: min(280px, calc(100vw - 24px)); font-family: var(--font-body); }
+    .location-control { position: fixed; top: 128px; left: 18px; z-index: 200000; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; max-width: min(280px, calc(100vw - 24px)); font-family: var(--font-echoes); }
     .location-control button { border: 1px solid #caa867; border-radius: 999px; padding: 9px 14px; background: #fff; color: #5a3e1b; font-size: 12px; font-weight: 700; cursor: pointer; box-shadow: 0 3px 12px rgba(0,0,0,.25); }
     .location-control button:disabled { cursor: wait; opacity: .7; }
     .location-control-status { display: none; max-width: 100%; padding: 7px 10px; border-radius: 8px; background: rgba(255,255,255,.96); color: #334155; font-size: 11px; line-height: 1.4; box-shadow: 0 3px 12px rgba(0,0,0,.2); }
@@ -184,8 +195,8 @@
     .gp-con-wrap { position: relative; width: 30px; height: 30px; }
     .gp-con-core { position: relative; z-index: 1; width: 30px; height: 30px; background-size: contain; background-repeat: no-repeat; animation: gpConPing 4s ease-in-out infinite; }
     @keyframes gpConPing { 0%,100% { filter: brightness(1) saturate(1); } 50% { filter: brightness(0.6) saturate(0.6) drop-shadow(0 0 4px rgba(255,255,255,0.7)); } }
-    .gp-area-label { transform: translate(-50%, -50%); white-space: nowrap; font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #0b3d66; background: rgba(255,255,255,0.82); border: 1px solid rgba(11,61,102,0.4); border-radius: 999px; padding: 3px 12px; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.25); font-family: var(--font-body); }
-    .gp-hotel-label { transform: translate(-50%, -100%); white-space: nowrap; font-size: 11px; font-weight: 700; color: #1f2937; background: rgba(255,255,255,0.9); border: 1px solid rgba(148,163,184,0.8); border-radius: 6px; padding: 2px 8px; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.25); font-family: var(--font-body); }
+    .gp-area-label { transform: translate(-50%, -50%); white-space: nowrap; font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #0b3d66; background: rgba(255,255,255,0.82); border: 1px solid rgba(11,61,102,0.4); border-radius: 999px; padding: 3px 12px; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.25); font-family: var(--font-echoes); }
+    .gp-hotel-label { transform: translate(-50%, -100%); white-space: nowrap; font-size: 11px; font-weight: 700; color: #1f2937; background: rgba(255,255,255,0.9); border: 1px solid rgba(148,163,184,0.8); border-radius: 6px; padding: 2px 8px; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.25); font-family: var(--font-echoes); }
 
     .mapboxgl-popup-content { border-radius: 14px !important; padding: 12px 14px !important; box-shadow: 0 12px 30px rgba(0,0,0,0.45) !important; font-family: var(--font-body) !important; max-width: 260px; }
     .gp-dir { margin-top: 6px; padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(212,175,55,0.8); background: linear-gradient(180deg,#faf4e3,#f1e4b8); color: #1f1f1f; font-size: 11px; font-weight: 700; cursor: pointer; width: 100%; text-align: center; }
@@ -222,7 +233,7 @@
     .guide-panel-head h3 { font-size: 15px; letter-spacing: 0.18em; text-transform: uppercase; color: #5a3e1b; font-weight: 700; margin: 0; font-family: var(--font-display); }
     .guide-panel-close { background: none; border: none; font-size: 28px; color: #8c734b; cursor: pointer; line-height: 1; padding: 4px; }
     .guide-panel-actions { display: flex; align-items: center; gap: 6px; flex: 0 0 auto; }
-    .guide-panel-action { min-height: 34px; padding: 0 10px; border: 1px solid #c8c7c2; border-radius: 999px; background: rgba(255,255,255,.62); color: #5a3e1b; font: 700 10px/1 Arial, sans-serif; letter-spacing: .04em; cursor: pointer; }
+    .guide-panel-action { min-height: 34px; padding: 0 10px; border: 1px solid #c8c7c2; border-radius: 999px; background: rgba(255,255,255,.62); color: #5a3e1b; font: 100 10px/1 var(--font-echoes); letter-spacing: .04em; cursor: pointer; }
     .guide-panel-action:hover, .guide-panel-action:focus-visible { background: #fff; border-color: #b9a385; }
     .guide-panel-body { padding: 20px 24px; display: flex; flex-direction: column; gap: 16px; overflow: hidden; flex: 1; }
     .guide-search { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border: 1px solid #c8c7c2; border-radius: 12px; background: #ffffff; }
@@ -294,7 +305,7 @@
       }
       html[data-embed-mode="complex"] .guide-panel-head h3 {
         min-width: 0;
-        font: 700 10px/1.3 Arial, sans-serif;
+        font: 100 10px/1.3 var(--font-echoes);
         letter-spacing: .06em;
       }
       html[data-embed-mode="complex"] .guide-panel-actions { gap: 5px; }
@@ -320,7 +331,7 @@
         border-radius: 999px;
         background: rgba(255,253,248,.96);
         color: #173a32;
-        font: 700 10px/1 Arial, sans-serif;
+        font: 100 10px/1 var(--font-echoes);
         letter-spacing: .02em;
         box-shadow: 0 4px 14px rgba(0,0,0,.2);
         cursor: pointer;
@@ -366,7 +377,7 @@
         border-radius: 999px;
         background: rgba(255,253,248,.96);
         color: #173a32;
-        font: 700 11px/1 Arial, sans-serif;
+        font: 100 11px/1 var(--font-echoes);
         box-shadow: 0 4px 14px rgba(0,0,0,.2);
       }
       html[data-embed-mode="complex"] .location-control {
@@ -401,6 +412,45 @@
     }
     @media (max-width: 360px) {
       html[data-embed-mode="complex"] .location-control { top: 142px; }
+    }
+
+    h1,
+    h2,
+    h3 {
+      font-family: var(--font-display) !important;
+      font-style: normal !important;
+      font-weight: 400 !important;
+      text-transform: uppercase !important;
+      letter-spacing: .025em !important;
+      line-height: 1 !important;
+    }
+
+    p,
+    li {
+      font-family: var(--font-body) !important;
+      font-style: normal !important;
+      text-transform: none !important;
+      letter-spacing: 0 !important;
+    }
+
+    em,
+    i,
+    cite {
+      font-style: italic !important;
+    }
+
+    .gp-area-label,
+    .gp-hotel-label,
+    .gp-route-bar,
+    .gp-route-bar-cancel,
+    .guide-panel-action,
+    .location-control,
+    .mapbox-touch-controls button,
+    .mapbox-touch-activate span {
+      font-family: var(--font-echoes) !important;
+      font-weight: 100 !important;
+      text-transform: uppercase !important;
+      letter-spacing: .1em !important;
     }
   </style>
 </head>

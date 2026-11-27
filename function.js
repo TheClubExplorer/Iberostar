@@ -2781,8 +2781,12 @@ function ensureLocationWelcomeElement() {
       <strong class="location-welcome-hotel-name"></strong>
       <small class="location-welcome-hotel-distance"></small>
     </div>
-    <div class="location-welcome-actions">
-      <button type="button" class="location-welcome-btn primary" data-role="directions" hidden>Trazar ruta</button>
+    <div class="location-welcome-actions location-welcome-actions--mobile">
+      <button type="button" class="location-welcome-btn primary" data-role="trace-route" hidden>Trazar ruta</button>
+    </div>
+    <div class="location-welcome-actions location-welcome-actions--desktop">
+      <a class="location-welcome-btn primary" data-role="hotel" href="#" hidden>Ver este hotel</a>
+      <button type="button" class="location-welcome-btn ghost" data-role="directions" hidden>Cómo llegar</button>
     </div>`;
   document.body.appendChild(element);
   element.querySelector(".location-welcome-close").addEventListener("click", dismissLocationWelcome);
@@ -2802,6 +2806,9 @@ function showLocationWelcome(coords) {
 
   const element = ensureLocationWelcomeElement();
   const backdrop = document.getElementById("locationWelcomeBackdrop");
+  const mobileMode = document.body.classList.contains("mobile-app-active");
+  element.classList.toggle("location-welcome--mobile", mobileMode);
+  element.classList.toggle("location-welcome--desktop", !mobileMode);
   element.querySelector(".location-welcome-region").textContent = region.name;
   element.querySelector(".location-welcome-country").textContent = country.name;
   element.querySelector(".location-welcome-kicker").textContent = nearest?.hotel
@@ -2811,6 +2818,8 @@ function showLocationWelcome(coords) {
     `¡Bienvenido! Nos alegra tenerle tan cerca de ${region.name}. Preparamos todo para que su visita sea mágica.`;
 
   const hotelBox = element.querySelector(".location-welcome-hotel");
+  const traceButton = element.querySelector('[data-role="trace-route"]');
+  const hotelLink = element.querySelector('[data-role="hotel"]');
   const directionsButton = element.querySelector('[data-role="directions"]');
 
   if (nearest?.hotel) {
@@ -2819,10 +2828,32 @@ function showLocationWelcome(coords) {
     element.querySelector(".location-welcome-hotel-distance").textContent =
       `${nearby.matchedLocation && nearby.matchedLocation !== nearest.hotel.name ? nearby.matchedLocation + " · " : ""}a unos ${formatApproximateDistance(nearest.distance)} de usted · ${region.name}, ${country.name}`;
 
-    directionsButton.hidden = false;
-    directionsButton.onclick = () => startWelcomeRouteTrace(nearest);
+    if (mobileMode) {
+      traceButton.hidden = false;
+      traceButton.onclick = () => startWelcomeRouteTrace(nearest);
+      hotelLink.hidden = true;
+      directionsButton.hidden = true;
+    } else {
+      const hotelRoute = `/${nearest.countrySlug}/${nearest.destination.slug}/${nearest.hotel.slug}`;
+      hotelLink.hidden = false;
+      hotelLink.href = hotelRoute;
+      hotelLink.dataset.appRoute = hotelRoute;
+      hotelLink.onclick = (event) => {
+        event.preventDefault();
+        dismissLocationWelcome();
+        window.RevistaDigital?.routes?.navigate?.(hotelRoute);
+      };
+      directionsButton.hidden = false;
+      directionsButton.onclick = () => {
+        dismissLocationWelcome();
+        startWelcomeDirections(nearest);
+      };
+      traceButton.hidden = true;
+    }
   } else {
     hotelBox.hidden = true;
+    traceButton.hidden = true;
+    hotelLink.hidden = true;
     directionsButton.hidden = true;
   }
 
@@ -2876,6 +2907,32 @@ function startWelcomeRouteTrace(nearest) {
   }
   if (handled) return;
   window.RevistaDigital?.mapas?.openDirections?.(hotelName, coordinates);
+}
+
+function startWelcomeDirections(nearest) {
+  if (!nearest?.hotel) return;
+  const hotelRoute = `/${nearest.countrySlug}/${nearest.destination.slug}/${nearest.hotel.slug}`;
+  const hotelName = nearest.hotel.name;
+  const coordinates = [nearest.hotel.latitude, nearest.hotel.longitude];
+
+  dismissLocationWelcome();
+  window.RevistaDigital?.routes?.navigate?.(hotelRoute);
+
+  let attempts = 0;
+  const timer = setInterval(() => {
+    attempts += 1;
+    const mapElement = document.querySelector("#hotelPortalMap");
+    const map = window.RevistaDigital.state?.activeMap;
+    if (mapElement && map && map._container === mapElement) {
+      clearInterval(timer);
+      setTimeout(() => {
+        window.RevistaDigital.mapas?.openDirections?.(hotelName, coordinates);
+        mapElement.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 350);
+    } else if (attempts >= 48) {
+      clearInterval(timer);
+    }
+  }, 250);
 }
 
 function autoDetectLocation() {

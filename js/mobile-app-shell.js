@@ -110,6 +110,7 @@
   var globalClosed = false;
   var globalDrag = null;
   var globalGuideWasHome = false;
+  var guideSwitchTimer = null;
   var globalPoiMode = false;
   var globalPoiHotelId = null;
   var globalPoiQuery = "";
@@ -888,7 +889,7 @@
       '</div>' +
       '<div class="mgs-body">' +
         '<div class="mgs-panel-head">' +
-          '<div class="mgs-title"><strong></strong><span></span></div>' +
+          '<div class="mgs-title" aria-live="polite"><strong></strong><span></span></div>' +
           '<div class="mgs-panel-actions">' +
             '<button type="button" class="mgs-icon-btn" data-mgs-global>↩</button>' +
           '</div>' +
@@ -1002,6 +1003,21 @@
     syncGlobalGuide();
   }
 
+  function flashGuideModeSwitch() {
+    if (!globalSheet) return;
+    var title = globalSheet.querySelector(".mgs-title");
+    globalSheet.classList.remove("is-switching");
+    if (title) title.classList.remove("is-switching");
+    void globalSheet.offsetWidth;
+    globalSheet.classList.add("is-switching");
+    if (title) title.classList.add("is-switching");
+    window.clearTimeout(guideSwitchTimer);
+    guideSwitchTimer = window.setTimeout(function () {
+      globalSheet.classList.remove("is-switching");
+      if (title) title.classList.remove("is-switching");
+    }, 700);
+  }
+
   function updateGlobalGuideToggleLabel() {
     if (!globalSheet) return;
     var english = lang() === "en";
@@ -1017,7 +1033,7 @@
     var english = lang() === "en";
     var guideTitle = globalPoiMode
       ? (english ? "Interactive guide" : "Guía interactiva")
-      : label("menuGuia", "Guía global", "Global guide");
+      : (english ? "Global guide" : "Guía global");
     var searchLabel = globalPoiMode
       ? (english ? "Search points of interest…" : "Buscar puntos de interés…")
       : label("navSearch", "Buscar hoteles, destinos…", "Search hotels, destinations…");
@@ -1225,6 +1241,7 @@
     setGlobalGuideOpen(false);
     updateGlobalGuideLabels();
     renderGlobalGuide();
+    flashGuideModeSwitch();
   }
 
   function exitGlobalPoiMode() {
@@ -1236,9 +1253,10 @@
     if (globalSheet) globalSheet.classList.remove("is-poi-mode");
     clearNearbyPoiLayer();
     setGlobalGuideClosed(false);
-    setGlobalGuideOpen(true);
+    setGlobalGuideOpen(false);
     updateGlobalGuideLabels();
     renderGlobalGuide();
+    flashGuideModeSwitch();
   }
 
   function switchGlobalPoiHotel(name) {
@@ -1902,6 +1920,7 @@
     function check() {
       var state = getState();
       if (state && state.activeMap && mapElement && state.activeMap.getContainer && state.activeMap.getContainer() === mapElement) {
+        mapInitializing = false;
         shellMap = state.activeMap;
         if (document.body.dataset.mobileSheet === "map") state.activeMap = shellMap;
         setTimeout(function () { try { shellMap.invalidateSize(); } catch (error) { /* ignore */ } }, 80);
@@ -1914,6 +1933,7 @@
         return;
       }
       if (Date.now() - started < 4000) setTimeout(check, 100);
+      else mapInitializing = false;
     }
     setTimeout(check, 100);
   }
@@ -2024,6 +2044,7 @@
     nearbyKey = "";
     nearbyItem = null;
     delete document.body.dataset.mobileNearby;
+    delete document.body.dataset.mobileNearbyHotelSlug;
   }
 
   function nearbyDistanceLabel(meters) {
@@ -2396,6 +2417,10 @@
     var token = ++nearbyRouteToken;
     nearbyKey = item.context.route;
     nearbyItem = item;
+    var nearbyHotel = item.context.hotel || {};
+    var nearbyHotelSlug = nearbyHotel.slug || String(item.context.route || "").split("/").filter(Boolean).pop();
+    if (nearbyHotelSlug) document.body.dataset.mobileNearbyHotelSlug = nearbyHotelSlug;
+    else delete document.body.dataset.mobileNearbyHotelSlug;
     nearbyRerouteAt = Date.now();
     nearbyRouteDetail = "";
     var distance = nearbyDistanceLabel(item.context.distance);
@@ -2501,6 +2526,8 @@
     if (!hotelName || !shellMap) return false;
     var hotelId = poiHotelIdForHotel({ name: hotelName });
     if (!hotelId || !poisForHotel(hotelId).length) return false;
+    var hotel = (globalHotels || collectGlobalHotels()).filter(function (item) { return item.name === hotelName; })[0];
+    if (hotel && hotel.slug) document.body.dataset.mobileNearbyHotelSlug = hotel.slug;
     if (nearbyPoiLayer && nearbyPoiHotelId === hotelId) clearNearbyPoiLayer();
     if (!showNearbyPoiLayer(hotelId, true)) return false;
     setGlobalPoiMode(hotelId);
@@ -2978,6 +3005,12 @@
       setSheet("map", "map");
       var gp = rd("guiapa");
       if (shellMap && gp && gp._map !== shellMap && typeof gp.bindMap === "function") gp.bindMap(shellMap);
+    });
+    window.addEventListener("revistadigital:routeChange", function (event) {
+      if (event && event.detail && event.detail.path === "/carrito-golf") {
+        mapInitializing = false;
+        shellMap = null;
+      }
     });
     window.addEventListener("popstate", scheduleSync);
     window.addEventListener("pageshow", function (event) {

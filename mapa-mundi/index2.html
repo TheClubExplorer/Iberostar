@@ -3,27 +3,32 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Mapamundi · The Iberostar Hotels 2026</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://use.typekit.net/vyw7bid.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
 <style>
+  @font-face{
+    font-family:"Echoes Sans";
+    src:url("../fonts/EchoesSans-Thin.otf") format("opentype");
+    font-style:normal;
+    font-weight:100;
+    font-display:swap;
+  }
   :root{
     --ink:#2c2a26; --muted:#83786f; --line:#ded7cb; --bg:#faf8f4; --sea:#f1ece3; --land:#e3dbcc;
-    --waves:#cf4a5f; --selection:#2fa898; --joia:#1358a5; --gold:#a9884f;
+    --waves:#cf4a5f; --selection:#2fa898; --joia:#1358a5; --gold:#a9884f; --adobe:"adobe-garamond-pro",Georgia,serif; --echoes:"Echoes Sans",sans-serif;
   }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);font-family:'Jost',system-ui,sans-serif;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--adobe);letter-spacing:0;}
   a{color:var(--gold)} a:hover{color:var(--ink)}
   html{-webkit-text-size-adjust:100%}
   .sheet{width:100%;max-width:1600px;margin:0 auto;padding:clamp(20px,4vw,48px) clamp(16px,5vw,56px) clamp(32px,6vw,64px);}
   header{display:flex;flex-wrap:wrap;gap:18px 24px;justify-content:space-between;align-items:flex-end;border-bottom:1px solid var(--line);padding-bottom:22px;}
-  h1{font-family:'Marcellus',serif;font-size:clamp(26px,4.2vw,44px);font-weight:400;margin:0;letter-spacing:.06em;text-transform:uppercase;}
+  h1{font-family:var(--adobe);font-size:clamp(26px,4.2vw,44px);font-weight:400;margin:0;letter-spacing:.06em;text-transform:uppercase;}
   .sub{font-size:clamp(11px,1.6vw,14px);letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-top:10px;}
   .totals{display:flex;flex-wrap:wrap;gap:20px 28px;}
   .tot{text-align:right}
-  .tot .n{font-family:'Marcellus',serif;font-size:clamp(22px,3.4vw,34px);line-height:1}
+  .tot .n{font-family:var(--adobe);font-size:clamp(22px,3.4vw,34px);line-height:1}
   .tot .l{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-top:6px}
   .legend{display:flex;flex-wrap:wrap;gap:14px 28px;align-items:center;margin:24px 0 6px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;}
   .legend .item{display:flex;gap:9px;align-items:center;white-space:nowrap}
@@ -42,14 +47,14 @@
        transform:translateY(8px) scale(.97);background:#fff;border:1px solid var(--line);border-top:3px solid var(--gold);
        box-shadow:0 12px 34px rgba(60,50,30,.16);padding:14px 16px;min-width:220px;max-width:min(320px,calc(100vw - 32px));z-index:20}
   .tip.show{opacity:1;transform:translateY(0) scale(1)}
-  .tip h4{font-family:'Marcellus',serif;font-size:16px;margin:0 0 2px;font-weight:400}
+  .tip h4{font-family:var(--adobe);font-size:16px;margin:0 0 2px;font-weight:400}
   .tip .co{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
   .tip ul{margin:0;padding:0;list-style:none;font-size:12.5px;line-height:1.55}
   .tip li{display:flex;gap:8px;align-items:baseline}
   .tip li i{width:6px;height:6px;border-radius:50%;flex:0 0 6px;display:block}
   .tip .grp{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:9px 0 3px}
   .lists{display:grid;grid-template-columns:repeat(3,1fr);gap:0 46px;margin-top:38px;border-top:1px solid var(--line);padding-top:28px}
-  .col h3{font-family:'Marcellus',serif;font-size:13px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);margin:0 0 14px;font-weight:400}
+  .col h3{font-family:var(--adobe);font-size:13px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);margin:0 0 14px;font-weight:400}
   .row{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;padding:5px 0;border-bottom:1px solid #efeae1;font-size:13px}
   .row .nm{flex:1 1 auto;min-width:0}
   .row .cc{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
@@ -100,7 +105,10 @@
     .tip h4,.tip .co,.tip .grp,.tip li{animation:none !important}
     .particle{animation:none !important;transition:none}
   }
-  *{font-family:'EB Garamond',Georgia,serif !important}
+  h1,h2,h3,h4{font-family:var(--adobe) !important;font-weight:400 !important;text-transform:uppercase !important;letter-spacing:.025em !important;line-height:1 !important;}
+  p,li,blockquote{font-family:var(--adobe) !important;font-style:normal !important;text-transform:none !important;letter-spacing:0 !important;}
+  em,i,cite{font-style:italic !important;}
+  .sub,.tot .l,.legend,.zoombar button,.col h3,.tip h4{font-family:var(--echoes) !important;font-weight:100 !important;text-transform:uppercase !important;letter-spacing:.1em !important;}
 </style>
 </head>
 <body>
