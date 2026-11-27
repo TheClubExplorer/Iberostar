@@ -2638,6 +2638,35 @@
     delete document.body.dataset.mobileNearbyPois;
   }
 
+  function showHomeAllPoiLayer() {
+    var gp = rd("guiapa");
+    if (!gp || typeof gp.addPoiLayer !== "function" || !shellMap || !window.L || nearbyPoiLayer) return false;
+    var pois = Array.isArray(gp.POIS) ? gp.POIS.filter(function (poi) {
+      return poi && poi.external !== true && poi.lat != null && poi.lng != null;
+    }) : [];
+    if (!pois.length) return false;
+    nearbyPoiPreviousMap = gp._map || null;
+    if (gp._map !== shellMap) gp._map = shellMap;
+    var originalPois = gp.POIS;
+    var layer = null;
+    try {
+      gp.POIS = pois;
+      layer = gp.addPoiLayer(shellMap, null, { disableClusteringAtZoom: 15 });
+    } finally {
+      gp.POIS = originalPois;
+    }
+    if (!layer) {
+      if (gp._map === shellMap) gp._map = nearbyPoiPreviousMap || null;
+      nearbyPoiPreviousMap = null;
+      return false;
+    }
+    nearbyPoiLayer = layer;
+    nearbyPoiLabelLayer = gp._poiLabelLayer || null;
+    nearbyPoiHotelId = "all";
+    document.body.dataset.mobileNearbyPois = "all";
+    return true;
+  }
+
   function clearNearbyRouteLayers() {
     if (nearbyRaf) {
       window.cancelAnimationFrame(nearbyRaf);
@@ -3148,6 +3177,7 @@
     if (nearbyPoiLayer && nearbyPoiHotelId === hotelId) {
       clearNearbyPoiLayer();
       if (globalPoiMode) exitGlobalPoiMode();
+      showHomeAllPoiLayer();
       syncNearbyPoiButton(nearbyItem);
       return;
     }
@@ -3237,6 +3267,7 @@
       clearNearbyMapHint();
       return;
     }
+    if (!nearbyPoiLayer || nearbyPoiHotelId === "all") showHomeAllPoiLayer();
     var distance = nearbyDistanceLabel(item.context.distance);
     if (nearbyKey === item.context.route && nearbyBadge) {
       try { nearbyBadge.setLatLng(item.latlng); } catch (error) {}
@@ -3656,7 +3687,10 @@
     });
     window.addEventListener("languagechange", function () {
       updateLabels();
-      if (nearbyPoiHotelId) {
+      if (nearbyPoiHotelId === "all") {
+        clearNearbyPoiLayer();
+        showHomeAllPoiLayer();
+      } else if (nearbyPoiHotelId) {
         var hotelId = nearbyPoiHotelId;
         clearNearbyPoiLayer();
         showNearbyPoiLayer(hotelId, false);
