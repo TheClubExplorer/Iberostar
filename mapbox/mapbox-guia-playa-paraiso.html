@@ -22,7 +22,7 @@
     })();
   </script>
   <script src="../js/i18n.js?v=14"></script>
-  <script src="../js/page-translations.js?v=16"></script>
+  <script src="../js/page-translations.js?v=17"></script>
   <script>
     window.addEventListener("storage", function (event) {
       if (event.key === "revista_lang" && window.RevistaDigital && window.RevistaDigital.i18n) {
@@ -50,8 +50,8 @@
       };
     })();
   </script>
-  <script src="../js/datos-complejo.js?v=22"></script>
-  <script src="../js/guia-playa-paraiso.js?v=87"></script>
+  <script src="../js/datos-complejo.js?v=24"></script>
+  <script src="../js/guia-playa-paraiso.js?v=91"></script>
   <link href="https://use.typekit.net/vyw7bid.css" rel="stylesheet">
 
   <style>
@@ -201,6 +201,7 @@
     .mapboxgl-popup-content { border-radius: 14px !important; padding: 12px 14px !important; box-shadow: 0 12px 30px rgba(0,0,0,0.45) !important; font-family: var(--font-body) !important; max-width: 260px; }
     .gp-dir { margin-top: 6px; padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(212,175,55,0.8); background: linear-gradient(180deg,#faf4e3,#f1e4b8); color: #1f1f1f; font-size: 11px; font-weight: 700; cursor: pointer; width: 100%; text-align: center; }
     .gp-cart-btn { margin-top: 4px; padding: 6px 12px; border-radius: 8px; border: 1px solid #10b981; background: #ecfdf5; color: #065f46; font-size: 11px; font-weight: 700; cursor: pointer; width: 100%; text-align: center; }
+    .gp-map-carousel-360-link { white-space: nowrap; }
     .gp-cart-request-form { display: grid; gap: 7px; min-width: 190px; color: #0f172a; font-size: 11px; }
     .gp-cart-request-title { font-size: 14px; }
     .gp-cart-request-destination { color: #475569; }
@@ -1260,7 +1261,7 @@
         var panoApi = window.RevistaDigital && window.RevistaDigital.pannellum360;
         var hasPano360 = (p.category === 'restaurante' || p.category === 'bar' || p.category === 'discoteca') &&
           panoApi && typeof panoApi.isPlayaParaiso === 'function' && panoApi.isPlayaParaiso(p.hotelId || p.hotel);
-        var panoBtn = hasPano360 ? '<button class="gp-dir gp-map-carousel-360-link" type="button" data-map-action="pano-360" data-id="'+esc(p.id)+'" data-hotel="'+esc(p.hotelId || p.hotel || '')+'" data-label="'+name+'" data-zone="'+esc(p.category === 'bar' || p.category === 'discoteca' ? 'bares' : 'restaurantes')+'">Ver exploración 360°</button>' : '';
+        var panoBtn = hasPano360 ? '<button class="gp-dir gp-map-carousel-360-link" type="button" data-map-action="pano-360" data-id="'+esc(p.id)+'" data-hotel="'+esc(p.hotelId || p.hotel || '')+'" data-label="'+name+'" data-zone="'+esc(p.category === 'bar' || p.category === 'discoteca' ? 'bares' : 'restaurantes')+'">Ver 360°</button>' : '';
         if(p.category === 'club') return '<div class="gp-club-popup"><div class="gp-club-popup-badge"><img class="gp-club-popup-logo" src="../branding/IB_THE_CLUB_VV_POS_RGB-320.webp" alt="The Club" /></div><h3 class="gp-club-popup-name">'+name+'</h3><p class="gp-club-popup-hours">'+hours+'</p>'+(desc?'<p class="gp-club-popup-desc">'+desc+'</p>':'')+dirBtn+'</div>';
         if(p.category === 'starprestige') return '<div class="gp-sp-popup"><div class="gp-sp-popup-badge"><span class="gp-sp-popup-star">✦</span>STAR PRESTIGE</div><h3 class="gp-sp-popup-name">'+name+'</h3>'+(desc?'<p class="gp-sp-popup-desc">'+desc+'</p>':'')+'<p class="gp-sp-popup-hours">'+hours+'</p>'+dirBtn+menuBtn+'</div>';
         return '<div><strong style="font-size:14px;color:#0f172a;">'+name+'</strong>'+(desc?'<p style="font-size:11px;color:#475569;margin:4px 0;">'+desc+'</p>':'')+'<small style="color:#64748b;display:block;margin-bottom:6px;">'+hours+'</small>'+dirBtn+menuBtn+panoBtn+cartBtn+'</div>';

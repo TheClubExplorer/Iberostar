@@ -132,7 +132,7 @@
     {"id":"punta-sal-ceviche","name":"Punta Sal Ceviche & Beach Bar","category":"bar","hotelId":"JOIA Paraíso by Iberostar","lat":20.754750,"lng":-86.959584,"description":"Ceviche & Beach Bar frente al mar; bebidas en la arena de 10:00 a 18:00 h","verified":true,"carta":"Ceviches frescos · Tiraditos · Cócteles de mariscos · Cervezas artesanales · Vinos blancos · Margaritas de frutas tropicales","menu":"Fresh ceviches · Tiraditos · Seafood cocktails · Craft beers · White wines · Tropical fruit margaritas","horario":"10:00 - 18:00 h","hours":"10:00 - 18:00"},
     {"id":"grand-cellar","name":"The Grand Cellar / Wine Cellar","category":"snacks","hotelId":"JOIA Paraíso by Iberostar","lat":20.756344,"lng":-86.962658,"description":"The Wine Cellar (Cava de Vinos). Coordenadas: 20.756344, -86.962658. Horarios de Cata: 17:00 y 19:00 h. Operación diaria: Degustaciones programadas de Lunes a Domingo. Costo: $700 MXN por persona lunes a sábado, $1,400 MXN domingos. Catas privadas disponibles contactando a Concierge.","verified":true,"carta":"Menú (Cata y Maridaje por día): Lunes y Miércoles (Tequila/Mezcal y Vinos Mexicanos): queso Oaxaca ahumado, chicharrón, sikil pak, chapulines y mermelada de chile. Martes (Vinos Españoles): queso manchego, Idiazábal, Mahón, jamón serrano y embutido ibérico. Jueves (Vinos Argentinos): tabla de carne con queso, chorizo, camarón y empanadas con chimichurri. Viernes (Vinos Italianos): burrata trufada, Asiago, provolone, coppa y prosciutto. Sábado y Domingo (Vinos del Nuevo Mundo y Burbujas): queso camembert, queso azul, paté de campaña y paté en croûte.","menu":"Menu (Tasting and Pairing by day): Monday and Wednesday (Tequila/Mezcal and Mexican Wines): smoked Oaxaca cheese, chicharrón, sikil pak, chapulines and chili jam. Tuesday (Spanish Wines): manchego, Idiazábal, Mahón, serrano ham and Iberian sausage. Thursday (Argentine Wines): meat board with cheese, chorizo, shrimp and chimichurri empanadas. Friday (Italian Wines): truffled burrata, Asiago, provolone, coppa and prosciutto. Saturday and Sunday (New World Wines and Sparkling): camembert, blue cheese, country pâté and pâté en croûte.","horario":"Catas 17:00 y 19:00 h · Lunes a Domingo","hours":"Tastings 5:00 PM and 7:00 PM · Monday to Sunday","vestimenta":"Casual Elegante (Smart Casual)","dressCode":"Smart Casual","reservas":true,"reservation":true,"especialidades":"Catas de vino privadas, maridaje guiado por sommelier experto y botellas de colección","specialties":"Private wine tastings, sommelier-guided pairing, and collection bottles"},
     {"id":"joia-cafe","name":"Star Cafe JOIA","category":"snacks","hotelId":"JOIA Paraíso by Iberostar","lat":20.756068,"lng":-86.962852,"description":"Star Café (Lobby JOIA Paraíso). Coordenadas: 20.756068, -86.962852. Horario: Abierto 24 horas. Operación diaria: Horario continuo (24 h) · Lunes a Domingo.","verified":true,"tipo":"cafeteria","cocina":"Coffee Shop & Snacks","cuisine":"Coffee Shop & Snacks","carta":"Menú (Bebidas y Coffee Shop): cafés tradicionales (espresso, capuchino, latte), especialidades (caramel macchiato, moca blanco) y barra de frappés (café, caramelo, moca, chocolate blanco). También sirven tés calientes (chai, negro, verde, manzanilla) y tés fríos (frutos rojos, limón y jengibre, limonada de durazno). Opciones de leche: entera, light, deslactosada, semi, soja y almendra. Acompañado de panadería, sándwiches fríos, ensaladas y postres.","menu":"Menu (Drinks and Coffee Shop): traditional coffees (espresso, cappuccino, latte), specialties (caramel macchiato, white mocha) and frappé bar (coffee, caramel, mocha, white chocolate). Also hot teas (chai, black, green, chamomile) and cold teas (red fruits, lemon and ginger, peach lemonade). Milk options: whole, light, lactose-free, semi, soy and almond. Accompanied by bakery, cold sandwiches, salads and desserts.","horario":"Abierto 24 horas","hours":"Open 24 hours","vestimenta":"Casual / Informal","dressCode":"Casual / Informal","reservas":false,"reservation":false,"especialidades":"Café barista, sándwiches fríos, panadería dulce y repostería disponible las 24 horas","specialties":"Barista coffee, cold sandwiches, sweet bakery and pastries available 24 hours"},
-    {"id":"baby-kitchen","name":"Baby Kitchen","category":"servicio","lat":20.758029,"lng":-86.963437,"description":"Cocina para bebés","verified":true});
+  );
   POIS.push(
     {"id":"sports-bar-corner","name":"Sports Bar Corner","category":"bar","hotelId":"Iberostar Waves Paraíso Lindo","lat":20.7596764,"lng":-86.9634133,"description":"Sports bar","verified":true,"carta":"Cervezas · Alitas · Nachos · Hamburguesas · Cócteles","menu":"Beers · Wings · Nachos · Burgers · Cocktails"},
     // "Heladería El Puente" (20.758672,-86.959008, Paraíso del Mar).
@@ -156,6 +156,12 @@
     {"id":"heladeria-el-puente","name":"Heladería El Puente","category":"snacks","hotelId":"Iberostar Selection Paraíso del Mar","lat":20.758672,"lng":-86.959008,"description":"Heladería El Puente","verified":true,"tipo":"cafeteria","cocina":"Heladería y snacks","cuisine":"Ice cream parlor and snacks","carta":"Helados artesanales variados, paletas, crepas dulces y café.","menu":"Assorted artisan ice cream, popsicles, sweet crepes and coffee.","horario":"Desayuno cerrado · Comida / Snack 11:00 - 18:00 h · Cena cerrada · Lunes a Domingo","hours":"Breakfast closed · Lunch / Snack 11:00 - 18:00 h · Dinner closed · Monday-Sunday","vestimenta":"Informal","dressCode":"Informal","reservas":false,"reservation":false,"especialidades":"Helados artesanales variados, paletas, crepas dulces y café.","specialties":"Assorted artisan ice cream, popsicles, sweet crepes and coffee."},
     {"id":"bar-el-kiosko","name":"El Kiosko Bar","category":"bar","hotelId":"Iberostar Selection Paraíso del Mar","lat":20.757810,"lng":-86.958304,"description":"Bar de playa frente al mar","verified":true,"carta":"Cócteles tropicales · Piñas coladas · Mojitos · Cervezas · Snacks de playa","menu":"Tropical cocktails · Piña coladas · Mojitos · Beers · Beach snacks"}),
   POIS.push(
+    {"id":"club-house","name":"Club House","category":"servicio","lat":20.757567,"lng":-86.960509,"description":"Club House","verified":true,"source":"Google Maps","horario":"10:00 - 17:00 h","hours":"10:00 - 17:00","hoursEn":"10:00 - 17:00"},
+    {"id":"bar-flamencos","name":"Bar Flamencos","category":"bar","lat":20.757119,"lng":-86.959934,"description":"Bar Flamencos","verified":true,"source":"Google Maps","tipo":"bar","cocina":"Bar de coctelería y bebidas (Todo Incluido)","cuisine":"Cocktail and beverage bar (All Inclusive)","carta":"Barra completa con coctelería clásica y tropical (margaritas, piñas coladas, mojitos, daiquiris), cervezas nacionales, vinos de la casa, licores nacionales e internacionales, refrescos, jugos y bebidas sin alcohol (mocktails).","menu":"Full bar offering classic and tropical cocktails (margaritas, piña coladas, mojitos, daiquiris), domestic beers, house wines, local and international spirits, sodas, juices, and non-alcoholic drinks (mocktails).","horario":"10:00 - 18:00 h","horarioTexto":"10:00 - 18:00 h","hours":"10:00 - 18:00","hoursEn":"10:00 - 18:00","reservas":false,"reservation":false},
+    {"id":"yoga-deck","name":"Yoga Deck","category":"wellness","lat":20.755900,"lng":-86.961506,"description":"Yoga Deck","verified":true,"source":"Google Maps"},
+    {"id":"concierge-paraiso-del-mar","name":"Concierge Paraíso del Mar","category":"concierge","hotelId":"Iberostar Selection Paraíso del Mar","lat":20.761993,"lng":-86.963393,"description":"Concierge del hotel","verified":true,"source":"Google Maps"}
+  );
+  POIS.push(
     {"id":"waterfall-jacuzzi","name":"Cascada y jacuzzi","category":"piscina","lat":20.759539,"lng":-86.960991,"description":"Water fall & jacuzzi","verified":true},
     {"id":"quiet-pool","name":"Piscina tranquila","category":"piscina","lat":20.759600,"lng":-86.960224,"description":"Quiet pool","verified":true},
     {"id":"activities-pool","name":"Piscina de actividades","category":"piscina","lat":20.759267,"lng":-86.959714,"description":"Activities pool","verified":true},
@@ -171,7 +177,7 @@
   POIS.push(
     {"id":"tennis","name":"Tenis","category":"deportes","lat":20.760289,"lng":-86.964375,"description":"Tennis","verified":true},
     {"id":"tenis-paraiso-lindo","name":"Tenis Paraíso Lindo","category":"deportes","hotelId":"Iberostar Waves Paraíso Lindo","lat":20.758833,"lng":-86.964598,"description":"Cancha de tenis Paraíso Lindo","verified":true},
-    {"id":"shooting-area","name":"Campo de tiro","category":"deportes","lat":20.761933,"lng":-86.962473,"description":"Shooting area","verified":true},
+    {"id":"shooting-area","name":"Campo de tiro","category":"deportes","lat":20.760227,"lng":-86.964011,"description":"Shooting area","verified":true,"source":"Google Maps"},
     {"id":"diving-center","name":"Centro de buceo","category":"deportes","description":"Diving center"},
     {"id":"golf-club-house","name":"Golf Club House","category":"golf","description":"Golf club house"},
     {"id":"teatro-music-hall","name":"Teatro Music Hall","category":"entretenimiento","lat":20.7591882,"lng":-86.9627312,"description":"Teatro","verified":true},
@@ -183,7 +189,6 @@
     {"id":"starmarket","name":"Starmarket","category":"comer","description":"Starmarket"},
     {"id":"shop-tienda","name":"Shop / Tienda","category":"comer","lat":20.762215,"lng":-86.963121,"description":"Shop / Tienda","verified":true},
     {"id":"pool-shop","name":"Tienda de piscina","category":"comer","lat":20.758561,"lng":-86.959673,"description":"Pool shop","verified":true},
-    {"id":"meeting-room","name":"Sala de juntas","category":"conv","lat":20.760629,"lng":-86.963838,"description":"Sala de juntas","verified":true},
     {"id":"billiards-library","name":"Internet, billar, biblioteca","category":"servicio","lat":20.760721,"lng":-86.963638,"description":"Billiards, library","verified":true},
     {"id":"medical-center","name":"Centro médico","category":"servicio","lat":20.759144,"lng":-86.964771,"description":"Medical center","verified":true},
     {"id":"drugstore","name":"Farmacia","category":"servicio","lat":20.759826,"lng":-86.965208,"description":"Drugstore","verified":true},
@@ -2368,7 +2373,7 @@
       btns += '<button type="button" class="guide-focus" data-id="' + escapeHtml(poi.id) + '">Ver en el mapa</button>';
       btns += menuButton;
       if (hasPano360Mobile) {
-        btns += '<button type="button" class="guide-pano360" data-id="' + escapeHtml(poi.id) + '">Ver exploración 360°</button>';
+        btns += '<button type="button" class="guide-pano360" data-id="' + escapeHtml(poi.id) + '">Ver 360°</button>';
       }
       if (cat === "restaurante" || cat === "spa" || cat === "golf") {
         var label = cat === "restaurante" ? "Reservar" : (cat === "spa" ? "Reservar cita" : "Reservar tee time");
@@ -2542,7 +2547,7 @@
     })();
     var cartAction = '<button type="button" class="guide-cart" data-id="' + escapeHtml(poi.id) + '" data-cat="' + escapeHtml(poi.category) + '">Solicitar carrito</button>';
     
-    var pano360Btn = (hasPano360 && verified) ? '<button type="button" class="guide-pano360" data-id="' + escapeHtml(poi.id) + '">Ver exploración 360°</button>' : "";
+    var pano360Btn = (hasPano360 && verified) ? '<button type="button" class="guide-pano360" data-id="' + escapeHtml(poi.id) + '">Ver 360°</button>' : "";
     var menuButton = gp.isDiningPoi(poi)
       ? '<button type="button" class="guide-menu" data-id="' + escapeHtml(poi.id) + '">' + gp.menuToggleLabel() + "</button>"
       : "";
@@ -3233,6 +3238,14 @@ function poiCommonInfoHtml(poi) {
   gp.queryPois = queryPois;
   gp.canMapPoi = canMap;
   gp.renderMobileActions = renderMobileActions;
+  gp.includedPois = includedPois;
+  gp.presentCategories = presentCategories;
+  gp.categoryLabel = categoryLabel;
+  gp.categoryColor = categoryColor;
+  gp.escapeHtml = escapeHtml;
+  gp.isEnglishUi = isEnglishUi;
+  gp.mobilePoiInfoHtml = mobilePoiInfoHtml;
+  gp.poiCommonInfoHtml = poiCommonInfoHtml;
   gp.renderCategoryLegend = function (mount) {
     if (!mount) return false;
     mount.innerHTML = legendMarkup();

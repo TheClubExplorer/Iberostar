@@ -114,6 +114,10 @@
   var globalPoiMode = false;
   var globalPoiHotelId = null;
   var globalPoiQuery = "";
+  var globalPoiExplorer = null;
+  var globalPoiFilter = "all";
+  var globalPoiSelectedId = null;
+  var globalPoiRouteTimer = null;
   var nearbyRouteLine = null;
   var nearbyRouteRenderer = null;
   var nearbyRouteAbort = null;
@@ -891,6 +895,7 @@
         '<div class="mgs-panel-head">' +
           '<div class="mgs-title" aria-live="polite"><strong></strong><span></span></div>' +
           '<div class="mgs-panel-actions">' +
+            '<button type="button" class="mgs-icon-btn" data-mgs-interactive>↪</button>' +
             '<button type="button" class="mgs-icon-btn" data-mgs-global>↩</button>' +
           '</div>' +
         '</div>' +
@@ -898,18 +903,25 @@
         '<div class="mgs-filter-label"><span></span><small></small></div>' +
         '<div class="mgs-countries"></div>' +
         '<div class="mgs-list"></div>' +
+        '<div class="mgs-gp-mount" hidden></div>' +
       '</div>';
     document.body.appendChild(globalSheet);
 
     globalHandle = globalSheet.querySelector(".mgs-handle");
     globalInput = globalSheet.querySelector(".mgs-input");
     globalList = globalSheet.querySelector(".mgs-list");
+    globalPoiExplorer = globalSheet.querySelector(".mgs-gp-mount");
 
     globalSheet.addEventListener("click", function (event) {
+      if (event.target.closest("[data-mgs-interactive]")) {
+        enterGlobalPoiModeFromGuide();
+        return;
+      }
       if (event.target.closest("[data-mgs-global]")) {
         exitGlobalPoiMode();
         return;
       }
+      if (globalPoiMode && handleGlobalPoiExplorerClick(event)) return;
       var poiHotel = event.target.closest("[data-mgs-poi-hotel]");
       if (poiHotel) {
         switchGlobalPoiHotel(poiHotel.dataset.mgsPoiHotel);
@@ -943,6 +955,14 @@
       if (event.target.closest("[data-mgs-exit]")) setGlobalGuideClosed(true);
     });
 
+    globalSheet.addEventListener("keydown", function (event) {
+      if (!globalPoiMode) return;
+      if (event.key !== "Enter" && event.key !== " ") return;
+      var item = event.target.closest("[data-mgs-guide-item]");
+      if (!item) return;
+      event.preventDefault();
+      selectGlobalGuidePoi(item.dataset.id);
+    });
     globalHandle.addEventListener("keydown", function (event) {
       if (event.key !== "Enter" && event.key !== " ") return;
       event.preventDefault();
@@ -953,13 +973,19 @@
     globalHandle.addEventListener("touchend", onGlobalDragEnd);
     globalHandle.addEventListener("touchcancel", onGlobalDragEnd);
     globalInput.addEventListener("input", function (event) {
-      if (globalPoiMode) {
-        globalPoiQuery = event.target.value || "";
-        renderGlobalGuide();
-        return;
-      }
+      if (globalPoiMode) return;
       globalQuery = event.target.value || "";
       renderGlobalGuide();
+    });
+    globalSheet.addEventListener("input", function (event) {
+      if (!globalPoiMode || !event.target.matches("#mgsGuideSearch")) return;
+      globalPoiQuery = event.target.value || "";
+      renderGlobalPoiGuide();
+    });
+    globalSheet.addEventListener("submit", function (event) {
+      if (!event.target.matches(".mgs-guide-book-form")) return;
+      event.preventDefault();
+      submitGlobalPoiBooking(event.target);
     });
 
     globalCard = document.createElement("div");
@@ -1040,18 +1066,22 @@
     globalSheet.setAttribute("aria-label", guideTitle);
     globalSheet.querySelector(".mgs-title strong").textContent = guideTitle;
     globalSheet.querySelector(".mgs-title span").textContent = globalPoiMode
-      ? (english ? "Points of interest at the selected hotel" : "Puntos de interés del hotel seleccionado")
+      ? (english ? "All places in Playa Paraíso and its five hotels" : "Todos los lugares de Playa Paraíso y sus cinco hoteles")
       : (english ? "All countries, destinations and hotels" : "Todos los países, destinos y hoteles");
     updateGlobalGuideToggleLabel();
     globalSheet.querySelector(".mgs-search-hint").textContent = english ? "Explore" : "Explorar";
     globalInput.placeholder = searchLabel;
     globalInput.setAttribute("aria-label", searchLabel);
     globalSheet.querySelector(".mgs-filter-label span").textContent = globalPoiMode
-      ? (english ? "Filter by hotel" : "Filtrar por hotel")
+      ? (english ? "Categories" : "Categorías")
       : (english ? "Filter by country" : "Filtrar por país");
+    if (globalPoiExplorer) globalPoiExplorer.hidden = !globalPoiMode;
     var globalBack = globalSheet.querySelector("[data-mgs-global]");
     globalBack.style.display = globalPoiMode ? "" : "none";
     globalBack.setAttribute("aria-label", english ? "Back to global guide" : "Volver a la guía global");
+    var globalInteractive = globalSheet.querySelector("[data-mgs-interactive]");
+    globalInteractive.style.display = globalPoiMode ? "none" : "";
+    globalInteractive.setAttribute("aria-label", english ? "Open interactive guide" : "Abrir guía interactiva");
     globalSheet.querySelector("[data-mgs-exit]").setAttribute("aria-label", english ? "Close guide" : "Cerrar guía");
     globalReopen.querySelector("[data-mgs-reopen-label]").textContent = english ? "Global guide" : "Guía global";
     globalReopen.setAttribute("aria-label", english ? "Open global guide" : "Abrir guía global");
@@ -1182,50 +1212,639 @@
       .replace(/\s+by Iberostar$/i, "");
   }
 
-  function renderGlobalPoiGuide() {
+  function isGlobalPoiMobileGuide() {
+    try { return window.matchMedia("(max-width: 768px)").matches; }
+    catch (error) { return window.innerWidth <= 768; }
+  }
+
+  function globalGuideEscape(value) {
     var gp = rd("guiapa");
-    var pois = poisForHotel(globalPoiHotelId);
-    var hotels = globalPoiHotels();
+    if (gp && typeof gp.escapeHtml === "function") return gp.escapeHtml(value);
+    return String(value == null ? "" : value).replace(/[&<>"']/g, function (char) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char];
+    });
+  }
+
+  function globalGuideCategoryLabel(category) {
+    var gp = rd("guiapa");
+    if (gp && typeof gp.categoryLabel === "function") return gp.categoryLabel(category);
+    return String(category || "Lugar");
+  }
+
+  function globalGuideCategoryColor(category) {
+    var gp = rd("guiapa");
+    if (gp && typeof gp.categoryColor === "function") return gp.categoryColor(category);
+    return "#8c8176";
+  }
+
+  function globalGuideText(poi, key) {
+    var gp = rd("guiapa");
+    var fn = gp && gp[key];
+    if (typeof fn === "function") return fn(poi) || "";
+    return String((poi && poi[key]) || "");
+  }
+
+  function findGlobalPoi(id) {
+    var gp = rd("guiapa");
+    if (!gp || !Array.isArray(gp.POIS) || !id) return null;
+    return gp.POIS.filter(function (poi) { return poi && poi.id === id; })[0] || null;
+  }
+
+  function globalGuideAllPois() {
+    var gp = rd("guiapa");
+    if (!gp || typeof gp.includedPois !== "function") return [];
+    return gp.includedPois();
+  }
+
+  function globalGuideFilteredPois() {
+    var gp = rd("guiapa");
+    if (!gp || typeof gp.queryPois !== "function") return [];
+    return gp.queryPois({ filter: globalPoiFilter || "all", query: globalPoiQuery || "" });
+  }
+
+  function ensureGlobalPoiExplorer() {
+    if (!globalPoiExplorer || globalPoiExplorer.dataset.built === "1") return;
+    globalPoiExplorer.innerHTML =
+      '<div class="guide-explorer guide-explorer--panel mgs-guide-explorer">' +
+        '<label class="guide-search"><span aria-hidden="true">⌕</span>' +
+          '<input id="mgsGuideSearch" type="search" autocomplete="off" aria-label="Buscar lugar por nombre" />' +
+        '</label>' +
+        '<div class="guide-filters" id="mgsGuideFilters" role="group" aria-label="Filtrar por categoría"></div>' +
+        '<div class="guide-layout">' +
+          '<div class="guide-panel guide-list-panel">' +
+            '<div class="guide-list-head" id="mgsGuideCount"></div>' +
+            '<ul class="guide-list" id="mgsGuideList"></ul>' +
+          '</div>' +
+          '<aside class="guide-panel guide-side">' +
+            '<div class="guide-mobile-actions" id="mgsGuideMobileActions" hidden role="region" aria-label="Acciones del lugar seleccionado">' +
+              '<div class="guide-mobile-actions-head">' +
+                '<span class="guide-mobile-actions-title" id="mgsGuideMobileActionsTitle"></span>' +
+                '<button type="button" class="guide-mobile-actions-close" id="mgsGuideMobileActionsClose" aria-label="Cerrar acciones">×</button>' +
+              '</div>' +
+              '<div class="guide-mobile-actions-body" id="mgsGuideMobileActionsBody"></div>' +
+            '</div>' +
+            '<div class="guide-detail" id="mgsGuideDetail"></div>' +
+            '<div class="guide-legend" id="mgsGuideLegend"></div>' +
+          '</aside>' +
+        '</div>' +
+      '</div>';
+    globalPoiExplorer.dataset.built = "1";
+  }
+
+  function renderGlobalPoiFilters() {
+    if (!globalPoiExplorer) return;
+    var gp = rd("guiapa");
+    var wrap = globalPoiExplorer.querySelector("#mgsGuideFilters");
+    if (!wrap) return;
     var english = lang() === "en";
-    var countriesWrap = globalSheet.querySelector(".mgs-countries");
-    countriesWrap.textContent = "";
-    hotels.forEach(function (name) {
-      var button = document.createElement("button");
-      button.type = "button";
-      button.className = "mgs-country" + (poiHotelIdForHotel({ name: name }) === globalPoiHotelId ? " is-active" : "");
-      button.dataset.mgsPoiHotel = name;
-      button.textContent = shortGlobalPoiHotel(name);
-      countriesWrap.appendChild(button);
+    var allCount = globalGuideAllPois().length;
+    var html = '<button type="button" class="guide-chip' + (globalPoiFilter === "all" ? " is-active" : "") + '" data-mgs-guide-filter="all" aria-pressed="' + (globalPoiFilter === "all") + '">' +
+      (english ? "All" : "Todos") + ' <span>' + allCount + '</span></button>';
+    var categories = gp && typeof gp.presentCategories === "function" ? gp.presentCategories() : [];
+    categories.forEach(function (entry) {
+      var active = globalPoiFilter === entry.key;
+      html += '<button type="button" class="guide-chip' + (active ? " is-active" : "") + '" data-mgs-guide-filter="' + globalGuideEscape(entry.key) + '" aria-pressed="' + active + '">' +
+        '<span class="guide-chip-dot" style="background:' + globalGuideCategoryColor(entry.key) + '"></span>' +
+        globalGuideEscape(globalGuideCategoryLabel(entry.key)) + ' <span>' + entry.count + '</span></button>';
     });
-    globalSheet.querySelector(".mgs-filter-label small").textContent = pois.length + (english ? " places" : " lugares");
-    var query = (globalPoiQuery || "").trim().toLowerCase();
-    var filtered = pois.filter(function (poi) {
-      if (!query) return true;
-      var name = gp && typeof gp.poiNameText === "function" ? gp.poiNameText(poi) : poi.name;
-      var description = gp && typeof gp.poiDescriptionText === "function" ? gp.poiDescriptionText(poi) : poi.description;
-      return (String(name || "") + " " + String(description || "") + " " + String(poi.category || "")).toLowerCase().indexOf(query) !== -1;
-    });
-    globalList.textContent = "";
-    if (!filtered.length) {
-      var empty = document.createElement("p");
-      empty.className = "mgs-empty";
-      empty.textContent = english ? "No points of interest found." : "No hay puntos de interés para esta búsqueda.";
-      globalList.appendChild(empty);
+    wrap.innerHTML = html;
+  }
+
+  function renderGlobalPoiList() {
+    if (!globalPoiExplorer) return;
+    var list = globalPoiExplorer.querySelector("#mgsGuideList");
+    var count = globalPoiExplorer.querySelector("#mgsGuideCount");
+    if (!list) return;
+    var english = lang() === "en";
+    var pois = globalGuideFilteredPois();
+    if (count) count.textContent = pois.length + (english ? " of " : " de ") + globalGuideAllPois().length + (english ? " places" : " lugares");
+    if (!pois.length) {
+      list.innerHTML = '<li class="guide-empty">' + (english ? "Adjust the search to see more places." : "Ajuste la búsqueda para ver más lugares.") + '</li>';
       return;
     }
-    filtered.forEach(function (poi) {
-      var button = document.createElement("button");
-      button.type = "button";
-      button.className = "mgs-hotel mgs-poi";
-      button.dataset.mgsPoi = poi.id;
-      var name = document.createElement("strong");
-      name.textContent = gp && typeof gp.poiNameText === "function" ? gp.poiNameText(poi) : poi.name;
-      var meta = document.createElement("span");
-      meta.textContent = (gp && typeof gp.poiDescriptionText === "function" ? gp.poiDescriptionText(poi) : poi.description) || poi.category || "";
-      button.appendChild(name);
-      button.appendChild(meta);
-      globalList.appendChild(button);
+    list.innerHTML = pois.map(function (poi) {
+      var active = poi.id === globalPoiSelectedId ? " is-active" : "";
+      var pending = poi.verified !== true || poi.lat == null || poi.lng == null ? " is-pending" : "";
+      var meta = globalGuideEscape(globalGuideCategoryLabel(poi.category)) + (poi.hotelId ? " · " + globalGuideEscape(poi.hotelId) : "");
+      var brandHtml = "";
+      if (poi.category === "hotel" && poi.brand) {
+        var logo = poi.brand === "waves"
+          ? "src/LOGOS-IBEROSTAR/LOGO_IB_WAVES_BR_POS_REDUCED_RGB.svg"
+          : poi.brand === "selection"
+            ? "src/LOGOS-IBEROSTAR/LOGO_IB_SELECTION_BR_POS_REDUCED_RGB.svg"
+            : poi.brand === "joia"
+              ? "src/LOGOS-IBEROSTAR/JOIA_by_IB_POS_RGB.svg"
+              : "";
+        if (logo) brandHtml = '<img class="guide-item-brand" src="' + logo + '" alt="' + globalGuideEscape(poi.brand) + '" width="48" height="32" loading="lazy" />';
+      }
+      return '<li class="guide-item' + active + pending + (poi.category === "hotel" ? " guide-item--hotel" : "") + '" data-mgs-guide-item data-id="' + globalGuideEscape(poi.id) + '" tabindex="0" role="button">' +
+        '<span class="guide-dot" style="background:' + globalGuideCategoryColor(poi.category) + '"></span>' +
+        '<span class="guide-item-body"><span class="guide-item-name">' + globalGuideEscape(globalGuideText(poi, "poiNameText") || poi.name) + '</span><span class="guide-item-meta">' + meta + '</span></span>' +
+        brandHtml +
+        '</li>';
+    }).join("");
+  }
+
+  function globalGuideExtraInfoHtml(poi) {
+    var english = lang() === "en";
+    var hoursFallback = english ? "Please check the Iberostar app." : "Consultar horario en la app de Iberostar";
+    var cuisineFallback = english ? "Please check the Iberostar app." : "Consultar en la app de Iberostar";
+    var missingMenu = english ? "Not available yet" : "No disponible por ahora";
+    var rows = [];
+    var hours = globalGuideText(poi, "poiHoursText") || hoursFallback;
+    var menu = globalGuideText(poi, "poiMenuText");
+    var cuisine = globalGuideText(poi, "poiCuisineText");
+    var specialty = globalGuideText(poi, "poiSpecialtiesText");
+    var treatments = globalGuideText(poi, "poiTreatmentsText");
+    var packages = globalGuideText(poi, "poiPackagesText");
+    var scheduleRows = [];
+    if (poi.breakfast) scheduleRows.push([english ? "Breakfast" : "Desayuno", poi.breakfast]);
+    if (poi.lunch) scheduleRows.push([english ? "Lunch" : "Comida", poi.lunch]);
+    if (poi.dinner) scheduleRows.push([english ? "Dinner" : "Cena", poi.dinner]);
+    if (poi.late) scheduleRows.push(["Bar", poi.late]);
+    if (poi.category === "restaurante") {
+      if (scheduleRows.length) rows.push.apply(rows, scheduleRows);
+      else rows.push([english ? "Hours" : "Horario", hours]);
+      rows.push([english ? "Cuisine" : "Cocina", cuisine || cuisineFallback]);
+      if (menu) rows.push([english ? "Menu" : "Menú", menu]);
+    } else if (poi.category === "spa") {
+      rows.push([english ? "Hours" : "Horario", hours]);
+      rows.push([english ? "Treatments" : "Tratamientos", treatments || (english ? "Check available treatments in the Iberostar app." : "Consulte los tratamientos disponibles en la app de Iberostar")]);
+      if (packages) rows.push([english ? "Packages" : "Paquetes", packages]);
+    } else if (poi.category === "golf") {
+      rows.push([english ? "Hours" : "Horario", hours]);
+      if (poi.teeTimes) rows.push(["Tee times", poi.teeTimes]);
+      rows.push([english ? "Packages" : "Paquetes", packages || (english ? "Check packages in the Iberostar app." : "Consulte los paquetes en la app de Iberostar")]);
+    } else if (poi.category === "bar" || poi.category === "discoteca") {
+      rows.push([english ? "Hours" : "Horario", hours]);
+      if (cuisine) rows.push([english ? "Concept" : "Concepto", cuisine]);
+      rows.push([english ? "Menu" : "Carta", menu || missingMenu]);
+    } else if (poi.category === "club" || poi.category === "starprestige") {
+      var amenities = globalGuideText(poi, "poiAmenitiesText");
+      var services = globalGuideText(poi, "poiServicesText");
+      if (globalGuideText(poi, "poiHoursText")) rows.push([english ? "Hours" : "Horario", globalGuideText(poi, "poiHoursText")]);
+      if (amenities) rows.push([english ? "Amenities" : "Amenidades", amenities]);
+      if (services) rows.push([english ? "Included services" : "Servicios incluidos", services]);
+    } else {
+      if (globalGuideText(poi, "poiHoursText")) rows.push([english ? "Hours" : "Horario", globalGuideText(poi, "poiHoursText")]);
+      if (cuisine) rows.push([english ? "Concept" : "Concepto", cuisine]);
+      if (menu) rows.push([english ? "Menu" : "Carta", menu]);
+      if (packages) rows.push([english ? "Packages" : "Paquetes", packages]);
+    }
+    if (!rows.length && specialty && specialty !== menu) rows.push([english ? "Specialties" : "Especialidades", specialty]);
+    if (!rows.length) return "";
+    return '<div class="guide-extra-info">' + rows.map(function (row) {
+      return '<p class="guide-detail-row"><strong>' + globalGuideEscape(row[0]) + '</strong> ' + globalGuideEscape(row[1]) + '</p>';
+    }).join("") + '</div>';
+  }
+
+  function globalGuideActionsHtml(poi, mobile) {
+    var gp = rd("guiapa");
+    var verified = Number.isFinite(poi.lat) && Number.isFinite(poi.lng);
+    var isArea = poi.kind === "area";
+    var cat = poi.category;
+    var id = globalGuideEscape(poi.id);
+    var menuButton = gp && typeof gp.isDiningPoi === "function" && gp.isDiningPoi(poi)
+      ? '<button type="button" class="guide-menu" data-id="' + id + '">' + (gp.menuToggleLabel ? gp.menuToggleLabel() : "Menú") + '</button>'
+      : "";
+    var cartButton = '<button type="button" class="guide-cart" data-id="' + id + '" data-cat="' + globalGuideEscape(cat) + '">Solicitar carrito</button>';
+    var bookingButton = "";
+    if (cat === "restaurante" || cat === "spa" || cat === "golf") {
+      var label = cat === "restaurante" ? "Reservar" : cat === "spa" ? "Reservar cita" : "Reservar tee time";
+      bookingButton = '<button type="button" class="guide-book" data-id="' + id + '" data-cat="' + cat + '">' + label + '</button>';
+    }
+    var pano = rd("pannellum360");
+    var hasPano = verified && (cat === "restaurante" || cat === "bar" || cat === "discoteca") && pano && typeof pano.isPlayaParaiso === "function" && pano.isPlayaParaiso(poi.hotelId || poi.hotel);
+    var panoButton = hasPano ? '<button type="button" class="guide-pano360" data-id="' + id + '">' + (mobile ? "Ver 360°" : "Ver exploración 360°") + '</button>' : "";
+    var focusButton = '<button type="button" class="guide-focus" data-id="' + id + '">Ver en el mapa</button>';
+    var routeButton = '<button type="button" class="guide-route" data-id="' + id + '">Cómo llegar</button>';
+    var buttons = "";
+    if (mobile) {
+      var primary = "";
+      var secondary = "";
+      var note = "";
+      if (isArea) {
+        primary = focusButton + cartButton;
+      } else if (verified) {
+        primary = routeButton + cartButton;
+        secondary = focusButton + menuButton + panoButton + bookingButton;
+      } else {
+        note = '<span class="guide-mobile-actions-note">Información en actualización; la ruta estará disponible pronto.</span>';
+        primary = cartButton;
+        secondary = menuButton + bookingButton;
+      }
+      return '<div class="guide-mobile-actions-buttons">' +
+        note +
+        (primary ? '<div class="guide-mobile-actions-primary">' + primary + '</div>' : "") +
+        (secondary ? '<div class="guide-mobile-actions-secondary">' + secondary + '</div>' : "") +
+      '</div>';
+    }
+    if (isArea) {
+      buttons = focusButton + cartButton;
+    } else if (verified) {
+      buttons = focusButton + routeButton + menuButton + panoButton + bookingButton + cartButton;
+    } else {
+      buttons = menuButton + bookingButton + cartButton;
+    }
+    return '<div class="guide-detail-actions">' + buttons + '</div>';
+  }
+
+  function globalGuideRouteStatusHtml() {
+    var gp = rd("guiapa");
+    var route = gp && gp._route;
+    var notice = gp && gp._routeNotice
+      ? '<p class="guide-route-status">' + globalGuideEscape(gp._routeNotice) + '</p>'
+      : "";
+    if (!route || route.status === "idle") return notice;
+    var name = globalGuideEscape(route.targetName || "el destino");
+    var html = "";
+    if (route.status === "locating") {
+      html = '<p class="guide-route-status is-loading">' + globalGuideEscape(route.info || "Obteniendo su ubicación…") + '</p>';
+    } else if (route.status === "calculating") {
+      html = '<p class="guide-route-status is-loading">Calculando ruta a ' + name + '…</p>';
+    } else if (route.status === "ready") {
+      html = '<p class="guide-route-status is-ready">Ruta ' + globalGuideEscape(route.info || "") + ' hasta ' + name + '.</p>';
+    } else {
+      html = '<p class="guide-route-status is-error">' + globalGuideEscape(route.info || "Intente calcular la ruta de nuevo.") + '</p>';
+    }
+    html += '<button type="button" class="guide-route-cancel">Cancelar ruta</button>';
+    return notice + html;
+  }
+
+  function renderGlobalPoiRouteStatus() {
+    if (!globalPoiExplorer) return;
+    var html = globalGuideRouteStatusHtml();
+    globalPoiExplorer.querySelectorAll(".mgs-guide-route-box").forEach(function (box) {
+      box.innerHTML = html;
     });
+  }
+
+  function renderGlobalPoiDetail(poi) {
+    if (!globalPoiExplorer) return;
+    var detail = globalPoiExplorer.querySelector("#mgsGuideDetail");
+    if (!detail) return;
+    if (!poi) {
+      detail.innerHTML = '<p class="guide-detail-empty">' + (lang() === "en" ? "Select a place from the list to see its details." : "Seleccione un lugar de la lista para ver su información.") + '</p>';
+      return;
+    }
+    var gp = rd("guiapa");
+    var english = lang() === "en";
+    var zone = poi.hotelId || poi.hotel
+      ? '<p class="guide-detail-row"><strong>' + (english ? "Hotel" : "Hotel") + '</strong> ' + globalGuideEscape(poi.hotelId || poi.hotel) + '</p>'
+      : poi.zone
+        ? '<p class="guide-detail-row"><strong>' + (english ? "Area" : "Zona") + '</strong> ' + globalGuideEscape(poi.zone) + '</p>'
+        : "";
+    var description = globalGuideText(poi, "poiDescriptionText");
+    var common = gp && typeof gp.poiCommonInfoHtml === "function" ? gp.poiCommonInfoHtml(poi) : "";
+    var pending = poi.verified !== true || poi.lat == null || poi.lng == null
+      ? '<p class="guide-pending-note">' + (english ? "Information for this place is being updated; the route will be available soon." : "La información de este lugar se está actualizando; en breve estará disponible en el mapa y con ruta.") + '</p>'
+      : "";
+    var detailActions = isGlobalPoiMobileGuide() ? "" : globalGuideActionsHtml(poi, false);
+    detail.innerHTML =
+      '<button type="button" class="guide-detail-close" aria-label="Cerrar información del lugar" title="Cerrar">×</button>' +
+      '<div class="guide-detail-feedback">' +
+        '<div class="guide-route-box mgs-guide-route-box" id="mgsGuideRouteBox" role="status" aria-live="polite"></div>' +
+        '<div class="guide-book-box" id="mgsGuideBookBox"></div>' +
+      '</div>' +
+      '<span class="guide-dot guide-dot--lg" style="background:' + globalGuideCategoryColor(poi.category) + '"></span>' +
+      '<h3 class="guide-detail-title">' + globalGuideEscape(globalGuideText(poi, "poiNameText") || poi.name) + '</h3>' +
+      '<p class="guide-detail-cat">' + globalGuideEscape(globalGuideCategoryLabel(poi.category)) + ((poi.hotelId || poi.hotel || poi.zone) ? ' · ' + globalGuideEscape(poi.hotelId || poi.hotel || poi.zone) : '') + '</p>' +
+      (description ? '<p class="guide-detail-desc">' + globalGuideEscape(description) + '</p>' : '') +
+      zone + globalGuideExtraInfoHtml(poi) + common + pending + detailActions;
+    renderGlobalPoiRouteStatus();
+  }
+
+  function renderGlobalPoiActions(poi) {
+    if (!globalPoiExplorer) return;
+    var panel = globalPoiExplorer.querySelector("#mgsGuideMobileActions");
+    var title = globalPoiExplorer.querySelector("#mgsGuideMobileActionsTitle");
+    var body = globalPoiExplorer.querySelector("#mgsGuideMobileActionsBody");
+    if (!panel || !body) return;
+    if (!isGlobalPoiMobileGuide()) {
+      panel.hidden = true;
+      panel.classList.remove("guide-mobile-actions--dining");
+      body.innerHTML = "";
+      if (title) title.textContent = "";
+      return;
+    }
+    if (!poi) {
+      panel.hidden = true;
+      panel.classList.remove("guide-mobile-actions--dining");
+      body.innerHTML = "";
+      if (title) title.textContent = "";
+      return;
+    }
+    var gp = rd("guiapa");
+    panel.classList.toggle("guide-mobile-actions--dining", !!(gp && typeof gp.isDiningPoi === "function" && gp.isDiningPoi(poi)));
+    var info = gp && typeof gp.mobilePoiInfoHtml === "function" ? gp.mobilePoiInfoHtml(poi) : "";
+    if (title) title.textContent = globalGuideText(poi, "poiNameText") || poi.name || "";
+    body.innerHTML = info +
+      globalGuideActionsHtml(poi, true) +
+      '<div class="guide-route-box mgs-guide-route-box" id="mgsGuideMobileRouteBox" role="status" aria-live="polite"></div>' +
+      '<div class="guide-book-box" id="mgsGuideMobileBookBox"></div>';
+    panel.hidden = false;
+    renderGlobalPoiRouteStatus();
+  }
+
+  function revealGlobalPoiSelection() {
+    if (!globalPoiExplorer) return;
+    var target = globalPoiExplorer.querySelector("#mgsGuideMobileActions");
+    if (!target || target.hidden || getComputedStyle(target).display === "none") {
+      target = globalPoiExplorer.querySelector("#mgsGuideDetail");
+    }
+    if (!target) return;
+    window.setTimeout(function () {
+      try { target.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" }); }
+      catch (error) { target.scrollIntoView(); }
+    }, 0);
+  }
+
+  function clearGlobalPoiSelection() {
+    globalPoiSelectedId = null;
+    renderGlobalPoiGuide();
+  }
+
+  function ensureGlobalPoiLayerFor(poi) {
+    if (!poi || !shellMap) return;
+    var hotelId = poiHotelIdForHotel({ name: poi.hotelId || poi.hotel || "" });
+    if (!hotelId) hotelId = globalPoiHotelId;
+    if (!hotelId) return;
+    if (nearbyPoiHotelId !== hotelId) {
+      clearNearbyPoiLayer();
+      showNearbyPoiLayer(hotelId, false);
+    }
+  }
+
+  function bindGlobalPoiMap() {
+    var gp = rd("guiapa");
+    if (!gp || !shellMap) return null;
+    if (gp._map !== shellMap) {
+      if (typeof gp.bindMap === "function") gp.bindMap(shellMap);
+      else gp._map = shellMap;
+    }
+    return gp;
+  }
+
+  function selectGlobalGuidePoi(id) {
+    var gp = bindGlobalPoiMap();
+    var poi = findGlobalPoi(id);
+    if (!gp || !poi) return;
+    globalPoiSelectedId = id;
+    ensureGlobalPoiLayerFor(poi);
+    if (typeof gp.selectPoi === "function") gp.selectPoi(id, { noScroll: true });
+    renderGlobalPoiGuide();
+    revealGlobalPoiSelection();
+  }
+
+  function focusGlobalPoi(id) {
+    var gp = bindGlobalPoiMap();
+    var poi = findGlobalPoi(id);
+    if (!gp || !poi) return;
+    globalPoiSelectedId = id;
+    ensureGlobalPoiLayerFor(poi);
+    if (typeof gp.selectPoi === "function") gp.selectPoi(id, { noScroll: true });
+    renderGlobalPoiGuide();
+    setGlobalGuideOpen(false);
+  }
+
+  function routeToGlobalPoi(id) {
+    var poi = findGlobalPoi(id);
+    if (!poi) return;
+    globalPoiSelectedId = id;
+    selectGlobalPoi(id);
+    renderGlobalPoiGuide();
+  }
+
+  function globalPoiCartSlug() {
+    var slug = document.body.dataset.hotelSlug || document.body.dataset.mobileNearbyHotelSlug || "";
+    try { return slug || window.sessionStorage.getItem("clubCartHotel") || ""; } catch (error) { return slug || ""; }
+  }
+
+  function openGlobalPoi360(poi) {
+    var pano = rd("pannellum360");
+    if (!poi || !pano || typeof pano.open !== "function") return;
+    var hotelName = poi.hotelId || poi.hotel;
+    if (!hotelName) return;
+    var zone = poi.category === "bar" || poi.category === "discoteca" ? "bares" : "restaurantes";
+    pano.open(hotelName, zone, globalGuideText(poi, "poiNameText") || poi.name, poi.id);
+  }
+
+  function renderGlobalPoiBooking(poi, kind, mobile) {
+    if (!globalPoiExplorer || !poi) return;
+    var box = globalPoiExplorer.querySelector(mobile ? "#mgsGuideMobileBookBox" : "#mgsGuideBookBox");
+    var other = globalPoiExplorer.querySelector(mobile ? "#mgsGuideBookBox" : "#mgsGuideMobileBookBox");
+    if (!box) return;
+    if (other) other.innerHTML = "";
+    var isCart = kind === "cart";
+    var english = lang() === "en";
+    var title = isCart
+      ? (english ? "Golf cart request" : "Solicitud de carrito de golf")
+      : poi.category === "restaurante"
+        ? (english ? "Book a table" : "Reservar mesa")
+        : poi.category === "spa"
+          ? (english ? "Book an appointment" : "Reservar cita")
+          : (english ? "Book a tee time" : "Reservar tee time");
+    var fields = isCart
+      ? '<p class="guide-book-note">' + (english ? "The cart will pick you up at your current location. Enable device location to share the exact point." : "El carrito le recogerá en su ubicación actual. Active la ubicación del dispositivo para compartir el punto exacto.") + '</p>'
+      : '<label class="guide-book-field"><span>' + (english ? "Date" : "Fecha") + '</span><input type="date" name="fecha" required /></label>' +
+        '<label class="guide-book-field"><span>' + (english ? "Time" : "Hora") + '</span><input type="time" name="hora" required /></label>' +
+        '<label class="guide-book-field"><span>' + (english ? "Guests" : "Personas") + '</span><input type="number" name="personas" min="1" max="20" value="2" required /></label>';
+    box.innerHTML = '<form class="guide-book-form mgs-guide-book-form" data-poi-id="' + globalGuideEscape(poi.id) + '" data-kind="' + kind + '">' +
+      '<h4 class="guide-book-title">' + globalGuideEscape(title) + '</h4>' +
+      '<p class="guide-book-place">' + globalGuideEscape(poi.name) + '</p>' +
+      fields +
+      '<label class="guide-book-field"><span>' + (english ? "Name" : "Nombre") + '</span><input type="text" name="nombre" required /></label>' +
+      '<label class="guide-book-field"><span>' + (english ? "Room" : "Habitación") + '</span><input type="text" name="habitacion" placeholder="Ej. 1204" /></label>' +
+      '<label class="guide-book-field"><span>' + (english ? "Notes" : "Notas") + '</span><textarea name="notas" rows="2"></textarea></label>' +
+      '<div class="guide-book-actions">' +
+        '<button type="submit" class="guide-book-submit">' + (english ? "Send request" : "Enviar solicitud") + '</button>' +
+        '<button type="button" class="guide-book-cancel" data-mgs-guide-book-cancel="1">' + (english ? "Cancel" : "Cancelar") + '</button>' +
+      '</div>' +
+      '<p class="guide-book-note">' + (english ? "Your request is recorded in the system. Confirmation takes place at hotel reception." : "Su solicitud se registra en el sistema. La confirmación se realiza en recepción del hotel.") + '</p>' +
+    '</form>';
+  }
+
+  function submitGlobalPoiBooking(form) {
+    if (!globalPoiExplorer) return;
+    var box = form.closest(".guide-book-box");
+    var poi = findGlobalPoi(form.dataset.poiId);
+    if (!box || !poi) return;
+    var english = lang() === "en";
+    if (form.dataset.kind === "cart") {
+      var tracker = rd("carritoGolf");
+      var destination = null;
+      if (Number.isFinite(Number(poi.lat)) && Number.isFinite(Number(poi.lng))) {
+        destination = { id: poi.id, name: globalGuideText(poi, "poiNameText") || poi.name, lat: Number(poi.lat), lng: Number(poi.lng) };
+      } else if (poi.hotelId) {
+        var guide = rd("guiapa");
+        var hotelPoi = guide && typeof guide.poiForHotel === "function" ? guide.poiForHotel(poi.hotelId) : null;
+        if (hotelPoi && Number.isFinite(Number(hotelPoi.lat)) && Number.isFinite(Number(hotelPoi.lng))) {
+          destination = { id: hotelPoi.id, name: globalGuideText(hotelPoi, "poiNameText") || hotelPoi.name, lat: Number(hotelPoi.lat), lng: Number(hotelPoi.lng) };
+        }
+      }
+      var request = tracker && typeof tracker.request === "function"
+        ? tracker.request({
+            guest: form.elements.nombre ? form.elements.nombre.value : "",
+            room: form.elements.habitacion ? form.elements.habitacion.value : "",
+            notes: form.elements.notas ? form.elements.notas.value : "",
+            destination: destination,
+            source: "guide-map"
+          })
+        : null;
+      if (request) {
+        box.innerHTML = '<div class="guide-book-done guide-book-done--cart">' +
+          '<h4 class="guide-book-title">' + (english ? "Transport requested" : "Se solicitó el transporte") + '</h4>' +
+          '<p>' + (english ? "Looking for a cart to pick you up at " : "Buscando un carrito para recogerte en ") + globalGuideEscape(request.pickup && request.pickup.label) +
+          (english ? " and take you to " : " y llevarte a ") + globalGuideEscape((request.destination && request.destination.name) || poi.name) + '.</p>' +
+          '<button type="button" class="guide-cart-track" data-mgs-guide-cart-track="1">' + (english ? "View transport →" : "Ver el transporte →") + '</button>' +
+        '</div>';
+      }
+      return;
+    }
+    box.innerHTML = '<div class="guide-book-done">' +
+      '<h4 class="guide-book-title">' + (english ? "Request received" : "Solicitud recibida") + '</h4>' +
+      '<p>' + (english ? "We will confirm it at hotel reception." : "La confirmación se realiza en recepción del hotel.") + '</p>' +
+    '</div>';
+  }
+
+  function handleGlobalPoiExplorerClick(event) {
+    var target = event.target;
+    var filter = target.closest("[data-mgs-guide-filter]");
+    if (filter) {
+      globalPoiFilter = filter.getAttribute("data-mgs-guide-filter") || "all";
+      renderGlobalPoiGuide();
+      var gp = rd("guiapa");
+      if (gp && typeof gp.filterMapMarkers === "function") gp.filterMapMarkers(globalPoiFilter);
+      return true;
+    }
+    if (target.closest("#mgsGuideMobileActionsClose") || target.closest(".guide-detail-close")) {
+      clearGlobalPoiSelection();
+      return true;
+    }
+    var more = target.closest("[data-mgs-guide-actions-more]");
+    if (more) {
+      var extra = globalPoiExplorer && globalPoiExplorer.querySelector(".mgs-guide-actions-extra");
+      if (extra) {
+        extra.hidden = !extra.hidden;
+        more.setAttribute("aria-expanded", extra.hidden ? "false" : "true");
+      }
+      return true;
+    }
+    if (target.closest(".guide-route-cancel")) {
+      var guide = rd("guiapa");
+      if (guide && typeof guide.cancelRoute === "function") guide.cancelRoute();
+      renderGlobalPoiRouteStatus();
+      return true;
+    }
+    var bookCancel = target.closest("[data-mgs-guide-book-cancel]");
+    if (bookCancel) {
+      var bookBox = bookCancel.closest(".guide-book-box");
+      if (bookBox) bookBox.innerHTML = "";
+      return true;
+    }
+    if (target.closest("[data-mgs-guide-cart-track]")) {
+      var tracker = rd("carritoGolf");
+      if (tracker && typeof tracker.openPage === "function") {
+        try { sessionStorage.setItem("auto_fullscreen_transporte", "true"); } catch (error) {}
+        tracker.openPage(globalPoiCartSlug());
+      }
+      return true;
+    }
+    var menu = target.closest(".guide-menu");
+    if (menu) {
+      var guideApi = rd("guiapa");
+      if (guideApi && typeof guideApi.openDiningOverlay === "function") guideApi.openDiningOverlay(menu.dataset.id);
+      return true;
+    }
+    var route = target.closest(".guide-route");
+    if (route) {
+      routeToGlobalPoi(route.dataset.id);
+      return true;
+    }
+    var focus = target.closest(".guide-focus");
+    if (focus) {
+      focusGlobalPoi(focus.dataset.id);
+      return true;
+    }
+    var book = target.closest(".guide-book");
+    if (book) {
+      var bookPoi = findGlobalPoi(book.dataset.id);
+      if (bookPoi) renderGlobalPoiBooking(bookPoi, "booking", Boolean(target.closest("#mgsGuideMobileActions")));
+      return true;
+    }
+    var cart = target.closest(".guide-cart");
+    if (cart) {
+      var cartPoi = findGlobalPoi(cart.dataset.id);
+      if (cartPoi) renderGlobalPoiBooking(cartPoi, "cart", Boolean(target.closest("#mgsGuideMobileActions")));
+      return true;
+    }
+    var pano = target.closest(".guide-pano360");
+    if (pano) {
+      openGlobalPoi360(findGlobalPoi(pano.dataset.id));
+      return true;
+    }
+    var item = target.closest("[data-mgs-guide-item]");
+    if (item) {
+      selectGlobalGuidePoi(item.dataset.id);
+      return true;
+    }
+    return false;
+  }
+
+  function renderGlobalPoiGuide() {
+    if (!globalPoiExplorer) return;
+    globalPoiExplorer.hidden = false;
+    ensureGlobalPoiExplorer();
+    var search = globalPoiExplorer.querySelector("#mgsGuideSearch");
+    if (search) {
+      search.placeholder = lang() === "en" ? "Search restaurant, bar, pool…" : "Buscar restaurante, bar, piscina…";
+      if (document.activeElement !== search) search.value = globalPoiQuery || "";
+    }
+    renderGlobalPoiFilters();
+    renderGlobalPoiList();
+    renderGlobalPoiDetail(findGlobalPoi(globalPoiSelectedId));
+    renderGlobalPoiActions(findGlobalPoi(globalPoiSelectedId));
+    var legend = globalPoiExplorer.querySelector("#mgsGuideLegend");
+    var gp = rd("guiapa");
+    if (legend && gp && typeof gp.renderCategoryLegend === "function") gp.renderCategoryLegend(legend);
+    renderGlobalPoiRouteStatus();
+  }
+
+  function globalInteractiveHotelCandidates() {
+    var candidates = [];
+    if (globalSelected) candidates.push(globalSelected);
+    var nearbyHotel = nearbyItem && nearbyItem.context && nearbyItem.context.hotel;
+    if (nearbyHotel) candidates.push(nearbyHotel);
+    var hotels = globalHotels || collectGlobalHotels();
+    var query = (globalQuery || "").trim().toLowerCase();
+    hotels.forEach(function (hotel) {
+      if (globalCountry !== "all" && hotel.countrySlug !== globalCountry) return;
+      if (query && (hotel.name + " " + hotel.countryName + " " + hotel.destinationName).toLowerCase().indexOf(query) === -1) return;
+      candidates.push(hotel);
+    });
+    globalPoiHotels().forEach(function (name) { candidates.push({ name: name }); });
+    return candidates;
+  }
+
+  function enterGlobalPoiModeFromGuide() {
+    var candidates = globalInteractiveHotelCandidates();
+    for (var index = 0; index < candidates.length; index += 1) {
+      var candidate = candidates[index];
+      var hotelId = poiHotelIdForHotel(candidate);
+      if (!hotelId || !poisForHotel(hotelId).length) continue;
+      if (candidate.name && openHotelPoisByName(candidate.name)) {
+        syncNearbyPoiButton(nearbyItem);
+        return true;
+      }
+      if (showNearbyPoiLayer(hotelId, true)) {
+        var hotel = candidates.filter(function (item) { return item && item.slug && poiHotelIdForHotel(item) === hotelId; })[0];
+        if (hotel) document.body.dataset.mobileNearbyHotelSlug = hotel.slug;
+        setGlobalPoiMode(hotelId);
+        syncNearbyPoiButton(nearbyItem);
+        return true;
+      }
+    }
+    return false;
   }
 
   function setGlobalPoiMode(hotelId) {
@@ -1233,10 +1852,14 @@
     globalPoiMode = true;
     globalPoiHotelId = hotelId;
     globalPoiQuery = "";
+    globalPoiFilter = "all";
+    globalPoiSelectedId = null;
     globalCountry = "all";
     globalSelected = null;
     if (globalInput) globalInput.value = "";
     if (globalSheet) globalSheet.classList.add("is-poi-mode");
+    if (globalPoiRouteTimer) window.clearInterval(globalPoiRouteTimer);
+    globalPoiRouteTimer = window.setInterval(renderGlobalPoiRouteStatus, 800);
     setGlobalGuideClosed(false);
     setGlobalGuideOpen(false);
     updateGlobalGuideLabels();
@@ -1249,9 +1872,14 @@
     globalPoiMode = false;
     globalPoiHotelId = null;
     globalPoiQuery = "";
+    globalPoiFilter = "all";
+    globalPoiSelectedId = null;
+    if (globalPoiRouteTimer) window.clearInterval(globalPoiRouteTimer);
+    globalPoiRouteTimer = null;
     if (globalInput) globalInput.value = "";
     if (globalSheet) globalSheet.classList.remove("is-poi-mode");
     clearNearbyPoiLayer();
+    syncNearbyPoiButton(nearbyItem);
     setGlobalGuideClosed(false);
     setGlobalGuideOpen(false);
     updateGlobalGuideLabels();
@@ -1456,12 +2084,16 @@
     globalPoiMode = false;
     globalPoiHotelId = null;
     globalPoiQuery = "";
+    globalPoiFilter = "all";
+    globalPoiSelectedId = null;
+    if (globalPoiRouteTimer) window.clearInterval(globalPoiRouteTimer);
+    globalPoiRouteTimer = null;
     if (globalInput) globalInput.value = "";
     if (globalSheet) globalSheet.classList.remove("mgs-expanded", "mgs-minimized", "is-poi-mode");
     delete document.body.dataset.guideExpanded;
     if (globalHandle) globalHandle.setAttribute("aria-expanded", "false");
     if (globalReopen) globalReopen.classList.remove("is-visible");
-    updateGlobalGuideToggleLabel();
+    updateGlobalGuideLabels();
     updateGlobalCard();
   }
 

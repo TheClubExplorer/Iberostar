@@ -4447,8 +4447,8 @@ body.pano-360-open { overflow: hidden; }
   .guide-mobile-actions-buttons .guide-pano360 {
     letter-spacing:0;
     text-transform:none;
-    white-space:normal;
-    max-width:100px;
+    white-space:nowrap;
+    max-width:none;
     line-height:1.1;
   }
   .guide-mobile-actions .guide-route-box { margin-top:6px; }

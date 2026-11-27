@@ -1282,6 +1282,318 @@
     text-align: center;
   }
 
+  .mgs-sheet.is-poi-mode .mgs-input,
+  .mgs-sheet.is-poi-mode .mgs-filter-label,
+  .mgs-sheet.is-poi-mode .mgs-countries,
+  .mgs-sheet.is-poi-mode .mgs-list {
+    display: none !important;
+  }
+
+  .mgs-gp-mount[hidden] {
+    display: none !important;
+  }
+
+  .mgs-sheet.is-poi-mode .mgs-gp-mount {
+    display: block;
+    min-height: 0;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-top: 8px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mgs-gp-mount .guide-explorer {
+    gap: 8px;
+  }
+
+  .mgs-gp-mount .guide-search {
+    min-width: 0;
+    padding: 7px 12px;
+    border-radius: 12px;
+  }
+
+  .mgs-gp-mount .guide-search span {
+    font-size: 13px;
+  }
+
+  .mgs-gp-mount .guide-search input {
+    font-size: 12px;
+  }
+
+  .mgs-gp-mount .guide-filters {
+    flex-wrap: nowrap;
+    gap: 5px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 1px;
+  }
+
+  .mgs-gp-mount .guide-filters::-webkit-scrollbar {
+    display: none;
+  }
+
+  .mgs-gp-mount .guide-chip {
+    flex: 0 0 auto;
+    padding: 4px 9px;
+    gap: 4px;
+    font-size: 10px;
+  }
+
+  .mgs-gp-mount .guide-chip-dot {
+    width: 8px;
+    height: 8px;
+  }
+
+  .mgs-gp-mount .guide-layout,
+  .mgs-gp-mount .guide-side {
+    gap: 8px;
+  }
+
+  .mgs-gp-mount .guide-list {
+    max-height: none;
+    padding: 3px;
+  }
+
+  .mgs-gp-mount .guide-list-head {
+    padding: 6px 10px;
+    font-size: 9px;
+  }
+
+  .mgs-gp-mount .guide-item {
+    gap: 7px;
+    padding: 6px 8px;
+    border-radius: 8px;
+  }
+
+  .mgs-gp-mount .guide-item-name {
+    font-size: 12px;
+  }
+
+  .mgs-gp-mount .guide-item-meta {
+    font-size: 10px;
+  }
+
+  .mgs-gp-mount .guide-dot {
+    width: 9px;
+    height: 9px;
+  }
+
+  .mgs-gp-mount .guide-dot--lg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .mgs-gp-mount .guide-detail {
+    padding: 10px;
+    border-radius: 10px;
+  }
+
+  .mgs-gp-mount .guide-detail-feedback {
+    position: static;
+  }
+
+  .mgs-gp-mount .guide-detail-title {
+    margin: 5px 0 2px;
+    padding-right: 26px;
+    font-size: 15px;
+  }
+
+  .mgs-gp-mount .guide-detail-cat {
+    margin: 0 0 6px;
+    font-size: 9px;
+  }
+
+  .mgs-gp-mount .guide-detail-desc {
+    margin: 0 0 7px;
+    font-size: 11.5px;
+    line-height: 1.45;
+  }
+
+  .mgs-gp-mount .guide-detail-row {
+    margin: 2px 0;
+    font-size: 11px;
+    line-height: 1.4;
+  }
+
+  .mgs-gp-mount .guide-detail-actions {
+    display: none !important;
+  }
+
+  .mgs-gp-mount .guide-focus,
+  .mgs-gp-mount .guide-route,
+  .mgs-gp-mount .guide-menu,
+  .mgs-gp-mount .guide-pano360,
+  .mgs-gp-mount .guide-book,
+  .mgs-gp-mount .guide-cart,
+  .mgs-gp-mount .guide-book-submit,
+  .mgs-gp-mount .guide-book-cancel,
+  .mgs-gp-mount .guide-route-cancel {
+    padding: 6px 9px;
+    border-radius: 7px;
+    font-size: 11px;
+  }
+
+  .mgs-gp-mount .guide-detail-actions .guide-focus,
+  .mgs-gp-mount .guide-detail-actions .guide-route,
+  .mgs-gp-mount .guide-detail-actions .guide-menu,
+  .mgs-gp-mount .guide-detail-actions .guide-pano360,
+  .mgs-gp-mount .guide-detail-actions .guide-book,
+  .mgs-gp-mount .guide-detail-actions .guide-cart {
+    flex: 1 1 calc(50% - 3px);
+    min-width: 0;
+  }
+
+  .mgs-gp-mount .guide-extra-info {
+    margin-top: 7px;
+    padding: 7px 9px;
+    border-radius: 7px;
+  }
+
+  .mgs-gp-mount .guide-legend {
+    padding: 10px;
+    border-radius: 10px;
+  }
+
+  .mgs-gp-mount .guide-legend-title {
+    font-size: 12px;
+  }
+
+  .mgs-gp-mount .guide-legend-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 5px 8px;
+  }
+
+  .mgs-gp-mount .guide-legend-list li {
+    font-size: 10px;
+  }
+
+  .mgs-gp-mount .guide-legend-list em {
+    font-size: 10px;
+  }
+
+  .mgs-gp-mount .guide-legend-note {
+    margin-top: 8px;
+    font-size: 10px;
+    line-height: 1.4;
+  }
+
+  .mgs-gp-mount .guide-mobile-actions {
+    position: static;
+    display: block;
+    width: auto;
+    max-width: none;
+    max-height: none;
+    margin-bottom: 8px;
+    padding: 8px;
+    border-color: rgba(185, 163, 133, .45);
+    border-radius: 10px;
+    background: #fffdf8;
+    box-shadow: none;
+    animation: none;
+  }
+
+  .mgs-gp-mount .guide-mobile-actions[hidden] {
+    display: none !important;
+  }
+
+  .mgs-gp-mount .guide-mobile-actions-title {
+    font-size: 12px;
+  }
+
+  .mgs-gp-mount .guide-mobile-actions-buttons {
+    display: grid;
+    gap: 6px;
+  }
+
+  .mgs-gp-mount .guide-mobile-actions-primary,
+  .mgs-gp-mount .guide-mobile-actions-secondary {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 5px;
+  }
+
+  .mgs-gp-mount .guide-mobile-actions-primary > button,
+  .mgs-gp-mount .guide-mobile-actions-secondary > button {
+    box-sizing: border-box;
+    display: flex;
+    width: 100%;
+    height: 38px;
+    min-width: 0;
+    min-height: 38px;
+    max-height: 38px;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 6px;
+    border: 1px solid var(--gold-deep) !important;
+    border-radius: 8px !important;
+    background: rgba(255, 253, 248, .96) !important;
+    color: var(--brown) !important;
+    font: 700 10.5px/1.05 var(--font-ui) !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+    cursor: pointer;
+  }
+
+  .mgs-gp-mount .guide-mobile-actions-primary > button {
+    border-color: var(--gold-deep) !important;
+    background: var(--gold-deep) !important;
+    color: #fffdf8 !important;
+  }
+
+  .mgs-gp-mount .guide-mobile-actions-secondary > button {
+    border-color: rgba(185, 163, 133, .8) !important;
+    background: rgba(255, 253, 248, .96) !important;
+    color: var(--brown) !important;
+  }
+
+  .mgs-gp-mount .guide-mobile-actions-buttons button:hover {
+    filter: brightness(1.06);
+  }
+
+  .mgs-gp-mount .guide-mobile-actions-buttons button:focus-visible {
+    outline: 2px solid var(--gold-deep);
+    outline-offset: 1px;
+  }
+
+  .mgs-gp-mount .guide-mobile-actions-primary > button:only-child,
+  .mgs-gp-mount .guide-mobile-actions-secondary > button:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+
+  .mgs-gp-mount .guide-mobile-actions-note {
+    grid-column: 1 / -1;
+    font-size: 10.5px;
+  }
+
+  .mgs-gp-mount .guide-route-box {
+    margin-top: 7px;
+  }
+
+  .mgs-gp-mount .guide-route-status {
+    margin-bottom: 7px;
+    padding: 7px 9px;
+    font-size: 11px;
+  }
+
+  .mgs-gp-mount .guide-book-form {
+    gap: 7px;
+    padding: 10px;
+  }
+
+  .mgs-gp-mount .guide-book-field input,
+  .mgs-gp-mount .guide-book-field textarea {
+    padding: 6px 8px;
+    font-size: 12px;
+  }
+
   body.mobile-app-active[data-mobile-home="1"][data-mobile-sheet="map"] .mgs-card:not([hidden]) {
     position: fixed;
     right: 12px;
@@ -1919,6 +2231,12 @@
   }
 
   .mobile-auth-panel [hidden] {
+    display: none !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .mgs-gp-mount .guide-mobile-actions {
     display: none !important;
   }
 }

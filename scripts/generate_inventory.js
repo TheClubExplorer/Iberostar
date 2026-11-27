@@ -6,7 +6,8 @@ const code = fs.readFileSync(path.join(__dirname, '..', 'js', 'guia-playa-parais
 const sandbox = {
   window: {
     L: { divIcon: () => ({}), marker: () => ({ bindPopup: () => ({}), addTo: () => ({}) }) },
-    RevistaDigital: {}
+    RevistaDigital: {},
+    addEventListener: () => {}
   },
   console: console
 };

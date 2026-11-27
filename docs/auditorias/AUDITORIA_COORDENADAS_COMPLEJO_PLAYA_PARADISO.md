@@ -5,6 +5,8 @@
 **Entorno de referencia:** Rama `main` (Repositorio: `TheClubExplorer/Iberostar`)  
 **Archivo fuente del catálogo:** `js/guia-playa-paraiso.js` e `inventory_final.json`  
 
+> **Actualización 2026-11-27:** el catálogo activo tiene 118 registros, 117 verificados con coordenadas y 1 pendiente. Las altas, bajas y reemplazos de esta fecha se detallan en `AUDITORIA_COORDENADAS_COMPLEJO_PLAYA_PARADISO_2.md`.
+
 ---
 
 ## 1. Resumen Ejecutivo
@@ -46,6 +48,7 @@ Los siguientes registros y coordenadas están declarados por el catálogo y las 
    * **Concierge Paraíso Lindo (`concierge-lindo`):** `20.759481, -86.963898` — **Verificado**.
    * **Concierge JOIA (`concierge-joia`):** `20.756125, -86.962989` — **Verificado**.
    * **Concierge Grand Paraíso (`concierge-grand-paraiso`):** `20.753724, -86.960434` — **Verificado**.
+   * **Concierge Paraíso del Mar (`concierge-paraiso-del-mar`):** `20.761993, -86.963393` — **Verificado**.
 
 5. **Consolidaciones y Limpieza de Duplicados:**
    * **El Mirador:** Consolidado como `lobby-bar-el-mirador` (`20.756335, -86.962712`, JOIA), unificando la heladería y lobby bar en una sola entidad.

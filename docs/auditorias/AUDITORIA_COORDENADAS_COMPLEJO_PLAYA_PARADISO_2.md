@@ -1,8 +1,14 @@
 # HISTORIAL DE ACTUALIZACIONES Y AMPLIACIÓN — COMPLEJO PLAYA PARAÍSO
-Última actualización: 2026-10-23
+Última actualización: 2026-11-27
 Documento maestro de referencia: `AUDITORIA_COORDENADAS_COMPLEJO_PLAYA_PARADISO.md`
 
-> **Nota de estado:** `inventory_final.json` se regeneró desde el catálogo activo: 111 registros, 110 marcados como verificados (99.1%) y 1 pendiente de coordenadas (0.9%). `verified` refleja los datos del código, no una nueva validación independiente en terreno.
+> **Nota de estado:** `inventory_final.json` se regeneró desde el catálogo activo: 118 registros, 117 marcados como verificados (99.2%) y 1 pendiente de coordenadas (0.8%). `verified` refleja los datos del código, no una nueva validación independiente en terreno.
+
+## Actualización de POIs (2026-11-27)
+- **Altas confirmadas:** `club-house` ("Club House", categoría `servicio`, `20.757567,-86.960509`, `10:00 - 17:00 h`); `bar-flamencos` ("Bar Flamencos", `bar`, `20.757119,-86.959934`, `10:00 - 18:00 h`, barra completa Todo Incluido, sin reserva); `yoga-deck` ("Yoga Deck", `wellness`, `20.755900,-86.961506`); `concierge-paraiso-del-mar` ("Concierge Paraíso del Mar", `concierge`, `20.761993,-86.963393`, `Iberostar Selection Paraíso del Mar`).
+- **Reemplazo:** `shooting-area` ("Campo de tiro") pasa de `20.761933,-86.962473` a `20.760227,-86.964011`; se conserva un solo POI con el id original.
+- **Bajas:** `baby-kitchen` (Baby Kitchen) y `meeting-room` (Sala de juntas) se eliminan del catálogo activo y de `js/datos-complejo.js` donde aplica.
+- **Sin cambios:** `lobby-bar-kukulkan` conserva `20.7575018,-86.9645296`; no se agrega `starcafe-maya` ni se duplica el punto. `golf-club-house` conserva `20.7586073,-86.9658668` y su horario de golf; el nuevo `club-house` es un POI de servicio distinto.
 
 ## Resumen de Consolidación Activa (2026-10-23)
 - **Catálogo activo:** 111 instalaciones.

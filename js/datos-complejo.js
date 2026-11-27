@@ -528,31 +528,6 @@
       carta: "Ceviches frescos · Tiraditos · Cócteles de mariscos · Cervezas artesanales · Vinos blancos · Margaritas de frutas tropicales",
       menu: "Fresh ceviches · Tiraditos · Seafood cocktails · Craft beers · White wines · Tropical fruit margaritas"
     },
-    "baby-kitchen": {
-      id: "baby-kitchen",
-      name: "Baby Kitchen",
-      tipo: "cafeteria",
-      cocina: "Área de Preparación Infantil 24h",
-      cuisine: "24h Infant Food Prep Area",
-      carta: "Purés y papillas orgánicas para bebés · Leche entera, deslactosada y vegetal · Fruta fresca seleccionada para triturar · Esterilizadores y microondas de libre uso",
-      menu: "Organic purees and porridges for babies · Whole, lactose-free and plant-based milk · Fresh selected fruit for crushing · Sterilizers and microwaves for free use",
-      horario: "Abierto 24 horas",
-      hours: "Open 24 hours",
-      horarioTexto: "Abierto 24 horas",
-      vestimenta: "Informal",
-      dressCode: "Informal",
-      reservas: false,
-      reservation: false,
-      especialidades: "Purés y papillas orgánicas para bebés, Leche entera, deslactosada y vegetal, Fruta fresca seleccionada para triturar y Esterilizadores y microondas de libre uso",
-      specialties: "Organic purees and porridges for babies, whole/lactose-free/plant-based milk, fresh selected fruit for crushing and sterilizers/microwaves for free use",
-      signatureDishes: [
-        "Purés y papillas orgánicas para bebés",
-        "Leche entera, deslactosada y vegetal",
-        "Fruta fresca seleccionada para triturar",
-        "Esterilizadores y microondas de libre uso"
-      ],
-      hotel: "Paraíso Maya & Paraíso Lindo"
-    },
     "el-rancho-tonis": {
       id: "el-rancho-tonis",
       name: "El Rancho",
@@ -751,6 +726,17 @@
       horarioTexto: "08:00 - 01:00 h",
       hotel: "Iberostar Paraíso del Mar"
     },
+    "bar-flamencos": {
+      tipo: "bar",
+      cocina: "Bar de coctelería y bebidas (Todo Incluido)",
+      cuisine: "Cocktail and beverage bar (All Inclusive)",
+      carta: "Barra completa con coctelería clásica y tropical (margaritas, piñas coladas, mojitos, daiquiris), cervezas nacionales, vinos de la casa, licores nacionales e internacionales, refrescos, jugos y bebidas sin alcohol (mocktails).",
+      menu: "Full bar offering classic and tropical cocktails (margaritas, piña coladas, mojitos, daiquiris), domestic beers, house wines, local and international spirits, sodas, juices, and non-alcoholic drinks (mocktails).",
+      hours: "10:00 - 18:00",
+      horarioTexto: "10:00 - 18:00 h",
+      reservas: false,
+      reservation: false
+    },
     "bar-el-kiosko": {
       tipo: "bar",
       cocina: "Bar de playa",
@@ -847,6 +833,14 @@
       treatmentsEn: "30 min foot massage · 60 min relaxing massage · 90 min Thai massage",
       packages: "Paquete Palapa para dos · Paquete de Spa de 60 minutos",
       packagesEn: "Palapa Package for two · 60 min Spa Package"
+    },
+    "club-house": {
+      id: "club-house",
+      name: "Club House",
+      tipo: "servicio",
+      horario: "10:00 - 17:00 h",
+      hours: "10:00 - 17:00",
+      horarioTexto: "10:00 - 17:00 h"
     },
     "golf-club-house": {
       hours: "07:00 - 18:00",
